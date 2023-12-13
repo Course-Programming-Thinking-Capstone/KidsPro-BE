@@ -13,7 +13,7 @@ public class Parent
 
     [DataType(DataType.DateTime)]
     [Precision(2)]
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDate { get; } = DateTime.UtcNow;
 
     public Guid? CreatedById { get; set; }
 
