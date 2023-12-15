@@ -14,7 +14,6 @@
     <Folder Include="Dtos\Request\" />
     <Folder Include="Interfaces\Services\" />
     <Folder Include="Mappers\" />
-    <Folder Include="Services\" />
     <Folder Include="Validations\" />
   </ItemGroup>
 

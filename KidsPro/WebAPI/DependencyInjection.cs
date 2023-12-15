@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
+using Application;
+using Application.Interfaces.Repositories;
 using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +14,7 @@ namespace WebAPI;
 
 public static class DependencyInjection
 {
-    public static readonly string Local_Policy = "local_policy";
+    public static readonly string LocalPolicy = "local_policy";
 
     public static IServiceCollection AddDependency(this IServiceCollection services, string databaseConnection = "")
     {
@@ -19,6 +22,11 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options => options.UseSqlServer(databaseConnection));
 
         //Repository
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        //unit of work
+        services.AddScoped<IUnitOfWork, IUnitOfWork>();
 
         //Service
 
@@ -30,7 +38,7 @@ public static class DependencyInjection
     {
         services.AddCors(options =>
             {
-                options.AddPolicy(name: Local_Policy,
+                options.AddPolicy(name: LocalPolicy,
                     //Define cors URL 
                     policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
                 );

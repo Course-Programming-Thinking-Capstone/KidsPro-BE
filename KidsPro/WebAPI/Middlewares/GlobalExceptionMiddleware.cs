@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Application.ErrorHandlers;
 
-namespace SurveyNow.Middlewares;
+namespace WebAPI.Middlewares;
 
 public class GlobalExceptionMiddleware
 {

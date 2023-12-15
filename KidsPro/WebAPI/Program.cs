@@ -1,6 +1,6 @@
 using Application.Configurations;
-using SurveyNow.Middlewares;
 using WebAPI;
+using WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(WebAPI.DependencyInjection.Local_Policy);
+app.UseCors(WebAPI.DependencyInjection.LocalPolicy);
 
 app.UseHttpsRedirection();
 

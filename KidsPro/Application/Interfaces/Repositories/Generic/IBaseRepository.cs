@@ -1,14 +1,14 @@
 ﻿using System.Linq.Expressions;
 using Application.Dtos.Response;
 
-namespace Application.Interfaces.Repositories;
+namespace Application.Interfaces.Repositories.Generic;
 
 public interface IBaseRepository<T> where T : class
 {
     Task<IEnumerable<T>> GetAsync(
         Expression<Func<T, bool>>? filter,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy,
-        string includeProperties = "",
+        string? includeProperties = null,
         bool disableTracking = false
     );
 
@@ -17,17 +17,12 @@ public interface IBaseRepository<T> where T : class
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy,
         int? page,
         int? size,
-        string includeProperties = "",
+        string? includeProperties = null,
         bool disableTracking = false
     );
 
-    Task<T?> GetByIdAsync(object id, string? includeProperties = null, bool disableTracking = false);
-
-    Task<List<T>> GetAllAsync();
-
-    Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null,
-        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, T? entityFilter = null,
-        string? includeProperties = null);
+    // Task<T?> GetByIdAsync(object id, string? includeProperties = null, bool disableTracking = false);
+    Task<T?> GetByIdAsync(object id);
 
     Task AddAsync(T entity);
 
@@ -36,6 +31,4 @@ public interface IBaseRepository<T> where T : class
     Task DeleteByIdAsync(object id);
 
     Task<bool> ExistById(object id);
-
-    Task<T> AddAsyncReturnEntity(T entity);
 }
