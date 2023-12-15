@@ -21,4 +21,6 @@ public class Teacher
     public Guid UserId { get; set; }
     
     public virtual User User { get; set; } = null!;
+
+    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 }

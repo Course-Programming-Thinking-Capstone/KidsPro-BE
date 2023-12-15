@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[Index(nameof(UserId), nameof(Type), IsUnique = true)]
 public class Payment
 {
     [Key]

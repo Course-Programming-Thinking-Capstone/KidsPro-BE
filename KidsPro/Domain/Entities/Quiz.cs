@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[Index(nameof(Order), nameof(LessonId), IsUnique = true)]
 public class Quiz
 {
     [Key]
@@ -46,4 +47,6 @@ public class Quiz
     public int LessonId { get; set; }
 
     public Lesson Lesson { get; set; } = null!;
+
+    public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }

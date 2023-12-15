@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(CourseId), nameof(Order), IsUnique = true)]
+[Index(nameof(Order), IsUnique = true)]
 public class CurriculumCourse
 {
-    [Key] public int CurriculumId { get; set; }
+    [Key, Column(Order = 0)] public int CurriculumId { get; set; }
 
-    [Key] public int CourseId { get; set; }
+    [Key, Column(Order = 1)] public int CourseId { get; set; }
 
     [Column(TypeName = "tinyint")]
     [Range(0, 255)]

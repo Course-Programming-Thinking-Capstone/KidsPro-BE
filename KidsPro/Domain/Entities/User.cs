@@ -46,4 +46,9 @@ public class User
     //relationship for course table
 
     public virtual ICollection<Course> CreatedCourses { get; set; } = new List<Course>();
+
+    //Cart
+    public int? CartId { get; set; }
+    
+    public virtual Cart? Cart { get; set; }
 }

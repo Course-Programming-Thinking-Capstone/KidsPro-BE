@@ -14,6 +14,8 @@ public class Lesson
 
     public int Order { get; set; }
 
+    [StringLength(250)] public string Name { get; set; } = null!;
+
     [Column(TypeName = "tinyint")] public LessonType Type { get; set; } = LessonType.Video;
 
     public bool IsFree { get; set; }
