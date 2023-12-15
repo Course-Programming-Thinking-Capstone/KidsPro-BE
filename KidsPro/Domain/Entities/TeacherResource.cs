@@ -12,6 +12,7 @@ public class TeacherResource
 
     [Column(TypeName = "tinyint")] public TeacherResourceType Type { get; set; }
 
+    [Required]
     public Guid TeacherId { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;

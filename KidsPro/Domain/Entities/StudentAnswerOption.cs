@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Entities;
 
 [Index(nameof(StudentAnswerId), nameof(OptionId), IsUnique = true)]
-public class StudentAnswerOptions
+public class StudentAnswerOption
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

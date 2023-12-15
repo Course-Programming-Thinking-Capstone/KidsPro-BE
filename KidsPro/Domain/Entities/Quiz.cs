@@ -19,9 +19,13 @@ public class Quiz
     [Range(0, 10000)]
     public int TotalQuestion { get; set; }
 
-    [Range(0, int.MaxValue)] public decimal TotalScore { get; set; }
+    [Range(0, int.MaxValue)]
+    [Precision(5, 2)]
+    public decimal TotalScore { get; set; }
 
-    [Range(0, int.MaxValue)] public decimal MinScore { get; set; }
+    [Range(0, int.MaxValue)]
+    [Precision(5, 2)]
+    public decimal MinScore { get; set; }
 
     [StringLength(250)] public string? Title { get; set; }
 
@@ -40,9 +44,9 @@ public class Quiz
     [Precision(2)]
     public DateTime CreatedDate { get; } = DateTime.UtcNow;
 
-    public Guid CreatedById { get; set; }
+    [Required] public Guid CreatedById { get; set; }
 
-    public virtual User CreatedBy { get; set; } = null!;
+    [ForeignKey(nameof(CreatedById))] public virtual User CreatedBy { get; set; } = null!;
 
     public int LessonId { get; set; }
 

@@ -34,9 +34,9 @@ public class Course
     [Precision(2)]
     public DateTime? EndSaleDate { get; set; }
 
-    [Range(0, float.MaxValue)] public decimal Price { get; set; }
+    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal Price { get; set; }
 
-    [Range(0, float.MaxValue)] public decimal DiscountPrice { get; set; }
+    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal DiscountPrice { get; set; }
 
     [Range(0, 2000)]
     [Column(TypeName = "smallint")]
@@ -56,13 +56,14 @@ public class Course
     [Precision(2)]
     public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
 
-    public Guid CreatedById { get; set; }
+    [Required] public Guid CreatedById { get; set; }
 
     public virtual User CreatedBy { get; set; } = null!;
 
-    public Guid? ModifiedById { get; set; }
+    [Required]
+    public Guid ModifiedById { get; set; }
 
-    public virtual User ModifiedBy { get; set; } = null!;
+    [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
 
     public virtual ICollection<CourseSection> CourseSections { get; set; } = new List<CourseSection>();
 }

@@ -21,7 +21,7 @@ public class Question
 
     [StringLength(250)] public string? ResourceUrl { get; set; }
 
-    [Range(0, int.MaxValue)] public decimal Score { get; set; }
+    [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
 
     [Column(TypeName = "tinyint")] public QuizQuestionType Type { get; set; } = QuizQuestionType.Radio;
 

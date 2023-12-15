@@ -11,7 +11,7 @@ public class StudentQuiz
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    [Range(0, int.MaxValue)] public decimal Score { get; set; }
+    [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
 
     [Column(TypeName = "tinyint")]
     [Range(0, 255)]

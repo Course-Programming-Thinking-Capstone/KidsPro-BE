@@ -1,19 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[PrimaryKey(nameof(OrderId), nameof(CourseId))]
 public class OrderDetail
 {
-    [Key, Column(Order = 0)] public int OrderId { get; set; }
+    public int OrderId { get; set; }
 
-    [Key, Column(Order = 1)] public int CourseId { get; set; }
+    public int CourseId { get; set; }
 
     [Range(0, 255)]
     [Column(TypeName = "tinyint")]
     public int Quantity { get; set; }
 
-    [Range(0, float.MaxValue)] public decimal Price { get; set; }
+    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal Price { get; set; }
 
     public virtual Course Course { get; set; } = null!;
 

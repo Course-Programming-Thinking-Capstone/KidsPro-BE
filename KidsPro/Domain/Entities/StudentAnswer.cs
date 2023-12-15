@@ -11,7 +11,7 @@ public class StudentAnswer
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    [Range(0, int.MaxValue)] public decimal Score { get; set; }
+    [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
 
     public int StudentQuizId { get; set; }
 
@@ -21,5 +21,5 @@ public class StudentAnswer
 
     public virtual Question Question { get; set; } = null!;
 
-    public virtual ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
+    public virtual ICollection<StudentAnswerOption> StudentAnswerOptions { get; set; } = new List<StudentAnswerOption>();
 }

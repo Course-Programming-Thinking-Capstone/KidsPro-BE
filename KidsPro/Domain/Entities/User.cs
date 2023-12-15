@@ -29,7 +29,7 @@ public class User
 
     public Guid? TeacherId { get; set; }
 
-    public virtual Teacher? Teacher { get; set; }
+    [ForeignKey(nameof(TeacherId))] public virtual Teacher? Teacher { get; set; }
 
     public virtual ICollection<Parent> Parents { get; set; } = new List<Parent>();
 
@@ -44,11 +44,7 @@ public class User
     public virtual ICollection<Curriculum> CreatedCurriculums { get; set; } = new List<Curriculum>();
 
     //relationship for course table
-
     public virtual ICollection<Course> CreatedCourses { get; set; } = new List<Course>();
-
-    //Cart
-    public int? CartId { get; set; }
     
     public virtual Cart? Cart { get; set; }
 }

@@ -18,6 +18,7 @@ public class Teacher
     public virtual ICollection<TeacherContactInformation> TeacherContactInformations { get; set; } =
         new List<TeacherContactInformation>();
 
+    [Required]
     public Guid UserId { get; set; }
     
     public virtual User User { get; set; } = null!;

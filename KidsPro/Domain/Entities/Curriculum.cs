@@ -36,9 +36,9 @@ public class Curriculum
     [Precision(2)]
     public DateTime? EndSaleDate { get; set; }
 
-    [Range(0, float.MaxValue)] public decimal Price { get; set; }
+    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal Price { get; set; }
 
-    [Range(0, float.MaxValue)] public decimal DiscountPrice { get; set; }
+    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal DiscountPrice { get; set; }
 
     [Range(0, 255)]
     [Column(TypeName = "tinyint")]
@@ -61,17 +61,16 @@ public class Curriculum
     [Precision(2)]
     public DateTime? ApprovedDate { get; set; }
 
-    public Guid UserId { get; set; }
+    [Required] public Guid CreatedById { get; set; }
+    [ForeignKey(nameof(CreatedById))] public virtual User CreatedBy { get; set; } = null!;
 
-    public virtual User CreatedBy { get; set; } = null!;
+    [Required] public Guid ModifiedById { get; set; }
 
-    public Guid ModifiedById { get; set; }
-
-    public virtual User ModifiedBy { get; set; } = null!;
+    [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
 
     public Guid? ApprovedById { get; set; }
 
-    public virtual User? ApprovedBy { get; set; }
+    [ForeignKey(nameof(ApprovedById))] public virtual User? ApprovedBy { get; set; }
 
     public virtual ICollection<CurriculumResource> CurriculumResources { get; set; } = new List<CurriculumResource>();
 

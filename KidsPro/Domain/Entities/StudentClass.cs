@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[PrimaryKey(nameof(StudentId), nameof(ClassCode))]
 public class StudentClass
 {
-    [Key, Column(Order = 0)] public string StudentId { get; set; } = null!;
+    public string StudentId { get; set; } = null!;
 
-    [Key, Column(Order = 1)] public string ClassCode { get; set; } = null!;
+    public string ClassCode { get; set; } = null!;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]

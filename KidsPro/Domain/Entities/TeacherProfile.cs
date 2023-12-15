@@ -18,6 +18,7 @@ public class TeacherProfile
     [Precision(2)]
     public DateTime ToDate { get; set; }
 
+    [Required]
     public Guid TeacherId { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;

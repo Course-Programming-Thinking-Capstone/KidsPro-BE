@@ -12,6 +12,7 @@ public class Payment
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
+    [Required]
     public Guid UserId { get; set; }
 
     [Column(TypeName = "tinyint")] public PaymentType Type { get; set; }

@@ -13,7 +13,7 @@ public class Order
 
     [StringLength(250)] public string PaymentMethod { get; set; } = null!;
 
-    [Range(0, float.MaxValue)] public decimal TotalPrice { get; set; }
+    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal TotalPrice { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]

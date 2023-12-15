@@ -14,6 +14,7 @@ public class TeacherContactInformation
 
     [Column(TypeName = "tinyint")] public ContactInformationType Type { get; set; }
 
+    [Required]
     public Guid TeacherId { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;

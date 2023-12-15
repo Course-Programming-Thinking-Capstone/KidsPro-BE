@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[PrimaryKey(nameof(CartId), nameof(CourseId))]
 public class CartDetail
 {
-    [Key, Column(Order = 0)] public int CartId { get; set; }
+    public int CartId { get; set; }
 
-    [Key, Column(Order = 1)] public int CourseId { get; set; }
+    public int CourseId { get; set; }
 
     [Range(0, 255)]
     [Column(TypeName = "tinyint")]
@@ -24,7 +25,6 @@ public class CartDetail
     public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
 
     public virtual Cart Cart { get; set; } = null!;
-
 
     public virtual Course Course { get; set; } = null!;
 }

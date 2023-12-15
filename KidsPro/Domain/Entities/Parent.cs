@@ -1,23 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[PrimaryKey(nameof(UserId), nameof(StudentId))]
 public class Parent
 {
-    [Key] public Guid UserId { get; set; }
+    public Guid UserId { get; set; }
 
-    [Key] [MaxLength(20)] public string StudentId { get; set; } = null!;
+    public string StudentId { get; set; } = null!;
 
     public bool IsDefault { get; set; } = false;
 
     [DataType(DataType.DateTime)]
     [Precision(2)]
     public DateTime CreatedDate { get; } = DateTime.UtcNow;
-
-    public Guid? CreatedById { get; set; }
-
-    public User? CreatedBy { get; set; }
 
     public virtual User User { get; set; } = null!;
 

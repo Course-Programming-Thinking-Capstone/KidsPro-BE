@@ -15,8 +15,10 @@ public class Cart
     [Column(TypeName = "tinyint")]
     public int TotalCourse { get; set; }
 
+    [Required]
     public Guid UserId { get; set; }
 
+    [ForeignKey(nameof(UserId))]
     public virtual User User { get; set; } = null!;
 
     public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
