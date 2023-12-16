@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Application;
 using Application.Configurations;
 using Application.ErrorHandlers;
 using Application.Services;
@@ -19,12 +20,19 @@ public class AuthenticationService : IAuthenticationService
 
     private readonly ILogger<AuthenticationService> _logger;
 
-    public AuthenticationService(AppConfiguration appConfiguration, IServiceProvider serviceProvider,
-        ILogger<AuthenticationService> logger)
+    private readonly IUnitOfWork _unit;
+    private readonly TokenValidationParameters _tokenValidation;
+    private readonly JwtSecurityTokenHandler _jwtSecurity;
+
+    public AuthenticationService(AppConfiguration appConfiguration, IServiceProvider serviceProvider, ILogger<AuthenticationService> logger, 
+        IUnitOfWork unit, TokenValidationParameters tokenValidation, JwtSecurityTokenHandler jwtSecurity)
     {
         _appConfiguration = appConfiguration;
         _serviceProvider = serviceProvider;
         _logger = logger;
+        _unit = unit;
+        _tokenValidation = tokenValidation;
+        _jwtSecurity = jwtSecurity;
     }
 
     public string CreateAccessToken(User user)
@@ -42,7 +50,7 @@ public class AuthenticationService : IAuthenticationService
                 issuer: _appConfiguration.Issuer,
                 audience: _appConfiguration.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -69,10 +77,21 @@ public class AuthenticationService : IAuthenticationService
                 issuer: _appConfiguration.Issuer,
                 audience: _appConfiguration.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(31),
+                expires: DateTime.UtcNow.AddDays(3),
                 signingCredentials: credentials
             );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var refeshToken= new JwtSecurityTokenHandler().WriteToken(token);
+            // add refeshtoken data to database
+            var refesh = new RefeshToken
+            {
+                Id= Guid.NewGuid(),
+                UserId= user.Id,
+                Token = refeshToken
+            };
+            _unit.RefeshTokenRepository.AddAsync(refesh);
+            _unit.SaveChangeAsync();
+
+            return refeshToken;
         }
         catch (Exception e)
         {
@@ -131,5 +150,22 @@ public class AuthenticationService : IAuthenticationService
         }
 
         throw new NotFoundException();
+    }
+
+    public string RenewToken(string accessToken, User user)
+    {
+        try
+        {
+            //Check 1: Accesstoken valid format
+            var tokenVerification = _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedToken);
+
+            //Check 2: Algorithm
+
+        }catch (Exception e)
+        {
+            _logger.LogError("Error at RenewToken: {}", e.Message);
+            throw;
+        }
+        return null;
     }
 }

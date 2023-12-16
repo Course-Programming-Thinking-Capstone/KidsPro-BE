@@ -39,7 +39,7 @@ public class AppDbContext : DbContext
     public virtual DbSet<TeacherResource> TeacherResources { get; set; }
     public virtual DbSet<Transaction> Transactions { get; set; }
     public virtual DbSet<User> Users { get; set; }
-
+    public virtual DbSet<RefeshToken> Tokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>()
@@ -126,5 +126,9 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(sao => sao.StudentAnswerId)
             .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<RefeshToken>(x =>
+        {
+            x.ToTable("RefeshToken");
+        });
     }
 }
