@@ -123,22 +123,22 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         }
     }
 
-    public async Task<T?> GetByIdAsync(object id)
+    public virtual async Task<T?> GetByIdAsync(object id)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task AddAsync(T entity)
+    public virtual async Task AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
     }
 
-    public void Update(T entity)
+    public virtual void Update(T entity)
     {
         _dbSet.Update(entity);
     }
 
-    public async Task DeleteByIdAsync(object id)
+    public virtual async Task DeleteByIdAsync(object id)
     {
         var entity = await GetByIdAsync(id);
         if (entity != null)
@@ -147,7 +147,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         }
     }
 
-    public async Task<bool> ExistById(object id)
+    public virtual async Task<bool> ExistById(object id)
     {
         return await GetByIdAsync(id)
             .ContinueWith(t => t.Result == null);

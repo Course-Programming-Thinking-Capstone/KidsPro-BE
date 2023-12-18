@@ -152,20 +152,50 @@ public class AuthenticationService : IAuthenticationService
         throw new NotFoundException();
     }
 
-    public string RenewToken(string accessToken, User user)
+    public (bool,string) RenewToken(string accessToken, User user)
     {
         try
         {
             //Check 1: Accesstoken valid format
             var tokenVerification = _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedToken);
 
-            //Check 2: Algorithm
+            //Check 2: Algorithm HmacSha512
+            if (validatedToken is JwtSecurityToken jwtSecurity)
+            {
+                var result = jwtSecurity.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
+                    StringComparison.InvariantCultureIgnoreCase);
+                if (!result)
+                    return (false, "Algorithm Wrong!");
+            }
 
-        }catch (Exception e)
+            //Check 3: Expire Token. check xem access token có hết hạn chưa
+            var utcExpireDate = long.Parse(tokenVerification.Claims.FirstOrDefault(
+                    x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+            var expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
+            if (expireDate > DateTime.UtcNow)
+                return (false, "Access token has not yet expired");
+
+            //Check 4: Check xem access có refesh token trong db không via user id
+            var refeshToken= _unit.RefeshTokenRepository.GetByIdAsync(tokenVerification.Claims.FirstOrDefault(
+                    x=> x.Type==JwtRegisteredClaimNames.NameId).Value);
+            if (refeshToken == null)
+                return (false, "Don't have refeshtoken");
+
+            //Check 5: 
+
+        }
+        catch (Exception e)
         {
             _logger.LogError("Error at RenewToken: {}", e.Message);
             throw;
         }
-        return null;
+        return (false,"Renew Token Failed!");
     }
+    private DateTime ConverUrnixTimeToDateTime(long utcExpireDate)
+    {
+        var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
+        return dateTimeInterval;
+    }
+
 }
