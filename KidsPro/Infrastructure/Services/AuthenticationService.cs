@@ -152,44 +152,67 @@ public class AuthenticationService : IAuthenticationService
         throw new NotFoundException();
     }
 
-    public (bool,string) RenewToken(string accessToken, User user)
+    public (bool,string,string?) ReissueToken(string accessToken,string refeshToken, User user)
     {
         try
         {
-            //Check 1: Accesstoken valid format
-            var tokenVerification = _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedToken);
+            //Check 1: Accesstoken & Refeshtoken valid format
+            var accessTokenVerification = _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedAccessToken)
+                ?? throw new NotImplementedException();
+            var refeshTokenVerification = _jwtSecurity.ValidateToken(refeshToken, _tokenValidation, out var validatedRefeshToken)
+                ?? throw new NotImplementedException();
 
             //Check 2: Algorithm HmacSha512
-            if (validatedToken is JwtSecurityToken jwtSecurity)
+            if (validatedAccessToken is JwtSecurityToken jwtSecurity)
             {
                 var result = jwtSecurity.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
                     StringComparison.InvariantCultureIgnoreCase);
                 if (!result)
-                    return (false, "Algorithm Wrong!");
+                    return (false, "Algorithm Wrong!",null);
             }
 
             //Check 3: Expire Token. check xem access token có hết hạn chưa
-            var utcExpireDate = long.Parse(tokenVerification.Claims.FirstOrDefault(
-                    x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+            var _ExpToken = accessTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
+            var utcExpireDate = long.Parse(_ExpToken);
             var expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
             if (expireDate > DateTime.UtcNow)
-                return (false, "Access token has not yet expired");
+                return (false, "Access token has not yet expired", null);
 
-            //Check 4: Check xem access có refesh token trong db không via user id
-            var refeshToken= _unit.RefeshTokenRepository.GetByIdAsync(tokenVerification.Claims.FirstOrDefault(
-                    x=> x.Type==JwtRegisteredClaimNames.NameId).Value);
-            if (refeshToken == null)
-                return (false, "Don't have refeshtoken");
+            //Check 4: Check xem userid của access token có exist trong table refeshtoken 
+            var _UserIdToken = accessTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value;
+            var _checkExistance= _unit.RefeshTokenRepository.CheckRefeshTokenExist(_UserIdToken,1);
+            if (!_checkExistance)
+                return (false, "UserId does not match", null);
 
-            //Check 5: 
+            //Check 5: Check xem refeshtoken gửi từ client có exist trong table refeshtoken 
+            _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(refeshToken, 2);
+            if (!_checkExistance)
+                return (false, "RefeshToken does not match", null);
 
+            //Check 6: Check expired refeshtoken 
+            _ExpToken = refeshTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
+            utcExpireDate = long.Parse(_ExpToken);
+            expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
+            string _accessToken = accessToken;
+            if (expireDate > DateTime.UtcNow)
+            {
+                // Nếu refesh token còn expire thì cấp lại access token
+                _accessToken = CreateAccessToken(user);
+                return (true, _accessToken, refeshToken);
+            }
+            else
+            {
+                // Nếu refesh token hết expire thì cấp lại access token và refesh token
+                _accessToken = CreateAccessToken(user);
+                var _refeshToken=CreateRefreshToken(user);
+                return (true, _accessToken, _refeshToken);
+            }
         }
         catch (Exception e)
         {
-            _logger.LogError("Error at RenewToken: {}", e.Message);
+            _logger.LogError("Error at ReissueToken: {}", e.Message);
             throw;
         }
-        return (false,"Renew Token Failed!");
     }
     private DateTime ConverUrnixTimeToDateTime(long utcExpireDate)
     {

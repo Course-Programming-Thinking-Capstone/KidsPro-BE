@@ -17,9 +17,23 @@ namespace Infrastructure.Repositories
         public RefeshTokenRepository(AppDbContext context, ILogger<BaseRepository<RefeshToken>> logger) : base(context, logger)
         {
         }
-        public override async Task<RefeshToken?> GetByIdAsync(object id)
+
+        public bool CheckRefeshTokenExist(string? parameter, int type)
         {
-            return await _context.Tokens.Where(x=> x.UserId.Equals(id)).FirstOrDefaultAsync();
+            if(parameter == null) return false;
+            RefeshToken? result= null;
+            switch (type)
+            {
+                case 1://Check by UserId
+                    result = _context.Tokens.Where(x => x.UserId.Equals(parameter)).FirstOrDefault();
+                    break;
+                case 2://Check by Token
+                    result = _context.Tokens.Where(x => x.Token.Equals(parameter)).FirstOrDefault();
+                    break;
+            }
+            if(result !=null)
+                return true;
+            return false;
         }
     }
 }

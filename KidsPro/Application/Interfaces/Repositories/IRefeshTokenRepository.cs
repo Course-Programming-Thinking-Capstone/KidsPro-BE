@@ -10,5 +10,6 @@ namespace Application.Interfaces.Repositories
 {
     public interface IRefeshTokenRepository:IBaseRepository<RefeshToken>
     {
+        public bool CheckRefeshTokenExist(string? parameter,int type);
     }
 }

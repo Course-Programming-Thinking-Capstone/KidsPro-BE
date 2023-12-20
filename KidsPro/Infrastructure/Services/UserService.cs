@@ -27,7 +27,7 @@ namespace Infrastructure.Services
             throw new NotImplementedException();
         }
 
-        public async Task<(string, string?)> LoginAsync(string phonenumber, string password)
+        public async Task<(bool,string, string?)> LoginAsync(string phonenumber, string password)
         {
             var hashedPass= HashingPass(password);
             var _user = await _unit.UserRepository.GetUserByAttribute(phonenumber, hashedPass, 1);
@@ -35,10 +35,17 @@ namespace Infrastructure.Services
             {
                 var accessToken = _authentication.CreateAccessToken(_user);
                 var refeshToken = _authentication.CreateRefreshToken(_user);
-                return (accessToken, refeshToken);
+                return (true,accessToken, refeshToken);
             }
-            return ("Login Failed", null);
+            return (false,"Login Failed", null);
         }
+
+        public (bool,string, string?) ReissueToken(string accessToken, string refeshToken,User user)
+        {
+            var result= _authentication.ReissueToken(accessToken, refeshToken,user);
+            return result;
+        }
+
         string HashingPass(string password)
         {
             var hasher= new PasswordHasher<object>();

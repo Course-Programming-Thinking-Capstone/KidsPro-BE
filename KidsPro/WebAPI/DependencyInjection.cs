@@ -3,12 +3,16 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Application;
 using Application.Interfaces.Repositories;
+using Application.Services;
+using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace WebAPI;
 
@@ -26,9 +30,11 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
 
         //unit of work
-        services.AddScoped<IUnitOfWork, IUnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         //Service
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         return services;
     }
