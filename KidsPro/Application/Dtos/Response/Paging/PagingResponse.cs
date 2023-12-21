@@ -1,4 +1,4 @@
-﻿namespace Application.Dtos.Response;
+﻿namespace Application.Dtos.Response.Paging;
 
 public class PagingResponse<T>
 {

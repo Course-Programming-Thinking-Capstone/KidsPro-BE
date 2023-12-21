@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Dtos.Response;
+using Application.Dtos.Response.Paging;
 
 namespace Application.Interfaces.Repositories.Generic;
 
@@ -28,15 +29,17 @@ public interface IBaseRepository<T> where T : class
 
     Task AddAsync(T entity);
 
+    Task AddRangeAsync(IEnumerable<T> entities);
+
     void Update(T entity);
 
-    void UpdateRange(List<T> entities);
+    void UpdateRange(IEnumerable<T> entities);
 
     Task DeleteByIdAsync(object id);
 
     void Delete(T entity);
 
-    void DeleteRange(List<T> entities);
+    void DeleteRange(IEnumerable<T> entities);
 
     Task<bool> ExistById(object id);
 }

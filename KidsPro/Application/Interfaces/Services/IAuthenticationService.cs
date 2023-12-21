@@ -1,7 +1,6 @@
-﻿using Application.Configurations;
-using Domain.Entities;
+﻿using Domain.Entities;
 
-namespace Application.Services;
+namespace Application.Interfaces.Services;
 
 public interface IAuthenticationService
 {

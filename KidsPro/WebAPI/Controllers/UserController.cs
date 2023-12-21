@@ -1,4 +1,4 @@
-﻿using Application.Services;
+﻿using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;

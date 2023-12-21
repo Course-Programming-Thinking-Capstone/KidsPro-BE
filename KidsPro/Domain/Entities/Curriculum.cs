@@ -42,7 +42,7 @@ public class Curriculum
 
     [Range(0, 255)]
     [Column(TypeName = "tinyint")]
-    public int? TotalCourse { get; set; }
+    public int TotalCourse { get; set; } = 0;
 
     public bool IsDelete { get; set; }
 

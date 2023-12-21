@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Dtos.Response;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.Repositories.Generic;
 using Infrastructure.Data;
@@ -138,12 +139,17 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         await _dbSet.AddAsync(entity);
     }
 
+    public async Task AddRangeAsync(IEnumerable<T> entities)
+    {
+        await _dbSet.AddRangeAsync(entities);
+    }
+
     public virtual void Update(T entity)
     {
         _dbSet.Update(entity);
     }
 
-    public void UpdateRange(List<T> entities)
+    public void UpdateRange(IEnumerable<T> entities)
     {
         _dbSet.UpdateRange(entities);
     }
@@ -162,7 +168,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         _dbSet.Remove(entity);
     }
 
-    public void DeleteRange(List<T> entities)
+    public void DeleteRange(IEnumerable<T> entities)
     {
         _dbSet.RemoveRange(entities);
     }
