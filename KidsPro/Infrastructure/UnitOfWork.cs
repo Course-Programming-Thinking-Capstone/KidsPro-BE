@@ -17,16 +17,15 @@ public class UnitOfWork : IUnitOfWork
 
     public IRefeshTokenRepository RefeshTokenRepository { get; }
 
-    public UnitOfWork(AppDbContext context, IDbContextTransaction? transaction, ILogger<UnitOfWork> logger, 
-        IRoleRepository roleRepository, IUserRepository userRepository, IRefeshTokenRepository refeshTokenRepository, bool disposed)
+    public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger,
+        IRoleRepository roleRepository, IUserRepository userRepository, IRefeshTokenRepository refeshTokenRepository
+    )
     {
         _context = context;
-        _transaction = transaction;
         _logger = logger;
         RoleRepository = roleRepository;
         UserRepository = userRepository;
         RefeshTokenRepository = refeshTokenRepository;
-        _disposed = disposed;
     }
 
     public async Task<int> SaveChangeAsync()

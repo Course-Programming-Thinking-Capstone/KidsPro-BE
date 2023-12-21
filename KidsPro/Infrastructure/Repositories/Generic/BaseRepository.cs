@@ -60,6 +60,11 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         }
     }
 
+    public IQueryable<T> GetAll()
+    {
+        return _dbSet;
+    }
+
     public async Task<PagingResponse<T>> GetPaginateAsync(Expression<Func<T, bool>>? filter,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy, int? page, int? size, string? includeProperties = null,
         bool disableTracking = false)
@@ -138,6 +143,11 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         _dbSet.Update(entity);
     }
 
+    public void UpdateRange(List<T> entities)
+    {
+        _dbSet.UpdateRange(entities);
+    }
+
     public virtual async Task DeleteByIdAsync(object id)
     {
         var entity = await GetByIdAsync(id);
@@ -145,6 +155,16 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         {
             _dbSet.Remove(entity);
         }
+    }
+
+    public void Delete(T entity)
+    {
+        _dbSet.Remove(entity);
+    }
+
+    public void DeleteRange(List<T> entities)
+    {
+        _dbSet.RemoveRange(entities);
     }
 
     public virtual async Task<bool> ExistById(object id)

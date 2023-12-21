@@ -12,6 +12,8 @@ public interface IBaseRepository<T> where T : class
         bool disableTracking = false
     );
 
+    IQueryable<T> GetAll();
+
     Task<PagingResponse<T>> GetPaginateAsync(
         Expression<Func<T, bool>>? filter,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy,
@@ -28,7 +30,13 @@ public interface IBaseRepository<T> where T : class
 
     void Update(T entity);
 
+    void UpdateRange(List<T> entities);
+
     Task DeleteByIdAsync(object id);
+
+    void Delete(T entity);
+
+    void DeleteRange(List<T> entities);
 
     Task<bool> ExistById(object id);
 }

@@ -16,16 +16,13 @@ public static class DateUtil
             return null;
         }
 
-        DateTime date;
         if (DateTime.TryParseExact(dateString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
-                out date))
+                out var date))
         {
             return date;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     public static DateTime? ConvertStringToDateTimeV2(string? dateString)
@@ -35,15 +32,12 @@ public static class DateUtil
             return null;
         }
 
-        DateTime date;
         if (DateTime.TryParseExact(dateString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None,
-                out date))
+                out var date))
         {
             return date;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 }
