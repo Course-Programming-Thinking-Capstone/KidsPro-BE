@@ -23,7 +23,6 @@ public class AppDbContext : DbContext
     public virtual DbSet<Option> Options { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderDetail> OrderDetails { get; set; }
-    public virtual DbSet<Parent> Parents { get; set; }
     public virtual DbSet<Payment> Payments { get; set; }
     public virtual DbSet<Question> Questions { get; set; }
     public virtual DbSet<Quiz> Quizzes { get; set; }
@@ -39,7 +38,8 @@ public class AppDbContext : DbContext
     public virtual DbSet<TeacherResource> TeacherResources { get; set; }
     public virtual DbSet<Transaction> Transactions { get; set; }
     public virtual DbSet<User> Users { get; set; }
-    public virtual DbSet<RefeshToken> Tokens { get; set; }
+    public virtual DbSet<RefreshToken> Tokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>()
@@ -96,7 +96,7 @@ public class AppDbContext : DbContext
 
         // modelBuilder.Entity<CurriculumCourse>()
         //     .HasKey(cc => new { cc.CurriculumId, cc.CourseId });
-        
+
         modelBuilder.Entity<CurriculumCourse>()
             .HasOne<Curriculum>(cc => cc.Curriculum)
             .WithMany()
@@ -126,9 +126,25 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(sao => sao.StudentAnswerId)
             .OnDelete(DeleteBehavior.Restrict);
-        modelBuilder.Entity<RefeshToken>(x =>
-        {
-            x.ToTable("RefeshToken");
-        });
+
+        modelBuilder.Entity<StudentClass>()
+            .HasOne(sc => sc.Class)
+            .WithMany()
+            .HasForeignKey(sc => sc.ClassId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<StudentClass>()
+            .HasOne(sc => sc.Student)
+            .WithMany()
+            .HasForeignKey(sc => sc.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<StudentQuiz>()
+            .HasOne(sq => sq.Student)
+            .WithMany()
+            .HasForeignKey(sq => sq.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RefreshToken>(x => { x.ToTable("RefreshToken"); });
     }
 }

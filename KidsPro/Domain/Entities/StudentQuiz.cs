@@ -4,14 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(StudentCode), nameof(QuizId), IsUnique = true)]
+[Index(nameof(StudentId), nameof(QuizId), IsUnique = true)]
 public class StudentQuiz
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
+    [Range(0, int.MaxValue)]
+    [Precision(5, 2)]
+    public decimal Score { get; set; }
 
     [Column(TypeName = "tinyint")]
     [Range(0, 255)]
@@ -24,9 +26,8 @@ public class StudentQuiz
     [Precision(2)]
     public DateTime Date { get; set; } = DateTime.UtcNow;
 
-    [StringLength(20)] public string StudentCode { get; set; } = null!;
-
-    [ForeignKey(nameof(StudentCode))] public virtual Student Student { get; set; } = null!;
+    public int StudentId { get; set; }
+    public virtual Student Student { get; set; } = null!;
 
     public int QuizId { get; set; }
 

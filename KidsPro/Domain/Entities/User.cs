@@ -1,21 +1,20 @@
 ﻿using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class User
+public class User : BaseEntity
 {
-    [Key] public Guid Id { get; set; }
-
     [MaxLength(100)] public string FullName { get; set; } = string.Empty;
     [MaxLength(11)] public string PhoneNumber { get; set; } = string.Empty;
     [MaxLength(150)] public string PasswordHash { get; set; } = string.Empty;
     [MaxLength(250)] public string? PictureUrl { get; set; }
     [Column(TypeName = "tinyint")] public Gender? Gender { get; set; }
-    [Column(TypeName = "tinyint")] public UserStatus Status { get; set; } = UserStatus.User;
+    [Column(TypeName = "tinyint")] public UserStatus Status { get; set; } = UserStatus.Active;
     public bool IsDelete { get; set; } = false;
 
     [DataType(DataType.DateTime)]
@@ -27,11 +26,11 @@ public class User
 
     public virtual Role Role { get; set; } = null!;
 
-    public Guid? TeacherId { get; set; }
+    public int? TeacherId { get; set; }
 
     [ForeignKey(nameof(TeacherId))] public virtual Teacher? Teacher { get; set; }
 
-    public virtual ICollection<Parent> Parents { get; set; } = new List<Parent>();
+    public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
@@ -45,6 +44,6 @@ public class User
 
     //relationship for course table
     public virtual ICollection<Course> CreatedCourses { get; set; } = new List<Course>();
-    
+
     public virtual Cart? Cart { get; set; }
 }

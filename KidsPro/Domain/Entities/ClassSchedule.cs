@@ -1,16 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class ClassSchedule
+public class ClassSchedule : BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
-
     [StringLength(250)] public string? RoomUrl { get; set; }
 
     [DataType(DataType.DateTime)]
@@ -27,7 +24,7 @@ public class ClassSchedule
 
     [StringLength(250)] public string? RecordUrl { get; set; }
 
-    public string ClassCode { get; set; } = null!;
+    public int ClassId { get; set; }
 
-    [ForeignKey(nameof(ClassCode))] public Class Class { get; set; } = null!;
+    public Class Class { get; set; } = null!;
 }

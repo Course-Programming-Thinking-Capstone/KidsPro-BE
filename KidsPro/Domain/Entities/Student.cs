@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Contracts;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,9 +9,10 @@ namespace Domain.Entities;
 
 [Index(nameof(Username), IsUnique = true)]
 [Index(nameof(Gmail), IsUnique = true)]
-public class Student
+[Index(nameof(Code), IsUnique = true)]
+public class Student : BaseEntity
 {
-    [Key] [MaxLength(20)] public string Code { get; set; } = string.Empty;
+    [MaxLength(20)] public string Code { get; set; } = string.Empty;
 
     [MaxLength(100)] public string Username { get; set; } = string.Empty;
 
@@ -32,5 +34,7 @@ public class Student
 
     public bool IsDelete { get; set; }
 
-    public virtual ICollection<Parent> Parents { get; set; } = new List<Parent>();
+    public int UserId { get; set; }
+
+    public virtual User User { get; set; } = null!;
 }

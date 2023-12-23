@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 [Index(nameof(StudentQuizId), nameof(QuestionId), IsUnique = true)]
-public class StudentAnswer
+public class StudentAnswer:BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
 
     [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
 

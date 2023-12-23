@@ -1,12 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+using Domain.Entities.Generic;
 using Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class Class
+[Index(nameof(Code), IsUnique = true)]
+public class Class : BaseEntity
 {
-    [Key] public string Code { get; set; } = null!;
+    public string Code { get; set; } = null!;
 
     [StringLength(250)] public string Name { get; set; } = null!;
 
@@ -24,7 +28,7 @@ public class Class
     [Column(TypeName = "smallint")]
     public int TotalStudent { get; set; }
 
-    [Required] public Guid TeacherId { get; set; }
+    [Required] public int TeacherId { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;
 
@@ -32,7 +36,7 @@ public class Class
 
     public virtual Course Course { get; set; } = null!;
 
-    public ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
+    public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
 
-    public ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
+    public virtual ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
 }

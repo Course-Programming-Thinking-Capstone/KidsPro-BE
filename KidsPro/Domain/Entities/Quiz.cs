@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 [Index(nameof(Order), nameof(LessonId), IsUnique = true)]
-public class Quiz
+public class Quiz: BaseEntity
 {
-    [Key]
-    [DatabaseGenerated((DatabaseGeneratedOption.Identity))]
-    public int Id { get; set; }
 
     [Column(TypeName = "tinyint")]
     [Range(0, 255)]
@@ -44,7 +42,7 @@ public class Quiz
     [Precision(2)]
     public DateTime CreatedDate { get; } = DateTime.UtcNow;
 
-    [Required] public Guid CreatedById { get; set; }
+    [Required] public int CreatedById { get; set; }
 
     [ForeignKey(nameof(CreatedById))] public virtual User CreatedBy { get; set; } = null!;
 

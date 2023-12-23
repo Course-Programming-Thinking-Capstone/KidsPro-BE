@@ -1,17 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class Transaction
+public class Transaction : BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
-
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
 
     [StringLength(750)] public string? Note { get; set; }
 
@@ -39,7 +36,7 @@ public class Transaction
     [Precision(2)]
     public DateTime? ProcessedDate { get; set; }
 
-    public Guid? StaffId { get; set; }
+    public int? StaffId { get; set; }
 
     public User? Staff { get; set; }
 
