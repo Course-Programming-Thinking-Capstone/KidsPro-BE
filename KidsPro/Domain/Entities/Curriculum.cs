@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class Curriculum
+public class Curriculum: BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
 
     [StringLength(250)] public string Name { get; set; } = null!;
 
@@ -61,14 +59,14 @@ public class Curriculum
     [Precision(2)]
     public DateTime? ApprovedDate { get; set; }
 
-    [Required] public Guid CreatedById { get; set; }
+    [Required] public int CreatedById { get; set; }
     [ForeignKey(nameof(CreatedById))] public virtual User CreatedBy { get; set; } = null!;
 
-    [Required] public Guid ModifiedById { get; set; }
+    [Required] public int ModifiedById { get; set; }
 
     [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
 
-    public Guid? ApprovedById { get; set; }
+    public int? ApprovedById { get; set; }
 
     [ForeignKey(nameof(ApprovedById))] public virtual User? ApprovedBy { get; set; }
 

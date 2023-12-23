@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 
 namespace Domain.Entities;
 
-public class Teacher
+public class Teacher : BaseEntity
 {
-    [Key] public Guid Id { get; set; }
-
-   [MaxLength(150)] public string? Field { get; set; }
+    [MaxLength(150)] public string? Field { get; set; }
 
     [MaxLength(3000)] public string? Description { get; set; }
 
@@ -18,9 +17,8 @@ public class Teacher
     public virtual ICollection<TeacherContactInformation> TeacherContactInformations { get; set; } =
         new List<TeacherContactInformation>();
 
-    [Required]
-    public Guid UserId { get; set; }
-    
+    [Required] public int UserId { get; set; }
+
     public virtual User User { get; set; } = null!;
 
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();

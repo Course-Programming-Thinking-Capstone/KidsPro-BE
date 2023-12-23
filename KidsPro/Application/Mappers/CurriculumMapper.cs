@@ -17,5 +17,6 @@ public class CurriculumMapper
             EndSaleDate = dto.EndSaleDate,
             Price = dto.Price
         };
-    }
+    }  
+    
 }

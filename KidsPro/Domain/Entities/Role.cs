@@ -1,16 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 [Index(nameof(Name), IsUnique = true)]
-public class Role
+public class Role:BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column(TypeName = "tinyint")]
-    public int Id { get; set; }
-
     [MaxLength(30)] public string Name { get; set; } = string.Empty;
 }

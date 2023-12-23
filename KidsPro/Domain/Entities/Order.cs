@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class Order
+public class Order:BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
 
     [StringLength(250)] public string PaymentMethod { get; set; } = null!;
 
@@ -26,7 +24,7 @@ public class Order
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    [Required] public Guid UserId { get; set; }
+    [Required] public int UserId { get; set; }
 
     public virtual User User { get; set; } = null!;
 

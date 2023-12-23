@@ -1,19 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 [Index(nameof(UserId), nameof(Type), IsUnique = true)]
-public class Payment
+public class Payment : BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
-
-    [Required]
-    public Guid UserId { get; set; }
+    [Required] public int UserId { get; set; }
 
     [Column(TypeName = "tinyint")] public PaymentType Type { get; set; }
 

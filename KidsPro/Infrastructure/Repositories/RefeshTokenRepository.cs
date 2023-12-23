@@ -6,16 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories
 {
-    public class RefeshTokenRepository : BaseRepository<RefeshToken>, IRefeshTokenRepository
+    public class RefeshTokenRepository : BaseRepository<RefreshToken>, IRefeshTokenRepository
     {
-        public RefeshTokenRepository(AppDbContext context, ILogger<BaseRepository<RefeshToken>> logger) : base(context, logger)
+        public RefeshTokenRepository(AppDbContext context, ILogger<BaseRepository<RefreshToken>> logger) : base(context, logger)
         {
         }
 
         public bool CheckRefeshTokenExist(string? parameter, int type)
         {
             if(parameter == null) return false;
-            RefeshToken? result= null;
+            RefreshToken? result= null;
             switch (type)
             {
                 case 1://Check by UserId

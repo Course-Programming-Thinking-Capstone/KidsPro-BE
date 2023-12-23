@@ -4,5 +4,5 @@ namespace Application.Interfaces.Services;
 
 public interface ICurriculumService
 {
-    Task Create(CreateCurriculumDto dto);
+    Task CreateAsync(CreateCurriculumDto dto);
 }

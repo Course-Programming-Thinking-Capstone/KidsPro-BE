@@ -24,7 +24,8 @@ public class AuthenticationService : IAuthenticationService
     private readonly TokenValidationParameters _tokenValidation;
     private readonly JwtSecurityTokenHandler _jwtSecurity;
 
-    public AuthenticationService(AppConfiguration appConfiguration, IServiceProvider serviceProvider, ILogger<AuthenticationService> logger, 
+    public AuthenticationService(AppConfiguration appConfiguration, IServiceProvider serviceProvider,
+        ILogger<AuthenticationService> logger,
         IUnitOfWork unit, TokenValidationParameters tokenValidation, JwtSecurityTokenHandler jwtSecurity)
     {
         _appConfiguration = appConfiguration;
@@ -80,12 +81,11 @@ public class AuthenticationService : IAuthenticationService
                 expires: DateTime.UtcNow.AddDays(3),
                 signingCredentials: credentials
             );
-            var refeshToken= new JwtSecurityTokenHandler().WriteToken(token);
+            var refeshToken = new JwtSecurityTokenHandler().WriteToken(token);
             // add refeshtoken data to database
-            var refesh = new RefeshToken
+            var refesh = new RefreshToken
             {
-                Id= Guid.NewGuid(),
-                UserId= user.Id,
+                UserId = user.Id,
                 Token = refeshToken
             };
             _unit.RefeshTokenRepository.AddAsync(refesh);
@@ -100,7 +100,7 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public int GetCurrentUserId()
+    public Guid GetCurrentUserId()
     {
         var httpContextAccessor = _serviceProvider.GetService<IHttpContextAccessor>();
 
@@ -108,7 +108,7 @@ public class AuthenticationService : IAuthenticationService
         {
             if (httpContextAccessor.HttpContext?.User.Identity is ClaimsIdentity claimsIdentity &&
                 claimsIdentity.Claims.Any() &&
-                int.TryParse(claimsIdentity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value,
+                Guid.TryParse(claimsIdentity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value,
                     out var userId))
             {
                 return userId;
@@ -152,14 +152,16 @@ public class AuthenticationService : IAuthenticationService
         throw new NotFoundException();
     }
 
-    public (bool,string,string?) ReissueToken(string accessToken,string refeshToken, User user)
+    public (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user)
     {
         try
         {
             //Check 1: Accesstoken & Refeshtoken valid format
-            var accessTokenVerification = _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedAccessToken)
+            var accessTokenVerification =
+                _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedAccessToken)
                 ?? throw new NotImplementedException();
-            var refeshTokenVerification = _jwtSecurity.ValidateToken(refeshToken, _tokenValidation, out var validatedRefeshToken)
+            var refeshTokenVerification =
+                _jwtSecurity.ValidateToken(refeshToken, _tokenValidation, out var validatedRefeshToken)
                 ?? throw new NotImplementedException();
 
             //Check 2: Algorithm HmacSha512
@@ -168,7 +170,7 @@ public class AuthenticationService : IAuthenticationService
                 var result = jwtSecurity.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
                     StringComparison.InvariantCultureIgnoreCase);
                 if (!result)
-                    return (false, "Algorithm Wrong!",null);
+                    return (false, "Algorithm Wrong!", null);
             }
 
             //Check 3: Expire Token. check xem access token có hết hạn chưa
@@ -179,15 +181,16 @@ public class AuthenticationService : IAuthenticationService
                 return (false, "Access token has not yet expired", null);
 
             //Check 4: Check xem userid của access token có exist trong table refeshtoken 
-            var _UserIdToken = accessTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value;
-            var _checkExistance= _unit.RefeshTokenRepository.CheckRefeshTokenExist(_UserIdToken,1);
+            var _UserIdToken = accessTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId)
+                .Value;
+            var _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(_UserIdToken, 1);
             if (!_checkExistance)
                 return (false, "UserId does not match", null);
 
             //Check 5: Check xem refeshtoken gửi từ client có exist trong table refeshtoken 
             _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(refeshToken, 2);
             if (!_checkExistance)
-                return (false, "RefeshToken does not match", null);
+                return (false, "RefreshToken does not match", null);
 
             //Check 6: Check expired refeshtoken 
             _ExpToken = refeshTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
@@ -204,7 +207,7 @@ public class AuthenticationService : IAuthenticationService
             {
                 // Nếu refesh token hết expire thì cấp lại access token và refesh token
                 _accessToken = CreateAccessToken(user);
-                var _refeshToken=CreateRefreshToken(user);
+                var _refeshToken = CreateRefreshToken(user);
                 return (true, _accessToken, _refeshToken);
             }
         }
@@ -214,11 +217,11 @@ public class AuthenticationService : IAuthenticationService
             throw;
         }
     }
+
     private DateTime ConverUrnixTimeToDateTime(long utcExpireDate)
     {
         var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
         return dateTimeInterval;
     }
-
 }
