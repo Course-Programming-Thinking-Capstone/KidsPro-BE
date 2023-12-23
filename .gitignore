@@ -5,6 +5,7 @@
 
 #Ignore appsetting production file:
 KidsPro/WebAPI/appsettings.Production.json
+KidsPro/WebAPI/appsettings.Development.json
 
 # User-specific files
 *.rsuser
