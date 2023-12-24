@@ -34,8 +34,12 @@ public class AuthenticationController : ControllerBase
     public async Task<IActionResult> Login(string phonenumber, string password)
     {
         var result = await _userService.LoginAsync(phonenumber, password);
-        if (result.Item1)
-            return Ok(result);
-        return Unauthorized(result.Item2);
+        // Create the response with a custom header
+        var response = Ok(result.Item1);
+
+        // Access the HttpContext to modify the headers
+        HttpContext.Response.Headers.Add("AccessToken", result.Item2);
+        HttpContext.Response.Headers.Add("RefreshToken", result.Item3);
+        return response;
     }
 }

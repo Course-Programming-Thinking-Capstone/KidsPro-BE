@@ -27,18 +27,23 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task<(bool, string, string?)> LoginAsync(string phonenumber, string password)
+        public async Task<(LoginUserDto, string, string?)> LoginAsync(string phonenumber, string password)
         {
-            var hashedPass = HashingPass(password);
-            var _user = await _unit.UserRepository.GetUserByAttribute(phonenumber, hashedPass, 1);
-            if (_user != null)
+            var user = await _unit.UserRepository.GetAll()
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u =>
+                    u.PhoneNumber == phonenumber && u.IsDelete == false && u.Status == UserStatus.Active)
+                .ContinueWith(t => t.Result ?? throw new NotFoundException("Account does not exist or being block."));
+
+            if (BCrypt.Net.BCrypt.EnhancedVerify(password, user.PasswordHash))
             {
-                var accessToken = _authentication.CreateAccessToken(_user);
-                var refeshToken = _authentication.CreateRefreshToken(_user);
-                return (true, accessToken, refeshToken);
+                var accessToken = _authentication.CreateAccessToken(user);
+                var refreshToken = _authentication.CreateRefreshToken(user);
+                var result = UserMapper.EntityToLoginUserDto(user);
+                return (result, accessToken, refreshToken);
             }
 
-            return (false, "Login Failed", null);
+            throw new BadRequestException("Incorrect password");
         }
 
         public (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user)
@@ -47,7 +52,7 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<(LoginUserDto, string, string)> RegisterAsync(RegisterDto request)
+        public async Task<(LoginUserDto, string?, string?)> RegisterAsync(RegisterDto request)
         {
             //check duplicate phone number
             var isExist = await _unit.UserRepository.GetAll()
@@ -74,7 +79,7 @@ namespace Application.Services
                 PhoneNumber = request.PhoneNumber,
                 FullName = request.FullName,
                 Gender = request.Gender,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
                 RoleId = userRole.Id,
                 Role = userRole,
                 Status = UserStatus.Active,
