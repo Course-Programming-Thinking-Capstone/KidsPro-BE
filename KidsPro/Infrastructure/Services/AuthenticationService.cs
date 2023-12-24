@@ -71,8 +71,7 @@ public class AuthenticationService : IAuthenticationService
             var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role.Name ?? throw new Exception("Role is empty"))
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
             var token = new JwtSecurityToken(
                 issuer: _appConfiguration.Issuer,

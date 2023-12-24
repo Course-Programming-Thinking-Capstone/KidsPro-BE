@@ -1,10 +1,11 @@
 ﻿using System.Linq.Expressions;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Paging;
+using Domain.Entities.Generic;
 
 namespace Application.Interfaces.Repositories.Generic;
 
-public interface IBaseRepository<T> where T : class
+public interface IBaseRepository<T> where T : BaseEntity
 {
     Task<IEnumerable<T>> GetAsync(
         Expression<Func<T, bool>>? filter,
@@ -25,7 +26,7 @@ public interface IBaseRepository<T> where T : class
     );
 
     // Task<T?> GetByIdAsync(object id, string? includeProperties = null, bool disableTracking = false);
-    Task<T?> GetByIdAsync(object id);
+    Task<T?> GetByIdAsync(int id, bool disableTracking = false);
 
     Task AddAsync(T entity);
 
@@ -35,11 +36,11 @@ public interface IBaseRepository<T> where T : class
 
     void UpdateRange(IEnumerable<T> entities);
 
-    Task DeleteByIdAsync(object id);
+    Task DeleteByIdAsync(int id);
 
     void Delete(T entity);
 
     void DeleteRange(IEnumerable<T> entities);
 
-    Task<bool> ExistById(object id);
+    Task<bool> ExistById(int id);
 }

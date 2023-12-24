@@ -25,8 +25,9 @@ public class CurriculumService : ICurriculumService
     {
         var currentUser = await GetCurrentUser() ??
                           throw new UnauthorizedException("User does not exist or has been blocked.");
-        if (currentUser.Role.Name != Constant.ADMIN_ROLE && currentUser.Role.Name != Constant.TEACHER_ROLE &&
-            currentUser.Role.Name != Constant.STAFF_ROLE)
+        if (currentUser.Role.Name != Constant.ADMIN_ROLE
+            && currentUser.Role.Name != Constant.TEACHER_ROLE
+            && currentUser.Role.Name != Constant.STAFF_ROLE)
         {
             throw new ForbiddenException("Action forbidden.");
         }

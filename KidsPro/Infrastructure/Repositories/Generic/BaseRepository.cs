@@ -3,13 +3,14 @@ using Application.Dtos.Response;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.Repositories.Generic;
+using Domain.Entities.Generic;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories.Generic;
 
-public class BaseRepository<T> : IBaseRepository<T> where T : class
+public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
 {
     protected readonly AppDbContext _context;
     protected readonly DbSet<T> _dbSet;
@@ -129,9 +130,16 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         }
     }
 
-    public virtual async Task<T?> GetByIdAsync(object id)
+    public virtual async Task<T?> GetByIdAsync(int id, bool disableTracking = false)
     {
-        return await _dbSet.FindAsync(id);
+        IQueryable<T> query = _dbSet;
+
+        if (disableTracking)
+        {
+            query.AsNoTracking();
+        }
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public virtual async Task AddAsync(T entity)
@@ -154,7 +162,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         _dbSet.UpdateRange(entities);
     }
 
-    public virtual async Task DeleteByIdAsync(object id)
+    public virtual async Task DeleteByIdAsync(int id)
     {
         var entity = await GetByIdAsync(id);
         if (entity != null)
@@ -173,7 +181,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         _dbSet.RemoveRange(entities);
     }
 
-    public virtual async Task<bool> ExistById(object id)
+    public virtual async Task<bool> ExistById(int id)
     {
         return await GetByIdAsync(id)
             .ContinueWith(t => t.Result == null);

@@ -1,31 +1,23 @@
 ﻿using Application.Interfaces.Services;
 using Domain.Entities;
-using Domain.Enums;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/users")]
+    [Route("api/v1/users")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
 
-        
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(string phonenumber, string password)
-        {
-            var result = await _userService.LoginAsync(phonenumber, password);
-            if (result.Item1)
-                 return Ok(result);
-            return Unauthorized(result.Item2);
-        }
+
+
+
         /// <summary>
         /// Reissue Token Including Access & Refesh Token
         /// </summary>
@@ -36,11 +28,10 @@ namespace WebAPI.Controllers
         [HttpPost("reissue")]
         public IActionResult ReissueToken(string accessToken, string refeshToken, User user)
         {
-            var result =  _userService.ReissueToken(accessToken, refeshToken,user);
+            var result = _userService.ReissueToken(accessToken, refeshToken, user);
             if (result.Item1)
                 return Ok(result);
             return NotFound(result.Item2);
         }
-        
     }
 }
