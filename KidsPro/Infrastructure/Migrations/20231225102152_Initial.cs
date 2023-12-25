@@ -851,7 +851,7 @@ namespace Infrastructure.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "User" },
+                    { 1, "Parent" },
                     { 2, "Teacher" },
                     { 3, "Staff" },
                     { 4, "Admin" }

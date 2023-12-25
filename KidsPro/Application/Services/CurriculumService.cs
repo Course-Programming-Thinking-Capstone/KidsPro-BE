@@ -1,7 +1,7 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Curriculum;
 using Application.ErrorHandlers;
-using Application.Interfaces.Services;
+using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;

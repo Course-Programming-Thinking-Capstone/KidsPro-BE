@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Application.Dtos.Response;
 using Application.Dtos.Response.Paging;
 using Domain.Entities.Generic;
 
-namespace Application.Interfaces.Repositories.Generic;
+namespace Application.Interfaces.IRepositories.Generic;
 
 public interface IBaseRepository<T> where T : BaseEntity
 {

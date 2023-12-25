@@ -1,13 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using Application;
-using Application.Interfaces.Repositories;
-using Application.Interfaces.Repositories.Generic;
+using Application.Interfaces.IRepositories.Generic;
 using Infrastructure;
 using Infrastructure.Data;
-using Infrastructure.Repositories;
 using Infrastructure.Repositories.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

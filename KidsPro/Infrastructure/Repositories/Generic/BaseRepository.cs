@@ -2,7 +2,7 @@
 using Application.Dtos.Response;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
-using Application.Interfaces.Repositories.Generic;
+using Application.Interfaces.IRepositories.Generic;
 using Domain.Entities.Generic;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

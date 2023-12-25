@@ -851,7 +851,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "User"
+                            Name = "Parent"
                         },
                         new
                         {

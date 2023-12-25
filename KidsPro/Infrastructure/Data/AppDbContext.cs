@@ -150,7 +150,7 @@ public class AppDbContext : DbContext
 
         //data seeding
         modelBuilder.Entity<Role>().HasData(
-            new Role() { Id = 1, Name = Constant.USER_ROLE },
+            new Role() { Id = 1, Name = Constant.PARENT_ROLE },
             new Role() { Id = 2, Name = Constant.TEACHER_ROLE },
             new Role() { Id = 3, Name = Constant.STAFF_ROLE },
             new Role() { Id = 4, Name = Constant.ADMIN_ROLE }

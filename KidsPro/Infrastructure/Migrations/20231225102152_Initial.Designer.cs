@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231224103234_Initial")]
+    [Migration("20231225102152_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -854,7 +854,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "User"
+                            Name = "Parent"
                         },
                         new
                         {

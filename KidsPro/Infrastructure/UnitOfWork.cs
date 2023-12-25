@@ -1,5 +1,5 @@
 ﻿using Application;
-using Application.Interfaces.Repositories;
+using Application.Interfaces.IRepositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.Request.Curriculum;
 
-namespace Application.Interfaces.Services;
+namespace Application.Interfaces.IServices;
 
 public interface ICurriculumService
 {

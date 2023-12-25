@@ -1,7 +1,7 @@
-﻿using Application.Interfaces.Repositories.Generic;
+﻿using Application.Interfaces.IRepositories.Generic;
 using Domain.Entities;
 
-namespace Application.Interfaces.Repositories;
+namespace Application.Interfaces.IRepositories;
 
 public interface IUserRepository:IBaseRepository<User>
 {

@@ -2,7 +2,7 @@
 using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.User;
 using Application.ErrorHandlers;
-using Application.Interfaces.Services;
+using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;
@@ -27,20 +27,24 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task<(LoginUserDto, string, string?)> LoginAsync(string phonenumber, string password)
+        public async Task<LoginUserDto> LoginAsync(string phonenumber, string password)
         {
-            var user = await _unit.UserRepository.GetAll()
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u =>
-                    u.PhoneNumber == phonenumber && u.IsDelete == false && u.Status == UserStatus.Active)
-                .ContinueWith(t => t.Result ?? throw new NotFoundException("Account does not exist or being block."));
+            var user = await _unit.UserRepository.GetAsync(
+                    filter: u => u.PhoneNumber == phonenumber && u.IsDelete == false && u.Status == UserStatus.Active,
+                    orderBy: null,
+                    includeProperties: $"{nameof(User.Role)}",
+                    disableTracking: true)
+                .ContinueWith(t =>
+                    t.Result.FirstOrDefault() ?? throw new NotFoundException("Account does not exist or being block."));
 
             if (BCrypt.Net.BCrypt.EnhancedVerify(password, user.PasswordHash))
             {
-                var accessToken = _authentication.CreateAccessToken(user);
-                var refreshToken = _authentication.CreateRefreshToken(user);
+                
                 var result = UserMapper.EntityToLoginUserDto(user);
-                return (result, accessToken, refreshToken);
+                result.AccessToken = _authentication.CreateAccessToken(user);
+                result.RefreshToken = _authentication.CreateRefreshToken(user);
+                
+                return result;
             }
 
             throw new BadRequestException("Incorrect password");
@@ -52,12 +56,14 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<(LoginUserDto, string?, string?)> RegisterAsync(RegisterDto request)
+        public async Task<LoginUserDto> RegisterAsync(RegisterDto request)
         {
             //check duplicate phone number
-            var isExist = await _unit.UserRepository.GetAll()
-                .FirstOrDefaultAsync(u => u.PhoneNumber == request.PhoneNumber)
-                .ContinueWith(t => t.Result != null);
+            var isExist = await _unit.UserRepository.GetAsync(
+                    filter: u => u.PhoneNumber == request.PhoneNumber,
+                    orderBy: null
+                )
+                .ContinueWith(t => t.Result.Any());
 
             if (isExist)
             {
@@ -70,9 +76,11 @@ namespace Application.Services
                 throw new BadRequestException("Confirm password does not match.");
             }
 
-            var userRole = await _unit.RoleRepository.GetAll()
-                .FirstOrDefaultAsync(r => r.Name == Constant.USER_ROLE)
-                .ContinueWith(t => t.Result ?? throw new NotFoundException("User role not found on database."));
+            var userRole = await _unit.RoleRepository.GetAsync(
+                    filter: r => r.Name == Constant.PARENT_ROLE,
+                    orderBy: null)
+                .ContinueWith(t =>
+                    t.Result.FirstOrDefault() ?? throw new NotFoundException("User role not found on database."));
 
             var entity = new User()
             {
@@ -91,9 +99,9 @@ namespace Application.Services
             if (result > 0)
             {
                 var returnDto = UserMapper.EntityToLoginUserDto(entity);
-                var accessToken = _authentication.CreateAccessToken(entity);
-                var refreshToken = _authentication.CreateRefreshToken(entity);
-                return (returnDto, accessToken, refreshToken);
+                returnDto.AccessToken = _authentication.CreateAccessToken(entity);
+                returnDto.RefreshToken = _authentication.CreateRefreshToken(entity);
+                return returnDto;
             }
 
             throw new BadRequestException("Error when adding user to database.");

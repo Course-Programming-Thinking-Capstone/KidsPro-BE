@@ -10,6 +10,7 @@ public class UserMapper
     {
         return new LoginUserDto()
         {
+            Id = entity.Id,
             PhoneNumber = entity.PhoneNumber,
             FullName = entity.FullName,
             PictureUrl = entity.PictureUrl,

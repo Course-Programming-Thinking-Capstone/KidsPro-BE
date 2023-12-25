@@ -4,7 +4,7 @@ using System.Text;
 using Application;
 using Application.Configurations;
 using Application.ErrorHandlers;
-using Application.Interfaces.Services;
+using Application.Interfaces.IServices;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

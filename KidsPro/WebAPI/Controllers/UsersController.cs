@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Services;
+﻿using Application.Interfaces.IServices;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
