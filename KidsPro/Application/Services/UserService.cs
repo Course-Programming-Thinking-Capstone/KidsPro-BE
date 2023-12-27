@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.User;
 using Application.ErrorHandlers;
+using Application.Interfaces.IServices;
 using Application.Interfaces.Services;
 using Application.Mappers;
 using Domain.Entities;
