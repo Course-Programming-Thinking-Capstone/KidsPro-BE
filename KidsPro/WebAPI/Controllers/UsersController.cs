@@ -22,18 +22,13 @@ namespace WebAPI.Controllers
             _roleService = roleService;
             _map = map;
         }
-        /// <summary>
-        /// Add role to sever
-        /// </summary>
-        /// <param name="role"></param>
-        /// <returns></returns>
-        [HttpPost("roles")]
-        public async Task<IActionResult> AddRole(Role role)
-        {
-            var result = await _roleService.AddRole(role);
-            if (result) return Ok();
-            return BadRequest();
-        }
+        //[HttpPost("roles")]
+        //public async Task<IActionResult> AddRole(Role role)
+        //{
+        //    var result = await _roleService.AddRole(role);
+        //    if (result) return Ok();
+        //    return BadRequest();
+        //}
         /// <summary>
         /// Get all roles in sever
         /// </summary>
@@ -45,17 +40,19 @@ namespace WebAPI.Controllers
             if(roles.Any()) return Ok(roles);
             return NotFound();
         }
-        [HttpPut("roles")]
-        public async Task<IActionResult> UpdateRole(Role role)
-        {
-            var result = await _roleService.UpdateRole(role);
-            if (result) return Ok();
-            return BadRequest();
-        }
+
+        //[HttpPut("roles")]
+        //public async Task<IActionResult> UpdateRole(Role role)
+        //{
+        //    var result = await _roleService.UpdateRole(role);
+        //    if (result) return Ok();
+        //    return BadRequest();
+        //}
+
         /// <summary>
         /// Get all users by role number
         /// </summary>
-        /// <param name="role">1.Staff, 2.Parents, 3. Teachers, 4. Students</param>
+        /// <param name="role">1.Staff, 2.Parents, 3. Teachers</param>
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetAllUsers(RoleType role)

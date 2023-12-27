@@ -15,8 +15,8 @@ public class UserRepository : BaseRepository<User>, IUserRepository
 
     public async Task<List<User>> GetAllUsersByRole(int role)
     {
-        return await _context.Users.ToListAsync();
-                                 //   .Include(x=> x.Role).ToListAsync();.Where(x => x.RoleId == role)
+        return await _context.Users.Where(x => x.RoleId == role)
+                                  .Include(x=> x.Role).ToListAsync();
     }
 
     public async Task<User?> GetUserByAttribute(string at1, string? at2, int type)

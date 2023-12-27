@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Mappers;
 
 namespace WebAPI;
 
@@ -127,7 +128,7 @@ public static class DependencyInjection
 
         services.AddDistributedMemoryCache();
         // Mapper
-        services.AddAutoMapper(typeof(Program).Assembly);
+        services.AddAutoMapper(typeof(UserMapper).Assembly);
         return services;
     }
 }
