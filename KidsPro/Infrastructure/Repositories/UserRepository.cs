@@ -13,6 +13,12 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
     }
 
+    public async Task<List<User>> GetAllUsersByRole(int role)
+    {
+        return await _context.Users.ToListAsync();
+                                 //   .Include(x=> x.Role).ToListAsync();.Where(x => x.RoleId == role)
+    }
+
     public async Task<User?> GetUserByAttribute(string at1, string? at2, int type)
     {
         switch (type)

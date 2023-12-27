@@ -851,22 +851,22 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Parent"
+                            Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Teacher"
-                        },
-                        new
-                        {
-                            Id = 3,
                             Name = "Staff"
                         },
                         new
                         {
+                            Id = 3,
+                            Name = "Teacher"
+                        },
+                        new
+                        {
                             Id = 4,
-                            Name = "Admin"
+                            Name = "Parents"
                         });
                 });
 

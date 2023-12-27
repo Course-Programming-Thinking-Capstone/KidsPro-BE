@@ -2,14 +2,15 @@
 using Application.Dtos.Response.User;
 using Domain.Entities;
 
-namespace Application.Interfaces.IServices
+namespace Application.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<LoginUserDto> LoginAsync(string phonenumber, string password);
+        Task<(LoginUserDto, string, string?)> LoginAsync(string phonenumber, string password);
         Task<User> GetUserById(Guid id);
         (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);
 
-        Task<LoginUserDto> RegisterAsync(RegisterDto request);
+        Task<(LoginUserDto, string?, string?)> RegisterAsync(RegisterDto request);
+        Task<List<User>> GetAllUsersByRole(int role);
     }
 }
