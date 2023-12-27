@@ -1,10 +1,11 @@
 ﻿using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.User;
+using AutoMapper;
 using Domain.Entities;
 
 namespace Application.Mappers;
 
-public class UserMapper
+public class UserMapper:Profile
 {
     public static LoginUserDto EntityToLoginUserDto(User entity)
     {
@@ -16,5 +17,13 @@ public class UserMapper
             Gender = entity.Gender?.ToString(),
             Role = entity.Role.Name,
         };
+    }
+
+    public UserMapper()
+    {
+        //UserResponse
+        CreateMap<User,UserResponseDto>()
+            .ForMember(x=> x.RoleName, otp =>otp.MapFrom(src => src.Role != null ? src.Role.Name: string.Empty))
+            .ReverseMap();
     }
 }
