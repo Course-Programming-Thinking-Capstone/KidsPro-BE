@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Enums
 {
-    public enum TokenType
+    public enum RoleType
     {
-        Login =1,
-        Reissue=2
+        Staff=2,
+        Teacher = 3,
+        Parents = 4
     }
 }

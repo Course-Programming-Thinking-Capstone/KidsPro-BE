@@ -49,7 +49,7 @@ namespace Application.Services
 
             throw new BadRequestException("Incorrect password");
         }
-
+        //Cấp lại accesstoken qua refeshtoken
         public (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user)
         {
             var result = _authentication.ReissueToken(accessToken, refeshToken, user);
@@ -107,10 +107,16 @@ namespace Application.Services
             throw new BadRequestException("Error when adding user to database.");
         }
 
-        string HashingPass(string password)
+        //string HashingPass(string password)
+        //{
+        //    var hasher = new PasswordHasher<object>();
+        //    return hasher.HashPassword(null, password);
+        //}
+
+        public async Task<List<User>> GetAllUsersByRole(int role)
         {
-            var hasher = new PasswordHasher<object>();
-            return hasher.HashPassword(null, password);
+            if (role == 5) throw new Exception();
+            return await _unit.UserRepository.GetAllUsersByRole(role);
         }
     }
 }

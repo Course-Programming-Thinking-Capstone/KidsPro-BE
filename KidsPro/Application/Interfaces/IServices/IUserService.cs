@@ -11,5 +11,6 @@ namespace Application.Interfaces.IServices
         (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);
 
         Task<LoginUserDto> RegisterAsync(RegisterDto request);
+        Task<List<User>> GetAllUsersByRole(int role);
     }
 }
