@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.User;
-using Application.Interfaces.Services;
+using Application.Interfaces.IServices;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
