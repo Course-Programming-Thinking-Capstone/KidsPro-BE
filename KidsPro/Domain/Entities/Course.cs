@@ -14,6 +14,14 @@ public class Course : BaseEntity
 
     [StringLength(3000)] public string? Prerequisite { get; set; }
 
+    [Range(3, 100)]
+    [Column(TypeName = "tinyint")]
+    public int? FromAge { get; set; }
+
+    [Range(3, 100)]
+    [Column(TypeName = "tinyint")]
+    public int? ToAge { get; set; }
+
     [StringLength(250)] public string? PictureUrl { get; set; }
 
     [DataType(DataType.DateTime)]
@@ -33,11 +41,11 @@ public class Course : BaseEntity
 
     [Range(0, float.MaxValue)]
     [Precision(11, 2)]
-    public decimal Price { get; set; }
+    public decimal? Price { get; set; }
 
     [Range(0, float.MaxValue)]
     [Precision(11, 2)]
-    public decimal DiscountPrice { get; set; }
+    public decimal? DiscountPrice { get; set; }
 
     [Range(0, 2000)]
     [Column(TypeName = "smallint")]
@@ -66,4 +74,6 @@ public class Course : BaseEntity
     [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
 
     public virtual ICollection<CourseSection> CourseSections { get; set; } = new List<CourseSection>();
+
+    public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
 }

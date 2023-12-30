@@ -9,7 +9,7 @@ public interface IAuthenticationService
     
     string CreateRefreshToken (User user);
 
-    Guid GetCurrentUserId();
+    int GetCurrentUserId();
 
     void GetCurrentUserInformation(out int userId, out string role);
     (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);

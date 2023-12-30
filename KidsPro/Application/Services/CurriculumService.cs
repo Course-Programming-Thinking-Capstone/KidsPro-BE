@@ -11,20 +11,19 @@ namespace Application.Services;
 public class CurriculumService : ICurriculumService
 
 {
-    public IUnitOfWork UnitOfWork { get; set; }
+    private readonly IUnitOfWork _unitOfWork;
 
-    public IAuthenticationService AuthenticationService { get; set; }
+    private readonly IAuthenticationService _authenticationService;
 
     public CurriculumService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
     {
-        UnitOfWork = unitOfWork;
-        AuthenticationService = authenticationService;
+        _unitOfWork = unitOfWork;
+        _authenticationService = authenticationService;
     }
 
     public async Task CreateAsync(CreateCurriculumDto dto)
     {
-        var currentUser = await GetCurrentUser() ??
-                          throw new UnauthorizedException("User does not exist or has been blocked.");
+        var currentUser = await GetCurrentUser();
         if (currentUser.Role.Name != Constant.ADMIN_ROLE
             && currentUser.Role.Name != Constant.TEACHER_ROLE
             && currentUser.Role.Name != Constant.STAFF_ROLE)
@@ -38,11 +37,11 @@ public class CurriculumService : ICurriculumService
     }
 
 
-    private async Task<User?> GetCurrentUser()
+    private async Task<User> GetCurrentUser()
     {
-        AuthenticationService.GetCurrentUserInformation(out var currentUserId, out var roleName);
+        var currentUserId = _authenticationService.GetCurrentUserId();
 
-        return await UnitOfWork.UserRepository
+        return await _unitOfWork.UserRepository
             .GetAsync(
                 filter: u => u.Id == currentUserId && u.Status == UserStatus.Active,
                 orderBy: null,
@@ -50,6 +49,8 @@ public class CurriculumService : ICurriculumService
                 disableTracking: true
             )
             .ContinueWith(t =>
-                t.Result.Any() ? t.Result.FirstOrDefault() : throw new UnauthorizedException("Invalid token."));
+                t.Result.Any()
+                    ? t.Result.FirstOrDefault() ?? throw new NotFoundException("User does not exist or being block.")
+                    : throw new NotFoundException("User does not exist or being block."));
     }
 }
