@@ -162,15 +162,6 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         _dbSet.UpdateRange(entities);
     }
 
-    public virtual async Task DeleteByIdAsync(int id)
-    {
-        var entity = await GetByIdAsync(id);
-        if (entity != null)
-        {
-            _dbSet.Remove(entity);
-        }
-    }
-
     public void Delete(T entity)
     {
         _dbSet.Remove(entity);

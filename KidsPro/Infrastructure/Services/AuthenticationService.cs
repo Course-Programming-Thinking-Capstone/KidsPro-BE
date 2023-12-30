@@ -99,7 +99,7 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public Guid GetCurrentUserId()
+    public int GetCurrentUserId()
     {
         var httpContextAccessor = _serviceProvider.GetService<IHttpContextAccessor>();
 
@@ -107,7 +107,7 @@ public class AuthenticationService : IAuthenticationService
         {
             if (httpContextAccessor.HttpContext?.User.Identity is ClaimsIdentity claimsIdentity &&
                 claimsIdentity.Claims.Any() &&
-                Guid.TryParse(claimsIdentity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value,
+                int.TryParse(claimsIdentity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value,
                     out var userId))
             {
                 return userId;

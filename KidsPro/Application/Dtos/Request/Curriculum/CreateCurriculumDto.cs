@@ -14,9 +14,11 @@ public record CreateCurriculumDto
 
     public DateTime? OpenDate { get; set; }
 
-    [StartSaleDateValidation] public DateTime? StartSaleDate { get; set; }
+    [StartSaleDateValidation]
+    [DataType(DataType.DateTime)]
+    public DateTime? StartSaleDate { get; set; }
 
-    public DateTime? EndSaleDate { get; set; }
+    [DataType(DataType.DateTime)] public DateTime? EndSaleDate { get; set; }
 
     [Range(0, float.MaxValue)]
     [Precision(11, 2)]

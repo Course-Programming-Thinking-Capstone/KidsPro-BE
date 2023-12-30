@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231225102152_Initial")]
+    [Migration("20231230101811_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -189,13 +189,16 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
-                    b.Property<decimal>("DiscountPrice")
+                    b.Property<decimal?>("DiscountPrice")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
                     b.Property<DateTime?>("EndSaleDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
+
+                    b.Property<byte?>("FromAge")
+                        .HasColumnType("tinyint");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
@@ -224,7 +227,7 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
@@ -241,6 +244,9 @@ namespace Infrastructure.Migrations
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
+                    b.Property<byte?>("ToAge")
+                        .HasColumnType("tinyint");
+
                     b.Property<short>("TotalLesson")
                         .HasColumnType("smallint");
 
@@ -251,6 +257,42 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ModifiedById");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CourseResource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
+
+                    b.Property<string>("ResourceUrl")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseResource");
                 });
 
             modelBuilder.Entity("Domain.Entities.CourseSection", b =>
@@ -322,6 +364,9 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
+                    b.Property<byte?>("FromAge")
+                        .HasColumnType("tinyint");
+
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
@@ -360,6 +405,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2(2)");
 
                     b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte?>("ToAge")
                         .HasColumnType("tinyint");
 
                     b.Property<byte>("TotalCourse")
@@ -433,9 +481,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Title")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
@@ -854,22 +899,22 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Parent"
+                            Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Teacher"
-                        },
-                        new
-                        {
-                            Id = 3,
                             Name = "Staff"
                         },
                         new
                         {
+                            Id = 3,
+                            Name = "Teacher"
+                        },
+                        new
+                        {
                             Id = 4,
-                            Name = "Admin"
+                            Name = "Parent"
                         });
                 });
 
@@ -1413,6 +1458,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("ModifiedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CourseResource", b =>
+                {
+                    b.HasOne("Domain.Entities.Course", "Course")
+                        .WithMany("CourseResources")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("Domain.Entities.CourseSection", b =>
                 {
                     b.HasOne("Domain.Entities.Course", "Course")
@@ -1785,6 +1841,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
+                    b.Navigation("CourseResources");
+
                     b.Navigation("CourseSections");
                 });
 

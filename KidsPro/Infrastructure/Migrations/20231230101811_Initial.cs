@@ -172,12 +172,14 @@ namespace Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     Prerequisite = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
+                    FromAge = table.Column<byte>(type: "tinyint", nullable: true),
+                    ToAge = table.Column<byte>(type: "tinyint", nullable: true),
                     PictureUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     OpenDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     StartSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     EndSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
-                    DiscountPrice = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: true),
+                    DiscountPrice = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: true),
                     TotalLesson = table.Column<short>(type: "smallint", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
@@ -212,6 +214,8 @@ namespace Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     PictureUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
+                    FromAge = table.Column<byte>(type: "tinyint", nullable: true),
+                    ToAge = table.Column<byte>(type: "tinyint", nullable: true),
                     TotalStudent = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     OpenDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
@@ -423,6 +427,29 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CourseResource",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
+                    ResourceUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseResource", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CourseResource_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CourseSections",
                 columns: table => new
                 {
@@ -481,7 +508,6 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<byte>(type: "tinyint", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     ResourceUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
@@ -851,10 +877,10 @@ namespace Infrastructure.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Parent" },
-                    { 2, "Teacher" },
-                    { 3, "Staff" },
-                    { 4, "Admin" }
+                    { 1, "Admin" },
+                    { 2, "Staff" },
+                    { 3, "Teacher" },
+                    { 4, "Parent" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -888,6 +914,11 @@ namespace Infrastructure.Migrations
                 name: "IX_ClassSchedules_ClassId",
                 table: "ClassSchedules",
                 column: "ClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseResource_CourseId",
+                table: "CourseResource",
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_CreatedById",
@@ -1155,6 +1186,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClassSchedules");
+
+            migrationBuilder.DropTable(
+                name: "CourseResource");
 
             migrationBuilder.DropTable(
                 name: "CurriculumCourses");

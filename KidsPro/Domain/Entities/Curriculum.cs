@@ -14,6 +14,14 @@ public class Curriculum: BaseEntity
     [StringLength(250)] public string? PictureUrl { get; set; }
 
     [StringLength(3000)] public string? Description { get; set; }
+    
+    [Range(3, 100)]
+    [Column(TypeName = "tinyint")]
+    public int? FromAge { get; set; }
+
+    [Range(3, 100)]
+    [Column(TypeName = "tinyint")]
+    public int? ToAge { get; set; }
 
     public int TotalStudent { get; set; }
 

@@ -14,7 +14,7 @@ if (configuration != null)
     configuration.Issuer = builder.Configuration["JwtSettings:Issuer"] ?? "";
     configuration.Audience = builder.Configuration["JwtSettings:Audience"] ?? "";
     builder.Services.AddDependency(configuration.DatabaseConnection);
-    builder.Services.AddApiService(configuration.Key, configuration.Issuer, configuration.Key);
+    builder.Services.AddApiService(configuration.Key, configuration.Issuer, configuration.Audience);
     builder.Services.AddSingleton(configuration);
 }
 

@@ -35,8 +35,6 @@ public interface IBaseRepository<T> where T : BaseEntity
 
     void UpdateRange(IEnumerable<T> entities);
 
-    Task DeleteByIdAsync(int id);
-
     void Delete(T entity);
 
     void DeleteRange(IEnumerable<T> entities);

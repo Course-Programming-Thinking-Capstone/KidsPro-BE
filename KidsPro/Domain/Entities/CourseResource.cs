@@ -1,20 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
-using Domain.Enums;
 
 namespace Domain.Entities;
 
-public class CurriculumResource : BaseEntity
+public class CourseResource : BaseEntity
 {
-
     [StringLength(3000)] public string? Description { get; set; }
 
     [StringLength(250)] public string? ResourceUrl { get; set; }
 
     [StringLength(250)] public string? Title { get; set; }
 
-    public int CurriculumId { get; set; }
+    public int CourseId { get; set; }
 
-    public virtual Curriculum Curriculum { get; set; } = null!;
+    public virtual Course Course { get; set; } = null!;
 }
