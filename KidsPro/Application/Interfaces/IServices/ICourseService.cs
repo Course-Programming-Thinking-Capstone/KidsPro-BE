@@ -10,5 +10,5 @@ public interface ICourseService
 
     Task<CourseDto> UpdateAsync(int id, UpdateCourseDto request);
 
-    Task<string> UpdatePicture(IFormFile file);
+    Task<CourseDto> UpdatePictureAsync(int courseId, IFormFile file);
 }

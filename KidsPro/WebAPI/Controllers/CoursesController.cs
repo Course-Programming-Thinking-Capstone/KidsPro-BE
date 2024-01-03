@@ -55,16 +55,17 @@ public class CoursesController : Controller
     /// <summary>
     /// Upload ảnh bìa cho khóa học 
     /// </summary>
+    /// <param name="id"></param>
     /// <param name="file"></param>
-    /// <param name="fileName"></param>
     /// <returns></returns>
-    [HttpPost("picture")]
-    [AllowAnonymous]
+    [HttpPatch("{id:int}/picture")]
+    [Authorize(Roles = "Admin,Teacher,Staff")]
     [Consumes("image/jpeg", "image/png", "multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<string>> UpdatePictureAsync([FromForm(Name = "file")] IFormFile file)
+    public async Task<ActionResult<string>> UpdatePictureAsync([FromRoute] int id,
+        [FromForm(Name = "file")] IFormFile file)
     {
-        return Ok(await _courseService.UpdatePicture(file));
+        return Ok(await _courseService.UpdatePictureAsync(id, file));
     }
 }

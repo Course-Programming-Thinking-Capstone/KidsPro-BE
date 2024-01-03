@@ -109,19 +109,50 @@ public class CourseService : ICourseService
         }
     }
 
-    public async Task<string> UpdatePicture(IFormFile file)
+    public async Task<CourseDto> UpdatePictureAsync(int courseId, IFormFile file)
     {
-        //remove before upload
+        var currentUser = await GetCurrentUser();
 
-        string imageUrl = "https://firebasestorage.googleapis.com/v0/b/kid-pro.appspot.com/o/Image%2FCourse%2FPicture.jpg?alt=media&token=15c13c53-ed8c-4a62-b8f1-f73b10b27a8b";
-        
-        if (!string.IsNullOrEmpty(imageUrl))
+        var course = await _unitOfWork.CourseRepository.GetAsync(
+                filter: c => c.Id == courseId,
+                orderBy: null,
+                includeProperties: $"{nameof(Course.CreatedBy)},{nameof(Course.ModifiedBy)}",
+                disableTracking: false)
+            .ContinueWith(t => t.Result.Any()
+                ? t.Result.FirstOrDefault() ?? throw new NotFoundException($"Course {courseId} does not exist.")
+                : throw new NotFoundException($"Course {courseId} does not exist."));
+
+        //check role
+        if (currentUser.Role.Name != Constant.ADMIN_ROLE && currentUser.Role.Name != Constant.STAFF_ROLE &&
+            currentUser.Role.Name != Constant.TEACHER_ROLE)
         {
-            await _imageService.RemoveFile(imageUrl);
+            throw new ForbiddenException("Action forbidden.");
         }
 
+        //remove before upload
 
-        return await _imageService.UploadImage(file, Constant.FIREBASE_COURSE_PICTURE_FOLDER, COURSE_PICTURE_NAME);
+        if (!string.IsNullOrEmpty(course.PictureUrl))
+        {
+            await _imageService.RemoveFile(course.PictureUrl);
+        }
+
+        var uploadedUrl =
+            await _imageService.UploadImage(file, Constant.FIREBASE_COURSE_PICTURE_FOLDER, COURSE_PICTURE_NAME);
+        course.PictureUrl = uploadedUrl;
+        course.ModifiedById = currentUser.Id;
+        course.ModifiedBy = currentUser;
+        course.ModifiedDate = DateTime.UtcNow;
+        _unitOfWork.CourseRepository.Update(course);
+        try
+        {
+            var updateResult = await _unitOfWork.SaveChangeAsync();
+            return CourseMapper.EntityToDto(course);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when update picture for course {}. Detail: {}", course, e.Message);
+            throw new Exception($"Error when update picture for course {course}");
+        }
     }
 
     private async Task<User> GetCurrentUser()
