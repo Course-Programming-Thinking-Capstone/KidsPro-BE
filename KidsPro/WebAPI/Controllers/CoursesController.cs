@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Request.Course;
+﻿using System.ComponentModel.DataAnnotations;
+using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -49,5 +50,21 @@ public class CoursesController : Controller
     public async Task<ActionResult<CourseDto>> UpdateAsync([FromRoute] int id, [FromBody] UpdateCourseDto request)
     {
         return Ok(await _courseService.UpdateAsync(id, request));
+    }
+
+    /// <summary>
+    /// Upload ảnh bìa cho khóa học 
+    /// </summary>
+    /// <param name="file"></param>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    [HttpPost("picture")]
+    [AllowAnonymous]
+    [Consumes("image/jpeg", "image/png", "multipart/form-data")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<string>> UpdatePictureAsync([FromForm(Name = "file")] IFormFile file)
+    {
+        return Ok(await _courseService.UpdatePicture(file));
     }
 }

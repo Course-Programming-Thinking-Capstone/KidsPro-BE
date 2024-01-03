@@ -6,6 +6,7 @@ using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -16,13 +17,19 @@ public class CourseService : ICourseService
 
     private readonly IAuthenticationService _authenticationService;
 
+    private readonly IImageService _imageService;
+
     private readonly ILogger<CourseService> _logger;
 
+    private readonly string COURSE_PICTURE_NAME = "Picture";
+
     public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
+        IImageService imageService,
         ILogger<CourseService> logger)
     {
         _unitOfWork = unitOfWork;
         _authenticationService = authenticationService;
+        _imageService = imageService;
         _logger = logger;
     }
 
@@ -100,6 +107,21 @@ public class CourseService : ICourseService
             _logger.LogError("Error when update course {}. Detail: {}", id, e.Message);
             throw new Exception($"Error when update course {id}");
         }
+    }
+
+    public async Task<string> UpdatePicture(IFormFile file)
+    {
+        //remove before upload
+
+        string imageUrl = "https://firebasestorage.googleapis.com/v0/b/kid-pro.appspot.com/o/Image%2FCourse%2FPicture.jpg?alt=media&token=15c13c53-ed8c-4a62-b8f1-f73b10b27a8b";
+        
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            await _imageService.RemoveFile(imageUrl);
+        }
+
+
+        return await _imageService.UploadImage(file, Constant.FIREBASE_COURSE_PICTURE_FOLDER, COURSE_PICTURE_NAME);
     }
 
     private async Task<User> GetCurrentUser()
