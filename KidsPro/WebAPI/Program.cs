@@ -13,6 +13,10 @@ if (configuration != null)
     configuration.Key = builder.Configuration["JwtSettings:Key"] ?? "";
     configuration.Issuer = builder.Configuration["JwtSettings:Issuer"] ?? "";
     configuration.Audience = builder.Configuration["JwtSettings:Audience"] ?? "";
+    configuration.FireBaseApiKey = builder.Configuration["FireBaseSettings:ApiKey"] ?? "";
+    configuration.FireBaseBucket = builder.Configuration["FireBaseSettings:Bucket"] ?? "";
+    configuration.FireBaseAuthEmail = builder.Configuration["FireBaseSettings:AuthEmail"] ?? "";
+    configuration.FireBaseAuthPassword = builder.Configuration["FireBaseSettings:AuthPassword"] ?? "";
     builder.Services.AddDependency(configuration.DatabaseConnection);
     builder.Services.AddApiService(configuration.Key, configuration.Issuer, configuration.Audience);
     builder.Services.AddSingleton(configuration);

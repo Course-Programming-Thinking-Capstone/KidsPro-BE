@@ -19,9 +19,5 @@ public record RegisterDto
     [MinLength(4, ErrorMessage = "Password must have at least 4 character")]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Confirm password is required.")]
-    [MinLength(4, ErrorMessage = "Password must have at least 4 character")]
-    public string ConfirmPassword { get; set; } = string.Empty;
-
     public Gender? Gender { get; set; }
 }

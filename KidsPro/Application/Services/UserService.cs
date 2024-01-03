@@ -70,12 +70,6 @@ namespace Application.Services
                 throw new ConflictException("Phone number has been existed.");
             }
 
-            //check confirm password
-            if (request.Password != request.ConfirmPassword)
-            {
-                throw new BadRequestException("Confirm password does not match.");
-            }
-
             var userRole = await _unit.RoleRepository.GetAsync(
                     filter: r => r.Name == Constant.PARENT_ROLE,
                     orderBy: null)
