@@ -61,9 +61,9 @@ public class CoursesController : Controller
     [HttpPatch("{id:int}/picture")]
     [Authorize(Roles = "Admin,Teacher,Staff")]
     [Consumes("image/jpeg", "image/png", "multipart/form-data")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<string>> UpdatePictureAsync([FromRoute] int id,
+    public async Task<ActionResult<CourseDto>> UpdatePictureAsync([FromRoute] int id,
         [FromForm(Name = "file")] IFormFile file)
     {
         return Ok(await _courseService.UpdatePictureAsync(id, file));
