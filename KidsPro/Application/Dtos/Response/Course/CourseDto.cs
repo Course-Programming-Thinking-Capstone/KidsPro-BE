@@ -1,4 +1,6 @@
-﻿namespace Application.Dtos.Response.Course;
+﻿using Application.Dtos.Request.Course;
+
+namespace Application.Dtos.Response.Course;
 
 public class CourseDto
 {
@@ -41,4 +43,7 @@ public class CourseDto
     public int ModifiedById { get; set; }
 
     public string ModifiedByName { get; set; } = string.Empty;
+
+    public ICollection<CourseResourceDto>? Resources { get; set; } 
+
 }
