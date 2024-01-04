@@ -24,9 +24,9 @@ public class CurriculumService : ICurriculumService
     public async Task CreateAsync(CreateCurriculumDto dto)
     {
         var currentUser = await GetCurrentUser();
-        if (currentUser.Role.Name != Constant.ADMIN_ROLE
-            && currentUser.Role.Name != Constant.TEACHER_ROLE
-            && currentUser.Role.Name != Constant.STAFF_ROLE)
+        if (currentUser.Role.Name != Constant.AdminRole
+            && currentUser.Role.Name != Constant.TeacherRole
+            && currentUser.Role.Name != Constant.StaffRole)
         {
             throw new ForbiddenException("Action forbidden.");
         }

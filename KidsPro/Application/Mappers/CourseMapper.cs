@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Paging;
 using Application.Utils;
 using Domain.Entities;
 
@@ -7,46 +8,61 @@ namespace Application.Mappers;
 
 public class CourseMapper
 {
-    public static CourseDto EntityToDto(Course entity)
+    public static CourseDto EntityToDto(Course entity) => new()
     {
-        return new CourseDto()
-        {
-            Id = entity.Id,
-            Name = entity.Name,
-            Description = entity.Description,
-            Prerequisite = entity.Prerequisite,
-            FromAge = entity.FromAge,
-            ToAge = entity.ToAge,
-            PictureUrl = entity.PictureUrl,
-            OpenDate = DateUtil.FormatDateTimeToDatetimeV1(entity.OpenDate),
-            StartSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
-            EndSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
-            Price = entity.Price,
-            DiscountPrice = entity.DiscountPrice,
-            TotalLesson = entity.TotalLesson,
-            Status = entity.Status.ToString(),
-            CreatedDate = DateUtil.FormatDateTimeToDatetimeV1(entity.CreatedDate),
-            ModifiedDate = DateUtil.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
-            ModifiedById = entity.ModifiedById,
-            ModifiedByName = entity.ModifiedBy.FullName,
-            CreatedById = entity.CreatedById,
-            CreatedByName = entity.CreatedBy.FullName,
-            Resources = entity.CourseResources?.Select(CourseResourceMapper.EntityToDto).ToList()
-        };
-    }
+        Id = entity.Id,
+        Name = entity.Name,
+        Description = entity.Description,
+        Prerequisite = entity.Prerequisite,
+        FromAge = entity.FromAge,
+        ToAge = entity.ToAge,
+        PictureUrl = entity.PictureUrl,
+        OpenDate = DateUtil.FormatDateTimeToDatetimeV1(entity.OpenDate),
+        StartSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
+        EndSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
+        Price = entity.Price,
+        DiscountPrice = entity.DiscountPrice,
+        TotalLesson = entity.TotalLesson,
+        Status = entity.Status.ToString(),
+        CreatedDate = DateUtil.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        ModifiedDate = DateUtil.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
+        ModifiedById = entity.ModifiedById,
+        ModifiedByName = entity.ModifiedBy.FullName,
+        CreatedById = entity.CreatedById,
+        CreatedByName = entity.CreatedBy.FullName,
+        Resources = entity.CourseResources?.Select(CourseResourceMapper.EntityToDto).ToList()
+    };
 
-    public static Course CreateDtoToEntity(CreateCourseDto dto)
+
+    public static Course CreateDtoToEntity(CreateCourseDto dto) => new()
     {
-        return new Course()
+        Name = dto.Name,
+        Description = dto.Description,
+        Prerequisite = dto.Prerequisite,
+        FromAge = dto.FromAge,
+        ToAge = dto.ToAge,
+        CourseResources = dto.Resources?.Select(CourseResourceMapper.AddDtoToEntity).ToList()
+    };
+
+
+    public static CommonCourseDto EntityToCommonDto(Course entity) => new()
+    {
+        Id = entity.Id,
+        Name = entity.Name,
+        PictureUrl = entity.PictureUrl,
+        Status = entity.Status.ToString(),
+        CreatedDate = DateUtil.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedById = entity.CreatedBy.Id,
+        CreatedByName = entity.CreatedBy.FullName
+    };
+
+    public static PagingResponse<CommonCourseDto> EntityToCommonDto(PagingResponse<Course> entities) =>
+        new()
         {
-            Name = dto.Name,
-            Description = dto.Description,
-            Prerequisite = dto.Prerequisite,
-            FromAge = dto.FromAge,
-            ToAge = dto.ToAge,
-            CourseResources = dto.Resources?.Select(CourseResourceMapper.AddDtoToEntity).ToList()
+            Results = entities.Results.Select(EntityToCommonDto).ToList(),
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords
         };
-    }
 
     public static void UpdateDtoToEntity(UpdateCourseDto dto, ref Course entity)
     {
