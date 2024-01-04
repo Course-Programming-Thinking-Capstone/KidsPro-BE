@@ -21,7 +21,9 @@ public class CourseService : ICourseService
 
     private readonly ILogger<CourseService> _logger;
 
-    private readonly string COURSE_PICTURE_NAME = "Picture";
+    private readonly string COURSE_PICTURE_FILE_NAME = "Picture";
+
+    private readonly string COURSE_PICTURE_FOLDER = "Image/Course";
 
     public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
         IImageService imageService,
@@ -74,7 +76,8 @@ public class CourseService : ICourseService
         var entity = await _unitOfWork.CourseRepository.GetAsync(
                 filter: c => c.Id == id,
                 orderBy: null,
-                includeProperties: $"{nameof(Course.CreatedBy)},{nameof(Course.ModifiedBy)}",
+                includeProperties:
+                $"{nameof(Course.CreatedBy)},{nameof(Course.ModifiedBy)},{nameof(Course.CourseResources)}",
                 disableTracking: false)
             .ContinueWith(t => t.Result.Any()
                 ? t.Result.FirstOrDefault() ?? throw new NotFoundException($"Course {id} does not exist.")
@@ -95,6 +98,19 @@ public class CourseService : ICourseService
         entity.ModifiedById = currentUser.Id;
         entity.ModifiedBy = currentUser;
         entity.ModifiedDate = DateTime.UtcNow;
+
+        //Update resource
+        if (request.Resources != null)
+        {
+            //remove old resource
+            if (entity.CourseResources != null)
+            {
+                _unitOfWork.CourseResourceRepository.DeleteRange(entity.CourseResources);
+            }
+            //Update new resource
+            entity.CourseResources = request.Resources.Select(CourseResourceMapper.AddDtoToEntity).ToList();
+        }
+
         _unitOfWork.CourseRepository.Update(entity);
 
         try
@@ -137,7 +153,7 @@ public class CourseService : ICourseService
         }
 
         var uploadedUrl =
-            await _imageService.UploadImage(file, Constant.FIREBASE_COURSE_PICTURE_FOLDER, COURSE_PICTURE_NAME);
+            await _imageService.UploadImage(file, COURSE_PICTURE_FOLDER, COURSE_PICTURE_FILE_NAME);
         course.PictureUrl = uploadedUrl;
         course.ModifiedById = currentUser.Id;
         course.ModifiedBy = currentUser;

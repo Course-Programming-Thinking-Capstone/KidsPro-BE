@@ -19,4 +19,6 @@ public record CreateCourseDto
     
     [Range(3, 100)]
     public int? ToAge { get; set; }
+
+    public List<AddCourseResourceDto>? Resources { get; set; } 
 }

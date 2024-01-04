@@ -7,7 +7,7 @@ public class CourseResource : BaseEntity
 {
     [StringLength(3000)] public string? Description { get; set; }
 
-    [StringLength(250)] public string? ResourceUrl { get; set; }
+    [StringLength(250)] public string ResourceUrl { get; set; } = string.Empty;
 
     [StringLength(250)] public string? Title { get; set; }
 

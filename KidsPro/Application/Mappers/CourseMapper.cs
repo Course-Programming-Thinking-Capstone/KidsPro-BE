@@ -18,7 +18,7 @@ public class CourseMapper
             FromAge = entity.FromAge,
             ToAge = entity.ToAge,
             PictureUrl = entity.PictureUrl,
-            OpenDate =  DateUtil.FormatDateTimeToDatetimeV1(entity.OpenDate),
+            OpenDate = DateUtil.FormatDateTimeToDatetimeV1(entity.OpenDate),
             StartSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             EndSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
             Price = entity.Price,
@@ -30,7 +30,8 @@ public class CourseMapper
             ModifiedById = entity.ModifiedById,
             ModifiedByName = entity.ModifiedBy.FullName,
             CreatedById = entity.CreatedById,
-            CreatedByName = entity.CreatedBy.FullName
+            CreatedByName = entity.CreatedBy.FullName,
+            Resources = entity.CourseResources?.Select(CourseResourceMapper.EntityToDto).ToList()
         };
     }
 
@@ -42,7 +43,8 @@ public class CourseMapper
             Description = dto.Description,
             Prerequisite = dto.Prerequisite,
             FromAge = dto.FromAge,
-            ToAge = dto.ToAge
+            ToAge = dto.ToAge,
+            CourseResources = dto.Resources?.Select(CourseResourceMapper.AddDtoToEntity).ToList()
         };
     }
 

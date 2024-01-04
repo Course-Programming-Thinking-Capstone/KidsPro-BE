@@ -73,7 +73,7 @@ public class Course : BaseEntity
 
     [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
 
-    public virtual ICollection<CourseSection> CourseSections { get; set; } = new List<CourseSection>();
+    public virtual ICollection<CourseSection>? CourseSections { get; set; } 
 
-    public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
+    public virtual ICollection<CourseResource>? CourseResources { get; set; } 
 }

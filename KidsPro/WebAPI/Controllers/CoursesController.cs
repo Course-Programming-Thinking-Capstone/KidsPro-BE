@@ -46,6 +46,9 @@ public class CoursesController : Controller
     [HttpPut]
     [Authorize(Roles = "Admin,Teacher")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseDto>> UpdateAsync([FromRoute] int id, [FromBody] UpdateCourseDto request)
     {
@@ -62,6 +65,8 @@ public class CoursesController : Controller
     [Authorize(Roles = "Admin,Teacher,Staff")]
     [Consumes("image/jpeg", "image/png", "multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseDto>> UpdatePictureAsync([FromRoute] int id,
         [FromForm(Name = "file")] IFormFile file)
