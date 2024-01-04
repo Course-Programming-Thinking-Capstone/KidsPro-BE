@@ -6,8 +6,6 @@ using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -71,7 +69,7 @@ namespace Application.Services
             }
 
             var userRole = await _unit.RoleRepository.GetAsync(
-                    filter: r => r.Name == Constant.PARENT_ROLE,
+                    filter: r => r.Name == Constant.ParentRole,
                     orderBy: null)
                 .ContinueWith(t =>
                     t.Result.FirstOrDefault() ?? throw new NotFoundException("User role not found on database."));

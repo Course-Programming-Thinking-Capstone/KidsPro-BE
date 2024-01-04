@@ -1,13 +1,17 @@
-﻿using Application.Configurations;
+﻿using System.Linq.Expressions;
+using Application.Configurations;
 using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static System.Enum;
 
 namespace Application.Services;
 
@@ -21,9 +25,9 @@ public class CourseService : ICourseService
 
     private readonly ILogger<CourseService> _logger;
 
-    private readonly string COURSE_PICTURE_FILE_NAME = "Picture";
+    private const string CoursePictureFileName = "Picture";
 
-    private readonly string COURSE_PICTURE_FOLDER = "Image/Course";
+    private const string CoursePictureFolder = "Image/Course";
 
     public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
         IImageService imageService,
@@ -40,7 +44,7 @@ public class CourseService : ICourseService
         var currentUser = await GetCurrentUser();
 
         //check role 
-        if (currentUser.Role.Name != Constant.ADMIN_ROLE && currentUser.Role.Name != Constant.TEACHER_ROLE)
+        if (currentUser.Role.Name != Constant.AdminRole && currentUser.Role.Name != Constant.TeacherRole)
         {
             throw new ForbiddenException("Only teacher or admin can create course.");
         }
@@ -59,7 +63,7 @@ public class CourseService : ICourseService
         await _unitOfWork.CourseRepository.AddAsync(entity);
         try
         {
-            var updateResult = await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.SaveChangeAsync();
             return CourseMapper.EntityToDto(entity);
         }
         catch (Exception e)
@@ -84,7 +88,7 @@ public class CourseService : ICourseService
                 : throw new NotFoundException($"Course {id} does not exist."));
 
         //check role 
-        if (currentUser.Role.Name != Constant.ADMIN_ROLE && currentUser.Id != entity.CreatedById)
+        if (currentUser.Role.Name != Constant.AdminRole && currentUser.Id != entity.CreatedById)
         {
             throw new ForbiddenException("Only admin or owner can update this course.");
         }
@@ -107,6 +111,7 @@ public class CourseService : ICourseService
             {
                 _unitOfWork.CourseResourceRepository.DeleteRange(entity.CourseResources);
             }
+
             //Update new resource
             entity.CourseResources = request.Resources.Select(CourseResourceMapper.AddDtoToEntity).ToList();
         }
@@ -115,7 +120,7 @@ public class CourseService : ICourseService
 
         try
         {
-            var updateResult = await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.SaveChangeAsync();
             return CourseMapper.EntityToDto(entity);
         }
         catch (Exception e)
@@ -139,8 +144,8 @@ public class CourseService : ICourseService
                 : throw new NotFoundException($"Course {courseId} does not exist."));
 
         //check role
-        if (currentUser.Role.Name != Constant.ADMIN_ROLE && currentUser.Role.Name != Constant.STAFF_ROLE &&
-            currentUser.Role.Name != Constant.TEACHER_ROLE)
+        if (currentUser.Role.Name != Constant.AdminRole && currentUser.Role.Name != Constant.StaffRole &&
+            currentUser.Role.Name != Constant.TeacherRole)
         {
             throw new ForbiddenException("Action forbidden.");
         }
@@ -153,7 +158,7 @@ public class CourseService : ICourseService
         }
 
         var uploadedUrl =
-            await _imageService.UploadImage(file, COURSE_PICTURE_FOLDER, COURSE_PICTURE_FILE_NAME);
+            await _imageService.UploadImage(file, CoursePictureFolder, CoursePictureFileName);
         course.PictureUrl = uploadedUrl;
         course.ModifiedById = currentUser.Id;
         course.ModifiedBy = currentUser;
@@ -161,13 +166,137 @@ public class CourseService : ICourseService
         _unitOfWork.CourseRepository.Update(course);
         try
         {
-            var updateResult = await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.SaveChangeAsync();
             return CourseMapper.EntityToDto(course);
         }
         catch (Exception e)
         {
             _logger.LogError("Error when update picture for course {}. Detail: {}", course, e.Message);
             throw new Exception($"Error when update picture for course {course}");
+        }
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var currentUser = await GetCurrentUser();
+
+        var entity = await _unitOfWork.CourseRepository.GetAsync(
+                filter: c => c.Id == id,
+                orderBy: null,
+                includeProperties:
+                $"{nameof(Course.CreatedBy)},{nameof(Course.ModifiedBy)},{nameof(Course.CourseResources)}",
+                disableTracking: false)
+            .ContinueWith(t => t.Result.Any()
+                ? t.Result.FirstOrDefault() ?? throw new NotFoundException($"Course {id} does not exist.")
+                : throw new NotFoundException($"Course {id} does not exist."));
+        //check role 
+        if (currentUser.Role.Name != Constant.AdminRole && currentUser.Id != entity.CreatedById)
+        {
+            throw new ForbiddenException("Only admin or owner can delete this course.");
+        }
+
+        //check course status 
+        if (entity.Status is not CourseStatus.Draft)
+        {
+            throw new BadRequestException("Can only delete draft course.");
+        }
+
+        _unitOfWork.CourseRepository.Delete(entity);
+        try
+        {
+            await _unitOfWork.SaveChangeAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when delete course {}.\n Detail: {}", id, e.Message);
+            throw new Exception($"Error when delete course {id}.\n");
+        }
+    }
+
+    public async Task<PagingResponse<CommonCourseDto>> GetCourseAsync(
+        string? name,
+        string? status,
+        string? sortName,
+        string? sortCreatedDate,
+        string? sortModifiedDate,
+        int? page,
+        int? size)
+    {
+        //need to check role
+        var parameter = Expression.Parameter(typeof(Course));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        try
+        {
+            //get course that is not deleted
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
+                    Expression.Constant(false)));
+            
+            if (!string.IsNullOrEmpty(status))
+            {
+                if (!TryParse<CourseStatus>(status, out var statusEnum))
+                {
+                    throw new BadRequestException($"Invalid status value for status {status}");
+                }
+
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                        Expression.Constant(statusEnum)));
+            }
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Course.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(s => s.Id);
+
+            if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Name);
+            }
+            else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.CreatedDate);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.CreatedDate);
+            }
+            else if (sortModifiedDate != null && sortModifiedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.ModifiedDate);
+            }
+            else if (sortModifiedDate != null && sortModifiedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.ModifiedDate);
+            }
+
+            var courses = await _unitOfWork.CourseRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Course, bool>>(filter, parameter),
+                orderBy: orderBy,
+                page: page,
+                size: size,
+                includeProperties: $"{nameof(Course.CreatedBy)}"
+            );
+            var result = CourseMapper.EntityToCommonDto(courses);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute GetCourseAsync method: \nDetail: {}.", e.Message);
+            throw new Exception("Error when execute GetCourseAsync method");
         }
     }
 
