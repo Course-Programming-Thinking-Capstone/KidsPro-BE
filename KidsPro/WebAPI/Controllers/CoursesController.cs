@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Application.Dtos.Request.Course;
+﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -72,5 +71,23 @@ public class CoursesController : Controller
         [FromForm(Name = "file")] IFormFile file)
     {
         return Ok(await _courseService.UpdatePictureAsync(id, file));
+    }
+
+    /// <summary>
+    ///  Delete unused course. Only admin or owner can delete course by Id and can only delete draft course
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin,Teacher,Staff")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult> DeleteAsync([FromRoute] int id)
+    {
+        await _courseService.DeleteAsync(id);
+        return NoContent();
     }
 }

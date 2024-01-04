@@ -107,6 +107,7 @@ public class CourseService : ICourseService
             {
                 _unitOfWork.CourseResourceRepository.DeleteRange(entity.CourseResources);
             }
+
             //Update new resource
             entity.CourseResources = request.Resources.Select(CourseResourceMapper.AddDtoToEntity).ToList();
         }
@@ -168,6 +169,43 @@ public class CourseService : ICourseService
         {
             _logger.LogError("Error when update picture for course {}. Detail: {}", course, e.Message);
             throw new Exception($"Error when update picture for course {course}");
+        }
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var currentUser = await GetCurrentUser();
+
+        var entity = await _unitOfWork.CourseRepository.GetAsync(
+                filter: c => c.Id == id,
+                orderBy: null,
+                includeProperties:
+                $"{nameof(Course.CreatedBy)},{nameof(Course.ModifiedBy)},{nameof(Course.CourseResources)}",
+                disableTracking: false)
+            .ContinueWith(t => t.Result.Any()
+                ? t.Result.FirstOrDefault() ?? throw new NotFoundException($"Course {id} does not exist.")
+                : throw new NotFoundException($"Course {id} does not exist."));
+        //check role 
+        if (currentUser.Role.Name != Constant.ADMIN_ROLE && currentUser.Id != entity.CreatedById)
+        {
+            throw new ForbiddenException("Only admin or owner can delete this course.");
+        }
+
+        //check course status 
+        if (entity.Status is not CourseStatus.Draft)
+        {
+            throw new BadRequestException("Can only delete draft course.");
+        }
+
+        _unitOfWork.CourseRepository.Delete(entity);
+        try
+        {
+            await _unitOfWork.SaveChangeAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when delete course {}.\n Detail: {}", id, e.Message);
+            throw new Exception($"Error when delete course {id}.\n");
         }
     }
 
