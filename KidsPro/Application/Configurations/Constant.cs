@@ -7,4 +7,5 @@ public static class Constant
     public const string ParentRole = "Parent";
     public const string StaffRole = "Staff";
     public const string TeacherRole = "Teacher";
+    public const string AdminOrStaffRole = AdminRole + "," + StaffRole;
 }

@@ -13,6 +13,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
     }
 
+  
     public async Task<List<User>> GetAllUsersByRole(int role)
     {
         return await _context.Users.Where(x => x.RoleId == role)
@@ -31,4 +32,6 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         }
         return null;
     }
+    
+
 }

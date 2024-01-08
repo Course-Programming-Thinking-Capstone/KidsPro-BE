@@ -10,7 +10,10 @@ namespace Application.Interfaces.IServices
         Task<User> GetUserById(Guid id);
         (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);
 
-        Task<LoginUserDto> RegisterAsync(RegisterDto request);
+        Task<LoginUserDto> RegisterAsync(RegisterDto request, int number);
         Task<List<User>> GetAllUsersByRole(int role);
+        Task<bool> SwitchStatusUser(int id, int number);
+
+
     }
 }

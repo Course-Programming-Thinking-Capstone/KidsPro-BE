@@ -8,8 +8,8 @@ namespace Domain.Enums
 {
     public enum RoleType
     {
-        Staff=2,
-        Teacher = 3,
-        Parents = 4
+        Staff=1,
+        Teacher = 2,
+        Parent = 3
     }
 }

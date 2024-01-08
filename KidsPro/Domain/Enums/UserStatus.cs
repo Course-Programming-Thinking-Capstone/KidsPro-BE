@@ -3,5 +3,5 @@
 public enum UserStatus
 {
     Active = 1,
-    Inactive = 2
+    Deactive = 2
 }
