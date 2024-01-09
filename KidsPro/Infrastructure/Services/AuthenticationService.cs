@@ -217,10 +217,7 @@ public class AuthenticationService : IAuthenticationService
             }
             else
             {
-                // Nếu refesh token hết expire thì cấp lại access token và refesh token
-                _accessToken = CreateAccessToken(user);
-                var _refeshToken = CreateRefreshToken(user);
-                return (true, _accessToken, _refeshToken);
+                throw new NotImplementException("RefreshToken has expired, please login again");
             }
         }
         catch (Exception e)
