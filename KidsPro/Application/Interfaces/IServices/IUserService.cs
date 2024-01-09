@@ -8,7 +8,7 @@ namespace Application.Interfaces.IServices
     {
         Task<LoginUserDto> LoginAsync(string phonenumber, string password);
         Task<User> GetUserById(Guid id);
-        (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);
+        Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id);
 
         Task<LoginUserDto> RegisterAsync(RegisterDto request, int number);
         Task<List<User>> GetAllUsersByRole(int role);

@@ -19,15 +19,19 @@ public class RoleRepository : BaseRepository<Role>, IRoleRepository
         var _role= new Role();
         switch (number)
         {
-            case 1:
+            //case 1:
+            //    _role = await GetAsync(filter: x => x.Name == Constant.AdminRole, orderBy: null)
+            //        .ContinueWith(t => t.Result.FirstOrDefault() ?? throw new NotFoundException("Staff role not found on database."));
+            //    break;
+            case 2:
                 _role =await GetAsync(filter: x => x.Name == Constant.StaffRole, orderBy: null)
                     .ContinueWith(t => t.Result.FirstOrDefault() ?? throw new NotFoundException("Staff role not found on database."));
                 break;
-            case 2:
+            case 3:
                 _role = await GetAsync(filter: x => x.Name == Constant.TeacherRole, orderBy: null)
                    .ContinueWith(t => t.Result.FirstOrDefault() ?? throw new NotFoundException("Teacher role not found on database."));
                 break;
-            case 3:
+            case 4:
                 _role = await GetAsync(filter: x => x.Name == Constant.ParentRole, orderBy: null)
                    .ContinueWith(t => t.Result.FirstOrDefault() ?? throw new NotFoundException("Parent role not found on database."));
                 break;

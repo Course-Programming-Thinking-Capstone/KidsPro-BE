@@ -48,9 +48,9 @@ namespace Application.Services
             throw new BadRequestException("Incorrect password");
         }
         //Cấp lại accesstoken qua refeshtoken
-        public (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user)
+        public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)
         {
-            var result = _authentication.ReissueToken(accessToken, refeshToken, user);
+            var result =await _authentication.ReissueToken(accessToken, refeshToken, id);
             return result;
         }
 
@@ -109,10 +109,10 @@ namespace Application.Services
                 switch (number)
                 {
                     case 1: // Active User
-                        user.IsDelete = true;
+                        user.Status = UserStatus.Active;
                         break;
-                    case 2:// Inactive User
-                        user.IsDelete = false;
+                    case 2:// Deactive User
+                        user.Status = UserStatus.Deactive;
                         break;
                 }
                 _unit.UserRepository.Update(user);

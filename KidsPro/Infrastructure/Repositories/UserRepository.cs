@@ -32,6 +32,16 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         }
         return null;
     }
-    
 
+    public override async Task<User?> GetByIdAsync(int id, bool disableTracking = false)
+    {
+        IQueryable<User> query = _dbSet;
+
+        if (disableTracking)
+        {
+            query.AsNoTracking();
+        }
+
+        return await _context.Users.Where(x=> x.Id==id).Include(x=> x.Role).FirstOrDefaultAsync();
+    }
 }

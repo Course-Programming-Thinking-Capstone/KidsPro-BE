@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Get all users trong database theo role number
         /// </summary>
-        /// <param name="role">1.Staff, 2. Teacher, 3.Parent</param>
+        /// <param name="role">2.Staff, 3. Teacher, 4.Parent</param>
         /// <returns></returns>
         [Authorize(Roles =Constant.AdminRole)]
         [HttpGet]
@@ -64,8 +64,8 @@ namespace WebAPI.Controllers
        /// <param name="id"></param>
        /// <param name="status">1. Active, 2. Deactive</param>
        /// <returns></returns>
-        //[Authorize(Roles =Constant.AdminRole)]
-        [HttpPatch("switch")]
+        [Authorize(Roles =Constant.AdminRole)]
+        [HttpPatch("switch/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
