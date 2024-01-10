@@ -9,7 +9,6 @@ using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static System.Enum;
 
@@ -41,7 +40,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseDto> CreateAsync(CreateCourseDto request)
     {
-        var currentUser = await GetCurrentUser();
+        var currentUser = await GetCurrentUserAsync();
 
         //check role 
         if (currentUser.Role.Name != Constant.AdminRole && currentUser.Role.Name != Constant.TeacherRole)
@@ -75,7 +74,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseDto> UpdateAsync(int id, UpdateCourseDto request)
     {
-        var currentUser = await GetCurrentUser();
+        var currentUser = await GetCurrentUserAsync();
 
         var entity = await _unitOfWork.CourseRepository.GetAsync(
                 filter: c => c.Id == id,
@@ -132,7 +131,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseDto> UpdatePictureAsync(int courseId, IFormFile file)
     {
-        var currentUser = await GetCurrentUser();
+        var currentUser = await GetCurrentUserAsync();
 
         var course = await _unitOfWork.CourseRepository.GetAsync(
                 filter: c => c.Id == courseId,
@@ -178,7 +177,7 @@ public class CourseService : ICourseService
 
     public async Task DeleteAsync(int id)
     {
-        var currentUser = await GetCurrentUser();
+        var currentUser = await GetCurrentUserAsync();
 
         var entity = await _unitOfWork.CourseRepository.GetAsync(
                 filter: c => c.Id == id,
@@ -220,11 +219,20 @@ public class CourseService : ICourseService
         string? sortCreatedDate,
         string? sortModifiedDate,
         int? page,
-        int? size)
+        int? size,
+        bool isOfCurrentUser = false
+    )
     {
         //need to check role
         var parameter = Expression.Parameter(typeof(Course));
         Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue && !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
 
         try
         {
@@ -232,7 +240,16 @@ public class CourseService : ICourseService
             filter = Expression.AndAlso(filter,
                 Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
                     Expression.Constant(false)));
-            
+
+            if (isOfCurrentUser)
+            {
+                var currentUser = await GetCurrentUserAsync();
+
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.CreatedById)),
+                        Expression.Constant(currentUser.Id)));
+            }
+
             if (!string.IsNullOrEmpty(status))
             {
                 if (!TryParse<CourseStatus>(status, out var statusEnum))
@@ -300,7 +317,7 @@ public class CourseService : ICourseService
         }
     }
 
-    private async Task<User> GetCurrentUser()
+    private async Task<User> GetCurrentUserAsync()
     {
         var currentUserId = _authenticationService.GetCurrentUserId();
 

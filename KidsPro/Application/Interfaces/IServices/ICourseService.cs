@@ -22,6 +22,7 @@ public interface ICourseService
         string? sortCreatedDate,
         string? sortModifiedDate,
         int? page,
-        int? size
+        int? size,
+        bool isOfCurrentUser = false
     );
 }

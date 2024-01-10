@@ -16,6 +16,9 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     protected readonly DbSet<T> _dbSet;
     protected readonly ILogger<BaseRepository<T>> _logger;
 
+    protected readonly int defaultPage = 1;
+    protected readonly int defaultSize = 10;
+
     public BaseRepository(AppDbContext context, ILogger<BaseRepository<T>> logger)
     {
         _context = context;
@@ -99,7 +102,6 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
                 query = orderBy(query);
             }
 
-
             if (page.HasValue && size.HasValue)
             {
                 if (page.Value <= 0)
@@ -111,21 +113,22 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
                 {
                     throw new BadRequestException("Size must be greater than 0.");
                 }
-
-                query = query.Skip((page.Value - 1) * size.Value).Take(size.Value);
-                result.Results = await query.ToListAsync();
-                result.TotalPages = (int)Math.Ceiling((double)result.TotalRecords / size.Value);
             }
             else
             {
-                result.Results = await query.ToListAsync();
+                page = defaultPage;
+                size = defaultSize;
             }
+
+            query = query.Skip((page.Value - 1) * size.Value).Take(size.Value);
+            result.Results = await query.ToListAsync();
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalRecords / size.Value);
 
             return result;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error when filter data of {typeof(T)} entity.");
+            _logger.LogError("Error when filter data of {class name} entity.\nDetail: {error}", typeof(T), e.Message);
             throw new Exception(e.Message);
         }
     }

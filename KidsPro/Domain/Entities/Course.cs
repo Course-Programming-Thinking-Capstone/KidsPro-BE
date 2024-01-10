@@ -58,7 +58,7 @@ public class Course : BaseEntity
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime CreatedDate { get; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
@@ -73,7 +73,7 @@ public class Course : BaseEntity
 
     [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
 
-    public virtual ICollection<CourseSection>? CourseSections { get; set; } 
+    public virtual ICollection<CourseSection>? CourseSections { get; set; }
 
-    public virtual ICollection<CourseResource>? CourseResources { get; set; } 
+    public virtual ICollection<CourseResource>? CourseResources { get; set; }
 }

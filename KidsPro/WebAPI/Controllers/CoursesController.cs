@@ -28,6 +28,7 @@ public class CoursesController : Controller
     /// <param name="sortName"></param>
     /// <param name="sortCreatedDate"></param>
     /// <param name="sortModifiedDate"></param>
+    /// <param name="isOfCurrentUser"></param>
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <returns></returns>
@@ -43,7 +44,8 @@ public class CoursesController : Controller
         [FromQuery] string? sortCreatedDate,
         [FromQuery] string? sortModifiedDate,
         [FromQuery] int? page,
-        [FromQuery] int? size
+        [FromQuery] int? size,
+        [FromQuery] bool? isOfCurrentUser
     )
     {
         var result = await _courseService.GetCourseAsync(
@@ -53,7 +55,8 @@ public class CoursesController : Controller
             sortCreatedDate,
             sortModifiedDate,
             page,
-            size
+            size,
+            isOfCurrentUser ?? false
         );
 
         return Ok(result);

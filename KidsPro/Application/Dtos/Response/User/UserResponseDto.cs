@@ -11,7 +11,7 @@ namespace Application.Dtos.Response.User
         public UserStatus Status { get; set; } = UserStatus.Active;
         public bool IsDelete { get; set; } = false;
 
-        public DateTime CreatedDate { get; } = DateTime.UtcNow;
+        public DateTime CreatedDate { get; set; } 
 
         public string? RoleName { get; set; } = null!;
 

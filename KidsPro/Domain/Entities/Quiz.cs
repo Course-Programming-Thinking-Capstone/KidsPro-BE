@@ -40,7 +40,7 @@ public class Quiz: BaseEntity
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime CreatedDate { get; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     [Required] public int CreatedById { get; set; }
 
