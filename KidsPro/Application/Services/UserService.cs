@@ -78,7 +78,6 @@ namespace Application.Services
             {
                 PhoneNumber = request.PhoneNumber,
                 FullName = request.FullName,
-                Gender = request.Gender,
                 PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
                 RoleId = userRole.Id,
                 Role = userRole,

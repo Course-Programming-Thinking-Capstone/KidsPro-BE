@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Entities;
 
 [Index(nameof(Order), nameof(CourseId), IsUnique = true)]
-public class CourseSection: BaseEntity
+public class CourseSection : BaseEntity
 {
-
     [Range(0, 255)]
     [Column(TypeName = "tinyint")]
     public int Order { get; set; }
@@ -20,4 +19,6 @@ public class CourseSection: BaseEntity
     public virtual Course Course { get; set; } = null!;
 
     public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+
+    public virtual ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
 }

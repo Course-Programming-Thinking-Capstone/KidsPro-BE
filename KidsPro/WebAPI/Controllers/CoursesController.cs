@@ -34,10 +34,10 @@ public class CoursesController : Controller
     /// <returns></returns>
     [HttpGet("manage")]
     [Authorize(Roles = "Admin,Teacher,Staff")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<CommonCourseDto>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<CommonManageCourseDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<CommonCourseDto>>> GetAsync(
+    public async Task<ActionResult<PagingResponse<CommonManageCourseDto>>> GetManageCourseAsync(
         [FromQuery] string? name,
         [FromQuery] string? status,
         [FromQuery] string? sortName,
@@ -48,7 +48,7 @@ public class CoursesController : Controller
         [FromQuery] bool? isOfCurrentUser
     )
     {
-        var result = await _courseService.GetCourseAsync(
+        var result = await _courseService.GetManageCourseAsync(
             name,
             status,
             sortName,
@@ -59,6 +59,34 @@ public class CoursesController : Controller
             isOfCurrentUser ?? false
         );
 
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Người dùng thông thường có thể lấy danh sách các khóa học hiện có trên hệ thống (status = Active).
+    /// Api không yêu cầu đăng nhập, các param đều không bắt buộc. Mặc định page = 1, size = 10 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="sortName"></param>
+    /// <param name="sortPostedDate"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<CommonCourseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<CommonCourseDto>>> GetCommonCourseAsync(
+        [FromQuery] string? name,
+        [FromQuery] string? sortName,
+        [FromQuery] string? sortPostedDate,
+        [FromQuery] int? page,
+        [FromQuery] int? size
+    )
+    {
+        var result = await _courseService.GetCoursesAsync(
+            name, sortName, sortPostedDate, page, size);
         return Ok(result);
     }
 

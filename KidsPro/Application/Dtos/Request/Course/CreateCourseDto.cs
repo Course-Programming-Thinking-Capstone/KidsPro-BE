@@ -14,10 +14,10 @@ public record CreateCourseDto
     [StringLength(3000, ErrorMessage = "Prerequisite can not exceed 3000 character")]
     public string? Prerequisite { get; set; }
     
-    [Range(3, 100)]
+    [Range(3, 30)]
     public int? FromAge { get; set; }
     
-    [Range(3, 100)]
+    [Range(3, 30)]
     public int? ToAge { get; set; }
 
     public List<AddCourseResourceDto>? Resources { get; set; } 

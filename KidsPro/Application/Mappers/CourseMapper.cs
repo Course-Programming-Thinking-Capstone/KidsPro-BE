@@ -45,7 +45,7 @@ public class CourseMapper
     };
 
 
-    public static CommonCourseDto EntityToCommonDto(Course entity) => new()
+    public static CommonManageCourseDto EntityToCommonManageDto(Course entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
@@ -56,13 +56,34 @@ public class CourseMapper
         CreatedByName = entity.CreatedBy.FullName
     };
 
-    public static PagingResponse<CommonCourseDto> EntityToCommonDto(PagingResponse<Course> entities) =>
+    public static PagingResponse<CommonManageCourseDto> EntityToCommonManageDto(PagingResponse<Course> entities) =>
         new()
         {
-            Results = entities.Results.Select(EntityToCommonDto).ToList(),
+            Results = entities.Results.Select(EntityToCommonManageDto).ToList(),
             TotalPages = entities.TotalPages,
             TotalRecords = entities.TotalRecords
         };
+
+    public static CommonCourseDto EntityToCommonCourseDto(Course entity) => new()
+    {
+        Id = entity.Id,
+        Name = entity.Name,
+        PictureUrl = entity.PictureUrl,
+        OpenDate = DateUtil.FormatDateTimeToDatetimeV1(entity.OpenDate),
+        StartSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
+        EndSaleDate = DateUtil.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
+        Price = entity.Price,
+        DiscountPrice = entity.DiscountPrice,
+        FromAge = entity.FromAge,
+        ToAge = entity.ToAge
+    };
+
+    public static PagingResponse<CommonCourseDto> EntityToCommonCourseDto(PagingResponse<Course> entities) => new()
+    {
+        TotalRecords = entities.TotalRecords,
+        TotalPages = entities.TotalPages,
+        Results = entities.Results.Select(EntityToCommonCourseDto).ToList()
+    };
 
     public static void UpdateDtoToEntity(UpdateCourseDto dto, ref Course entity)
     {

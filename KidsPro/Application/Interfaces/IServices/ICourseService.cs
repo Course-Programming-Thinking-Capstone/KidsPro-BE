@@ -15,7 +15,7 @@ public interface ICourseService
 
     Task DeleteAsync(int id);
 
-    Task<PagingResponse<CommonCourseDto>> GetCourseAsync(
+    Task<PagingResponse<CommonManageCourseDto>> GetManageCourseAsync(
         string? name,
         string? status,
         string? sortName,
@@ -24,5 +24,13 @@ public interface ICourseService
         int? page,
         int? size,
         bool isOfCurrentUser = false
+    );
+
+    Task<PagingResponse<CommonCourseDto>> GetCoursesAsync(
+        string? name,
+        string? sortName,
+        string? sortPostedDate,
+        int? page,
+        int? size
     );
 }

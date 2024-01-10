@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Domain.Enums;
 
 namespace Application.Dtos.Request.Authentication;
 
@@ -18,6 +17,4 @@ public record RegisterDto
     [Required(ErrorMessage = "Password is required.")]
     [MinLength(4, ErrorMessage = "Password must have at least 4 character")]
     public string Password { get; init; } = string.Empty;
-
-    public Gender? Gender { get; init; }
 }

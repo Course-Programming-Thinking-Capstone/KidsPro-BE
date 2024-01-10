@@ -212,7 +212,7 @@ public class CourseService : ICourseService
         }
     }
 
-    public async Task<PagingResponse<CommonCourseDto>> GetCourseAsync(
+    public async Task<PagingResponse<CommonManageCourseDto>> GetManageCourseAsync(
         string? name,
         string? status,
         string? sortName,
@@ -228,7 +228,7 @@ public class CourseService : ICourseService
         Expression filter = Expression.Constant(true); // default is "where true"
 
         //set default page size
-        if (!page.HasValue && !size.HasValue)
+        if (!page.HasValue || !size.HasValue)
         {
             page = 1;
             size = 10;
@@ -307,13 +307,87 @@ public class CourseService : ICourseService
                 size: size,
                 includeProperties: $"{nameof(Course.CreatedBy)}"
             );
-            var result = CourseMapper.EntityToCommonDto(courses);
+            var result = CourseMapper.EntityToCommonManageDto(courses);
             return result;
         }
         catch (Exception e)
         {
-            _logger.LogError("Error when execute GetCourseAsync method: \nDetail: {}.", e.Message);
-            throw new Exception("Error when execute GetCourseAsync method");
+            _logger.LogError("Error when execute GetManageCourseAsync method: \nDetail: {}.", e.Message);
+            throw new Exception("Error when execute GetManageCourseAsync method");
+        }
+    }
+
+    public async Task<PagingResponse<CommonCourseDto>> GetCoursesAsync(string? name, string? sortName,
+        string? sortPostedDate,
+        int? page, int? size)
+    {
+        //need to check role
+        var parameter = Expression.Parameter(typeof(Course));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            //get course that is not deleted
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
+                    Expression.Constant(false)));
+
+            //Just get active course
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                    Expression.Constant(CourseStatus.Active)));
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Course.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(s => s.Id);
+
+            if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Name);
+            }
+            else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+            else if (sortPostedDate != null && sortPostedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.CreatedDate);
+            }
+            else if (sortPostedDate != null && sortPostedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.CreatedDate);
+            }
+
+            var courses = await _unitOfWork.CourseRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Course, bool>>(filter, parameter),
+                orderBy: orderBy,
+                page: page,
+                size: size,
+                includeProperties: $"{nameof(Course.CreatedBy)}"
+            );
+            var result = CourseMapper.EntityToCommonCourseDto(courses);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.", nameof(this.GetCoursesAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.GetCoursesAsync)} method");
         }
     }
 
