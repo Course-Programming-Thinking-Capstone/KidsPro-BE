@@ -5,5 +5,5 @@ namespace Application.Interfaces.IRepositories;
 
 public interface IRoleRepository: IBaseRepository<Role>
 {
-    
+    public Task<Role> GetRoleAsync(int number);
 }

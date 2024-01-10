@@ -27,7 +27,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     }
 
 
-    public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>>? filter,
+    public virtual async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>>? filter,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy, string? includeProperties = null,
         bool disableTracking = false)
     {

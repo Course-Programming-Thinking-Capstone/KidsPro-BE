@@ -12,6 +12,6 @@ public interface IAuthenticationService
     int GetCurrentUserId();
 
     void GetCurrentUserInformation(out int userId, out string role);
-    (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);
+    public Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id);
 
 }

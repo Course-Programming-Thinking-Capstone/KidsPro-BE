@@ -19,7 +19,7 @@ namespace Infrastructure.Repositories
             switch (type)
             {
                 case 1://Check by UserId
-                    result = _context.Tokens.Where(x => x.UserId.Equals(parameter)).FirstOrDefault();
+                    result = _context.Tokens.Where(x => x.UserId==Int32.Parse(parameter)).FirstOrDefault();
                     break;
                 case 2://Check by Token
                     result = _context.Tokens.Where(x => x.Token.Equals(parameter)).FirstOrDefault();

@@ -48,13 +48,13 @@ namespace Application.Services
             throw new BadRequestException("Incorrect password");
         }
         //Cấp lại accesstoken qua refeshtoken
-        public (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user)
+        public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)
         {
-            var result = _authentication.ReissueToken(accessToken, refeshToken, user);
+            var result =await _authentication.ReissueToken(accessToken, refeshToken, id);
             return result;
         }
 
-        public async Task<LoginUserDto> RegisterAsync(RegisterDto request)
+        public async Task<LoginUserDto> RegisterAsync(RegisterDto request,int number)
         {
             //check duplicate phone number
             var isExist = await _unit.UserRepository.GetAsync(
@@ -68,11 +68,7 @@ namespace Application.Services
                 throw new ConflictException("Phone number has been existed.");
             }
 
-            var userRole = await _unit.RoleRepository.GetAsync(
-                    filter: r => r.Name == Constant.ParentRole,
-                    orderBy: null)
-                .ContinueWith(t =>
-                    t.Result.FirstOrDefault() ?? throw new NotFoundException("User role not found on database."));
+            var userRole = await _unit.RoleRepository.GetRoleAsync(number);
 
             var entity = new User()
             {
@@ -98,16 +94,34 @@ namespace Application.Services
             throw new BadRequestException("Error when adding user to database.");
         }
 
-        //string HashingPass(string password)
-        //{
-        //    var hasher = new PasswordHasher<object>();
-        //    return hasher.HashPassword(null, password);
-        //}
-
         public async Task<List<User>> GetAllUsersByRole(int role)
         {
-            if (role == 5) throw new Exception();
+            if (role <1 || role >4) throw new ForbiddenException("Access Unacceptable");
             return await _unit.UserRepository.GetAllUsersByRole(role);
         }
+
+        public async Task<bool> SwitchStatusUser(int id, int number)
+        {
+            var user = await _unit.UserRepository.GetByIdAsync(id);
+            if (user != null)
+            {
+                switch (number)
+                {
+                    case 1: // Active User
+                        user.Status = UserStatus.Active;
+                        break;
+                    case 2:// Deactive User
+                        user.Status = UserStatus.Deactive;
+                        break;
+                }
+                _unit.UserRepository.Update(user);
+                var result = await _unit.SaveChangeAsync();
+                if (result > 0) return true;
+                throw new ConflictException("Error when switch user status");
+            }
+            throw new BadRequestException("id not exist in database");
+        }
+
+
     }
 }

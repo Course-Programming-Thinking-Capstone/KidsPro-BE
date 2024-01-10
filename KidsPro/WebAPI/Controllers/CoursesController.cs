@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;

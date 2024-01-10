@@ -1,7 +1,11 @@
-﻿using Application.Dtos.Request.Authentication;
+﻿using Application.Configurations;
+using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.User;
+using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Entities;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -20,7 +24,7 @@ public class AuthenticationController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<LoginUserDto>> Register([FromBody] RegisterDto request)
     {
-        var result = await _userService.RegisterAsync(request);
+        var result = await _userService.RegisterAsync(request,4);
 
         /*
         // Create the response with a custom header
@@ -42,18 +46,60 @@ public class AuthenticationController : ControllerBase
     }
 
     /// <summary>
-    /// Reissue Token Including Access & Refesh Token
+    /// Reissue Token Including Access and Refesh Token
     /// </summary>
     /// <param name="accessToken"></param>
     /// <param name="refeshToken"></param>
-    /// <param name="user"></param>
+    /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("reissue")]
-    public IActionResult ReissueToken(string accessToken, string refeshToken, User user)
+    [HttpPost("reissue/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status501NotImplemented, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> ReissueToken(string accessToken, string refeshToken,[FromRoute] int id)
     {
-        var result = _userService.ReissueToken(accessToken, refeshToken, user);
+        var result =await _userService.ReissueToken(accessToken, refeshToken, id);
         if (result.Item1)
-            return Ok(result);
-        return NotFound(result.Item2);
+            return Ok(new
+            {
+                AccessToken=result.Item2,
+                RefeshToken=result.Item3
+            });
+        return NotFound(result.Item1);
+    }
+    /// <summary>
+    /// Register cho thành viên nội bộ
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="role">2. Staff, 3. Teacher</param>
+    /// <returns></returns>
+    [Authorize(Constant.AdminRole)]
+    [HttpPost("register/insider")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound,Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status409Conflict,Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest,Type= typeof(ErrorDetail))]
+    public async Task<ActionResult<LoginUserDto>> RegisterInsider([FromBody] RegisterDto request,RoleType role)
+    {
+        var result = new LoginUserDto();
+        switch ((int)role)
+        {
+            // Register for admin
+            //case 1:
+            //    result = await _userService.RegisterAsync(request, 1);
+            //    break;
+            // Register for staff
+            case 2:
+                result = await _userService.RegisterAsync(request, 2);
+                break;
+            // Register for teacher
+            case 3:
+                result = await _userService.RegisterAsync(request, 3);
+                break;
+            case 4:
+                throw new BadRequestException("This API only create for staff & teacher role");
+        }
+         return CreatedAtAction(nameof(Register), result);
     }
 }

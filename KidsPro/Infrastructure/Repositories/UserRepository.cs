@@ -13,6 +13,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
     }
 
+  
     public async Task<List<User>> GetAllUsersByRole(int role)
     {
         return await _context.Users.Where(x => x.RoleId == role)
@@ -30,5 +31,17 @@ public class UserRepository : BaseRepository<User>, IUserRepository
                 break;
         }
         return null;
+    }
+
+    public override async Task<User?> GetByIdAsync(int id, bool disableTracking = false)
+    {
+        IQueryable<User> query = _dbSet;
+
+        if (disableTracking)
+        {
+            query.AsNoTracking();
+        }
+
+        return await _context.Users.Where(x=> x.Id==id).Include(x=> x.Role).FirstOrDefaultAsync();
     }
 }
