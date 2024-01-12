@@ -129,6 +129,7 @@ public static class DependencyInjection
         services.AddDistributedMemoryCache();
         // Mapper
         services.AddAutoMapper(typeof(UserMapper).Assembly);
+        services.AddAutoMapper(typeof(TeacherMapper).Assembly);
         return services;
     }
 }

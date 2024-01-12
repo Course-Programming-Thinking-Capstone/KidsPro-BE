@@ -74,7 +74,7 @@ public class AuthenticationController : ControllerBase
     /// <param name="request"></param>
     /// <param name="role">2. Staff, 3. Teacher</param>
     /// <returns></returns>
-    [Authorize(Constant.AdminRole)]
+    //[Authorize(Constant.AdminRole)]
     [HttpPost("register/insider")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound,Type = typeof(ErrorDetail))]
@@ -85,11 +85,11 @@ public class AuthenticationController : ControllerBase
         var result = new LoginUserDto();
         switch ((int)role)
         {
-            // Register for admin
-            //case 1:
-            //    result = await _userService.RegisterAsync(request, 1);
-            //    break;
-            // Register for staff
+             //Register for admin
+            case 1:
+                result = await _userService.RegisterAsync(request, 1);
+                break;
+             // Register for staff
             case 2:
                 result = await _userService.RegisterAsync(request, 2);
                 break;

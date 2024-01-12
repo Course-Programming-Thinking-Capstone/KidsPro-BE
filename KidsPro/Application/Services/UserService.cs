@@ -13,11 +13,13 @@ namespace Application.Services
     {
         readonly IUnitOfWork _unit;
         readonly IAuthenticationService _authentication;
-
-        public UserService(IUnitOfWork unit, IAuthenticationService authentication)
+        readonly ITeacherService _teacher;
+        public UserService(IUnitOfWork unit, IAuthenticationService authentication, ITeacherService teacher)
         {
             _unit = unit;
             _authentication = authentication;
+            _teacher = teacher;
+
         }
 
         public Task<User> GetUserById(Guid id)
@@ -80,8 +82,13 @@ namespace Application.Services
                 Status = UserStatus.Active,
                 IsDelete = false,
             };
+           
             await _unit.UserRepository.AddAsync(entity);
             var result = await _unit.SaveChangeAsync();
+
+            if (number == 3)
+                await _teacher.CreateTeacher(entity.Id);
+
 
             if (result > 0)
             {

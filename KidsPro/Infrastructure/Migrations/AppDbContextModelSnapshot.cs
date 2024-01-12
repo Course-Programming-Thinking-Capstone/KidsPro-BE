@@ -47,7 +47,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CartDetail", b =>
@@ -72,7 +72,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CartDetails");
+                    b.ToTable("CartDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Class", b =>
@@ -125,7 +125,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ClassSchedule", b =>
@@ -168,7 +168,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("ClassSchedules");
+                    b.ToTable("ClassSchedules", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
@@ -261,7 +261,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CourseResource", b =>
@@ -298,7 +298,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CourseResource");
+                    b.ToTable("CourseResource", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CourseSection", b =>
@@ -333,7 +333,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "CourseId")
                         .IsUnique();
 
-                    b.ToTable("CourseSections");
+                    b.ToTable("CourseSections", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Curriculum", b =>
@@ -434,7 +434,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Curricula");
+                    b.ToTable("Curricula", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CurriculumCourse", b =>
@@ -460,7 +460,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order")
                         .IsUnique();
 
-                    b.ToTable("CurriculumCourses");
+                    b.ToTable("CurriculumCourses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CurriculumResource", b =>
@@ -496,7 +496,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CurriculumId");
 
-                    b.ToTable("CurriculumResources");
+                    b.ToTable("CurriculumResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Lesson", b =>
@@ -551,7 +551,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "CourseSectionId")
                         .IsUnique();
 
-                    b.ToTable("Lessons");
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.LessonResource", b =>
@@ -591,7 +591,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("LessonResources");
+                    b.ToTable("LessonResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Option", b =>
@@ -635,7 +635,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "QuestionId")
                         .IsUnique();
 
-                    b.ToTable("Options");
+                    b.ToTable("Options", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -680,7 +680,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderDetail", b =>
@@ -702,7 +702,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
@@ -742,7 +742,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "Type")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
@@ -788,7 +788,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "QuizId")
                         .IsUnique();
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>
@@ -857,7 +857,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "LessonId")
                         .IsUnique();
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
@@ -912,7 +912,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -1008,7 +1008,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentAnswer", b =>
@@ -1047,7 +1047,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("StudentQuizId", "QuestionId")
                         .IsUnique();
 
-                    b.ToTable("StudentAnswers");
+                    b.ToTable("StudentAnswers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentAnswerOption", b =>
@@ -1086,7 +1086,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("StudentAnswerId", "OptionId")
                         .IsUnique();
 
-                    b.ToTable("StudentAnswerOptions");
+                    b.ToTable("StudentAnswerOptions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentClass", b =>
@@ -1110,7 +1110,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ClassId1");
 
-                    b.ToTable("StudentClasses");
+                    b.ToTable("StudentClasses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>
@@ -1148,7 +1148,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("StudentId", "QuizId")
                         .IsUnique();
 
-                    b.ToTable("StudentQuizzes");
+                    b.ToTable("StudentQuizzes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Teacher", b =>
@@ -1178,7 +1178,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teachers");
+                    b.ToTable("Teachers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherContactInformation", b =>
@@ -1210,7 +1210,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("TeacherContactInformations");
+                    b.ToTable("TeacherContactInformations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
@@ -1242,7 +1242,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("TeacherProfiles");
+                    b.ToTable("TeacherProfiles", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherResource", b =>
@@ -1274,7 +1274,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("TeacherResources");
+                    b.ToTable("TeacherResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Transaction", b =>
@@ -1340,7 +1340,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -1403,7 +1403,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[TeacherId] IS NOT NULL");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Cart", b =>
