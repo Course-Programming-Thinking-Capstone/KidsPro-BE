@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.IRepositories
 {
-    public interface ITeacherRepository<T> : IBaseRepository<T> where T : BaseEntity
+    public interface ITeacherOverallRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         Task CreateOrUpdateAsync(TeacherRequestType type, Func<T> data);
         public Task<int> SaveChangeAsync();

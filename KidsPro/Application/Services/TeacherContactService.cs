@@ -15,10 +15,10 @@ namespace Application.Services
 {
     public class TeacherContactService : ITeacherContactService
     {
-        ITeacherRepository<TeacherContactInformation> _teacher;
+        ITeacherOverallRepository<TeacherContactInformation> _teacher;
         IMapper _map;
 
-        public TeacherContactService(ITeacherRepository<TeacherContactInformation> teacher, IMapper map)
+        public TeacherContactService(ITeacherOverallRepository<TeacherContactInformation> teacher, IMapper map)
         {
             _teacher = teacher;
             _map = map;
@@ -31,20 +31,36 @@ namespace Application.Services
             {
                 case TeacherRequestType.Create:
                     if (_contact == null)
+                    {
                         _contact = new TeacherContactInformation();
+                        //Add Entity
+                        await _teacher.CreateOrUpdateAsync(type, () =>
+                        {
+                            _contact = _map.Map<TeacherContactInformation>(dto);
+                            return _contact;
+                        });
+                    }
                     else
                         throw new BadRequestException("Teacher Contact Information is existed, create failed");
                     break;
                 case TeacherRequestType.Update:
                     if (_contact == null)
                         throw new BadRequestException("Teacher Contact Information is not existed, update failed");
+                    else
+                    {
+                        //Update Entity
+                        await _teacher.CreateOrUpdateAsync(type, () =>
+                        {
+                            _contact.TeacherId = dto.TeacherId;
+                            _contact.Url = dto.Url;
+                            _contact.Type = dto.Type;
+                            return _contact;
+                        });
+                    }
                     break;
             }
-            await _teacher.CreateOrUpdateAsync(type, () =>
-            {
-                _contact = _map.Map<TeacherContactInformation>(dto);
-                return _contact;
-            });
         }
+
+
     }
 }

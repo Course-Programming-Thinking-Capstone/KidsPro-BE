@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class TeacherProfileService:ITeacherProfileService
+    public class TeacherProfileService : ITeacherProfileService
     {
-        ITeacherRepository<TeacherProfile> _teacher;
+        ITeacherOverallRepository<TeacherProfile> _teacher;
         IMapper _map;
 
-        public TeacherProfileService(ITeacherRepository<TeacherProfile> teacher, IMapper map)
+        public TeacherProfileService(ITeacherOverallRepository<TeacherProfile> teacher, IMapper map)
         {
             _teacher = teacher;
             _map = map;
@@ -31,20 +31,36 @@ namespace Application.Services
             {
                 case TeacherRequestType.Create:
                     if (_contact == null)
+                    {
                         _contact = new TeacherProfile();
+                        //Add Entity
+                        await _teacher.CreateOrUpdateAsync(type, () =>
+                        {
+                            _contact = _map.Map<TeacherProfile>(dto);
+                            return _contact;
+                        });
+                    }
                     else
                         throw new BadRequestException("Teacher profile is existed, create failed");
                     break;
                 case TeacherRequestType.Update:
                     if (_contact == null)
                         throw new BadRequestException("Teacher profile is not existed, update failed");
+                    else
+                    {
+                        //Update Entity
+                        await _teacher.CreateOrUpdateAsync(type, () =>
+                        {
+                            _contact.TeacherId = dto.TeacherId;
+                            _contact.ToDate = dto.ToDate;
+                            _contact.FromDate = dto.FromDate;
+                            return _contact;
+                        });
+                    }
                     break;
             }
-            await _teacher.CreateOrUpdateAsync(type, () =>
-            {
-                _contact = _map.Map<TeacherProfile>(dto);
-                return _contact;
-            });
         }
+
+
     }
 }

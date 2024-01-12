@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
-    public class TeacherRepository<T> : BaseRepository<T>, ITeacherRepository<T> where T : BaseEntity
+    public class TeacherOverallRepository<T> : BaseRepository<T>, ITeacherOverallRepository<T> where T : BaseEntity
     {
-        public TeacherRepository(AppDbContext context, ILogger<BaseRepository<T>> logger) : base(context, logger)
+        public TeacherOverallRepository(AppDbContext context, ILogger<BaseRepository<T>> logger) : base(context, logger)
         {
         }
         public async Task CreateOrUpdateAsync(TeacherRequestType type, Func<T> data)

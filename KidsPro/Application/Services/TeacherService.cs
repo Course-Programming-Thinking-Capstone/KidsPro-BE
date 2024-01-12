@@ -16,9 +16,9 @@ namespace Application.Services
 {
     public class TeacherService : ITeacherService
     {
-        ITeacherRepository<Teacher> _teacher;
+        ITeacherOverallRepository<Teacher> _teacher;
 
-        public TeacherService(ITeacherRepository<Teacher> unit)
+        public TeacherService(ITeacherOverallRepository<Teacher> unit)
         {
             _teacher = unit;
         }
