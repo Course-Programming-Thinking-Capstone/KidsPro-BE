@@ -11,7 +11,6 @@ namespace Application.Dtos.Request.Teacher
 {
     public class TeacherProfileRequest
     {
-        [JsonIgnore]
         public int Id { get; set; }
         public DateTime FromDate { get; set; }
 

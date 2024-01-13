@@ -11,7 +11,7 @@ public interface IUnitOfWork : IDisposable
     public ICourseRepository CourseRepository { get; }
     public IClassRepository ClassRepository { get; }
     public ICourseResourceRepository CourseResourceRepository { get; }
-    
+    public ITeacherRepository TeacherRepository { get; }
     public Task<int> SaveChangeAsync();
 
     public Task BeginTransactionAsync();

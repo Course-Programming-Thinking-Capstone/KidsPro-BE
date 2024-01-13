@@ -1,4 +1,5 @@
-﻿using Application.ErrorHandlers;
+﻿using Application.Dtos.Request.Teacher;
+using Application.ErrorHandlers;
 using Domain.Entities;
 using Domain.Entities.Generic;
 using Domain.Enums;
@@ -12,6 +13,8 @@ namespace Application.Interfaces.IServices
 {
     public interface ITeacherService
     {
-        public Task CreateTeacher(int id);
+        Task CreateTeacher(int id);
+        Task<Teacher?> GetTeacherById(int id);
+        Task<bool> UpdateTeacher(TeacherRequest request);
     }
 }
