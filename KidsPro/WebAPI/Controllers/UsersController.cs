@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="role">2.Staff, 3. Teacher, 4.Parent</param>
         /// <returns></returns>
-        [Authorize(Roles =Constant.AdminRole)]
+        //[Authorize(Roles =Constant.AdminRole)]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound,Type = typeof(ErrorDetail))]
