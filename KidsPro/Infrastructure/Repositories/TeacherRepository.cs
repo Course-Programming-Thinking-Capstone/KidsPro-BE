@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories
 
         public override async Task<Teacher?> GetByIdAsync(int id, bool disableTracking = false)
         {
-            return await _context.Teachers.Where(x => x.Id == id)
+            return await _context.Teachers.Where(x => x.UserId == id)
                 .Include(x => x.TeacherContactInformations)
                 .Include(x => x.TeacherProfiles)
                 .Include(x => x.TeacherResources).FirstOrDefaultAsync();

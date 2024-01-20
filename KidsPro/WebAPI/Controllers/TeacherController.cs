@@ -34,7 +34,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Get teacher by id
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">userId</param>
         /// <returns></returns>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Teacher))]

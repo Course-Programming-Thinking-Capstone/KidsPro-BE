@@ -12,7 +12,6 @@ namespace Application.Dtos.Request.Teacher
 {
     public class TeacherContactRequest
     {
-        [JsonIgnore]
         public int Id { get; set; }
         [MaxLength(250)] public string Url { get; set; } = string.Empty;
 

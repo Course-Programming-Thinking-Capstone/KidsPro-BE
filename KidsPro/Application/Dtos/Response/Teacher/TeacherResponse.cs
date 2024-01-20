@@ -10,6 +10,8 @@ namespace Application.Dtos.Response.Teacher
 {
     public class TeacherResponse
     {
+        public int Id { get; set; }
+        public int UserId { get; set; }
         [MaxLength(150)] public string? Field { get; set; }
 
         [MaxLength(3000)] public string? Description { get; set; }
