@@ -7,18 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(Username), IsUnique = true)]
+[Index(nameof(Gmail), IsUnique = true)]
 [Index(nameof(Gmail), IsUnique = true)]
 [Index(nameof(Code), IsUnique = true)]
 public class Student : BaseEntity
 {
     [MaxLength(20)] public string Code { get; set; } = string.Empty;
 
-    [MaxLength(100)] public string Username { get; set; } = string.Empty;
-
     [MaxLength(150)] public string PasswordHash { get; set; } = string.Empty;
 
-    [MaxLength(50)] public string? Gmail { get; set; }
+    [MaxLength(50)] public string Gmail { get; set; } = string.Empty;
 
     [Column(TypeName = "tinyint")] public Gender? Gender { get; set; }
 

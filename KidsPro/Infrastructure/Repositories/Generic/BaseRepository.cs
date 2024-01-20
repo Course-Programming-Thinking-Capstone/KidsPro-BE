@@ -60,7 +60,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error when filter data of {typeof(T)} entity.");
+            _logger.LogError(e, "Error when filter data of {} entity.", typeof(T));
             throw;
         }
     }

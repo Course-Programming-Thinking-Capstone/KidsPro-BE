@@ -15,23 +15,28 @@ public class UnitOfWork : IUnitOfWork
     public IRoleRepository RoleRepository { get; }
     public IUserRepository UserRepository { get; }
 
+    public ITeacherRepository TeacherRepository { get; }
+    
     public IRefeshTokenRepository RefeshTokenRepository { get; }
+    public ICourseSectionRepository CourseSectionRepository { get; }
     public ICourseRepository CourseRepository { get; }
     public IClassRepository ClassRepository { get; }
     public ICourseResourceRepository CourseResourceRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository, 
-        IUserRepository userRepository, IRefeshTokenRepository refeshTokenRepository, 
-        ICourseRepository courseRepository, IClassRepository classRepository, ICourseResourceRepository courseResourceRepository)
+        IUserRepository userRepository, IRefeshTokenRepository refreshTokenRepository, 
+        ICourseRepository courseRepository, IClassRepository classRepository, ICourseResourceRepository courseResourceRepository, ITeacherRepository teacherRepository, ICourseSectionRepository courseSectionRepository)
     {
         _context = context;
         _logger = logger;
         RoleRepository = roleRepository;
         UserRepository = userRepository;
-        RefeshTokenRepository = refeshTokenRepository;
+        RefeshTokenRepository = refreshTokenRepository;
         CourseRepository = courseRepository;
         ClassRepository = classRepository;
         CourseResourceRepository = courseResourceRepository;
+        TeacherRepository = teacherRepository;
+        CourseSectionRepository = courseSectionRepository;
     }
 
     public async Task<int> SaveChangeAsync()
@@ -74,7 +79,7 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    private bool _disposed = false;
+    private bool _disposed;
 
     protected virtual void Dispose(bool disposing)
     {

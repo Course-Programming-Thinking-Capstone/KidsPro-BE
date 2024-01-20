@@ -2,6 +2,7 @@
 using Application.Configurations;
 using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.Section;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -386,9 +387,98 @@ public class CourseService : ICourseService
         }
         catch (Exception e)
         {
-            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.", nameof(this.GetCoursesAsync), e.Message);
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.GetCoursesAsync), e.Message);
             throw new Exception($"Error when execute {nameof(this.GetCoursesAsync)} method");
         }
+    }
+
+    public async Task<CourseDto> AddSectionAsync(int courseId, string sectionName)
+    {
+        var currentUser = await GetCurrentUserAsync();
+
+        //need to Check role
+        
+        //Need to check status
+        var course = await _unitOfWork.CourseRepository.GetAsync(
+                filter: c => c.IsDelete == false && c.Id == courseId,
+                orderBy: null,
+                includeProperties: $"{nameof(Course.ModifiedBy)}",
+                disableTracking: false)
+            .ContinueWith(t => t.Result.Any()
+                ? t.Result.FirstOrDefault() ?? throw new NotFoundException($"Course {courseId} does not exist.")
+                : throw new NotFoundException($"Course {courseId} does not exist."));
+
+        // check authorize
+        if (currentUser.Role.Name == Constant.TeacherRole && course.CreatedById != currentUser.Id)
+        {
+            throw new ForbiddenException("Only admin, staff or owner can modify this course.");
+        }
+        
+        var largestOrderCourseSection = await _unitOfWork.CourseSectionRepository.GetFirstByFilterAsync(
+            filter: c => c.CourseId == courseId,
+            orderBy: c => c.OrderByDescending(t => t.Order),
+            disableTracking: true
+        );
+
+        var order = largestOrderCourseSection?.Order + 1 ?? 1;
+
+        var courseSectionEntity = new CourseSection()
+        {
+            Name = sectionName,
+            Order = order,
+            CourseId = courseId
+        };
+
+        await _unitOfWork.CourseSectionRepository.AddAsync(courseSectionEntity);
+
+        course.ModifiedById = currentUser.Id;
+        course.ModifiedBy = currentUser;
+        course.ModifiedDate = DateTime.UtcNow;
+
+        _unitOfWork.CourseRepository.Update(course);
+
+        try
+        {
+            await _unitOfWork.SaveChangeAsync();
+            return CourseMapper.EntityToDto(course);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when add course section. Detail: {}", e.Message);
+            throw new Exception("Error when add course section.");
+        }
+    }
+
+    public Task<CourseDto> RemoveSectionAsync(int courseId, int courseSectionId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<CourseDto> UpdateSectionOrderAsync(int courseId, List<SectionDto> sections)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<CourseDto> AddSectionAsync(int courseId, List<SectionDto> sections)
+    {
+        // check role
+        var currentUser = await GetCurrentUserAsync();
+
+        var course = await _unitOfWork.CourseRepository.GetAsync(
+                filter: c => c.IsDelete == false && c.Id == courseId,
+                orderBy: null,
+                includeProperties: $"{nameof(Course.CourseSections)},{nameof(Course.ModifiedBy)}",
+                disableTracking: false)
+            .ContinueWith(t => t.Result.Any()
+                ? t.Result.FirstOrDefault()
+                : throw new NotFoundException($"Course {courseId} does not exist."));
+
+        //Remove course section
+        await _unitOfWork.CourseSectionRepository.DeleteByCourseIdAsync(courseId);
+
+
+        throw new NotImplementedException();
     }
 
     private async Task<User> GetCurrentUserAsync()

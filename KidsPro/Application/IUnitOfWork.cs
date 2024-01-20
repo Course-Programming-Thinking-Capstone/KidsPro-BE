@@ -7,6 +7,8 @@ public interface IUnitOfWork : IDisposable
     public IRoleRepository RoleRepository { get; }
     public IUserRepository UserRepository { get; }
     public IRefeshTokenRepository RefeshTokenRepository { get; }
+    
+    public ICourseSectionRepository CourseSectionRepository { get; }
 
     public ICourseRepository CourseRepository { get; }
     public IClassRepository ClassRepository { get; }

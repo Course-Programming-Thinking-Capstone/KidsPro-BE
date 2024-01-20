@@ -17,8 +17,6 @@ public class Lesson : BaseEntity
 
     public bool IsFree { get; set; }
 
-    public string? PictureUrl { get; set; }
-
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]

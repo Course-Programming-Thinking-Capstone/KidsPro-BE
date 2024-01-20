@@ -1,6 +1,4 @@
-﻿using Application.Dtos.Request.Course;
-
-namespace Application.Dtos.Response.Course;
+﻿namespace Application.Dtos.Response.Course;
 
 public class CourseDto
 {

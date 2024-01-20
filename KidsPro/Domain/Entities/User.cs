@@ -44,5 +44,4 @@ public class User : BaseEntity
     //relationship for course table
     public virtual ICollection<Course> CreatedCourses { get; set; } = new List<Course>();
 
-    public virtual Cart? Cart { get; set; }
 }

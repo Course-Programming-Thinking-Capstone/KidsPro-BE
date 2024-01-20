@@ -9,9 +9,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
-
-    public virtual DbSet<Cart> Carts { get; set; }
-    public virtual DbSet<CartDetail> CartDetails { get; set; }
+    
     public virtual DbSet<Class> Classes { get; set; }
     public virtual DbSet<ClassSchedule> ClassSchedules { get; set; }
     public virtual DbSet<Course> Courses { get; set; }

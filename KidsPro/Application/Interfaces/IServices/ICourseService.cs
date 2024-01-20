@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.Section;
 using Application.Dtos.Response.Paging;
 using Microsoft.AspNetCore.Http;
 
@@ -33,4 +34,10 @@ public interface ICourseService
         int? page,
         int? size
     );
+
+    Task<CourseDto> AddSectionAsync(int courseId, string sectionName);
+
+    Task<CourseDto> RemoveSectionAsync(int courseId, int courseSectionId);
+
+    Task<CourseDto> UpdateSectionOrderAsync(int courseId, List<SectionDto> sections);
 }
