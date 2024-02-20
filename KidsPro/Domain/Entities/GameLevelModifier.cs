@@ -3,7 +3,7 @@ using Domain.Entities.Generic;
 
 namespace Domain.Entities;
 
-public class GameLeverModifier: BaseEntity
+public class GameLevelModifier: BaseEntity
 {
     [Required]
     public int GameVersionId { get; set; }
