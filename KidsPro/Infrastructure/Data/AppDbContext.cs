@@ -10,150 +10,113 @@ public class AppDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Cart> Carts { get; set; }
-    public virtual DbSet<CartDetail> CartDetails { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<Account> Accounts { get; set; }
+    public virtual DbSet<Admin> Admins { get; set; }
+    public virtual DbSet<Teacher> Teachers { get; set; }
+    public virtual DbSet<Staff> Staves { get; set; }
+    public virtual DbSet<Parent> Parents { get; set; }
+    public virtual DbSet<Student> Students { get; set; }
+    public virtual DbSet<Payment> Payments { get; set; }
+    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<TeacherProfile> TeacherProfiles { get; set; }
+    public virtual DbSet<Course> Courses { get; set; }
+    public virtual DbSet<Certificate> Certificates { get; set; }
     public virtual DbSet<Class> Classes { get; set; }
     public virtual DbSet<ClassSchedule> ClassSchedules { get; set; }
-    public virtual DbSet<Course> Courses { get; set; }
-    public virtual DbSet<CourseSection> CourseSections { get; set; }
-    public virtual DbSet<Curriculum> Curricula { get; set; }
-    public virtual DbSet<CurriculumCourse> CurriculumCourses { get; set; }
-    public virtual DbSet<CurriculumResource> CurriculumResources { get; set; }
-    public virtual DbSet<Lesson> Lessons { get; set; }
-    public virtual DbSet<LessonResource> LessonResources { get; set; }
-    public virtual DbSet<Option> Options { get; set; }
+    public virtual DbSet<CourseResource> CourseResources { get; set; }
+    public virtual DbSet<Section> Chapters { get; set; }
+    public virtual DbSet<Lesson> Lesson { get; set; }
+    public virtual DbSet<StudentLesson> StudentLessons { get; set; }
+    public virtual DbSet<StudentProgress> StudentProgresses { get; set; }
+    public virtual DbSet<Quiz> Quizzes { get; set; }
+    public virtual DbSet<Question> Questions { get; set; }
+    public virtual DbSet<Answer> Answers { get; set; }
+    public virtual DbSet<StudentQuiz> StudentQuizzes { get; set; }
+    public virtual DbSet<StudentAnswer> StudentAnswers { get; set; }
+    public virtual DbSet<Voucher> Vouchers { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderDetail> OrderDetails { get; set; }
-    public virtual DbSet<Payment> Payments { get; set; }
-    public virtual DbSet<Question> Questions { get; set; }
-    public virtual DbSet<Quiz> Quizzes { get; set; }
-    public virtual DbSet<Role> Roles { get; set; }
-    public virtual DbSet<Student> Students { get; set; }
-    public virtual DbSet<StudentAnswer> StudentAnswers { get; set; }
-    public virtual DbSet<StudentAnswerOption> StudentAnswerOptions { get; set; }
-    public virtual DbSet<StudentClass> StudentClasses { get; set; }
-    public virtual DbSet<StudentQuiz> StudentQuizzes { get; set; }
-    public virtual DbSet<Teacher> Teachers { get; set; }
-    public virtual DbSet<TeacherContactInformation> TeacherContactInformations { get; set; }
-    public virtual DbSet<TeacherProfile> TeacherProfiles { get; set; }
-    public virtual DbSet<TeacherResource> TeacherResources { get; set; }
-    public virtual DbSet<Transaction> Transactions { get; set; }
-    public virtual DbSet<User> Users { get; set; }
-    public virtual DbSet<RefreshToken> Tokens { get; set; }
+    public virtual DbSet<Game> Games { get; set; }
+    public virtual DbSet<LevelType> LevelTypes { get; set; }
+    public virtual DbSet<GameLevel> GameLevels { get; set; }
+    public virtual DbSet<PositionType> PositionTypes { get; set; }
+    public virtual DbSet<GameLevelDetail> GameLevelDetails { get; set; }
+    public virtual DbSet<GameVersion> GameVersions { get; set; }
+    public virtual DbSet<GameLevelModifier> GameLevelModifiers { get; set; }
+    public virtual DbSet<GameQuizRoom> GameQuizRooms { get; set; }
+    public virtual DbSet<GameStudentQuiz> GameStudentQuizzes { get; set; }
+    public virtual DbSet<GamePlayHistory> GamePlayHistories { get; set; }
+    public virtual DbSet<GameUserProfile> GameUserProfiles { get; set; }
+    public virtual DbSet<GameItem> GameItems { get; set; }
+    public virtual DbSet<ItemOwned> ItemOwneds { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.CreatedTransactions)
-            .WithOne(t => t.User)
-            .HasForeignKey(t => t.UserId)
-            .IsRequired(true);
+        modelBuilder.Entity<Staff>()
+            .HasOne<Admin>(s => s.CreatedBy)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.ProcessedTransactions)
-            .WithOne(t => t.Staff)
-            .HasForeignKey(t => t.StaffId)
-            .IsRequired(false);
-
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.CreatedCurriculums)
-            .WithOne(c => c.CreatedBy)
-            .HasForeignKey(c => c.CreatedById);
-
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.CreatedCourses)
-            .WithOne(c => c.CreatedBy)
-            .HasForeignKey(c => c.CreatedById);
-
+        modelBuilder.Entity<Teacher>()
+            .HasOne<Admin>(s => s.CreatedBy)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Student>()
+            .HasOne<Parent>(s => s.Parent)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+        
         modelBuilder.Entity<Course>()
-            .HasOne<User>(c => c.ModifiedBy)
+            .HasOne<Teacher>(s => s.CreatedBy)
             .WithMany()
-            .HasForeignKey(c => c.ModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Curriculum>()
-            .HasOne<User>(c => c.ModifiedBy)
+        
+        modelBuilder.Entity<Course>()
+            .HasOne<Admin>(s => s.ModifiedBy)
             .WithMany()
-            .HasForeignKey(c => c.ModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Curriculum>()
-            .HasOne<User>(c => c.ApprovedBy)
+        
+        modelBuilder.Entity<TeacherProfile>()
+            .HasOne<Teacher>(s => s.Teacher)
             .WithMany()
-            .HasForeignKey(c => c.ApprovedById)
             .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<CartDetail>()
-            .HasOne<Course>(ca => ca.Course)
+        
+        modelBuilder.Entity<Class>()
+            .HasOne<Teacher>(s => s.Teacher)
             .WithMany()
-            .HasForeignKey(ca => ca.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        
+        modelBuilder.Entity<GameStudentQuiz>()
+            .HasOne<Student>(s => s.Student)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<StudentProgress>()
+            .HasOne<Course>(s => s.Course)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+        
         modelBuilder.Entity<OrderDetail>()
-            .HasOne<Course>(o => o.Course)
+            .HasOne<Student>(o => o.Student)
             .WithMany()
-            .HasForeignKey(o => o.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        // modelBuilder.Entity<CurriculumCourse>()
-        //     .HasKey(cc => new { cc.CurriculumId, cc.CourseId });
-
-        modelBuilder.Entity<CurriculumCourse>()
-            .HasOne<Curriculum>(cc => cc.Curriculum)
-            .WithMany()
-            .HasForeignKey(cc => cc.CurriculumId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<CurriculumCourse>()
-            .HasOne<Course>(cc => cc.Course)
-            .WithMany()
-            .HasForeignKey(cc => cc.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Quiz>()
-            .HasOne<User>(q => q.CreatedBy)
-            .WithMany()
-            .HasForeignKey(q => q.CreatedById)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<StudentAnswer>()
-            .HasOne<StudentQuiz>(sq => sq.StudentQuiz)
-            .WithMany()
-            .HasForeignKey(sq => sq.StudentQuizId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<StudentAnswerOption>()
-            .HasOne<StudentAnswer>(sao => sao.StudentAnswer)
-            .WithMany()
-            .HasForeignKey(sao => sao.StudentAnswerId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<StudentClass>()
-            .HasOne(sc => sc.Class)
-            .WithMany()
-            .HasForeignKey(sc => sc.ClassId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<StudentClass>()
-            .HasOne(sc => sc.Student)
-            .WithMany()
-            .HasForeignKey(sc => sc.StudentId)
-            .OnDelete(DeleteBehavior.Restrict);
-
+        
         modelBuilder.Entity<StudentQuiz>()
-            .HasOne(sq => sq.Student)
+            .HasOne<Student>(s => s.Student)
             .WithMany()
-            .HasForeignKey(sq => sq.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<RefreshToken>(x => { x.ToTable("RefreshToken"); });
 
         //data seeding
         modelBuilder.Entity<Role>().HasData(
-            new Role() { Id = 1, Name = Constant.ADMIN_ROLE },
-            new Role() { Id = 2, Name = Constant.STAFF_ROLE },
-            new Role() { Id = 3, Name = Constant.TEACHER_ROLE },
-            new Role() { Id = 4, Name = Constant.PARENT_ROLE }
+            new Role() { Id = 1, Name = Constant.AdminRole },
+            new Role() { Id = 2, Name = Constant.StaffRole },
+            new Role() { Id = 3, Name = Constant.TeacherRole },
+            new Role() { Id = 4, Name = Constant.ParentRole },
+            new Role() { Id = 5, Name = Constant.StudentRole }
         );
     }
 }

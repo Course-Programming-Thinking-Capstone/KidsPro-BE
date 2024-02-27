@@ -1,23 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Entities.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities.Generic;
 
 namespace Domain.Entities;
 
-[Index(nameof(StudentQuizId), nameof(QuestionId), IsUnique = true)]
-public class StudentAnswer:BaseEntity
+public class StudentAnswer : BaseEntity
 {
-
-    [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
-
-    public int StudentQuizId { get; set; }
-
-    public virtual StudentQuiz StudentQuiz { get; set; } = null!;
-
     public int QuestionId { get; set; }
 
-    public virtual Question Question { get; set; } = null!;
+    public int AnswerId { get; set; }
 
-    public virtual ICollection<StudentAnswerOption> StudentAnswerOptions { get; set; } = new List<StudentAnswerOption>();
+    public int QuestionOrder { get; set; }
+
+    public virtual StudentQuiz StudentQuiz { get; set; } = null!;
+    public int StudentQuizId { get; set; }
 }

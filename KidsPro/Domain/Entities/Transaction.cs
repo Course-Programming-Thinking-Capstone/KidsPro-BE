@@ -8,37 +8,33 @@ namespace Domain.Entities;
 
 public class Transaction : BaseEntity
 {
-    public int UserId { get; set; }
+    [MaxLength(750)] public string? Note { get; set; }
 
-    [StringLength(750)] public string? Note { get; set; }
+    public TransactionType Type { get; set; }
 
-    [Column(TypeName = "tinyint")] public TransactionType? Type { get; set; }
+    [MaxLength(50)] public string PaymentType { get; set; } = null!;
 
-    [Column(TypeName = "tinyint")] public PaymentType? Method { get; set; }
+    [MaxLength(250)] public string? SourceAccount { get; set; }
+    [MaxLength(250)] public string? DestinationAccount { get; set; }
 
-    [StringLength(250)] public string? SourceAccount { get; set; }
+    public decimal Amount { get; set; }
 
-    [StringLength(250)] public string? DestinationAccount { get; set; }
+    [MaxLength(250)] public string? TransactionCode { get; set; }
 
-    [StringLength(250)] public string? TransactionCode { get; set; }
-
-    [StringLength(100)] public string? Code { get; set; }
+    [MaxLength(100)] public string? VerificationCode { get; set; }
 
     [Column(TypeName = "tinyint")] public TransactionStatus Status { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime CreatedDate { get; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
     public DateTime? ProcessedDate { get; set; }
 
+    public virtual Staff? Staff { get; set; }
     public int? StaffId { get; set; }
-
-    public User? Staff { get; set; }
-
-    public virtual User User { get; set; } = null!;
 }

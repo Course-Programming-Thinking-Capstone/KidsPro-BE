@@ -6,29 +6,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class Order:BaseEntity
+public class Order : BaseEntity
 {
+    [MaxLength(50)] public string PaymentType { get; set; } = null!;
 
-    [StringLength(250)] public string PaymentMethod { get; set; } = null!;
+    [Precision(11,2)]
+    public decimal TotalPrice { get; set; }
+    public int Quantity { get; set; }
 
-    [Range(0, float.MaxValue)] [Precision(11,2)] public decimal TotalPrice { get; set; }
+    [Precision(11,2)]
+    public decimal Price { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime Date { get; } = DateTime.UtcNow;
+    public DateTime Date { get; set; }
 
-    [StringLength(750)] public string? Note { get; set; }
+    [MaxLength(750)] public string? Note { get; set; }
 
-    [Column(TypeName = "tinyint")] public OrderStatus Status { get; set; } = OrderStatus.Pending;
+    [Column(TypeName = "tinyint")] public OrderStatus Status { get; set; }
 
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual Voucher? Voucher { get; set; }
+    public int VoucherId { get; set; }
 
-    [Required] public int UserId { get; set; }
-
-    public virtual User User { get; set; } = null!;
-
-    public int? CurriculumId { get; set; }
-
-    public virtual Curriculum? Curriculum { get; set; }
+    public virtual Course Course { get; set; } = null!;
+    public int CourseId { get; set; }
 }

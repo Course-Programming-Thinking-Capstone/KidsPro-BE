@@ -4,14 +4,12 @@ namespace Application.Interfaces.IServices;
 
 public interface IAuthenticationService
 {
+    string CreateAccessToken(Account user);
 
-    string CreateAccessToken(User user);
-    
-    string CreateRefreshToken (User user);
+    string CreateRefreshToken(Account user);
 
     int GetCurrentUserId();
 
-    void GetCurrentUserInformation(out int userId, out string role);
-    (bool, string, string?) ReissueToken(string accessToken, string refeshToken, User user);
-
+    void GetCurrentUserInformation(out int accountId, out string role);
+    // public Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id);
 }

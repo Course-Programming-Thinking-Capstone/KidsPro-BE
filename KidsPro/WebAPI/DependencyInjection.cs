@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Application.Mappers;
 
 namespace WebAPI;
 
@@ -127,8 +126,6 @@ public static class DependencyInjection
         });
 
         services.AddDistributedMemoryCache();
-        // Mapper
-        services.AddAutoMapper(typeof(UserMapper).Assembly);
         return services;
     }
 }

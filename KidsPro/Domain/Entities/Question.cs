@@ -1,31 +1,19 @@
-﻿using System.Collections;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Generic;
-using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 [Index(nameof(Order), nameof(QuizId), IsUnique = true)]
-public class Question: BaseEntity
+public class Question : BaseEntity
 {
-
-    [Range(0, 255)]
-    [Column(TypeName = "tinyint")]
-    public int Order { get; set; }
-
-    [StringLength(750)] public string Title { get; set; } = null!;
-
-    [StringLength(250)] public string? ResourceUrl { get; set; }
-
-    [Range(0, int.MaxValue)] [Precision(5,2)] public decimal Score { get; set; }
-
-    [Column(TypeName = "tinyint")] public QuizQuestionType Type { get; set; } = QuizQuestionType.Radio;
-
-    public int QuizId { get; set; }
+    [Range(1, 100)] public int Order { get; set; }
+    [MaxLength(750)] public string Title { get; set; } = null!;
+    [Precision(5,2)]
+    public decimal Score { get; set; }
 
     public virtual Quiz Quiz { get; set; } = null!;
+    public int QuizId { get; set; }
 
-    public virtual ICollection<Option> Options { get; set; } = new List<Option>();
+    public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 }

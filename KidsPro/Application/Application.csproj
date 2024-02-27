@@ -13,7 +13,16 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Dtos\Request\Old\" />
+    <Folder Include="Dtos\Response\Old\" />
+    <Folder Include="Dtos\Response\Old\Teacher\" />
+    <Folder Include="Mappers\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

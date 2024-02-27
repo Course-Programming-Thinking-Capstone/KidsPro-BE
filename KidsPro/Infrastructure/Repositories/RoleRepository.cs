@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
-public class RoleRepository : BaseRepository<Role>, IRoleRepository
+public class RoleRepository:BaseRepository<Role>, IRoleRepository
 {
     public RoleRepository(AppDbContext context, ILogger<BaseRepository<Role>> logger) : base(context, logger)
     {
