@@ -13,28 +13,16 @@ public class UnitOfWork : IUnitOfWork
     private readonly ILogger<UnitOfWork> _logger;
 
     public IRoleRepository RoleRepository { get; }
-    public IUserRepository UserRepository { get; }
+    public IAccountRepository AccountRepository { get; }
 
-    public IRefeshTokenRepository RefeshTokenRepository { get; }
-    public ICourseRepository CourseRepository { get; }
-    public IClassRepository ClassRepository { get; }
-    public ICourseResourceRepository CourseResourceRepository { get; }
 
-    public ITeacherRepository TeacherRepository { get; }
-
-    public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository, 
-        IUserRepository userRepository, IRefeshTokenRepository refeshTokenRepository, 
-        ICourseRepository courseRepository, IClassRepository classRepository, ICourseResourceRepository courseResourceRepository, ITeacherRepository t)
+    public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
+        IAccountRepository accountRepository)
     {
         _context = context;
         _logger = logger;
         RoleRepository = roleRepository;
-        UserRepository = userRepository;
-        RefeshTokenRepository = refeshTokenRepository;
-        CourseRepository = courseRepository;
-        ClassRepository = classRepository;
-        CourseResourceRepository = courseResourceRepository;
-        TeacherRepository = t;
+        AccountRepository = accountRepository;
     }
 
     public async Task<int> SaveChangeAsync()

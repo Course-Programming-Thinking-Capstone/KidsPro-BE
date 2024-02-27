@@ -1,54 +1,42 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(Order), nameof(LessonId), IsUnique = true)]
-public class Quiz: BaseEntity
+[Index(nameof(Order), nameof(SectionId), IsUnique = true)]
+public class Quiz : BaseEntity
 {
+    [Range(1, 100)] public int Order { get; set; }
+    [Range(0, 100)] public int TotalQuestion { get; set; }
 
-    [Column(TypeName = "tinyint")]
-    [Range(0, 255)]
-    public int Order { get; set; }
+    public int TotalScore { get; set; }
 
-    [Column(TypeName = "smallint")]
-    [Range(0, 10000)]
-    public int TotalQuestion { get; set; }
+    public int MinScore { get; set; }
 
-    [Range(0, int.MaxValue)]
-    [Precision(5, 2)]
-    public decimal TotalScore { get; set; }
+    [MaxLength(250)] public string Title { get; set; } = null!;
 
-    [Range(0, int.MaxValue)]
-    [Precision(5, 2)]
-    public decimal MinScore { get; set; }
+    [MaxLength(750)] public string? Description { get; set; }
 
-    [StringLength(250)] public string? Title { get; set; }
-
-    [StringLength(750)] public string? Description { get; set; }
-
-    [Range(0, 6000)]
-    [Column(TypeName = "smallint")]
     public int? Duration { get; set; }
 
-    [Range(0, 255)]
-    [Column(TypeName = "tinyint")]
+    public int NumberOfQuestion { get; set; }
+
+    public bool IsOrderRandom { get; set; }
+
     public int? NumberOfAttempt { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; }
 
-    [Required] public int CreatedById { get; set; }
+    public virtual Teacher CreatedBy { get; set; } = null!;
+    public int CreatedById { get; set; }
 
-    [ForeignKey(nameof(CreatedById))] public virtual User CreatedBy { get; set; } = null!;
+    public virtual Section Section { get; set; } = null!;
+    public int SectionId { get; set; }
 
-    public int LessonId { get; set; }
-
-    public Lesson Lesson { get; set; } = null!;
 
     public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }

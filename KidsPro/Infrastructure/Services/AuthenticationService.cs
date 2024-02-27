@@ -36,7 +36,7 @@ public class AuthenticationService : IAuthenticationService
         _jwtSecurity = jwtSecurity;
     }
 
-    public string CreateAccessToken(User user)
+    public string CreateAccessToken(Account account)
     {
         try
         {
@@ -44,8 +44,8 @@ public class AuthenticationService : IAuthenticationService
             var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role.Name ?? throw new Exception("Role is empty"))
+                new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
+                new Claim(ClaimTypes.Role, account.Role.Name ?? throw new Exception("Role is empty"))
             };
             var token = new JwtSecurityToken(
                 issuer: _appConfiguration.Issuer,
@@ -63,7 +63,7 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public string CreateRefreshToken(User user)
+    public string CreateRefreshToken(Account account)
     {
         try
         {
@@ -71,7 +71,7 @@ public class AuthenticationService : IAuthenticationService
             var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, account.Id.ToString())
             };
             var token = new JwtSecurityToken(
                 issuer: _appConfiguration.Issuer,
@@ -80,17 +80,17 @@ public class AuthenticationService : IAuthenticationService
                 expires: DateTime.UtcNow.AddDays(3),
                 signingCredentials: credentials
             );
-            var refeshToken = new JwtSecurityTokenHandler().WriteToken(token);
+            var refreshToken = new JwtSecurityTokenHandler().WriteToken(token);
             // add refeshtoken data to database
-            var refesh = new RefreshToken
-            {
-                UserId = user.Id,
-                Token = refeshToken
-            };
-            _unit.RefeshTokenRepository.AddAsync(refesh);
-            _unit.SaveChangeAsync();
+            // var refesh = new RefreshToken
+            // {
+            //     UserId = user.Id,
+            //     Token = refeshToken
+            // };
+            // _unit.RefeshTokenRepository.AddAsync(refesh);
+            // _unit.SaveChangeAsync();
 
-            return refeshToken;
+            return refreshToken;
         }
         catch (Exception e)
         {
@@ -151,85 +151,85 @@ public class AuthenticationService : IAuthenticationService
         throw new NotFoundException();
     }
 
-    public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)
-    {
-        _tokenValidation = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = _appConfiguration.Issuer,
-            ValidAudience = _appConfiguration.Audience,
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfiguration.Key)),
-            ClockSkew = TimeSpan.Zero
-        };
-        try
-        {
-            //Check 1: Accesstoken & Refeshtoken valid format
-            var accessTokenVerification =
-                _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedAccessToken)
-                ?? throw new NotImplementException("Access Token wrong format");
-            var refeshTokenVerification =
-                _jwtSecurity.ValidateToken(refeshToken, _tokenValidation, out var validatedRefeshToken)
-                ?? throw new NotImplementException("Refesh Token wrong format");
-
-            //Check 2: Algorithm HmacSha512
-            if (validatedAccessToken is JwtSecurityToken jwtSecurity)
-            {
-                var result = jwtSecurity.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-                    StringComparison.InvariantCultureIgnoreCase);
-                if (!result)
-                    throw new NotImplementException("Access token wrong algorithms");
-            }
-
-            //Check 3: Expire Token. check xem access token có hết hạn chưa
-            var _ExpToken = accessTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
-            var utcExpireDate = long.Parse(_ExpToken);
-            var expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
-            if (expireDate > DateTime.UtcNow)
-                throw new NotImplementException("Access token has not yet expired");
-
-            //Check 4: Check xem userid của access token có exist trong table refeshtoken 
-            var _UserIdToken = accessTokenVerification.Claims.First(x => x.Type == ClaimTypes.NameIdentifier)
-                .Value;
-            var _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(_UserIdToken, 1);
-            if (!_checkExistance)
-                throw new NotFoundException("UserId not match");
-
-            //Check 5: Check xem refeshtoken gửi từ client có exist trong table refeshtoken 
-            _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(refeshToken, 2);
-            if (!_checkExistance)
-                throw new NotFoundException("RefreshToken does not match");
-
-            //Check 6: Check expired refeshtoken 
-            _ExpToken = refeshTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
-            utcExpireDate = long.Parse(_ExpToken);
-            expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
-            string _accessToken = accessToken;
-            //Get user by id
-            var user =await _unit.UserRepository.GetByIdAsync(id);
-            if (expireDate > DateTime.UtcNow)
-            {
-                // Nếu refesh token còn expire thì cấp lại access token
-                _accessToken = CreateAccessToken(user);
-                return (true, _accessToken, refeshToken);
-            }
-            else
-            {
-                throw new NotImplementException("RefreshToken has expired, please login again");
-            }
-        }
-        catch (Exception e)
-        {
-            throw new BadRequestException("Reissue token fail");
-        }
-    }
-
-    private DateTime ConverUrnixTimeToDateTime(long utcExpireDate)
-    {
-        var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        dateTimeInterval = dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
-        return dateTimeInterval;
-    }
+    // public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)
+    // {
+    //     _tokenValidation = new TokenValidationParameters
+    //     {
+    //         ValidateIssuer = true,
+    //         ValidateAudience = true,
+    //         ValidateIssuerSigningKey = true,
+    //         ValidIssuer = _appConfiguration.Issuer,
+    //         ValidAudience = _appConfiguration.Audience,
+    //         ValidateLifetime = true,
+    //         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfiguration.Key)),
+    //         ClockSkew = TimeSpan.Zero
+    //     };
+    //     try
+    //     {
+    //         //Check 1: Accesstoken & Refeshtoken valid format
+    //         var accessTokenVerification =
+    //             _jwtSecurity.ValidateToken(accessToken, _tokenValidation, out var validatedAccessToken)
+    //             ?? throw new NotImplementException("Access Token wrong format");
+    //         var refeshTokenVerification =
+    //             _jwtSecurity.ValidateToken(refeshToken, _tokenValidation, out var validatedRefeshToken)
+    //             ?? throw new NotImplementException("Refesh Token wrong format");
+    //
+    //         //Check 2: Algorithm HmacSha512
+    //         if (validatedAccessToken is JwtSecurityToken jwtSecurity)
+    //         {
+    //             var result = jwtSecurity.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+    //                 StringComparison.InvariantCultureIgnoreCase);
+    //             if (!result)
+    //                 throw new NotImplementException("Access token wrong algorithms");
+    //         }
+    //
+    //         //Check 3: Expire Token. check xem access token có hết hạn chưa
+    //         var _ExpToken = accessTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
+    //         var utcExpireDate = long.Parse(_ExpToken);
+    //         var expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
+    //         if (expireDate > DateTime.UtcNow)
+    //             throw new NotImplementException("Access token has not yet expired");
+    //
+    //         //Check 4: Check xem userid của access token có exist trong table refeshtoken 
+    //         var _UserIdToken = accessTokenVerification.Claims.First(x => x.Type == ClaimTypes.NameIdentifier)
+    //             .Value;
+    //         var _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(_UserIdToken, 1);
+    //         if (!_checkExistance)
+    //             throw new NotFoundException("UserId not match");
+    //
+    //         //Check 5: Check xem refeshtoken gửi từ client có exist trong table refeshtoken 
+    //         _checkExistance = _unit.RefeshTokenRepository.CheckRefeshTokenExist(refeshToken, 2);
+    //         if (!_checkExistance)
+    //             throw new NotFoundException("RefreshToken does not match");
+    //
+    //         //Check 6: Check expired refeshtoken 
+    //         _ExpToken = refeshTokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
+    //         utcExpireDate = long.Parse(_ExpToken);
+    //         expireDate = ConverUrnixTimeToDateTime(utcExpireDate);
+    //         string _accessToken = accessToken;
+    //         //Get user by id
+    //         var user =await _unit.UserRepository.GetByIdAsync(id);
+    //         if (expireDate > DateTime.UtcNow)
+    //         {
+    //             // Nếu refesh token còn expire thì cấp lại access token
+    //             _accessToken = CreateAccessToken(user);
+    //             return (true, _accessToken, refeshToken);
+    //         }
+    //         else
+    //         {
+    //             throw new NotImplementException("RefreshToken has expired, please login again");
+    //         }
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         throw new BadRequestException("Reissue token fail");
+    //     }
+    // }
+    //
+    // private DateTime ConverUrnixTimeToDateTime(long utcExpireDate)
+    // {
+    //     var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    //     dateTimeInterval = dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
+    //     return dateTimeInterval;
+    // }
 }

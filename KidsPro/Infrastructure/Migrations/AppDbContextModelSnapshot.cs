@@ -22,7 +22,7 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.Cart", b =>
+            modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,49 +30,130 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
-                    b.Property<byte>("TotalCourse")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("PictureUrl")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<int>("UserId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Admins");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CartDetail", b =>
+            modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
-                    b.Property<int>("CartId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AnswerExplain")
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("Order", "QuestionId")
+                        .IsUnique();
+
+                    b.ToTable("Answers");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Certificate", b =>
+                {
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ModifiedDate")
+                    b.Property<DateTime>("CompletionDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<byte>("Quantity")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("Description")
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
 
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("ResourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
-                    b.HasKey("CartId", "CourseId");
+                    b.HasKey("StudentId", "CourseId");
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CartDetails", (string)null);
+                    b.ToTable("Certificates");
                 });
 
             modelBuilder.Entity("Domain.Entities.Class", b =>
@@ -85,36 +166,34 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<short>("Duration")
-                        .HasColumnType("smallint");
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<byte?>("Duration")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
 
-                    b.Property<short>("TotalSlot")
-                        .HasColumnType("smallint");
+                    b.Property<int>("TotalSlot")
+                        .HasColumnType("int");
 
-                    b.Property<short>("TotalStudent")
-                        .HasColumnType("smallint");
+                    b.Property<int>("TotalStudent")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -123,9 +202,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Classes", (string)null);
+                    b.ToTable("Classes");
                 });
 
             modelBuilder.Entity("Domain.Entities.ClassSchedule", b =>
@@ -143,32 +224,19 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("RecordUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
                     b.Property<string>("RoomUrl")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<DateTime>("StartTime")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("ClassSchedules", (string)null);
+                    b.ToTable("ClassSchedules");
                 });
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
@@ -201,13 +269,21 @@ namespace Infrastructure.Migrations
                     b.Property<byte?>("FromAge")
                         .HasColumnType("tinyint");
 
+                    b.Property<string>("GraduateCondition")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("ModifiedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ModifiedDate")
+                    b.Property<DateTime?>("ModifiedDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
@@ -228,19 +304,13 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("Prerequisite")
+                    b.Property<string>("PreRequire")
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<DateTime?>("StartSaleDate")
                         .HasPrecision(2)
@@ -252,7 +322,7 @@ namespace Infrastructure.Migrations
                     b.Property<byte?>("ToAge")
                         .HasColumnType("tinyint");
 
-                    b.Property<short>("TotalLesson")
+                    b.Property<short?>("TotalLesson")
                         .HasColumnType("smallint");
 
                     b.HasKey("Id");
@@ -261,7 +331,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("Domain.Entities.CourseResource", b =>
@@ -284,12 +354,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.Property<string>("Title")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -298,10 +362,10 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CourseResource", (string)null);
+                    b.ToTable("CourseResources");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CourseSection", b =>
+            modelBuilder.Entity("Domain.Entities.Game", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -309,34 +373,56 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
+                    b.Property<int>("LevelTypeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<int>("RequiredLevel")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LevelTypeId");
+
+                    b.HasIndex("SectionId");
+
+                    b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SpritesUrl")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<byte>("Order")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("Order", "CourseId")
-                        .IsUnique();
-
-                    b.ToTable("CourseSections", (string)null);
+                    b.ToTable("GameItems");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Curriculum", b =>
+            modelBuilder.Entity("Domain.Entities.GameLevel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -344,126 +430,86 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ApprovedById")
+                    b.Property<int?>("CoinReward")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ApprovedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<int>("CreatedById")
+                    b.Property<int>("GameLevelTypeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
+                    b.Property<int?>("GameReward")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LevelIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Max")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VStartPosition")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameLevelTypeId");
+
+                    b.ToTable("GameLevels");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameLevelDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GameLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PositionTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VPosition")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameLevelId");
+
+                    b.HasIndex("PositionTypeId");
+
+                    b.ToTable("GameLevelDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameLevelModifier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
+                        .IsRequired()
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
 
-                    b.Property<decimal>("DiscountPrice")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<DateTime?>("EndSaleDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<byte?>("FromAge")
-                        .HasColumnType("tinyint");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ModifiedById")
+                    b.Property<int>("GameId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime?>("OpenDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<string>("PictureUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime?>("PostedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime?>("StartSaleDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte?>("ToAge")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("TotalCourse")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("TotalStudent")
+                    b.Property<int>("GameLevelId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovedById");
+                    b.HasIndex("GameId");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("GameLevelId");
 
-                    b.HasIndex("ModifiedById");
-
-                    b.ToTable("Curricula", (string)null);
+                    b.ToTable("GameLevelModifiers");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CurriculumCourse", b =>
-                {
-                    b.Property<int>("CurriculumId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CurriculumId1")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Order")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("CurriculumId", "CourseId");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CurriculumId1");
-
-                    b.HasIndex("Order")
-                        .IsUnique();
-
-                    b.ToTable("CurriculumCourses", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.CurriculumResource", b =>
+            modelBuilder.Entity("Domain.Entities.GamePlayHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -471,32 +517,184 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CurriculumId")
+                    b.Property<int>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
+                    b.Property<DateTime>("FinishTime")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("ResourceUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                    b.Property<int>("GameLevelType")
+                        .HasColumnType("int");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<int>("LevelIndex")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                    b.Property<DateTime>("PlayTime")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CurriculumId");
+                    b.HasIndex("StudentId");
 
-                    b.ToTable("CurriculumResources", (string)null);
+                    b.ToTable("GamePlayHistories");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameQuizRoom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JoinCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameLevelId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("GameQuizRooms");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameStudentQuiz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FinishTime")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
+                    b.Property<int>("GameQuizRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("JoinTime")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
+                    b.Property<int>("StepCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameQuizRoomId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("GameStudentQuizzes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameUserProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Coin")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Gem")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("GameUserProfiles");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChangeMessage")
+                        .IsRequired()
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GameVersions");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ItemOwned", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("GameItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameItemId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("ItemOwneds");
                 });
 
             modelBuilder.Entity("Domain.Entities.Lesson", b =>
@@ -507,11 +705,10 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("ClosedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
+                    b.Property<int>("ChapterId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("CourseSectionId")
+                    b.Property<int?>("Duration")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDelete")
@@ -520,81 +717,39 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsFree")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<DateTime?>("OpenDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PictureUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<byte>("Type")
+                    b.Property<byte>("Order")
                         .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseSectionId");
-
-                    b.HasIndex("Order", "CourseSectionId")
-                        .IsUnique();
-
-                    b.ToTable("Lessons", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.LessonResource", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(750)
-                        .HasColumnType("nvarchar(750)");
-
-                    b.Property<int>("LessonId")
-                        .HasColumnType("int");
 
                     b.Property<string>("ResourceUrl")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("Type")
+                    b.Property<int>("SectionId")
                         .HasColumnType("int");
+
+                    b.Property<byte>("Type")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LessonId");
+                    b.HasIndex("SectionId");
 
-                    b.ToTable("LessonResources", (string)null);
+                    b.HasIndex("Order", "ChapterId")
+                        .IsUnique();
+
+                    b.ToTable("Lesson");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Option", b =>
+            modelBuilder.Entity("Domain.Entities.LevelType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -602,40 +757,43 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
-                        .HasMaxLength(750)
-                        .HasColumnType("nvarchar(750)");
-
-                    b.Property<bool>("IsAnswer")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCustom")
-                        .HasColumnType("bit");
-
-                    b.Property<byte>("Order")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("QuestionExplain")
-                        .HasMaxLength(750)
-                        .HasColumnType("nvarchar(750)");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<string>("TypeName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuestionId");
+                    b.ToTable("LevelTypes");
+                });
 
-                    b.HasIndex("Order", "QuestionId")
-                        .IsUnique();
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.ToTable("Options", (string)null);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NotificationMessage")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -646,23 +804,28 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CurriculumId")
+                    b.Property<int>("CourseId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
                     b.Property<string>("Note")
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
-                    b.Property<string>("PaymentMethod")
+                    b.Property<string>("PaymentType")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<decimal>("Price")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -671,16 +834,16 @@ namespace Infrastructure.Migrations
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("VoucherId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CurriculumId");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("VoucherId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderDetail", b =>
@@ -688,21 +851,41 @@ namespace Infrastructure.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
+                    b.HasKey("OrderId", "StudentId");
 
-                    b.Property<byte>("Quantity")
-                        .HasColumnType("tinyint");
+                    b.HasIndex("StudentId");
 
-                    b.HasKey("OrderId", "CourseId");
+                    b.ToTable("OrderDetails");
+                });
 
-                    b.HasIndex("CourseId");
+            modelBuilder.Entity("Domain.Entities.Parent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.ToTable("OrderDetails", (string)null);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique()
+                        .HasFilter("[PhoneNumber] IS NOT NULL");
+
+                    b.ToTable("Parents");
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
@@ -721,28 +904,35 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("Type")
                         .HasColumnType("tinyint");
 
-                    b.Property<int>("UserId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Domain.Entities.PositionType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "Type")
-                        .IsUnique();
-
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("PositionTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
@@ -753,21 +943,11 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte>("Order")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ResourceUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<decimal>("Score")
                         .HasPrecision(5, 2)
@@ -778,9 +958,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
@@ -788,7 +965,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "QuizId")
                         .IsUnique();
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>
@@ -798,9 +975,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CourseSectionId")
-                        .HasColumnType("int");
 
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
@@ -813,79 +987,48 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
-                    b.Property<short?>("Duration")
-                        .HasColumnType("smallint");
-
-                    b.Property<int>("LessonId")
+                    b.Property<int?>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("MinScore")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                    b.Property<bool>("IsOrderRandom")
+                        .HasColumnType("bit");
 
-                    b.Property<byte?>("NumberOfAttempt")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("MinScore")
+                        .HasColumnType("int");
 
-                    b.Property<byte>("Order")
-                        .HasColumnType("tinyint");
+                    b.Property<int?>("NumberOfAttempt")
+                        .HasColumnType("int");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<int>("NumberOfQuestion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<short>("TotalQuestion")
-                        .HasColumnType("smallint");
+                    b.Property<int>("TotalQuestion")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalScore")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CourseSectionId");
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("LessonId");
+                    b.HasIndex("SectionId");
 
-                    b.HasIndex("Order", "LessonId")
+                    b.HasIndex("Order", "SectionId")
                         .IsUnique();
 
-                    b.ToTable("Quizzes", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshToken", (string)null);
+                    b.ToTable("Quizzes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
@@ -901,18 +1044,12 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -934,7 +1071,77 @@ namespace Infrastructure.Migrations
                         {
                             Id = 4,
                             Name = "Parent"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Student"
                         });
+                });
+
+            modelBuilder.Entity("Domain.Entities.Section", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<byte>("Order")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("Order", "CourseId")
+                        .IsUnique();
+
+                    b.ToTable("Chapters");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Staff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Biography")
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<string>("ProfilePicture")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Staves");
                 });
 
             modelBuilder.Entity("Domain.Entities.Student", b =>
@@ -945,70 +1152,27 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
                     b.Property<byte?>("Gender")
                         .HasColumnType("tinyint");
 
-                    b.Property<string>("Gmail")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("PictureUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("ParentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<short?>("YearOfBirth")
-                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
+                    b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.HasIndex("Gmail")
-                        .IsUnique()
-                        .HasFilter("[Gmail] IS NOT NULL");
+                    b.HasIndex("ParentId");
 
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("Username")
-                        .IsUnique();
-
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentAnswer", b =>
@@ -1019,136 +1183,114 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AnswerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<decimal>("Score")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                    b.Property<int>("QuestionOrder")
+                        .HasColumnType("int");
 
                     b.Property<int>("StudentQuizId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StudentQuizId1")
+                    b.Property<int>("StudentQuizQuizId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentQuizStudentId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("StudentQuizStudentId", "StudentQuizQuizId");
 
-                    b.HasIndex("StudentQuizId1");
-
-                    b.HasIndex("StudentQuizId", "QuestionId")
-                        .IsUnique();
-
-                    b.ToTable("StudentAnswers", (string)null);
+                    b.ToTable("StudentAnswers");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StudentAnswerOption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .HasMaxLength(750)
-                        .HasColumnType("nvarchar(750)");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("StudentAnswerId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StudentAnswerId1")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OptionId");
-
-                    b.HasIndex("StudentAnswerId1");
-
-                    b.HasIndex("StudentAnswerId", "OptionId")
-                        .IsUnique();
-
-                    b.ToTable("StudentAnswerOptions", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.StudentClass", b =>
+            modelBuilder.Entity("Domain.Entities.StudentLesson", b =>
                 {
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ClassId")
+                    b.Property<int>("LessonId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ClassId1")
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("StudentId", "LessonId");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("StudentLessons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.StudentProgress", b =>
+                {
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("JoinDate")
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompletedDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.HasKey("StudentId", "ClassId");
+                    b.Property<DateTime>("EnrolledDate")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
-                    b.HasIndex("ClassId");
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("ClassId1");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                    b.ToTable("StudentClasses", (string)null);
+                    b.HasKey("StudentId", "CourseId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SectionId");
+
+                    b.ToTable("StudentProgresses");
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
 
-                    b.Property<byte>("Attempt")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("Attempt")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<int?>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndTime")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
                     b.Property<bool>("IsPass")
                         .HasColumnType("bit");
 
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Score")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("StartTime")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("StudentId", "QuizId");
 
                     b.HasIndex("QuizId");
 
-                    b.HasIndex("StudentId", "QuizId")
-                        .IsUnique();
-
-                    b.ToTable("StudentQuizzes", (string)null);
+                    b.ToTable("StudentQuizzes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Teacher", b =>
@@ -1159,58 +1301,36 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Biography")
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<string>("Field")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Teachers", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.TeacherContactInformation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
+                    b.Property<string>("ProfilePicture")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
-                    b.ToTable("TeacherContactInformations", (string)null);
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Teachers");
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
@@ -1221,15 +1341,20 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AddedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CertificatePicture")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
+
                     b.Property<DateTime>("FromDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
@@ -1240,12 +1365,14 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AddedById");
+
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("TeacherProfiles", (string)null);
+                    b.ToTable("TeacherProfiles");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TeacherResource", b =>
+            modelBuilder.Entity("Domain.Entities.Voucher", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1253,187 +1380,104 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ResourceUrl")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("TeacherId")
+                    b.Property<int?>("ApprovedById")
                         .HasColumnType("int");
 
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TeacherId");
-
-                    b.ToTable("TeacherResources", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Transaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("CreatedById")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("DestinationAccount")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
 
-                    b.Property<byte?>("Method")
+                    b.Property<byte>("DiscountType")
                         .HasColumnType("tinyint");
 
-                    b.Property<string>("Note")
-                        .HasMaxLength(750)
-                        .HasColumnType("nvarchar(750)");
-
-                    b.Property<DateTime?>("ProcessedDate")
+                    b.Property<DateTime>("ExpirationDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("SourceAccount")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int?>("StaffId")
+                    b.Property<int>("NumberOfUsed")
                         .HasColumnType("int");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<string>("TransactionCode")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<byte?>("Type")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UsageLimit")
                         .HasColumnType("int");
+
+                    b.Property<string>("VoucherCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StaffId");
+                    b.HasIndex("ApprovedById");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CreatedById");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Vouchers");
                 });
 
-            modelBuilder.Entity("Domain.Entities.User", b =>
+            modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<byte?>("Gender")
-                        .HasColumnType("tinyint");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
-
-                    b.Property<string>("PictureUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int?>("TeacherId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("TeacherId")
-                        .IsUnique()
-                        .HasFilter("[TeacherId] IS NOT NULL");
-
-                    b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Cart", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("Domain.Entities.Cart", "UserId")
+                    b.HasOne("Domain.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CartDetail", b =>
+            modelBuilder.Entity("Domain.Entities.Admin", b =>
                 {
-                    b.HasOne("Domain.Entities.Cart", "Cart")
-                        .WithMany("CartDetails")
-                        .HasForeignKey("CartId")
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithOne("Admin")
+                        .HasForeignKey("Domain.Entities.Admin", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Answer", b =>
+                {
+                    b.HasOne("Domain.Entities.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Certificate", b =>
+                {
                     b.HasOne("Domain.Entities.Course", "Course")
                         .WithMany()
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Cart");
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Course");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Domain.Entities.Class", b =>
@@ -1444,13 +1488,21 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithMany("Classes")
-                        .HasForeignKey("TeacherId")
+                    b.HasOne("Domain.Entities.Staff", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Course");
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("Teacher");
                 });
@@ -1458,7 +1510,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ClassSchedule", b =>
                 {
                     b.HasOne("Domain.Entities.Class", "Class")
-                        .WithMany("ClassSchedules")
+                        .WithMany()
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1468,13 +1520,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany("CreatedCourses")
+                    b.HasOne("Domain.Entities.Teacher", "CreatedBy")
+                        .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "ModifiedBy")
+                    b.HasOne("Domain.Entities.Admin", "ModifiedBy")
                         .WithMany()
                         .HasForeignKey("ModifiedById")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1496,155 +1548,233 @@ namespace Infrastructure.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CourseSection", b =>
+            modelBuilder.Entity("Domain.Entities.Game", b =>
                 {
-                    b.HasOne("Domain.Entities.Course", "Course")
-                        .WithMany("CourseSections")
-                        .HasForeignKey("CourseId")
+                    b.HasOne("Domain.Entities.LevelType", "LevelType")
+                        .WithMany()
+                        .HasForeignKey("LevelTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Curriculum", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                    b.HasOne("Domain.Entities.Section", "Section")
                         .WithMany()
-                        .HasForeignKey("ApprovedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany("CreatedCurriculums")
-                        .HasForeignKey("CreatedById")
+                        .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "ModifiedBy")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("LevelType");
 
-                    b.Navigation("ApprovedBy");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("ModifiedBy");
+                    b.Navigation("Section");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CurriculumCourse", b =>
+            modelBuilder.Entity("Domain.Entities.GameLevel", b =>
                 {
-                    b.HasOne("Domain.Entities.Course", "Course")
+                    b.HasOne("Domain.Entities.LevelType", "GameLevelType")
                         .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Curriculum", "Curriculum")
-                        .WithMany()
-                        .HasForeignKey("CurriculumId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Curriculum", null)
-                        .WithMany("CurriculumCourses")
-                        .HasForeignKey("CurriculumId1");
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Curriculum");
-                });
-
-            modelBuilder.Entity("Domain.Entities.CurriculumResource", b =>
-                {
-                    b.HasOne("Domain.Entities.Curriculum", "Curriculum")
-                        .WithMany("CurriculumResources")
-                        .HasForeignKey("CurriculumId")
+                        .HasForeignKey("GameLevelTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Curriculum");
+                    b.Navigation("GameLevelType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameLevelDetail", b =>
+                {
+                    b.HasOne("Domain.Entities.GameLevel", "GameLevel")
+                        .WithMany()
+                        .HasForeignKey("GameLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.PositionType", "PositionType")
+                        .WithMany()
+                        .HasForeignKey("PositionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GameLevel");
+
+                    b.Navigation("PositionType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameLevelModifier", b =>
+                {
+                    b.HasOne("Domain.Entities.GameVersion", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.GameLevel", "GameLevel")
+                        .WithMany()
+                        .HasForeignKey("GameLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("GameLevel");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GamePlayHistory", b =>
+                {
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameQuizRoom", b =>
+                {
+                    b.HasOne("Domain.Entities.GameLevel", "GameLevel")
+                        .WithMany()
+                        .HasForeignKey("GameLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GameLevel");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameStudentQuiz", b =>
+                {
+                    b.HasOne("Domain.Entities.GameQuizRoom", "GameQuizRoom")
+                        .WithMany()
+                        .HasForeignKey("GameQuizRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GameQuizRoom");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GameUserProfile", b =>
+                {
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ItemOwned", b =>
+                {
+                    b.HasOne("Domain.Entities.GameItem", "GameItem")
+                        .WithMany()
+                        .HasForeignKey("GameItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GameItem");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Domain.Entities.Lesson", b =>
                 {
-                    b.HasOne("Domain.Entities.CourseSection", "CourseSection")
+                    b.HasOne("Domain.Entities.Section", "Section")
                         .WithMany("Lessons")
-                        .HasForeignKey("CourseSectionId")
+                        .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CourseSection");
+                    b.Navigation("Section");
                 });
 
-            modelBuilder.Entity("Domain.Entities.LessonResource", b =>
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
                 {
-                    b.HasOne("Domain.Entities.Lesson", "Lesson")
-                        .WithMany("LessonResources")
-                        .HasForeignKey("LessonId")
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Lesson");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Option", b =>
-                {
-                    b.HasOne("Domain.Entities.Question", "Question")
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.HasOne("Domain.Entities.Curriculum", "Curriculum")
-                        .WithMany()
-                        .HasForeignKey("CurriculumId");
-
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Curriculum");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.OrderDetail", b =>
-                {
                     b.HasOne("Domain.Entities.Course", "Course")
                         .WithMany()
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Order", "Order")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId")
+                    b.HasOne("Domain.Entities.Voucher", "Voucher")
+                        .WithMany()
+                        .HasForeignKey("VoucherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Course");
 
+                    b.Navigation("Voucher");
+                });
+
+            modelBuilder.Entity("Domain.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("Domain.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Order");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Parent", b =>
+                {
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithOne("Parent")
+                        .HasForeignKey("Domain.Entities.Parent", "AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("Payments")
-                        .HasForeignKey("UserId")
+                    b.HasOne("Domain.Entities.Parent", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
@@ -1660,114 +1790,125 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>
                 {
-                    b.HasOne("Domain.Entities.CourseSection", null)
-                        .WithMany("Quizzes")
-                        .HasForeignKey("CourseSectionId");
+                    b.HasOne("Domain.Entities.Teacher", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                    b.HasOne("Domain.Entities.Section", "Section")
+                        .WithMany()
+                        .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Section");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Section", b =>
+                {
+                    b.HasOne("Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Staff", b =>
+                {
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithOne("Staff")
+                        .HasForeignKey("Domain.Entities.Staff", "AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Admin", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Account");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Student", b =>
+                {
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithOne("Student")
+                        .HasForeignKey("Domain.Entities.Student", "AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Parent", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("Domain.Entities.StudentAnswer", b =>
+                {
+                    b.HasOne("Domain.Entities.StudentQuiz", "StudentQuiz")
+                        .WithMany("StudentAnswers")
+                        .HasForeignKey("StudentQuizStudentId", "StudentQuizQuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StudentQuiz");
+                });
+
+            modelBuilder.Entity("Domain.Entities.StudentLesson", b =>
+                {
                     b.HasOne("Domain.Entities.Lesson", "Lesson")
                         .WithMany()
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedBy");
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Lesson");
+
+                    b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("Domain.Entities.StudentProgress", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "User")
+                    b.HasOne("Domain.Entities.Course", "Course")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Student", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("Students")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.StudentAnswer", b =>
-                {
-                    b.HasOne("Domain.Entities.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.StudentQuiz", "StudentQuiz")
-                        .WithMany()
-                        .HasForeignKey("StudentQuizId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.StudentQuiz", null)
-                        .WithMany("StudentAnswers")
-                        .HasForeignKey("StudentQuizId1");
-
-                    b.Navigation("Question");
-
-                    b.Navigation("StudentQuiz");
-                });
-
-            modelBuilder.Entity("Domain.Entities.StudentAnswerOption", b =>
-                {
-                    b.HasOne("Domain.Entities.Option", "Option")
+                    b.HasOne("Domain.Entities.Section", "Section")
                         .WithMany()
-                        .HasForeignKey("OptionId")
+                        .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.StudentAnswer", "StudentAnswer")
-                        .WithMany()
-                        .HasForeignKey("StudentAnswerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.StudentAnswer", null)
-                        .WithMany("StudentAnswerOptions")
-                        .HasForeignKey("StudentAnswerId1");
-
-                    b.Navigation("Option");
-
-                    b.Navigation("StudentAnswer");
-                });
-
-            modelBuilder.Entity("Domain.Entities.StudentClass", b =>
-                {
-                    b.HasOne("Domain.Entities.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Class", null)
-                        .WithMany("StudentClasses")
-                        .HasForeignKey("ClassId1");
 
                     b.HasOne("Domain.Entities.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Class");
+                    b.Navigation("Course");
+
+                    b.Navigation("Section");
 
                     b.Navigation("Student");
                 });
@@ -1791,119 +1932,82 @@ namespace Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TeacherContactInformation", b =>
+            modelBuilder.Entity("Domain.Entities.Teacher", b =>
                 {
-                    b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithMany("TeacherContactInformations")
-                        .HasForeignKey("TeacherId")
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithOne("Teacher")
+                        .HasForeignKey("Domain.Entities.Teacher", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Teacher");
+                    b.HasOne("Domain.Entities.Admin", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
                 {
-                    b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithMany("TeacherProfiles")
-                        .HasForeignKey("TeacherId")
+                    b.HasOne("Domain.Entities.Staff", "AddedBy")
+                        .WithMany()
+                        .HasForeignKey("AddedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AddedBy");
 
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TeacherResource", b =>
+            modelBuilder.Entity("Domain.Entities.Voucher", b =>
                 {
-                    b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithMany("TeacherResources")
-                        .HasForeignKey("TeacherId")
+                    b.HasOne("Domain.Entities.Admin", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
+
+                    b.HasOne("Domain.Entities.Staff", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Teacher");
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "Staff")
-                        .WithMany("ProcessedTransactions")
-                        .HasForeignKey("StaffId");
+                    b.Navigation("Admin");
 
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("CreatedTransactions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Parent");
 
                     b.Navigation("Staff");
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.HasOne("Domain.Entities.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithOne("User")
-                        .HasForeignKey("Domain.Entities.User", "TeacherId");
-
-                    b.Navigation("Role");
+                    b.Navigation("Student");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Cart", b =>
-                {
-                    b.Navigation("CartDetails");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Class", b =>
-                {
-                    b.Navigation("ClassSchedules");
-
-                    b.Navigation("StudentClasses");
                 });
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
                     b.Navigation("CourseResources");
-
-                    b.Navigation("CourseSections");
-                });
-
-            modelBuilder.Entity("Domain.Entities.CourseSection", b =>
-                {
-                    b.Navigation("Lessons");
-
-                    b.Navigation("Quizzes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Curriculum", b =>
-                {
-                    b.Navigation("CurriculumCourses");
-
-                    b.Navigation("CurriculumResources");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Lesson", b =>
-                {
-                    b.Navigation("LessonResources");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Order", b =>
-                {
-                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
-                    b.Navigation("Options");
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>
@@ -1911,45 +2015,14 @@ namespace Infrastructure.Migrations
                     b.Navigation("Questions");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StudentAnswer", b =>
+            modelBuilder.Entity("Domain.Entities.Section", b =>
                 {
-                    b.Navigation("StudentAnswerOptions");
+                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>
                 {
                     b.Navigation("StudentAnswers");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Teacher", b =>
-                {
-                    b.Navigation("Classes");
-
-                    b.Navigation("TeacherContactInformations");
-
-                    b.Navigation("TeacherProfiles");
-
-                    b.Navigation("TeacherResources");
-
-                    b.Navigation("User")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.Navigation("Cart");
-
-                    b.Navigation("CreatedCourses");
-
-                    b.Navigation("CreatedCurriculums");
-
-                    b.Navigation("CreatedTransactions");
-
-                    b.Navigation("Payments");
-
-                    b.Navigation("ProcessedTransactions");
-
-                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

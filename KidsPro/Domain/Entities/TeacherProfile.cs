@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +14,14 @@ public class TeacherProfile : BaseEntity
     [Precision(2)]
     public DateTime ToDate { get; set; }
 
-    [Required] public int TeacherId { get; set; }
+    [MaxLength(750)] public string? Description { get; set; }
+
+    [StringLength(250)] public string? CertificatePicture { get; set; }
+
+    public int TeacherId { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;
+
+    public virtual Staff AddedBy { get; set; } = null!;
+    public virtual int AddedById { get; set; }
 }
