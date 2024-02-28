@@ -113,7 +113,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     PictureUrl = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
@@ -1052,7 +1052,8 @@ namespace Infrastructure.Migrations
                 name: "IX_Accounts_Email",
                 table: "Accounts",
                 column: "Email",
-                unique: true);
+                unique: true,
+                filter: "[Email] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_RoleId",

@@ -7,4 +7,10 @@ public interface IAccountService
 {
     Task<LoginAccountDto> RegisterByEmailAsync(EmailRegisterDto dto);
 
+    Task<LoginAccountDto> RegisterByPhoneNumberAsync(PhoneNumberRegisterDto dto);
+
+    Task<LoginAccountDto> LoginByEmailAsync(EmailCredential dto);
+
+    Task<LoginAccountDto> LoginByPhoneNumberAsync(PhoneCredential dto);
+
 }
