@@ -13,30 +13,17 @@ public class UnitOfWork : IUnitOfWork
     private readonly ILogger<UnitOfWork> _logger;
 
     public IRoleRepository RoleRepository { get; }
-    public IUserRepository UserRepository { get; }
+    public IAccountRepository AccountRepository { get; }
+    public IParentRepository ParentRepository { get; }
 
-    public ITeacherRepository TeacherRepository { get; }
-    
-    public IRefeshTokenRepository RefeshTokenRepository { get; }
-    public ICourseSectionRepository CourseSectionRepository { get; }
-    public ICourseRepository CourseRepository { get; }
-    public IClassRepository ClassRepository { get; }
-    public ICourseResourceRepository CourseResourceRepository { get; }
-
-    public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository, 
-        IUserRepository userRepository, IRefeshTokenRepository refreshTokenRepository, 
-        ICourseRepository courseRepository, IClassRepository classRepository, ICourseResourceRepository courseResourceRepository, ITeacherRepository teacherRepository, ICourseSectionRepository courseSectionRepository)
+    public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
+        IAccountRepository accountRepository, IParentRepository parentRepository)
     {
         _context = context;
         _logger = logger;
         RoleRepository = roleRepository;
-        UserRepository = userRepository;
-        RefeshTokenRepository = refreshTokenRepository;
-        CourseRepository = courseRepository;
-        ClassRepository = classRepository;
-        CourseResourceRepository = courseResourceRepository;
-        TeacherRepository = teacherRepository;
-        CourseSectionRepository = courseSectionRepository;
+        AccountRepository = accountRepository;
+        ParentRepository = parentRepository;
     }
 
     public async Task<int> SaveChangeAsync()
@@ -79,7 +66,7 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    private bool _disposed;
+    private bool _disposed = false;
 
     protected virtual void Dispose(bool disposing)
     {

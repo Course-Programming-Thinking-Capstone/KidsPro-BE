@@ -2,8 +2,6 @@
 
 public enum PaymentType
 {
-    VNPAY = 1,
-    MOMO = 2,
-    ZALOPAY = 3,
-    BIDV = 4
+    ZaloPay = 1,
+    Momo = 2
 }

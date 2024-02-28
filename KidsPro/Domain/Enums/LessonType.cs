@@ -3,6 +3,5 @@
 public enum LessonType
 {
     Video = 1,
-    Game = 2,
-    Quiz = 3
+    Reading = 2
 }

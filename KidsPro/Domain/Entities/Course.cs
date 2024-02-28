@@ -8,27 +8,27 @@ namespace Domain.Entities;
 
 public class Course : BaseEntity
 {
-    [StringLength(250)] public string Name { get; set; } = null!;
+    [MaxLength(250)] public string Name { get; set; } = null!;
 
-    [StringLength(3000)] public string? Description { get; set; }
+    [MaxLength(3000)] public string? Description { get; set; }
 
-    [StringLength(3000)] public string? Prerequisite { get; set; }
-
-    [Range(3, 100)]
+    [Range(3, 20)]
     [Column(TypeName = "tinyint")]
     public int? FromAge { get; set; }
 
-    [Range(3, 100)]
+    [Range(3, 20)]
     [Column(TypeName = "tinyint")]
     public int? ToAge { get; set; }
 
-    [StringLength(250)] public string? PictureUrl { get; set; }
+    [MaxLength(3000)] public string? PreRequire { get; set; }
+
+    [MaxLength(250)] public string? PictureUrl { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
     public DateTime? OpenDate { get; set; }
-    
+
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
@@ -44,41 +44,42 @@ public class Course : BaseEntity
     [Precision(2)]
     public DateTime? EndSaleDate { get; set; }
 
-    [Range(0, float.MaxValue)]
+    [Range(0, int.MaxValue)]
     [Precision(11, 2)]
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
-    [Range(0, float.MaxValue)]
+    [Range(0, int.MaxValue)]
     [Precision(11, 2)]
     public decimal? DiscountPrice { get; set; }
 
-    [Range(0, 2000)]
+    [Range(0, 1000)]
     [Column(TypeName = "smallint")]
-    public int TotalLesson { get; set; }
+    public int? TotalLesson { get; set; }
 
-    [Column(TypeName = "tinyint")] public CourseStatus Status { get; set; }
+    [MaxLength(150)] public string? Language { get; set; }
+
+    [MaxLength(250)] public string? GraduateCondition { get; set; }
+
+    [Column(TypeName = "tinyint")] public CourseStatus Status { get; set; } = CourseStatus.Draft;
 
     public bool IsDelete { get; set; }
 
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; }
 
-    [Required] public int CreatedById { get; set; }
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
+    [Precision(2)]
+    public DateTime? ModifiedDate { get; set; }
 
-    public virtual User CreatedBy { get; set; } = null!;
+    public virtual Teacher CreatedBy { get; set; } = null!;
+    public int CreatedById { get; set; }
 
-    [Required] public int ModifiedById { get; set; }
+    public virtual Admin ModifiedBy { get; set; } = null!;
+    public int ModifiedById { get; set; }
 
-    [ForeignKey(nameof(ModifiedById))] public virtual User ModifiedBy { get; set; } = null!;
-
-    public virtual ICollection<CourseSection>? CourseSections { get; set; }
-
-    public virtual ICollection<CourseResource>? CourseResources { get; set; }
+    public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
 }

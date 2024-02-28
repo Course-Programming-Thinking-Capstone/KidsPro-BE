@@ -17,4 +17,10 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.1.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Request\Old\" />
+    <Folder Include="Dtos\Response\Old\" />
+    <Folder Include="Dtos\Response\Old\Teacher\" />
+  </ItemGroup>
+
 </Project>

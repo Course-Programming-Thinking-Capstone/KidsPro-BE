@@ -5,13 +5,12 @@ namespace Domain.Entities;
 
 public class CourseResource : BaseEntity
 {
-    [StringLength(3000)] public string? Description { get; set; }
+    [MaxLength(250)] public string ResourceUrl { get; set; } = null!;
 
-    [StringLength(250)] public string ResourceUrl { get; set; } = string.Empty;
+    [MaxLength(3000)] public string? Description { get; set; }
 
     [StringLength(250)] public string? Title { get; set; }
 
-    public int CourseId { get; set; }
-
     public virtual Course Course { get; set; } = null!;
+    public int CourseId { get; set; }
 }

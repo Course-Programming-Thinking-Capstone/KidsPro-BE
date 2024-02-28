@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
 
 namespace Domain.Entities;
@@ -8,18 +7,15 @@ public class Teacher : BaseEntity
 {
     [MaxLength(150)] public string? Field { get; set; }
 
-    [MaxLength(3000)] public string? Description { get; set; }
+    [MaxLength(3000)] public string? Biography { get; set; }
 
-    public virtual ICollection<TeacherResource> TeacherResources { get; set; } = new List<TeacherResource>();
+    [MaxLength(250)] public string? ProfilePicture { get; set; }
 
-    public virtual ICollection<TeacherProfile> TeacherProfiles { get; set; } = new List<TeacherProfile>();
+    [MaxLength(11)] public string? PhoneNumber { get; set; }
 
-    public virtual ICollection<TeacherContactInformation> TeacherContactInformations { get; set; } =
-        new List<TeacherContactInformation>();
+    public int AccountId { get; set; }
+    public Account Account { get; set; } = null!;
 
-    [Required] public int UserId { get; set; }
-
-    public virtual User User { get; set; } = null!;
-
-    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
+    public int CreatedById { get; set; }
+    public virtual Admin CreatedBy { get; set; } = null!;
 }

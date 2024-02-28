@@ -6,32 +6,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(Order), nameof(CourseSectionId), IsUnique = true)]
+[Index(nameof(Order), nameof(ChapterId), IsUnique = true)]
 public class Lesson : BaseEntity
 {
+    [MaxLength(250)] public string Name { get; set; } = null!;
+
+    [Column(TypeName = "tinyint")]
+    [Range(0, 250)]
     public int Order { get; set; }
+    
+    [MaxLength(250)] public string ResourceUrl { get; set; } = null!;
 
-    [StringLength(250)] public string Name { get; set; } = null!;
-
-    [Column(TypeName = "tinyint")] public LessonType Type { get; set; } = LessonType.Video;
+    [Range(0, 1000)] public int? Duration { get; set; }
 
     public bool IsFree { get; set; }
-
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
-    public DateTime? OpenDate { get; set; }
-
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
-    public DateTime? ClosedDate { get; set; }
-
+    public bool IsRequired { get; set; }
     public bool IsDelete { get; set; }
 
-    public int CourseSectionId { get; set; }
+    [Column(TypeName = "tinyint")]
+    public LessonType Type { get; set; }
 
-    public virtual CourseSection CourseSection { get; set; } = null!;
-
-    public virtual ICollection<LessonResource> LessonResources { get; set; } = new List<LessonResource>();
+    public virtual Section Section { get; set; } = null!;
+    public int ChapterId { get; set; }
+    
 }
