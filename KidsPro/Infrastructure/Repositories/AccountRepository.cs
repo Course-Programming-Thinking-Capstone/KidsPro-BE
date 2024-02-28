@@ -2,14 +2,20 @@
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
 
 namespace Infrastructure.Repositories;
 
-public class AccountRepository:BaseRepository<Account>, IAccountRepository
+public class AccountRepository : BaseRepository<Account>, IAccountRepository
 {
     public AccountRepository(AppDbContext context, ILogger<BaseRepository<Account>> logger) : base(context, logger)
     {
+    }
+
+    public async Task<bool> ExistByEmailAsync(string email)
+    {
+        return await _dbSet.FirstOrDefaultAsync(a => a.Email == email)
+            .ContinueWith(t => t.Result != null);
     }
 }

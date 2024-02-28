@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Application.Interfaces.IRepositories;
 
-public interface IAccountRepository:IBaseRepository<Account>
+public interface IParentRepository:IBaseRepository<Parent>
 {
-    Task<bool> ExistByEmailAsync(string email);
+    
 }

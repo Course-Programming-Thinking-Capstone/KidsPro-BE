@@ -14,15 +14,16 @@ public class UnitOfWork : IUnitOfWork
 
     public IRoleRepository RoleRepository { get; }
     public IAccountRepository AccountRepository { get; }
-
+    public IParentRepository ParentRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
-        IAccountRepository accountRepository)
+        IAccountRepository accountRepository, IParentRepository parentRepository)
     {
         _context = context;
         _logger = logger;
         RoleRepository = roleRepository;
         AccountRepository = accountRepository;
+        ParentRepository = parentRepository;
     }
 
     public async Task<int> SaveChangeAsync()

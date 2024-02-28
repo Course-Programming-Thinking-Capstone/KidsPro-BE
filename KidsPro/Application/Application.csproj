@@ -21,8 +21,6 @@
     <Folder Include="Dtos\Request\Old\" />
     <Folder Include="Dtos\Response\Old\" />
     <Folder Include="Dtos\Response\Old\Teacher\" />
-    <Folder Include="Mappers\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
