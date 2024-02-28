@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Application.Dtos.Response;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IRepositories.Generic;
@@ -16,8 +15,8 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     protected readonly DbSet<T> _dbSet;
     protected readonly ILogger<BaseRepository<T>> _logger;
 
-    protected readonly int defaultPage = 1;
-    protected readonly int defaultSize = 10;
+    protected readonly int _defaultPage = 1;
+    protected readonly int _defaultSize = 10;
 
     public BaseRepository(AppDbContext context, ILogger<BaseRepository<T>> logger)
     {
@@ -60,7 +59,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error when filter data of {typeof(T)} entity.");
+            _logger.LogError(e, "Error when filter data of {} entity.", typeof(T));
             throw;
         }
     }
@@ -91,7 +90,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
 
             if (includeProperties != null)
             {
-                query = includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                query = includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
             }
 
@@ -116,8 +115,8 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
             }
             else
             {
-                page = defaultPage;
-                size = defaultSize;
+                page = _defaultPage;
+                size = _defaultSize;
             }
 
             query = query.Skip((page.Value - 1) * size.Value).Take(size.Value);

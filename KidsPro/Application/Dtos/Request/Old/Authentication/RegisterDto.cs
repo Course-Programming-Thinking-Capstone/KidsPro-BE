@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Application.Dtos.Request.Authentication;
+namespace Application.Dtos.Request.Old.Authentication;
 
 public record RegisterDto
 {

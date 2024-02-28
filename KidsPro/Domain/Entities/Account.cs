@@ -9,12 +9,12 @@ namespace Domain.Entities;
 [Index(nameof(Email), IsUnique = true)]
 public class Account : BaseEntity
 {
-    [MaxLength(100)] public string Email { get; set; } = null!;
+    [MaxLength(100)] public string? Email { get; set; } 
 
     [MaxLength(50)] public string FullName { get; set; } = null!;
 
     [MaxLength(150)] public string PasswordHash { get; set; } = null!;
-    [MaxLength(150)] public string PictureUrl { get; set; } = null!;
+    [MaxLength(150)] public string? PictureUrl { get; set; } 
 
     [Column(TypeName = "tinyint")] public UserStatus Status { get; set; } = UserStatus.Active;
 
