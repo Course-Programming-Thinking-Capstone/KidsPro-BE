@@ -13,4 +13,6 @@ public interface IAccountService
 
     Task<LoginAccountDto> LoginByPhoneNumberAsync(PhoneCredential dto);
 
+    Task ChangePasswordAsync(string oldPassword, string newPassword);
+
 }

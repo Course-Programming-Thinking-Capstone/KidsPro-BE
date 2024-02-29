@@ -118,4 +118,22 @@ public class AccountService : IAccountService
         result.RefreshToken = _authenticationService.CreateRefreshToken(account);
         return result;
     }
+
+    public async Task ChangePasswordAsync(string oldPassword, string newPassword)
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, account.PasswordHash))
+        {
+            throw new BadRequestException("Incorrect password.");
+        }
+
+        account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newPassword);
+
+        _unitOfWork.AccountRepository.Update(account);
+        await _unitOfWork.SaveChangeAsync();
+    }
 }
