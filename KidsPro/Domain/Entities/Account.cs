@@ -15,6 +15,13 @@ public class Account : BaseEntity
 
     [MaxLength(150)] public string PasswordHash { get; set; } = null!;
     [MaxLength(150)] public string? PictureUrl { get; set; } 
+    
+    public Gender? Gender { get; set; }
+    
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+    [Precision(2)]
+    public DateTime? DateOfBirth { get; set; }
 
     [Column(TypeName = "tinyint")] public UserStatus Status { get; set; } = UserStatus.Active;
 

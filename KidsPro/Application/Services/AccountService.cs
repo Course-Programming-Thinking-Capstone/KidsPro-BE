@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Authentication;
+using Application.Dtos.Request.User;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -6,6 +7,7 @@ using Application.Mappers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Constant = Application.Configurations.Constant;
 
 namespace Application.Services;
@@ -14,11 +16,16 @@ public class AccountService : IAccountService
 {
     private IUnitOfWork _unitOfWork;
     private IAuthenticationService _authenticationService;
+    private IImageService _imageService;
 
-    public AccountService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
+    private const string AvatarFolder = "Image/Avatar/";
+
+    public AccountService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
+        IImageService imageService)
     {
         _unitOfWork = unitOfWork;
         _authenticationService = authenticationService;
+        _imageService = imageService;
     }
 
     public async Task<LoginAccountDto> RegisterByEmailAsync(EmailRegisterDto dto)
@@ -119,19 +126,38 @@ public class AccountService : IAccountService
         return result;
     }
 
-    public async Task ChangePasswordAsync(string oldPassword, string newPassword)
+    public async Task ChangePasswordAsync(ChangePasswordDto dto)
     {
         _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
 
-        if (!BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, account.PasswordHash))
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.OldPassword, account.PasswordHash))
         {
             throw new BadRequestException("Incorrect password.");
         }
 
-        account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newPassword);
+        account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.NewPassword);
+
+        _unitOfWork.AccountRepository.Update(account);
+        await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task UpdatePictureAsync(IFormFile file)
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+
+        var avatarFolder = AvatarFolder + $"{account.Id}/";
+
+        var avatarFileName = "avatar";
+
+        var uploadedFile = await _imageService.UploadImage(file, avatarFolder, avatarFileName);
+
+        account.PictureUrl = uploadedFile;
 
         _unitOfWork.AccountRepository.Update(account);
         await _unitOfWork.SaveChangeAsync();

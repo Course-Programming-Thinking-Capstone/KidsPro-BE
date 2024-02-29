@@ -1,5 +1,7 @@
 ﻿using Application.Dtos.Request.Authentication;
+using Application.Dtos.Request.User;
 using Application.Dtos.Response.Account;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Interfaces.IServices;
 
@@ -13,6 +15,6 @@ public interface IAccountService
 
     Task<LoginAccountDto> LoginByPhoneNumberAsync(PhoneCredential dto);
 
-    Task ChangePasswordAsync(string oldPassword, string newPassword);
-
+    Task ChangePasswordAsync(ChangePasswordDto dto);
+    Task UpdatePictureAsync(IFormFile file);
 }

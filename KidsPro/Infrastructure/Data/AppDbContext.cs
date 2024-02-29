@@ -50,6 +50,7 @@ public class AppDbContext : DbContext
     public virtual DbSet<GameUserProfile> GameUserProfiles { get; set; }
     public virtual DbSet<GameItem> GameItems { get; set; }
     public virtual DbSet<ItemOwned> ItemOwneds { get; set; }
+    public virtual DbSet<SectionComponentNumber> SectionComponentNumbers { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -63,47 +64,47 @@ public class AppDbContext : DbContext
             .HasOne<Admin>(s => s.CreatedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<Student>()
             .HasOne<Parent>(s => s.Parent)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<Course>()
             .HasOne<Teacher>(s => s.CreatedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<Course>()
             .HasOne<Admin>(s => s.ModifiedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<TeacherProfile>()
             .HasOne<Teacher>(s => s.Teacher)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<Class>()
             .HasOne<Teacher>(s => s.Teacher)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<GameStudentQuiz>()
             .HasOne<Student>(s => s.Student)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<StudentProgress>()
             .HasOne<Course>(s => s.Course)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<OrderDetail>()
             .HasOne<Student>(o => o.Student)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<StudentQuiz>()
             .HasOne<Student>(s => s.Student)
             .WithMany()

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240228153225_Initial")]
+    [Migration("20240229145407_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -37,6 +37,10 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -45,6 +49,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
@@ -185,6 +192,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<DateTime?>("OpenDate")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -278,6 +289,9 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsFree")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Language")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
@@ -294,17 +308,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<DateTime?>("OpenDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
                     b.Property<string>("PictureUrl")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime?>("PostedDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
 
                     b.Property<string>("PreRequire")
                         .HasMaxLength(3000)
@@ -526,7 +532,7 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<int>("GameLevelType")
+                    b.Property<int>("GameLevelTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("LevelIndex")
@@ -540,6 +546,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GameLevelTypeId");
 
                     b.HasIndex("StudentId");
 
@@ -657,8 +665,8 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("Version")
                         .HasColumnType("int");
@@ -1110,6 +1118,28 @@ namespace Infrastructure.Migrations
                     b.ToTable("Chapters");
                 });
 
+            modelBuilder.Entity("Domain.Entities.SectionComponentNumber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MaxNumber")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("SectionComponentType")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SectionComponentType")
+                        .IsUnique();
+
+                    b.ToTable("SectionComponentNumbers");
+                });
+
             modelBuilder.Entity("Domain.Entities.Staff", b =>
                 {
                     b.Property<int>("Id")
@@ -1156,13 +1186,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
-                    b.Property<byte?>("Gender")
-                        .HasColumnType("tinyint");
 
                     b.Property<int>("ParentId")
                         .HasColumnType("int");
@@ -1316,6 +1339,10 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Field")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("PersonalInformation")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(11)
@@ -1620,11 +1647,19 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.GamePlayHistory", b =>
                 {
+                    b.HasOne("Domain.Entities.LevelType", "GameLevelType")
+                        .WithMany()
+                        .HasForeignKey("GameLevelTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GameLevelType");
 
                     b.Navigation("Student");
                 });

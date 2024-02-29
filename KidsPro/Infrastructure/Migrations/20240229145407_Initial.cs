@@ -36,7 +36,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Version = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
                     ChangeMessage = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: false)
                 },
                 constraints: table =>
@@ -84,6 +84,20 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SectionComponentNumbers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SectionComponentType = table.Column<byte>(type: "tinyint", nullable: false),
+                    MaxNumber = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SectionComponentNumbers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GameLevels",
                 columns: table => new
                 {
@@ -117,6 +131,8 @@ namespace Infrastructure.Migrations
                     FullName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     PictureUrl = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Gender = table.Column<int>(type: "int", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
@@ -284,6 +300,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Field = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    PersonalInformation = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Biography = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     ProfilePicture = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
@@ -335,8 +352,6 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Gender = table.Column<byte>(type: "tinyint", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     ParentId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -403,8 +418,6 @@ namespace Infrastructure.Migrations
                     ToAge = table.Column<byte>(type: "tinyint", nullable: true),
                     PreRequire = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     PictureUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    OpenDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
-                    PostedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     StartSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     EndSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     Price = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
@@ -414,6 +427,7 @@ namespace Infrastructure.Migrations
                     GraduateCondition = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
+                    IsFree = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
@@ -504,13 +518,19 @@ namespace Infrastructure.Migrations
                     LevelIndex = table.Column<int>(type: "int", nullable: false),
                     PlayTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     FinishTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    GameLevelType = table.Column<int>(type: "int", nullable: false),
+                    GameLevelTypeId = table.Column<int>(type: "int", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GamePlayHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GamePlayHistories_LevelTypes_GameLevelTypeId",
+                        column: x => x.GameLevelTypeId,
+                        principalTable: "LevelTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GamePlayHistories_Students_StudentId",
                         column: x => x.StudentId,
@@ -629,6 +649,7 @@ namespace Infrastructure.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     TotalSlot = table.Column<int>(type: "int", nullable: false),
                     TotalStudent = table.Column<int>(type: "int", nullable: false),
+                    OpenDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     TeacherId = table.Column<int>(type: "int", nullable: false),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false)
@@ -1160,6 +1181,11 @@ namespace Infrastructure.Migrations
                 column: "GameLevelTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GamePlayHistories_GameLevelTypeId",
+                table: "GamePlayHistories",
+                column: "GameLevelTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GamePlayHistories_StudentId",
                 table: "GamePlayHistories",
                 column: "StudentId");
@@ -1292,6 +1318,12 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_SectionComponentNumbers_SectionComponentType",
+                table: "SectionComponentNumbers",
+                column: "SectionComponentType",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Staves_AccountId",
                 table: "Staves",
                 column: "AccountId",
@@ -1414,6 +1446,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "SectionComponentNumbers");
 
             migrationBuilder.DropTable(
                 name: "StudentAnswers");

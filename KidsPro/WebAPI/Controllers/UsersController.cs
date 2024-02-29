@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Application.Dtos.Request.User;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -28,9 +28,17 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult> ChangePasswordAsync([Required] string oldPassword, [Required] string newPassword)
+    public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto request)
     {
-        await _accountService.ChangePasswordAsync(oldPassword, newPassword);
+        await _accountService.ChangePasswordAsync(request);
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpPatch("account/avatar")]
+    public async Task<ActionResult> UpdateAvatarAsync([FromForm] IFormFile file)
+    {
+        await _accountService.UpdatePictureAsync(file);
         return Ok();
     }
 }
