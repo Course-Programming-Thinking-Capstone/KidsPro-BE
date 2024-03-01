@@ -7,6 +7,8 @@ public class Teacher : BaseEntity
 {
     [MaxLength(150)] public string? Field { get; set; }
 
+    [MaxLength(500)] public string? PersonalInformation { get; set; }
+
     [MaxLength(3000)] public string? Biography { get; set; }
 
     [MaxLength(250)] public string? ProfilePicture { get; set; }

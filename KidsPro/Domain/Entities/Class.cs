@@ -22,6 +22,11 @@ public class Class : BaseEntity
     public int TotalSlot { get; set; }
 
     public int TotalStudent { get; set; }
+    
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+    [Precision(2)]
+    public DateTime? OpenDate { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;
     public int TeacherId { get; set; }

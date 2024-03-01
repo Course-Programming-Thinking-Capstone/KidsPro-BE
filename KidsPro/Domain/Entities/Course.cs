@@ -27,16 +27,6 @@ public class Course : BaseEntity
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
-    public DateTime? OpenDate { get; set; }
-
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
-    public DateTime? PostedDate { get; set; }
-
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
     public DateTime? StartSaleDate { get; set; }
 
     [DataType(DataType.DateTime)]
@@ -63,7 +53,8 @@ public class Course : BaseEntity
     [Column(TypeName = "tinyint")] public CourseStatus Status { get; set; } = CourseStatus.Draft;
 
     public bool IsDelete { get; set; }
-
+    
+    public bool IsFree { get; set; } = false;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
