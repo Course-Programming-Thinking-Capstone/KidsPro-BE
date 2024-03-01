@@ -15,15 +15,17 @@ public class UnitOfWork : IUnitOfWork
     public IRoleRepository RoleRepository { get; }
     public IAccountRepository AccountRepository { get; }
     public IParentRepository ParentRepository { get; }
+    public IStudentRepository StudentRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
-        IAccountRepository accountRepository, IParentRepository parentRepository)
+        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository)
     {
         _context = context;
         _logger = logger;
         RoleRepository = roleRepository;
         AccountRepository = accountRepository;
         ParentRepository = parentRepository;
+        StudentRepository = studentRepository;
     }
 
     public async Task<int> SaveChangeAsync()

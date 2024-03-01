@@ -161,4 +161,24 @@ public class AccountService : IAccountService
 
         return account.PictureUrl;
     }
+
+    public async Task<StudentGameLoginDto> StudentGameLoginAsync(EmailCredential dto)
+    {
+        var student = await _unitOfWork.StudentRepository.GameStudentLoginAsync(dto.Email)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find student account."));
+
+        var account = student.Account;
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.PasswordHash))
+        {
+            throw new UnauthorizedException("Incorrect password.");
+        }
+
+        var result = AccountMapper.StudentToStudentGameLoginDto(student);
+
+        result.AccessToken = _authenticationService.CreateAccessToken(student.Account);
+        result.RefreshToken = _authenticationService.CreateRefreshToken(student.Account);
+
+        return result;
+    }
 }
