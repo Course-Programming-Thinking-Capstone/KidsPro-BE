@@ -18,7 +18,6 @@ public class AccountService : IAccountService
     private IAuthenticationService _authenticationService;
     private IImageService _imageService;
 
-    private const string AvatarFolder = "Image/Avatar/";
 
     public AccountService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
         IImageService imageService)
@@ -144,22 +143,22 @@ public class AccountService : IAccountService
         await _unitOfWork.SaveChangeAsync();
     }
 
-    public async Task UpdatePictureAsync(IFormFile file)
+    public async Task<string> UpdatePictureAsync(IFormFile file)
     {
         _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
 
-        var avatarFolder = AvatarFolder + $"{account.Id}/";
+        var avatarFileName = $"avatar_{account.Id}";
 
-        var avatarFileName = "avatar";
-
-        var uploadedFile = await _imageService.UploadImage(file, avatarFolder, avatarFileName);
+        var uploadedFile = await _imageService.UploadImage(file, Constant.FirebaseUserAvatarFolder, avatarFileName);
 
         account.PictureUrl = uploadedFile;
 
         _unitOfWork.AccountRepository.Update(account);
         await _unitOfWork.SaveChangeAsync();
+
+        return account.PictureUrl;
     }
 }

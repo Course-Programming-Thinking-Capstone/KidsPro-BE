@@ -9,4 +9,9 @@ public static class Constant
     public const string TeacherRole = "Teacher";
     public const string StudentRole = "Student";
     public const string AdminOrStaffRole = AdminRole + "," + StaffRole;
+
+    //firebase
+    public static readonly string FirebaseCoursePictureFolder = "Image/Course";
+    public static readonly string FirebaseCurriculumPictureFolder = "Image/Curriculum";
+    public static readonly string FirebaseUserAvatarFolder = "Image/Avatar";
 }

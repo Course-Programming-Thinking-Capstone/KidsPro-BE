@@ -20,8 +20,7 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Đổi mật khẩu
     /// </summary>
-    /// <param name="oldPassword"></param>
-    /// <param name="newPassword"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPatch("account/password")]
     [Authorize]
@@ -34,11 +33,16 @@ public class UsersController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Đổi avatar
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
     [Authorize]
     [HttpPatch("account/avatar")]
-    public async Task<ActionResult> UpdateAvatarAsync([FromForm] IFormFile file)
+    public async Task<ActionResult<string>> UpdateAvatarAsync([FromForm] IFormFile file)
     {
-        await _accountService.UpdatePictureAsync(file);
-        return Ok();
+        var result = await _accountService.UpdatePictureAsync(file);
+        return Ok(result);
     }
 }

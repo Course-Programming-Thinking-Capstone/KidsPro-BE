@@ -16,5 +16,5 @@ public interface IAccountService
     Task<LoginAccountDto> LoginByPhoneNumberAsync(PhoneCredential dto);
 
     Task ChangePasswordAsync(ChangePasswordDto dto);
-    Task UpdatePictureAsync(IFormFile file);
+    Task<string> UpdatePictureAsync(IFormFile file);
 }
