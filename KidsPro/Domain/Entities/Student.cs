@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Entities.Generic;
-using Domain.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities.Generic;
 
 namespace Domain.Entities;
 
@@ -13,5 +9,7 @@ public class Student : BaseEntity
 
     public int ParentId { get; set; }
     public virtual Parent Parent { get; set; } = null!;
+
+    public virtual GameUserProfile GameUserProfile { get; set; } = null!;
 
 }
