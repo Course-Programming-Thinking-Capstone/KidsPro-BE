@@ -1,4 +1,5 @@
 ﻿using Application.Configurations;
+using Application.Dtos.Response.Account;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,7 +56,6 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
         modelBuilder.Entity<Student>()
             .HasOne<Parent>(s => s.Parent)
             .WithMany()
@@ -95,12 +95,11 @@ public class AppDbContext : DbContext
             .HasOne<Account>(c => c.CreatedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<Course>()
             .HasOne<Account>(c => c.ModifiedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-
 
         //data seeding
         modelBuilder.Entity<Role>().HasData(
