@@ -19,8 +19,7 @@ public class Voucher : BaseEntity
 
     public int NumberOfUsed { get; set; }
 
-    [Precision(11,2)]
-    public decimal DiscountAmount { get; set; }
+    [Precision(11, 2)] public decimal DiscountAmount { get; set; }
 
     [Column(TypeName = "tinyint")] public DiscountType DiscountType { get; set; }
 
@@ -36,11 +35,7 @@ public class Voucher : BaseEntity
     [Precision(2)]
     public DateTime? ModifiedDate { get; set; }
 
-    public Staff CreatedBy { get; set; } = null!;
+    public virtual Account CreatedBy { get; set; } = null!;
 
     public int CreatedById { get; set; }
-
-    public Admin? ApprovedBy { get; set; }
-
-    public int? ApprovedById { get; set; }
 }

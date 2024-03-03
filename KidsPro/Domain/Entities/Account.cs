@@ -9,15 +9,15 @@ namespace Domain.Entities;
 [Index(nameof(Email), IsUnique = true)]
 public class Account : BaseEntity
 {
-    [MaxLength(100)] public string? Email { get; set; } 
+    [MaxLength(100)] public string? Email { get; set; }
 
     [MaxLength(50)] public string FullName { get; set; } = null!;
 
     [MaxLength(150)] public string PasswordHash { get; set; } = null!;
-    [MaxLength(150)] public string? PictureUrl { get; set; } 
-    
+    [MaxLength(150)] public string? PictureUrl { get; set; }
+
     public Gender? Gender { get; set; }
-    
+
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     [Precision(2)]
@@ -49,4 +49,6 @@ public class Account : BaseEntity
 
     //Student
     public virtual Student? Student { get; set; }
+
+    public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }

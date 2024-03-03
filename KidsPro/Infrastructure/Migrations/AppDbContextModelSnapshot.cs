@@ -644,7 +644,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("StudentId")
+                        .IsUnique();
 
                     b.ToTable("GameUserProfiles");
                 });
@@ -712,9 +713,6 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ChapterId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Duration")
                         .HasColumnType("int");
 
@@ -750,10 +748,10 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.HasIndex("Order", "ChapterId")
+                    b.HasIndex("Order", "SectionId")
                         .IsUnique();
 
-                    b.ToTable("Lesson");
+                    b.ToTable("Lessons");
                 });
 
             modelBuilder.Entity("Domain.Entities.LevelType", b =>
@@ -781,24 +779,20 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("Date")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NotificationMessage")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<string>("Title")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
 
                     b.ToTable("Notifications");
                 });
@@ -1112,7 +1106,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Order", "CourseId")
                         .IsUnique();
 
-                    b.ToTable("Chapters");
+                    b.ToTable("Sections");
                 });
 
             modelBuilder.Entity("Domain.Entities.SectionComponentNumber", b =>
@@ -1152,9 +1146,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
@@ -1167,8 +1158,6 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AccountId")
                         .IsUnique();
-
-                    b.HasIndex("CreatedById");
 
                     b.ToTable("Staves");
                 });
@@ -1330,9 +1319,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<string>("Field")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
@@ -1354,8 +1340,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.HasIndex("CreatedById");
-
                     b.ToTable("Teachers");
                 });
 
@@ -1366,9 +1350,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AddedById")
-                        .HasColumnType("int");
 
                     b.Property<string>("CertificatePicture")
                         .HasMaxLength(250)
@@ -1391,11 +1372,36 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddedById");
-
                     b.HasIndex("TeacherId");
 
                     b.ToTable("TeacherProfiles");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("NotificationId", "AccountId")
+                        .IsUnique();
+
+                    b.ToTable("UserNotification");
                 });
 
             modelBuilder.Entity("Domain.Entities.Voucher", b =>
@@ -1405,9 +1411,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ApprovedById")
-                        .HasColumnType("int");
 
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
@@ -1446,8 +1449,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CreatedById");
 
@@ -1514,7 +1515,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Staff", "CreatedBy")
+                    b.HasOne("Domain.Entities.Account", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1546,13 +1547,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
-                    b.HasOne("Domain.Entities.Teacher", "CreatedBy")
+                    b.HasOne("Domain.Entities.Account", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Admin", "ModifiedBy")
+                    b.HasOne("Domain.Entities.Account", "ModifiedBy")
                         .WithMany()
                         .HasForeignKey("ModifiedById")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1583,7 +1584,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Section", "Section")
-                        .WithMany()
+                        .WithMany("Games")
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1702,8 +1703,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.GameUserProfile", b =>
                 {
                     b.HasOne("Domain.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
+                        .WithOne("GameUserProfile")
+                        .HasForeignKey("Domain.Entities.GameUserProfile", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1738,17 +1739,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Section");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Notification", b =>
-                {
-                    b.HasOne("Domain.Entities.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -1824,14 +1814,14 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>
                 {
-                    b.HasOne("Domain.Entities.Teacher", "CreatedBy")
+                    b.HasOne("Domain.Entities.Account", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Section", "Section")
-                        .WithMany()
+                        .WithMany("Quizzes")
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1860,15 +1850,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Admin", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Account");
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.Student", b =>
@@ -1974,49 +1956,46 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Admin", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Account");
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
                 {
-                    b.HasOne("Domain.Entities.Staff", "AddedBy")
-                        .WithMany()
-                        .HasForeignKey("AddedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Teacher", "Teacher")
                         .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("AddedBy");
-
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserNotification", b =>
+                {
+                    b.HasOne("Domain.Entities.Account", "Account")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Notification", "Notification")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Notification");
                 });
 
             modelBuilder.Entity("Domain.Entities.Voucher", b =>
                 {
-                    b.HasOne("Domain.Entities.Admin", "ApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("ApprovedById");
-
-                    b.HasOne("Domain.Entities.Staff", "CreatedBy")
+                    b.HasOne("Domain.Entities.Account", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApprovedBy");
 
                     b.Navigation("CreatedBy");
                 });
@@ -2032,11 +2011,18 @@ namespace Infrastructure.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("Teacher");
+
+                    b.Navigation("UserNotifications");
                 });
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
                     b.Navigation("CourseResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.Navigation("UserNotifications");
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
@@ -2051,7 +2037,17 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Section", b =>
                 {
+                    b.Navigation("Games");
+
                     b.Navigation("Lessons");
+
+                    b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Student", b =>
+                {
+                    b.Navigation("GameUserProfile")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>

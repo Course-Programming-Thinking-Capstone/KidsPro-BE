@@ -13,7 +13,4 @@ public class Staff : BaseEntity
 
     public int AccountId { get; set; }
     public Account Account { get; set; } = null!;
-
-    public int CreatedById { get; set; }
-    public virtual Admin CreatedBy { get; set; } = null!;
 }

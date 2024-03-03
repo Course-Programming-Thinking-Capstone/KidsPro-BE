@@ -31,7 +31,7 @@ public class Quiz : BaseEntity
     [Precision(2)]
     public DateTime CreatedDate { get; set; }
 
-    public virtual Teacher CreatedBy { get; set; } = null!;
+    public virtual Account CreatedBy { get; set; } = null!;
     public int CreatedById { get; set; }
 
     public virtual Section Section { get; set; } = null!;

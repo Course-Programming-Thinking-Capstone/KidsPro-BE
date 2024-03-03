@@ -35,6 +35,6 @@ public class Transaction : BaseEntity
     [Precision(2)]
     public DateTime? ProcessedDate { get; set; }
 
-    public virtual Staff? Staff { get; set; }
-    public int? StaffId { get; set; }
+    public virtual Account? ProcessedBy { get; set; }
+    public int? ProcessedById { get; set; }
 }
