@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.Request.User;
+using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace WebAPI.Controllers;
 
@@ -43,6 +45,20 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<string>> UpdateAvatarAsync([FromForm] IFormFile file)
     {
         var result = await _accountService.UpdatePictureAsync(file);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Lấy thông tin của account hiện tại. Tùy role sẽ có data khác nhau
+    /// </summary>
+    /// <returns></returns>
+    [Authorize]
+    [HttpGet("account")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<AccountDto>> GetCurrentAccountInformationAsync()
+    {
+        var result = await _accountService.GetCurrentAccountInformationAsync();
         return Ok(result);
     }
 }

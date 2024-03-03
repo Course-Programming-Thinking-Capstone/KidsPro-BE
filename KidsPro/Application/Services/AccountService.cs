@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Request.Authentication;
+﻿using System.Runtime.CompilerServices;
+using Application.Dtos.Request.Authentication;
 using Application.Dtos.Request.User;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
@@ -178,6 +179,60 @@ public class AccountService : IAccountService
 
         result.AccessToken = _authenticationService.CreateAccessToken(student.Account);
         result.RefreshToken = _authenticationService.CreateRefreshToken(student.Account);
+
+        return result;
+    }
+
+    public async Task<AccountDto> GetCurrentAccountInformationAsync()
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        Account account;
+        AccountDto result;
+        switch (role)
+        {
+            case Constant.ParentRole:
+            {
+                account = await _unitOfWork.AccountRepository.GetParentAccountById(accountId)
+                    .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+                result = AccountMapper.AccountToParentDto(account);
+                break;
+            }
+
+            case Constant.AdminRole:
+            {
+                account = await _unitOfWork.AccountRepository.GetAdminAccountById(accountId)
+                    .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+                result = AccountMapper.AccountToAdminDto(account);
+                break;
+            }
+
+            case Constant.StaffRole:
+            {
+                account = await _unitOfWork.AccountRepository.GetStaffAccountById(accountId)
+                    .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+                result = AccountMapper.AccountToStaffDto(account);
+                break;
+            }
+
+            case Constant.TeacherRole:
+            {
+                account = await _unitOfWork.AccountRepository.GetTeacherAccountById(accountId)
+                    .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+                result = AccountMapper.AccountToTeacherDto(account);
+                break;
+            }
+
+            case Constant.StudentRole:
+            {
+                account = await _unitOfWork.AccountRepository.GetStudentAccountById(accountId)
+                    .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+                result = AccountMapper.AccountToStudentDto(account);
+                break;
+            }
+
+            default: throw new UnauthorizedException("Invalid token.");
+        }
 
         return result;
     }
