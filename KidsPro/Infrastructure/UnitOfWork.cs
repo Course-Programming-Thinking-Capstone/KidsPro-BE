@@ -16,9 +16,11 @@ public class UnitOfWork : IUnitOfWork
     public IAccountRepository AccountRepository { get; }
     public IParentRepository ParentRepository { get; }
     public IStudentRepository StudentRepository { get; }
+    public IStaffRepository StaffRepository { get; }
+    public ITeacherRepository TeacherRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
-        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository)
+        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository, IStaffRepository staffRepository, ITeacherRepository teacherRepository)
     {
         _context = context;
         _logger = logger;
@@ -26,6 +28,8 @@ public class UnitOfWork : IUnitOfWork
         AccountRepository = accountRepository;
         ParentRepository = parentRepository;
         StudentRepository = studentRepository;
+        StaffRepository = staffRepository;
+        TeacherRepository = teacherRepository;
     }
 
     public async Task<int> SaveChangeAsync()

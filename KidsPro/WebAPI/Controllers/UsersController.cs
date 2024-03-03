@@ -1,10 +1,11 @@
-﻿using Application.Dtos.Request.User;
+﻿using System.ComponentModel.DataAnnotations;
+using Application.Configurations;
+using Application.Dtos.Request.User;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace WebAPI.Controllers;
 
@@ -60,5 +61,36 @@ public class UsersController : ControllerBase
     {
         var result = await _accountService.GetCurrentAccountInformationAsync();
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Get account by id and role
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    [Authorize]
+    [HttpGet("account/{id}")]
+    public async Task<ActionResult<AccountDto>> GetByIdAsync([FromRoute] int id, [FromQuery] [Required] string role)
+    {
+        var result = await _accountService.GetAccountByIdAsync(id, role);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Admin create account for staff and teacher. Gender is enum: "Male: 1, Female: 2".
+    /// Role can be "Staff" or "Teacher".
+    /// Default created account password is "0000"
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
+    [HttpPost("admin/account")]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AccountDto))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<AccountDto>> CreateAccountAsync([FromBody] CreateAccountDto dto)
+    {
+        var result = await _accountService.CreateAccountAsync(dto);
+        return Created(nameof(CreateAccountAsync), result);
     }
 }

@@ -26,6 +26,20 @@ public static class AccountMapper
             UserGem = entity.GameUserProfile.Gem
         };
 
+    public static AccountDto AccountToAccountDto(Account entity) => new AccountDto()
+    {
+        Id = entity.Id,
+        Version = entity.Version,
+        Email = entity.Email,
+        FullName = entity.FullName,
+        PictureUrl = entity.PictureUrl,
+        Gender = entity.Gender?.ToString(),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        Status = entity.Status.ToString(),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        Role = entity.Role.Name
+    };
+
     public static AdminDto AccountToAdminDto(Account entity) => new AdminDto()
     {
         Id = entity.Id,
@@ -39,6 +53,7 @@ public static class AccountMapper
         CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
         Role = entity.Role.Name
     };
+
 
     public static StaffDto AccountToStaffDto(Account entity) => new StaffDto()
     {
