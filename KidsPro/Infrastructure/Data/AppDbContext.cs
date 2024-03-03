@@ -25,8 +25,8 @@ public class AppDbContext : DbContext
     public virtual DbSet<Class> Classes { get; set; }
     public virtual DbSet<ClassSchedule> ClassSchedules { get; set; }
     public virtual DbSet<CourseResource> CourseResources { get; set; }
-    public virtual DbSet<Section> Chapters { get; set; }
-    public virtual DbSet<Lesson> Lesson { get; set; }
+    public virtual DbSet<Section> Sections { get; set; }
+    public virtual DbSet<Lesson> Lessons { get; set; }
     public virtual DbSet<StudentLesson> StudentLessons { get; set; }
     public virtual DbSet<StudentProgress> StudentProgresses { get; set; }
     public virtual DbSet<Quiz> Quizzes { get; set; }
@@ -55,28 +55,9 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Staff>()
-            .HasOne<Admin>(s => s.CreatedBy)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Teacher>()
-            .HasOne<Admin>(s => s.CreatedBy)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Student>()
             .HasOne<Parent>(s => s.Parent)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Course>()
-            .HasOne<Teacher>(s => s.CreatedBy)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Course>()
-            .HasOne<Admin>(s => s.ModifiedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -107,6 +88,16 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<StudentQuiz>()
             .HasOne<Student>(s => s.Student)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Course>()
+            .HasOne<Account>(c => c.CreatedBy)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Course>()
+            .HasOne<Account>(c => c.ModifiedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 

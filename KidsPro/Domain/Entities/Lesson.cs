@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(Order), nameof(ChapterId), IsUnique = true)]
+[Index(nameof(Order), nameof(SectionId), IsUnique = true)]
 public class Lesson : BaseEntity
 {
     [MaxLength(250)] public string Name { get; set; } = null!;
@@ -27,6 +27,6 @@ public class Lesson : BaseEntity
     public LessonType Type { get; set; }
 
     public virtual Section Section { get; set; } = null!;
-    public int ChapterId { get; set; }
+    public int SectionId { get; set; }
     
 }

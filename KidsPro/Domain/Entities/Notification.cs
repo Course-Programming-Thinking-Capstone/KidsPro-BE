@@ -6,15 +6,15 @@ namespace Domain.Entities;
 
 public class Notification : BaseEntity
 {
-    [MaxLength(500)] public string NotificationMessage { get; set; } = null!;
+    [MaxLength(100)] public string? Title { get; set; }
+
+    [MaxLength(500)] public string Content { get; set; } = null!;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
     public DateTime Date { get; set; }
 
-    public bool IsRead { get; set; }
+    public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
-    public Account Account { get; set; } = null!;
-    public int AccountId { get; set; }
 }

@@ -31,7 +31,7 @@ public class Class : BaseEntity
     public virtual Teacher Teacher { get; set; } = null!;
     public int TeacherId { get; set; }
 
-    public virtual Staff CreatedBy { get; set; } = null!;
+    public virtual Account CreatedBy { get; set; } = null!;
     public int CreatedById { get; set; }
 
     public virtual Course Course { get; set; } = null!;

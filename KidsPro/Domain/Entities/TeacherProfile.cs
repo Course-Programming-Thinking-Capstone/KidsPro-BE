@@ -21,7 +21,4 @@ public class TeacherProfile : BaseEntity
     public int TeacherId { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;
-
-    public virtual Staff AddedBy { get; set; } = null!;
-    public virtual int AddedById { get; set; }
 }

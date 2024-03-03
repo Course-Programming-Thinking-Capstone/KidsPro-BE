@@ -66,10 +66,10 @@ public class Course : BaseEntity
     [Precision(2)]
     public DateTime? ModifiedDate { get; set; }
 
-    public virtual Teacher CreatedBy { get; set; } = null!;
+    public virtual Account CreatedBy { get; set; } = null!;
     public int CreatedById { get; set; }
 
-    public virtual Admin ModifiedBy { get; set; } = null!;
+    public virtual Account ModifiedBy { get; set; } = null!;
     public int ModifiedById { get; set; }
 
     public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
