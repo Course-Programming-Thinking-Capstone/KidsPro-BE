@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.Dtos.Request.Course;
 
-namespace Application.Dtos.Request.Course;
+namespace Application.Dtos.Request.Old.Course;
 
 public record CreateCourseDto
 {

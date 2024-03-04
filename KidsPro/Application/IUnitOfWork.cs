@@ -9,6 +9,7 @@ public interface IUnitOfWork : IDisposable
     public IParentRepository ParentRepository { get; }
     public IStudentRepository StudentRepository { get; }
     public IStaffRepository StaffRepository { get; }
+    public ICourseRepository CourseRepository { get; }
     public ITeacherRepository TeacherRepository { get; }
     public Task<int> SaveChangeAsync();
 
