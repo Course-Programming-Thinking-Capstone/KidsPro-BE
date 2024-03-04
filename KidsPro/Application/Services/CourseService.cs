@@ -1,9 +1,11 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -96,5 +98,34 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
 
         return entity.PictureUrl;
+    }
+
+    public async Task<SectionDto> CreateSectionAsync(int courseId, CreateSectionDto dto)
+    {
+        if (await _unitOfWork.SectionRepository.ExistByOrderAsync(courseId, dto.Order))
+            throw new ConflictException($"Order {dto.Order} has been existed.");
+
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} not found."));
+
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Invalid token."));
+
+        var entity = new Section()
+        {
+            Name = dto.Name,
+            Order = dto.Order,
+            CourseId = courseId
+        };
+
+        courseEntity.ModifiedDate = DateTime.UtcNow;
+        courseEntity.ModifiedBy = account;
+
+        await _unitOfWork.SectionRepository.AddAsync(entity);
+        _unitOfWork.CourseRepository.Update(courseEntity);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.SectionToSectionDto(entity);
     }
 }

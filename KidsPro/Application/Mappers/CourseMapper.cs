@@ -22,7 +22,8 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            Order = entity.Order
+            Order = entity.Order,
+            CourseId = entity.CourseId
         };
 
     public static CourseDto CourseToCourseDto(Course entity)

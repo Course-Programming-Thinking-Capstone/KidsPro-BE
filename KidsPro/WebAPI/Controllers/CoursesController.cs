@@ -1,10 +1,12 @@
 ﻿using Application.Dtos.Request.Course;
-using Application.Dtos.Response.Old.Course;
+using Application.Dtos.Request.Course.Section;
+using Application.Dtos.Response.Course;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Constant = Application.Configurations.Constant;
+using CourseDto = Application.Dtos.Response.Old.Course.CourseDto;
 
 namespace WebAPI.Controllers;
 
@@ -81,5 +83,20 @@ public class CoursesController : ControllerBase
     {
         var result = await _courseService.UpdateCoursePictureAsync(id, file);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Create course section.
+    /// id in route is course's Id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [HttpPost("{id}/section")]
+    public async Task<ActionResult<SectionDto>> CreateSectionAsync([FromRoute] int id, [FromBody] CreateSectionDto dto)
+    {
+        var result = await _courseService.CreateSectionAsync(id, dto);
+        return Created(nameof(CreateSectionAsync), result);
     }
 }
