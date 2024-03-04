@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Paging;
 using Application.Utils;
 using Domain.Entities;
 
@@ -119,4 +120,12 @@ public static class AccountMapper
         CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
         Role = entity.Role.Name
     };
+
+    public static PagingResponse<AccountDto> AccountToAccountDto(PagingResponse<Account> entities) =>
+        new PagingResponse<AccountDto>()
+        {
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords,
+            Results = entities.Results.Select(AccountToAccountDto).ToList()
+        };
 }

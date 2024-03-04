@@ -2,8 +2,10 @@
 using Application.Configurations;
 using Application.Dtos.Request.User;
 using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -92,5 +94,46 @@ public class UsersController : ControllerBase
     {
         var result = await _accountService.CreateAccountAsync(dto);
         return Created(nameof(CreateAccountAsync), result);
+    }
+
+    /// <summary>
+    /// Admin filter account. Gender is enum: "Male: 1, Female: 2".
+    /// </summary>
+    /// <param name="fullName"></param>
+    /// <param name="gender"></param>
+    /// <param name="status"></param>
+    /// <param name="sortFullName"></param>
+    /// <param name="sortCreatedDate"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
+    [HttpGet("admin/account")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<AccountDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<AccountDto>>> FilterAccountAsync(
+        [FromQuery] string? fullName,
+        [FromQuery] Gender? gender,
+        [FromQuery] string? status,
+        [FromQuery] string? sortFullName,
+        [FromQuery] string? sortCreatedDate,
+        [FromQuery] int? page,
+        [FromQuery] int? size
+    )
+    {
+        var result = await _accountService.FilterAccountAsync(
+            fullName,
+            gender,
+            status,
+            sortFullName,
+            sortCreatedDate,
+            page,
+            size
+        );
+
+        return Ok(result);
     }
 }
