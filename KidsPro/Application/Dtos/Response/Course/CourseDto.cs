@@ -4,8 +4,6 @@ public class CourseDto
 {
     public int Id { get; set; }
 
-    public byte[] Version { get; set; } = null!;
-
     public string Name { get; set; } = null!;
 
     public string? Description { get; set; }
