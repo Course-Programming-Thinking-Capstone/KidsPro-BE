@@ -1,6 +1,8 @@
-﻿using Application.Dtos.Request.Authentication;
+﻿using System.Linq.Expressions;
+using Application.Dtos.Request.Authentication;
 using Application.Dtos.Request.User;
 using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -355,5 +357,101 @@ public class AccountService : IAccountService
         }
 
         return result;
+    }
+
+    public async Task<PagingResponse<AccountDto>> FilterAccountAsync(string? fullName, Gender? gender, string? status,
+        string? sortFullName, string? sortCreatedDate, int? page,
+        int? size)
+    {
+        //need to check role
+        var parameter = Expression.Parameter(typeof(Account));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            //get account that is not deleted
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Account.IsDelete)),
+                    Expression.Constant(false)));
+
+            //Get account that is not admin
+            filter = Expression.AndAlso(filter,
+                Expression.NotEqual(Expression.Property(parameter, nameof(Account.RoleId)),
+                    Expression.Constant(1)));
+
+            if (!string.IsNullOrEmpty(fullName))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Account.FullName)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(fullName)));
+            }
+
+            if (gender.HasValue)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Account.Gender)),
+                        Expression.Constant(gender)));
+            }
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                if (Enum.TryParse(status, true, out UserStatus statusEnum))
+                {
+                    filter = Expression.AndAlso(filter,
+                        Expression.Equal(Expression.Property(parameter, nameof(Account.Status)),
+                            Expression.Constant(statusEnum)));
+                }
+                else
+                {
+                    throw new BadRequestException($"Invalid Status value: {status}");
+                }
+            }
+
+            Func<IQueryable<Account>, IOrderedQueryable<Account>> orderBy = q => q.OrderBy(a => a.Id);
+
+            if (sortFullName != null && sortFullName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.FullName);
+            }
+            else if (sortFullName != null && sortFullName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.FullName);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.CreatedDate);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.CreatedDate);
+            }
+
+            var entities = await _unitOfWork.AccountRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Account, bool>>(filter, parameter),
+                orderBy: orderBy,
+                page: page,
+                size: size,
+                includeProperties: $"{nameof(Account.Role)}"
+            );
+            var result = AccountMapper.AccountToAccountDto(entities);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.FilterAccountAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterAccountAsync)} method");
+        }
     }
 }
