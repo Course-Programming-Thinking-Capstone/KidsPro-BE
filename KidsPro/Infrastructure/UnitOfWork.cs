@@ -19,9 +19,22 @@ public class UnitOfWork : IUnitOfWork
     public IStaffRepository StaffRepository { get; }
     public ICourseRepository CourseRepository { get; }
     public ITeacherRepository TeacherRepository { get; }
+    public IGameUserProfileRepository GameUserProfileRepository { get; }
+    public IGameRepository GameRepository { get; }
+    public IGameItemRepository GameItemRepository { get; }
+    public IGameLevelRepository GameLevelRepository { get; }
+    public IGameLevelModifierRepository GameLevelModifierRepository { get; }
+    public IGameLevelDetailRepository GameLevelDetailRepository { get; }
+    public IGamePlayHistoryRepository GamePlayHistoryRepository { get; }
+    public IGameQuizRoomRepository GameQuizRoomRepository { get; }
+    public IGameStudentQuizRepository GameStudentQuizRepository { get; }
+    public IGameVersionRepository GameVersionRepository { get; }
+    public IItemOwnedRepository ItemOwnedRepository { get; }
+    public ILevelTypeRepository LevelTypeRepository { get; }
+    public IPositionTypeRepository PositionTypeRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
-        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository, IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository)
+        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository, IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository, IGameUserProfileRepository gameUserProfileRepository, IGameRepository gameRepository, IGameItemRepository gameItemRepository, IGameLevelRepository gameLevelRepository, IGameLevelModifierRepository gameLevelModifierRepository, IGameLevelDetailRepository gameLevelDetailRepository, IGamePlayHistoryRepository gamePlayHistoryRepository, IGameQuizRoomRepository gameQuizRoomRepository, IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository, IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository, IPositionTypeRepository positionTypeRepository)
     {
         _context = context;
         _logger = logger;
@@ -32,6 +45,19 @@ public class UnitOfWork : IUnitOfWork
         StaffRepository = staffRepository;
         TeacherRepository = teacherRepository;
         CourseRepository = courseRepository;
+        GameUserProfileRepository = gameUserProfileRepository;
+        GameRepository = gameRepository;
+        GameItemRepository = gameItemRepository;
+        GameLevelRepository = gameLevelRepository;
+        GameLevelModifierRepository = gameLevelModifierRepository;
+        GameLevelDetailRepository = gameLevelDetailRepository;
+        GamePlayHistoryRepository = gamePlayHistoryRepository;
+        GameQuizRoomRepository = gameQuizRoomRepository;
+        GameStudentQuizRepository = gameStudentQuizRepository;
+        GameVersionRepository = gameVersionRepository;
+        ItemOwnedRepository = itemOwnedRepository;
+        LevelTypeRepository = levelTypeRepository;
+        PositionTypeRepository = positionTypeRepository;
     }
 
     public async Task<int> SaveChangeAsync()
