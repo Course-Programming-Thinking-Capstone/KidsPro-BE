@@ -4,8 +4,6 @@ public class AccountDto
 {
     public int Id { get; set; }
 
-    public byte[] Version { get; set; } = null!;
-
     public string? Email { get; set; }
 
     public string FullName { get; set; } = null!;

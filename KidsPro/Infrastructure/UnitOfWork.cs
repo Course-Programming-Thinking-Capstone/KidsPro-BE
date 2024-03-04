@@ -1,6 +1,8 @@
 ﻿using Application;
+using Application.ErrorHandlers;
 using Application.Interfaces.IRepositories;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
@@ -34,7 +36,15 @@ public class UnitOfWork : IUnitOfWork
     public IPositionTypeRepository PositionTypeRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
-        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository, IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository, IGameUserProfileRepository gameUserProfileRepository, IGameRepository gameRepository, IGameItemRepository gameItemRepository, IGameLevelRepository gameLevelRepository, IGameLevelModifierRepository gameLevelModifierRepository, IGameLevelDetailRepository gameLevelDetailRepository, IGamePlayHistoryRepository gamePlayHistoryRepository, IGameQuizRoomRepository gameQuizRoomRepository, IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository, IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository, IPositionTypeRepository positionTypeRepository)
+        IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
+        IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository,
+        IGameUserProfileRepository gameUserProfileRepository, IGameRepository gameRepository,
+        IGameItemRepository gameItemRepository, IGameLevelRepository gameLevelRepository,
+        IGameLevelModifierRepository gameLevelModifierRepository, IGameLevelDetailRepository gameLevelDetailRepository,
+        IGamePlayHistoryRepository gamePlayHistoryRepository, IGameQuizRoomRepository gameQuizRoomRepository,
+        IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
+        IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
+        IPositionTypeRepository positionTypeRepository)
     {
         _context = context;
         _logger = logger;
@@ -62,7 +72,32 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveChangeAsync()
     {
-        return await _context.SaveChangesAsync();
+        //Handle concurrency update
+        try
+        {
+            return await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                var databaseValues = await entry.GetDatabaseValuesAsync();
+
+                if (databaseValues != null)
+                {
+                    // Refresh original values to bypass next concurrency check
+                    entry.OriginalValues.SetValues(databaseValues);
+                }
+                else
+                {
+                    // Handle entity not found in the database
+                    throw new NotFoundException("Entity not found in the database.");
+                }
+            }
+
+            // Try saving changes again after resolving conflicts
+            return await _context.SaveChangesAsync();
+        }
     }
 
     public async Task BeginTransactionAsync()

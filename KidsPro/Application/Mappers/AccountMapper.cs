@@ -30,7 +30,6 @@ public static class AccountMapper
     public static AccountDto AccountToAccountDto(Account entity) => new AccountDto()
     {
         Id = entity.Id,
-        Version = entity.Version,
         Email = entity.Email,
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
@@ -44,7 +43,6 @@ public static class AccountMapper
     public static AdminDto AccountToAdminDto(Account entity) => new AdminDto()
     {
         Id = entity.Id,
-        Version = entity.Version,
         Email = entity.Email,
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
@@ -59,7 +57,6 @@ public static class AccountMapper
     public static StaffDto AccountToStaffDto(Account entity) => new StaffDto()
     {
         Id = entity.Id,
-        Version = entity.Version,
         Email = entity.Email,
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
@@ -76,7 +73,6 @@ public static class AccountMapper
     public static TeacherDto AccountToTeacherDto(Account entity) => new TeacherDto()
     {
         Id = entity.Id,
-        Version = entity.Version,
         Email = entity.Email,
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
@@ -95,7 +91,6 @@ public static class AccountMapper
     public static ParentDto AccountToParentDto(Account entity) => new ParentDto()
     {
         Id = entity.Id,
-        Version = entity.Version,
         Email = entity.Email,
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
@@ -110,7 +105,6 @@ public static class AccountMapper
     public static StudentDto AccountToStudentDto(Account entity) => new StudentDto()
     {
         Id = entity.Id,
-        Version = entity.Version,
         Email = entity.Email,
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,

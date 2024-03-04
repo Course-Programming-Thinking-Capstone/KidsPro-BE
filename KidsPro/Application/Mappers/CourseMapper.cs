@@ -21,7 +21,6 @@ public static class CourseMapper
         => new SectionDto()
         {
             Id = entity.Id,
-            Version = entity.Version,
             Name = entity.Name,
             Order = entity.Order
         };
@@ -30,7 +29,6 @@ public static class CourseMapper
         => new CourseDto()
         {
             Id = entity.Id,
-            Version = entity.Version,
             Name = entity.Name,
             Description = entity.Description,
             FromAge = entity.FromAge,
@@ -53,4 +51,47 @@ public static class CourseMapper
             IsFree = entity.IsFree,
             Sections = entity.Sections.Select(SectionToSectionDto).ToList()
         };
+
+    public static void UpdateCourseDtoToEntity(UpdateCourseDto dto, ref Course entity)
+    {
+        if (!string.IsNullOrEmpty(dto.Name))
+        {
+            entity.Name = dto.Name;
+        }
+
+        if (!string.IsNullOrEmpty(dto.Description))
+        {
+            entity.Description = dto.Description;
+        }
+
+        if (!string.IsNullOrEmpty(dto.Prerequisite))
+        {
+            entity.PreRequire = dto.Prerequisite;
+        }
+
+        if (!string.IsNullOrEmpty(dto.Language))
+        {
+            entity.Language = dto.Language;
+        }
+
+        if (!string.IsNullOrEmpty(dto.GraduateCondition))
+        {
+            entity.GraduateCondition = dto.GraduateCondition;
+        }
+
+        if (dto.FromAge.HasValue)
+        {
+            entity.FromAge = dto.FromAge.Value;
+        }
+
+        if (dto.ToAge.HasValue)
+        {
+            entity.ToAge = dto.ToAge.Value;
+        }
+
+        if (dto.IsFree.HasValue)
+        {
+            entity.IsFree = dto.IsFree.Value;
+        }
+    }
 }
