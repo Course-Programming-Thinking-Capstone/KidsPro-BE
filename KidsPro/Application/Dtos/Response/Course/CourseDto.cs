@@ -1,10 +1,10 @@
-﻿using Application.Dtos.Response.Course;
-
-namespace Application.Dtos.Response.Old.Course;
+﻿namespace Application.Dtos.Response.Course;
 
 public class CourseDto
 {
     public int Id { get; set; }
+
+    public byte[] Version { get; set; } = null!;
 
     public string Name { get; set; } = null!;
 
@@ -18,8 +18,6 @@ public class CourseDto
 
     public string? PictureUrl { get; set; }
 
-    public string? OpenDate { get; set; }
-
     public string? StartSaleDate { get; set; }
 
     public string? EndSaleDate { get; set; }
@@ -28,8 +26,12 @@ public class CourseDto
 
     public decimal? DiscountPrice { get; set; }
 
-    public int TotalLesson { get; set; }
+    public int? TotalLesson { get; set; }
+    
+    public string? Language { get; set; }
 
+    public bool IsFree { get; set; }
+    
     public string Status { get; set; } = string.Empty;
 
     public string CreatedDate { get; set; } = string.Empty;
@@ -44,6 +46,5 @@ public class CourseDto
 
     public string ModifiedByName { get; set; } = string.Empty;
 
-    public ICollection<CourseResourceDto>? Resources { get; set; } 
-
+    public ICollection<SectionDto>? Sections { get; set; } 
 }

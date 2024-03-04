@@ -72,5 +72,7 @@ public class Course : BaseEntity
     public virtual Account ModifiedBy { get; set; } = null!;
     public int ModifiedById { get; set; }
 
+    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
+
     public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
 }

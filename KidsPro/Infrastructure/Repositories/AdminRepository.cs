@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.IRepositories.Generic;
+﻿using Application.Interfaces.IRepositories;
+using Application.Interfaces.IRepositories.Generic;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
