@@ -24,6 +24,7 @@ public interface IUnitOfWork : IDisposable
     public IItemOwnedRepository ItemOwnedRepository { get; }
     public ILevelTypeRepository LevelTypeRepository { get; }
     public IPositionTypeRepository PositionTypeRepository { get; }
+    public ISectionRepository SectionRepository { get; }
     public Task<int> SaveChangeAsync();
 
     public Task BeginTransactionAsync();

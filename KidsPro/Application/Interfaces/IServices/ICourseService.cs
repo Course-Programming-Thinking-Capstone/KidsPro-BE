@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Microsoft.AspNetCore.Http;
 
@@ -13,4 +14,6 @@ public interface ICourseService
     Task<CourseDto> UpdateCourseAsync(int id, UpdateCourseDto dto);
 
     Task<string> UpdateCoursePictureAsync(int id, IFormFile file);
+
+    Task<SectionDto> CreateSectionAsync(int courseId, CreateSectionDto dto);
 }
