@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Application.Utils;
 using Domain.Entities;
@@ -25,6 +26,9 @@ public static class CourseMapper
             Order = entity.Order,
             CourseId = entity.CourseId
         };
+
+    public static List<SectionDto> SectionToSectionDto(IEnumerable<Section> entities)
+        => entities.Select(SectionToSectionDto).ToList();
 
     public static CourseDto CourseToCourseDto(Course entity)
         => new CourseDto()
@@ -93,6 +97,14 @@ public static class CourseMapper
         if (dto.IsFree.HasValue)
         {
             entity.IsFree = dto.IsFree.Value;
+        }
+    }
+
+    public static void UpdateSectionDtoToSection(UpdateSectionDto dto, ref Section entity)
+    {
+        if (!string.IsNullOrEmpty(dto.Name))
+        {
+            entity.Name = dto.Name;
         }
     }
 }

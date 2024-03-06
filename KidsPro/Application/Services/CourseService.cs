@@ -128,4 +128,40 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.SectionToSectionDto(entity);
     }
+
+    public async Task<SectionDto> UpdateSectionAsync(int sectionId, UpdateSectionDto dto)
+    {
+        var entity = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} can not found."));
+
+        CourseMapper.UpdateSectionDtoToSection(dto, ref entity);
+        _unitOfWork.SectionRepository.Update(entity);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.SectionToSectionDto(entity);
+    }
+
+    public async Task<List<SectionDto>> UpdateSectionOrderAsync(int courseId, List<UpdateSectionOrderDto> dtos)
+    {
+        if (!await _unitOfWork.CourseRepository.ExistByIdAsync(courseId))
+            throw new BadRequestException($"Course {courseId} does not exist.");
+
+        var entities = new List<Section>();
+
+        foreach (var dto in dtos)
+        {
+            var entity = await _unitOfWork.SectionRepository.GetByIdAsync(dto.Id)
+                .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {dto.Id} not found."));
+
+            if (entity.CourseId != courseId)
+                throw new BadRequestException($"Section {dto.Id} do not belong to course {courseId}");
+
+            entity.Order = dto.Order;
+            entities.Add(entity);
+        }
+
+        _unitOfWork.SectionRepository.UpdateRange(entities);
+        await _unitOfWork.SaveChangeAsync();
+
+        return CourseMapper.SectionToSectionDto(entities);
+    }
 }

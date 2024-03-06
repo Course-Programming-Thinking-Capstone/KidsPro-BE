@@ -174,7 +174,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         _dbSet.RemoveRange(entities);
     }
 
-    public virtual async Task<bool> ExistById(int id)
+    public virtual async Task<bool> ExistByIdAsync(int id)
     {
         return await GetByIdAsync(id)
             .ContinueWith(t => t.Result == null);
