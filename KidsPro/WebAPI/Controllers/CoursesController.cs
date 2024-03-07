@@ -122,7 +122,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPatch("section/{sectionId}")]
+    [HttpPatch("section/Order/{sectionId}")]
     public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int sectionId,
         [FromBody] List<UpdateSectionOrderDto> dto)
     {
