@@ -177,6 +177,6 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     public virtual async Task<bool> ExistByIdAsync(int id)
     {
         return await GetByIdAsync(id)
-            .ContinueWith(t => t.Result == null);
+            .ContinueWith(t => t.Result != null);
     }
 }

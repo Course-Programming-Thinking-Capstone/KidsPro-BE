@@ -118,15 +118,15 @@ public class CoursesController : ControllerBase
     /// <summary>
     /// Update section order
     /// </summary>
-    /// <param name="sectionId"></param>
+    /// <param name="courseId"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPatch("section/Order/{sectionId}")]
-    public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int sectionId,
+    [HttpPatch("{courseId}/section/order")]
+    public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int courseId,
         [FromBody] List<UpdateSectionOrderDto> dto)
     {
-        var result = await _courseService.UpdateSectionOrderAsync(sectionId, dto);
+        var result = await _courseService.UpdateSectionOrderAsync(courseId, dto);
         return Ok(result);
     }
 }
