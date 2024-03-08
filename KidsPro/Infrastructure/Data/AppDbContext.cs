@@ -1,5 +1,4 @@
 ﻿using Application.Configurations;
-using Application.Dtos.Response.Account;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,10 +31,10 @@ public class AppDbContext : DbContext
     public virtual DbSet<StudentProgress> StudentProgresses { get; set; }
     public virtual DbSet<Quiz> Quizzes { get; set; }
     public virtual DbSet<Question> Questions { get; set; }
-    public virtual DbSet<Answer> Answers { get; set; }
+    public virtual DbSet<Option> Options { get; set; }
     public virtual DbSet<StudentQuiz> StudentQuizzes { get; set; }
-    public virtual DbSet<StudentAnswer> StudentAnswers { get; set; }
-    public virtual DbSet<Voucher> Vouchers { get; set; }
+    public virtual DbSet<StudentOption> StudentOptions { get; set; }
+    public virtual DbSet<GameVoucher> GameVouchers { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderDetail> OrderDetails { get; set; }
     public virtual DbSet<Game> Games { get; set; }
@@ -45,8 +44,8 @@ public class AppDbContext : DbContext
     public virtual DbSet<GameLevelDetail> GameLevelDetails { get; set; }
     public virtual DbSet<GameVersion> GameVersions { get; set; }
     public virtual DbSet<GameLevelModifier> GameLevelModifiers { get; set; }
-    public virtual DbSet<GameQuizRoom> GameQuizRooms { get; set; }
-    public virtual DbSet<GameStudentQuiz> GameStudentQuizzes { get; set; }
+    public virtual DbSet<MiniGame> MiniGames { get; set; }
+    public virtual DbSet<StudentMiniGame> StudentMiniGames { get; set; }
     public virtual DbSet<GamePlayHistory> GamePlayHistories { get; set; }
     public virtual DbSet<GameUserProfile> GameUserProfiles { get; set; }
     public virtual DbSet<GameItem> GameItems { get; set; }
@@ -71,18 +70,13 @@ public class AppDbContext : DbContext
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<GameStudentQuiz>()
+        modelBuilder.Entity<StudentMiniGame>()
             .HasOne<Student>(s => s.Student)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<StudentProgress>()
             .HasOne<Course>(s => s.Course)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<OrderDetail>()
-            .HasOne<Student>(o => o.Student)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 

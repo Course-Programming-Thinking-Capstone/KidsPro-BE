@@ -10,12 +10,8 @@ public class Order : BaseEntity
 {
     [MaxLength(50)] public string PaymentType { get; set; } = null!;
 
-    [Precision(11,2)]
-    public decimal TotalPrice { get; set; }
+    [Precision(11, 2)] public decimal TotalPrice { get; set; }
     public int Quantity { get; set; }
-
-    [Precision(11,2)]
-    public decimal Price { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
@@ -26,9 +22,8 @@ public class Order : BaseEntity
 
     [Column(TypeName = "tinyint")] public OrderStatus Status { get; set; }
 
-    public virtual Voucher? Voucher { get; set; }
+    public virtual GameVoucher? Voucher { get; set; }
     public int VoucherId { get; set; }
 
-    public virtual Course Course { get; set; } = null!;
-    public int CourseId { get; set; }
+    public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
 }

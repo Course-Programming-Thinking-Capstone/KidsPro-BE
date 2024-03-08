@@ -12,10 +12,7 @@ public static class CourseMapper
         => new Course()
         {
             Name = dto.Name,
-            Description = dto.Description,
-            PreRequire = dto.Prerequisite,
-            FromAge = dto.FromAge,
-            ToAge = dto.ToAge
+            Description = dto.Description
         };
 
     public static SectionDto SectionToSectionDto(Section entity)
@@ -36,15 +33,11 @@ public static class CourseMapper
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
-            FromAge = entity.FromAge,
-            ToAge = entity.ToAge,
-            Prerequisite = entity.PreRequire,
             Price = entity.Price,
             CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString(),
             DiscountPrice = entity.DiscountPrice,
-            Language = entity.Language,
             ModifiedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
             TotalLesson = entity.TotalLesson,
             CreatedById = entity.CreatedById,
@@ -67,31 +60,6 @@ public static class CourseMapper
         if (!string.IsNullOrEmpty(dto.Description))
         {
             entity.Description = dto.Description;
-        }
-
-        if (!string.IsNullOrEmpty(dto.Prerequisite))
-        {
-            entity.PreRequire = dto.Prerequisite;
-        }
-
-        if (!string.IsNullOrEmpty(dto.Language))
-        {
-            entity.Language = dto.Language;
-        }
-
-        if (!string.IsNullOrEmpty(dto.GraduateCondition))
-        {
-            entity.GraduateCondition = dto.GraduateCondition;
-        }
-
-        if (dto.FromAge.HasValue)
-        {
-            entity.FromAge = dto.FromAge.Value;
-        }
-
-        if (dto.ToAge.HasValue)
-        {
-            entity.ToAge = dto.ToAge.Value;
         }
 
         if (dto.IsFree.HasValue)

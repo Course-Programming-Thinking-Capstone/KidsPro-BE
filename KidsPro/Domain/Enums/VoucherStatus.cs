@@ -2,7 +2,7 @@
 
 public enum VoucherStatus
 {
-    Active = 1, 
-    InActive = 2,
-    Expired = 3
+    Valid = 1,
+    Expired = 2,
+    Used = 3
 }

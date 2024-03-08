@@ -12,4 +12,5 @@ public class Student : BaseEntity
 
     public virtual GameUserProfile GameUserProfile { get; set; } = null!;
 
+    public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
 }

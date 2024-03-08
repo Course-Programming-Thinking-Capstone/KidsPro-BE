@@ -15,5 +15,5 @@ public class Question : BaseEntity
     public virtual Quiz Quiz { get; set; } = null!;
     public int QuizId { get; set; }
 
-    public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
+    public virtual ICollection<Option> Answers { get; set; } = new List<Option>();
 }
