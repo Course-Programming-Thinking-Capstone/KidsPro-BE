@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Response.Game;
+﻿using Application.Dtos.Request.Game;
+using Application.Dtos.Response.Game;
 using Application.Interfaces.IServices;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +64,20 @@ public class GameService : IGameService
         return result;
     }
 
+    public async Task<int> GetLevelCoin(int typeId, int levelIndex)
+    {
+        var gameLevel = await _unitOfWork.GameLevelRepository
+            .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
+
+        var firstItem = gameLevel.FirstOrDefault();
+        if (firstItem == null)
+        {
+            return 0;
+        }
+
+        return firstItem.CoinReward ?? 0;
+    }
+
     public async Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex)
     {
         var gameLevel = await _unitOfWork.GameLevelRepository
@@ -87,5 +102,37 @@ public class GameService : IGameService
                 TypeName = item.PositionType.TypeName
             }).ToList()
         };
+    }
+
+    public async Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
+    {
+        var isPlayedHistory = await _unitOfWork.GamePlayHistoryRepository.GetAsync(
+            o => o.StudentId == userFinishLevelRequest.UserID
+                 && o.GameLevelTypeId == userFinishLevelRequest.ModeId
+                 && o.LevelIndex == userFinishLevelRequest.LevelIndex
+            , null
+        );
+        var userCoin = -1;
+        var oldData = isPlayedHistory.FirstOrDefault();
+        if (oldData == null) // already play -> no coin
+        {
+            var userData = await _unitOfWork.GameUserProfileRepository.GetByIdAsync(userFinishLevelRequest.UserID);
+            var coinWin = await GetLevelCoin(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
+            userData.Coin += coinWin;
+            userCoin = userData.Coin;
+            _unitOfWork.GameUserProfileRepository.Update(userData);
+        }
+
+        await _unitOfWork.GamePlayHistoryRepository.AddAsync(new GamePlayHistory
+        {
+            LevelIndex = userFinishLevelRequest.LevelIndex,
+            PlayTime = userFinishLevelRequest.StartTime,
+            FinishTime = userFinishLevelRequest.EndTime,
+            GameLevelTypeId = userFinishLevelRequest.ModeId,
+            Duration = (userFinishLevelRequest.EndTime - userFinishLevelRequest.StartTime).Minutes,
+            StudentId = userFinishLevelRequest.UserID
+        });
+
+        return userCoin;
     }
 }

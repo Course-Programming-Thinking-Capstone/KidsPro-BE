@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Authentication;
+using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Game;
 using Application.ErrorHandlers;
@@ -73,6 +74,19 @@ public class GamesController : ControllerBase
     public async Task<ActionResult<LevelInformationResponse>> GetLevelData([FromRoute] int id, [FromRoute] int index)
     {
         var result = await _gameService.GetLevelInformation(id, index);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// User finish a level game
+    /// </summary>
+    [HttpPost("finishLevel")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<LevelInformationResponse>> FinishLevelGame(
+        [FromBody] UserFinishLevelRequest userFinishLevelRequest)
+    {
+        var result = await _gameService.UserFinishLevel(userFinishLevelRequest);
         return Ok(result);
     }
 }
