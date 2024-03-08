@@ -78,7 +78,7 @@ public class GamesController : ControllerBase
     }
 
     /// <summary>
-    /// User finish a level game
+    /// User finish a level game, return new user coin if first time clear level
     /// </summary>
     [HttpPost("finishLevel")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
