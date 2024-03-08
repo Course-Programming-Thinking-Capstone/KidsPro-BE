@@ -1,4 +1,7 @@
-﻿using Application.Interfaces.IServices;
+﻿using Application.Dtos.Response.Game;
+using Application.Interfaces.IServices;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -12,5 +15,51 @@ public class GameService : IGameService
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+    }
+
+    public async Task<List<ModeType>> GetAllGameMode()
+    {
+        var result2 = await _unitOfWork.GameLevelRepository
+            .GetAll()
+            .GroupBy(h => h.GameLevelType)
+            .Select(group => new ModeType
+            {
+                IdMode = group.Key.Id,
+                TypeName = group.Key.TypeName ?? "Null Name",
+                totalLevel = group.Max(h => h.LevelIndex) ?? 0
+            })
+            .ToListAsync();
+
+        if (result2.Count == 0)
+        {
+            var result3 = await _unitOfWork.LevelTypeRepository.GetAll().ToListAsync();
+            foreach (var item in result3)
+            {
+                result2.Add(new ModeType
+                {
+                    IdMode = item.Id,
+                    TypeName = item.TypeName ?? "Null Name",
+                    totalLevel = 0
+                });
+            }
+        }
+
+        return result2;
+    }
+
+    public async Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId)
+    {
+        var result = await _unitOfWork.GamePlayHistoryRepository
+            .GetAll()
+            .Where(h => h.StudentId == userId) // Filter by userId
+            .GroupBy(h => h.GameLevelType)
+            .Select(group => new CurrentLevelData
+            {
+                Mode = group.Key.Id,
+                LevelIndex = group.Max(h => h.LevelIndex)
+            })
+            .ToListAsync();
+
+        return result;
     }
 }
