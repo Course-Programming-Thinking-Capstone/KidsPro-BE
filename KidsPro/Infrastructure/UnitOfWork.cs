@@ -35,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
     public ILevelTypeRepository LevelTypeRepository { get; }
     public IPositionTypeRepository PositionTypeRepository { get; }
     public ISectionRepository SectionRepository { get; }
+    public ISectionComponentNumberRepository SectionComponentNumberRepository { get; set; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
@@ -45,7 +46,7 @@ public class UnitOfWork : IUnitOfWork
         IGamePlayHistoryRepository gamePlayHistoryRepository, IGameQuizRoomRepository gameQuizRoomRepository,
         IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
-        IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository)
+        IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository)
     {
         _context = context;
         _logger = logger;
@@ -70,6 +71,7 @@ public class UnitOfWork : IUnitOfWork
         LevelTypeRepository = levelTypeRepository;
         PositionTypeRepository = positionTypeRepository;
         SectionRepository = sectionRepository;
+        SectionComponentNumberRepository = sectionComponentNumberRepository;
     }
 
     public async Task<int> SaveChangeAsync()

@@ -18,4 +18,9 @@ public interface ICourseService
     Task<SectionDto> CreateSectionAsync(int courseId, CreateSectionDto dto);
     Task<SectionDto> UpdateSectionAsync(int sectionId, UpdateSectionDto dto);
     Task<List<SectionDto>> UpdateSectionOrderAsync(int courseId, List<UpdateSectionOrderDto> dtos);
+
+    Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync();
+
+    Task<ICollection<SectionComponentNumberDto>> UpdateSectionComponentNumberAsync(
+        List<UpdateSectionComponentNumberDto> dtos);
 }

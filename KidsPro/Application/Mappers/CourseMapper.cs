@@ -50,6 +50,17 @@ public static class CourseMapper
             Sections = entity.Sections.Select(SectionToSectionDto).ToList()
         };
 
+    public static SectionComponentNumberDto EntityToSectionComponentNumberDto(SectionComponentNumber entity)
+        => new SectionComponentNumberDto()
+        {
+            Name = entity.SectionComponentType.ToString(),
+            MaxNumber = entity.MaxNumber
+        };
+
+    public static List<SectionComponentNumberDto> EntityToSectionComponentNumberDto(
+        IEnumerable<SectionComponentNumber> entities)
+        => entities.Select(EntityToSectionComponentNumberDto).ToList();
+
     public static void UpdateCourseDtoToEntity(UpdateCourseDto dto, ref Course entity)
     {
         if (!string.IsNullOrEmpty(dto.Name))

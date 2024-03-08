@@ -1,5 +1,6 @@
 ﻿using Application.Configurations;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -102,6 +103,13 @@ public class AppDbContext : DbContext
             new Role() { Id = 3, Name = Constant.TeacherRole },
             new Role() { Id = 4, Name = Constant.ParentRole },
             new Role() { Id = 5, Name = Constant.StudentRole }
+        );
+
+        modelBuilder.Entity<SectionComponentNumber>().HasData(
+            new SectionComponentNumber() { Id = 1, SectionComponentType = SectionComponentType.Video, MaxNumber = 5 },
+            new SectionComponentNumber() { Id = 2, SectionComponentType = SectionComponentType.Reading, MaxNumber = 3 },
+            new SectionComponentNumber() { Id = 3, SectionComponentType = SectionComponentType.Quiz, MaxNumber = 1 },
+            new SectionComponentNumber() { Id = 4, SectionComponentType = SectionComponentType.Game, MaxNumber = 1 }
         );
     }
 }

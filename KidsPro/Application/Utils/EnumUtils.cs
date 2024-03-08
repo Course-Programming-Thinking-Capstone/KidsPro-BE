@@ -15,4 +15,16 @@ public static class EnumUtils
             throw new ArgumentException($"Invalid UserStatus value: {value}");
         }
     }
+
+    public static SectionComponentType ConvertToSectionComponentType(string value)
+    {
+        if (Enum.TryParse(value, true, out SectionComponentType type))
+        {
+            return type;
+        }
+        else
+        {
+            throw new ArgumentException($"Invalid UserStatus value: {value}");
+        }
+    }
 }

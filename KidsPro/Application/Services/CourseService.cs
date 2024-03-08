@@ -5,6 +5,7 @@ using Application.Dtos.Response.Course;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
+using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
@@ -163,5 +164,33 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
 
         return CourseMapper.SectionToSectionDto(entities);
+    }
+
+    public async Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync()
+    {
+        var entities = await _unitOfWork.SectionComponentNumberRepository.GetAsync(
+            filter: null,
+            orderBy: s => s.OrderBy(s => s.Id),
+            disableTracking: true
+        );
+
+        return CourseMapper.EntityToSectionComponentNumberDto(entities);
+    }
+
+    public async Task<ICollection<SectionComponentNumberDto>> UpdateSectionComponentNumberAsync(
+        List<UpdateSectionComponentNumberDto> dtos)
+    {
+        var entities = new List<SectionComponentNumber>();
+
+        foreach (var type in dtos.Select(dto => EnumUtils.ConvertToSectionComponentType(dto.Name)))
+        {
+            var entity = await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(type)
+                .ContinueWith(t => t.Result ?? throw new NotFoundException($"Type {type.ToString()} does not exist"));
+            entities.Add(entity);
+        }
+
+        _unitOfWork.SectionComponentNumberRepository.UpdateRange(entities);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.EntityToSectionComponentNumberDto(entities);
     }
 }
