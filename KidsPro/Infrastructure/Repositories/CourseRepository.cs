@@ -24,7 +24,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
 
         return await query.Include(c => c.CreatedBy)
             .Include(c => c.ModifiedBy)
-            .Include(c => c.Sections)
+            .Include(c => c.Sections.OrderBy(s => s.Order))
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
 }

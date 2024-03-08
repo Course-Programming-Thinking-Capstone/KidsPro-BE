@@ -99,4 +99,58 @@ public class CoursesController : ControllerBase
         var result = await _courseService.CreateSectionAsync(id, dto);
         return Created(nameof(CreateSectionAsync), result);
     }
+
+    /// <summary>
+    /// Update section name 
+    /// </summary>
+    /// <param name="sectionId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [HttpPatch("section/{sectionId}")]
+    public async Task<ActionResult<SectionDto>> UpdateSectionAsync([FromRoute] int sectionId,
+        [FromBody] UpdateSectionDto dto)
+    {
+        var result = await _courseService.UpdateSectionAsync(sectionId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Update section order
+    /// </summary>
+    /// <param name="courseId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [HttpPatch("{courseId}/section/order")]
+    public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int courseId,
+        [FromBody] List<UpdateSectionOrderDto> dto)
+    {
+        var result = await _courseService.UpdateSectionOrderAsync(courseId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get Section component number of section in course. Ex a section has at most 5 videos, 3 documents,...
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("sectionComponentNumber")]
+    public async Task<ActionResult<List<SectionComponentNumberDto>>> GetSectionComponentNumberAsync()
+    {
+        return Ok(await _courseService.GetSectionComponentNumberAsync());
+    }
+
+    /// <summary>
+    ///  Update Section component number of section in course.
+    /// </summary>
+    /// <param name="dtos"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
+    [HttpPut("sectionComponentNumber")]
+    public async Task<ActionResult<List<SectionComponentNumberDto>>> UpdateSectionComponentNumberAsync(
+        [FromBody] List<UpdateSectionComponentNumberDto> dtos)
+    {
+        var result = await _courseService.UpdateSectionComponentNumberAsync(dtos);
+        return Ok(result);
+    }
 }

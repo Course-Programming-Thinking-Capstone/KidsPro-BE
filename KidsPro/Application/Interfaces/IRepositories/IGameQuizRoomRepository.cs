@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Application.Interfaces.IRepositories;
 
-public interface IGameQuizRoomRepository:IBaseRepository<GameQuizRoom>
+public interface IGameQuizRoomRepository:IBaseRepository<MiniGame>
 {
     
 }

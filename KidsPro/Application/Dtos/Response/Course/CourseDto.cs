@@ -8,12 +8,6 @@ public class CourseDto
 
     public string? Description { get; set; }
 
-    public string? Prerequisite { get; set; }
-
-    public int? FromAge { get; set; }
-    
-    public int? ToAge { get; set; }
-
     public string? PictureUrl { get; set; }
 
     public string? StartSaleDate { get; set; }
@@ -25,8 +19,6 @@ public class CourseDto
     public decimal? DiscountPrice { get; set; }
 
     public int? TotalLesson { get; set; }
-    
-    public string? Language { get; set; }
 
     public bool IsFree { get; set; }
     

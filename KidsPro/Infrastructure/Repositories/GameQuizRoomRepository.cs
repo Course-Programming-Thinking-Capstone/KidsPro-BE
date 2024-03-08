@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
-public class GameQuizRoomRepository:BaseRepository<GameQuizRoom>, IGameQuizRoomRepository
+public class GameQuizRoomRepository:BaseRepository<MiniGame>, IGameQuizRoomRepository
 {
-    public GameQuizRoomRepository(AppDbContext context, ILogger<BaseRepository<GameQuizRoom>> logger) : base(context, logger)
+    public GameQuizRoomRepository(AppDbContext context, ILogger<BaseRepository<MiniGame>> logger) : base(context, logger)
     {
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-public class GameStudentQuiz : BaseEntity
+public class StudentMiniGame : BaseEntity
 {
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
@@ -21,6 +21,6 @@ public class GameStudentQuiz : BaseEntity
     public virtual Student Student { get; set; } = null!;
     public int StudentId { get; set; }
 
-    public virtual GameQuizRoom GameQuizRoom { get; set; } = null!;
+    public virtual MiniGame MiniGame { get; set; } = null!;
     public int GameQuizRoomId { get; set; }
 }

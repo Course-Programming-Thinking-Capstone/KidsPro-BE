@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240308064715_DatabaseV3")]
+    partial class DatabaseV3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1299,32 +1302,6 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("SectionComponentNumbers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            MaxNumber = 5,
-                            SectionComponentType = (byte)1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            MaxNumber = 3,
-                            SectionComponentType = (byte)2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            MaxNumber = 1,
-                            SectionComponentType = (byte)4
-                        },
-                        new
-                        {
-                            Id = 4,
-                            MaxNumber = 1,
-                            SectionComponentType = (byte)3
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Staff", b =>

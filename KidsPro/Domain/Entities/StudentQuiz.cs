@@ -30,5 +30,5 @@ public class StudentQuiz
 
     public bool IsPass { get; set; }
 
-    public virtual ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
+    public virtual ICollection<StudentOption> StudentAnswers { get; set; } = new List<StudentOption>();
 }

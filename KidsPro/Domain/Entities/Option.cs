@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Entities;
 
 [Index(nameof(Order), nameof(QuestionId), IsUnique = true)]
-public class Answer : BaseEntity
+public class Option : BaseEntity
 {
     public int Order { get; set; }
 

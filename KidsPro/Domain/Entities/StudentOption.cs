@@ -2,11 +2,11 @@
 
 namespace Domain.Entities;
 
-public class StudentAnswer : BaseEntity
+public class StudentOption : BaseEntity
 {
     public int QuestionId { get; set; }
 
-    public int AnswerId { get; set; }
+    public int OptionId { get; set; }
 
     public int QuestionOrder { get; set; }
 

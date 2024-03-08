@@ -11,4 +11,6 @@ public class Parent : BaseEntity
 
     public int AccountId { get; set; }
     public Account Account { get; set; } = null!;
+
+    public virtual ICollection<GameVoucher>? Vouchers { get; set; }
 }

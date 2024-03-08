@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Application.Utils;
 using Domain.Entities;
@@ -11,10 +12,7 @@ public static class CourseMapper
         => new Course()
         {
             Name = dto.Name,
-            Description = dto.Description,
-            PreRequire = dto.Prerequisite,
-            FromAge = dto.FromAge,
-            ToAge = dto.ToAge
+            Description = dto.Description
         };
 
     public static SectionDto SectionToSectionDto(Section entity)
@@ -26,21 +24,20 @@ public static class CourseMapper
             CourseId = entity.CourseId
         };
 
+    public static List<SectionDto> SectionToSectionDto(IEnumerable<Section> entities)
+        => entities.Select(SectionToSectionDto).ToList();
+
     public static CourseDto CourseToCourseDto(Course entity)
         => new CourseDto()
         {
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
-            FromAge = entity.FromAge,
-            ToAge = entity.ToAge,
-            Prerequisite = entity.PreRequire,
             Price = entity.Price,
             CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString(),
             DiscountPrice = entity.DiscountPrice,
-            Language = entity.Language,
             ModifiedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
             TotalLesson = entity.TotalLesson,
             CreatedById = entity.CreatedById,
@@ -52,6 +49,17 @@ public static class CourseMapper
             IsFree = entity.IsFree,
             Sections = entity.Sections.Select(SectionToSectionDto).ToList()
         };
+
+    public static SectionComponentNumberDto EntityToSectionComponentNumberDto(SectionComponentNumber entity)
+        => new SectionComponentNumberDto()
+        {
+            Name = entity.SectionComponentType.ToString(),
+            MaxNumber = entity.MaxNumber
+        };
+
+    public static List<SectionComponentNumberDto> EntityToSectionComponentNumberDto(
+        IEnumerable<SectionComponentNumber> entities)
+        => entities.Select(EntityToSectionComponentNumberDto).ToList();
 
     public static void UpdateCourseDtoToEntity(UpdateCourseDto dto, ref Course entity)
     {
@@ -65,34 +73,17 @@ public static class CourseMapper
             entity.Description = dto.Description;
         }
 
-        if (!string.IsNullOrEmpty(dto.Prerequisite))
-        {
-            entity.PreRequire = dto.Prerequisite;
-        }
-
-        if (!string.IsNullOrEmpty(dto.Language))
-        {
-            entity.Language = dto.Language;
-        }
-
-        if (!string.IsNullOrEmpty(dto.GraduateCondition))
-        {
-            entity.GraduateCondition = dto.GraduateCondition;
-        }
-
-        if (dto.FromAge.HasValue)
-        {
-            entity.FromAge = dto.FromAge.Value;
-        }
-
-        if (dto.ToAge.HasValue)
-        {
-            entity.ToAge = dto.ToAge.Value;
-        }
-
         if (dto.IsFree.HasValue)
         {
             entity.IsFree = dto.IsFree.Value;
+        }
+    }
+
+    public static void UpdateSectionDtoToSection(UpdateSectionDto dto, ref Section entity)
+    {
+        if (!string.IsNullOrEmpty(dto.Name))
+        {
+            entity.Name = dto.Name;
         }
     }
 }
