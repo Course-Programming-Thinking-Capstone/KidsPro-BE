@@ -62,4 +62,30 @@ public class GameService : IGameService
 
         return result;
     }
+
+    public async Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex)
+    {
+        var gameLevel = await _unitOfWork.GameLevelRepository
+            .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
+
+        var firstItem = gameLevel.FirstOrDefault();
+
+        if (firstItem == null)
+            return null;
+
+        var levelInformation = await _unitOfWork.GameLevelDetailRepository
+            .GetAsync(o => o.GameLevelId == firstItem.Id, null);
+
+        return new LevelInformationResponse
+        {
+            CoinReward = firstItem.CoinReward ?? 0,
+            GameReward = firstItem.GameReward ?? 0,
+            VStartPosition = firstItem.VStartPosition,
+            levelDetail = levelInformation.Select(item => new LevelPositionData
+            {
+                VPosition = item.VPosition,
+                TypeName = item.PositionType.TypeName
+            }).ToList()
+        };
+    }
 }

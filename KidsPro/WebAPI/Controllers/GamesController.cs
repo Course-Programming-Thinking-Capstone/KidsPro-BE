@@ -37,9 +37,9 @@ public class GamesController : ControllerBase
     /// <summary>
     /// Get User Process
     /// </summary>
-    /// <param name="id"User Id></param>
+    /// <param name="id">User Id</param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet("userProcess/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrentLevelData))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CurrentLevelData>> GetCurrentLevelByUserId([FromRoute] int id)
@@ -52,12 +52,27 @@ public class GamesController : ControllerBase
     /// Get all mode that have in game
     /// </summary>
     /// <returns></returns>
-    [HttpGet("game-mode")]
+    [HttpGet("gameMode")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModeType))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ModeType>> GetAllGameMode()
     {
         var result = await _gameService.GetAllGameMode();
+        return Ok(result);
+    }
+
+    /// <summary>
+    ///  Get information of a level
+    /// </summary>
+    /// <param name="id">game mode id</param>
+    /// <param name="index">level index</param>
+    /// <returns></returns>
+    [HttpGet("leveldata/{id}/{index}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelInformationResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<LevelInformationResponse>> GetLevelData([FromRoute] int id, [FromRoute] int index)
+    {
+        var result = await _gameService.GetLevelInformation(id, index);
         return Ok(result);
     }
 }
