@@ -21,6 +21,8 @@ public class GamesController : ControllerBase
         _gameService = gameService;
     }
 
+    #region GAME CLIENT
+
     /// <summary>
     /// Student login vào game
     /// </summary>
@@ -90,18 +92,63 @@ public class GamesController : ControllerBase
         return Ok(result);
     }
 
+    #endregion
+
+    #region Admin API
+
+    /// <summary>
+    /// Get Level information by id
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("admin/getLevelById/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult> GetLevelById([FromRoute] int id)
+    {
+        //  await _gameService.AddNewLevel(modifiedLevelData);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Get Level information by id
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("admin/getLevelsByMode/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult> GetLevelsByGameMode([FromRoute] int modeId)
+    {
+        //  await _gameService.AddNewLevel(modifiedLevelData);
+        return Ok();
+    }
+
     /// <summary>
     /// Admin add a new game level to game
     /// </summary>
-    /// <param name="userFinishLevelRequest">level data</param>
     /// <returns></returns>
-    [HttpPost("addNewLevel")]
+    [HttpPost("admin/addNewLevel")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<LevelInformationResponse>> AddNewLevels(
-        [FromBody] ModifiedLevelDataRequest userFinishLevelRequest)
+    public async Task<ActionResult> AddNewLevels(
+        [FromBody] ModifiedLevelDataRequest modifiedLevelData)
     {
-        await _gameService.AddNewLevel(userFinishLevelRequest);
+        await _gameService.AddNewLevel(modifiedLevelData);
         return Ok();
     }
+
+    /// <summary>
+    /// Admin add a new game level to game
+    /// </summary>
+    /// <returns></returns>
+    [HttpPut("admin/updateLevel")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult> UpdateLevel(
+        [FromBody] ModifiedLevelDataRequest modifiedLevelData)
+    {
+        //await _gameService.AddNewLevel(modifiedLevelData);
+        return Ok();
+    }
+
+    #endregion
 }
