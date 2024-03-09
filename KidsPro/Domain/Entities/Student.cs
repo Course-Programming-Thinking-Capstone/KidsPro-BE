@@ -13,4 +13,6 @@ public class Student : BaseEntity
     public virtual GameUserProfile GameUserProfile { get; set; } = null!;
 
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
+
+    public virtual ICollection<Certificate>? Certificates { get; set; }
 }

@@ -20,4 +20,19 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
             .Include(s => s.GameUserProfile)
             .FirstOrDefaultAsync(s => s.Account.Email == email);
     }
+
+    public async Task<List<Student>> GetStudents(int parentId)
+    {
+        return await _dbSet.Where(x => x.ParentId == parentId)
+                       .Include(x => x.Account).ToListAsync();
+    }
+
+    public override async Task<Student?> GetByIdAsync(int id, bool disableTracking = false)
+    {
+        return await _dbSet.Where(x => x.Id == id)
+            .Include(x => x.Account).ThenInclude(x=> x.Role)
+            .Include(x=> x.Certificates).ThenInclude(x=> x.Course)
+            .FirstOrDefaultAsync();
+    }
+
 }

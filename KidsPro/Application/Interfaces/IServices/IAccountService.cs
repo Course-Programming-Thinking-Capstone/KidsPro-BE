@@ -36,4 +36,10 @@ public interface IAccountService
         string? sortCreatedDate,
         int? page, int? size
     );
+
+    Task<StudentDto> AddStudent(StudentRequest request);
+
+    Task<List<StudentDto>> GetStudents(int parentId);
+
+    Task<StudentDetailDto> GetDetailStudent(int studentId);
 }

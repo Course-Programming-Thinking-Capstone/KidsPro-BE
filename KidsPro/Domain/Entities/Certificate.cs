@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
@@ -20,4 +22,5 @@ public class Certificate
     public DateTime CompletionDate { get; set; }
 
     [StringLength(750)] public string? Description { get; set; }
+
 }
