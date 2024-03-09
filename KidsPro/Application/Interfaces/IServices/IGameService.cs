@@ -9,4 +9,5 @@ public interface IGameService
     public Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId);
     public Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex);
     public Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
+    public  Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData);
 }

@@ -89,4 +89,19 @@ public class GamesController : ControllerBase
         var result = await _gameService.UserFinishLevel(userFinishLevelRequest);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Admin add a new game level to game
+    /// </summary>
+    /// <param name="userFinishLevelRequest">level data</param>
+    /// <returns></returns>
+    [HttpPost("addNewLevel")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<LevelInformationResponse>> AddNewLevels(
+        [FromBody] ModifiedLevelDataRequest userFinishLevelRequest)
+    {
+        await _gameService.AddNewLevel(userFinishLevelRequest);
+        return Ok();
+    }
 }

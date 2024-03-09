@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Game;
+using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -64,20 +65,6 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<int> GetLevelCoin(int typeId, int levelIndex)
-    {
-        var gameLevel = await _unitOfWork.GameLevelRepository
-            .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
-
-        var firstItem = gameLevel.FirstOrDefault();
-        if (firstItem == null)
-        {
-            return 0;
-        }
-
-        return firstItem.CoinReward ?? 0;
-    }
-
     public async Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex)
     {
         var gameLevel = await _unitOfWork.GameLevelRepository
@@ -106,6 +93,13 @@ public class GameService : IGameService
 
     public async Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
+        var winLevel =
+            await GetGameLevelByTypeAndIndex(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
+        if (winLevel == null)
+        {
+            throw new BadRequestException("Level not found");
+        }
+
         var isPlayedHistory = await _unitOfWork.GamePlayHistoryRepository.GetAsync(
             o => o.StudentId == userFinishLevelRequest.UserID
                  && o.GameLevelTypeId == userFinishLevelRequest.ModeId
@@ -117,7 +111,7 @@ public class GameService : IGameService
         if (oldData == null) // already play -> no coin
         {
             var userData = await _unitOfWork.GameUserProfileRepository.GetByIdAsync(userFinishLevelRequest.UserID);
-            var coinWin = await GetLevelCoin(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
+            var coinWin = winLevel.CoinReward ?? 0;
             userData.Coin += coinWin;
             userCoin = userData.Coin;
             _unitOfWork.GameUserProfileRepository.Update(userData);
@@ -134,5 +128,71 @@ public class GameService : IGameService
         });
 
         return userCoin;
+    }
+
+    public async Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData)
+    {
+        var checkExisted =
+            await GetGameLevelByTypeAndIndex(modifiedLevelData.GameLevelTypeId, modifiedLevelData.LevelIndex);
+        if (checkExisted != null)
+        {
+            throw new BadRequestException("This level with game mode " + modifiedLevelData.GameLevelTypeId +
+                                          " at index " + modifiedLevelData.LevelIndex + " already existed");
+        }
+
+        var gameLevelId = 0;
+        var newData = new GameLevel
+        {
+            LevelIndex = modifiedLevelData.LevelIndex,
+            CoinReward = modifiedLevelData.CoinReward,
+            GameReward = modifiedLevelData.GemReward,
+            Max = 0,
+            VStartPosition = modifiedLevelData.VStartPosition,
+            GameLevelTypeId = modifiedLevelData.GameLevelTypeId
+        };
+        var details = new List<GameLevelDetail>();
+        await _unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            await _unitOfWork.GameLevelRepository.AddAsync(newData);
+            var result = await GetGameLevelByTypeAndIndex(newData.GameLevelTypeId, (int)newData.LevelIndex);
+            gameLevelId = result!.Id;
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        foreach (var detail in modifiedLevelData.LevelDetail)
+        {
+            details.Add(new GameLevelDetail
+            {
+                VPosition = detail.VPosition,
+                GameLevelId = gameLevelId,
+                PositionTypeId = detail.TypeId
+            });
+        }
+
+        try
+        {
+            await _unitOfWork.GameLevelDetailRepository.AddRangeAsync(
+                details
+            );
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+    }
+
+    private async Task<GameLevel?> GetGameLevelByTypeAndIndex(int gameModeId, int levelIndex)
+    {
+        var result = await _unitOfWork.GameLevelRepository.GetAsync(
+            o => o.GameLevelTypeId == gameModeId && o.LevelIndex == levelIndex
+            , null);
+        return result.FirstOrDefault();
     }
 }
