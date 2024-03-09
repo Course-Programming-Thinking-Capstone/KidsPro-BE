@@ -101,12 +101,12 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("admin/getLevelById/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult> GetLevelById([FromRoute] int id)
+    public async Task<ActionResult<LevelDataResponse>> GetLevelById([FromRoute] int id)
     {
-        //  await _gameService.AddNewLevel(modifiedLevelData);
-        return Ok();
+        var result = await _gameService.GetLevelDataById(id);
+        return Ok(result);
     }
 
     /// <summary>
@@ -114,12 +114,12 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("admin/getLevelsByMode/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<LevelDataResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult> GetLevelsByGameMode([FromRoute] int modeId)
+    public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId)
     {
-        //  await _gameService.AddNewLevel(modifiedLevelData);
-        return Ok();
+        var result = await _gameService.GetLevelsByMode(modeId);
+        return Ok(result);
     }
 
     /// <summary>

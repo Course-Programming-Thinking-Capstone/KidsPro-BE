@@ -188,6 +188,70 @@ public class GameService : IGameService
         }
     }
 
+    public async Task<LevelDataResponse> GetLevelDataById(int id)
+    {
+        var query = await _unitOfWork.GameLevelRepository.GetAsync(o => o.Id == id, null);
+        var gameLevel = query.FirstOrDefault();
+        if (gameLevel == null)
+        {
+            throw new NotFoundException("Game level not found");
+        }
+
+        var levelInformation = await _unitOfWork.GameLevelDetailRepository
+            .GetAsync(o => o.GameLevelId == gameLevel.Id, null);
+
+        var result = new LevelDataResponse
+        {
+            Id = gameLevel.Id,
+            LevelIndex = gameLevel.LevelIndex ?? 0,
+            CoinReward = gameLevel.CoinReward ?? 0,
+            GemReward = gameLevel.GameReward ?? 0,
+            VStartPosition = gameLevel.VStartPosition,
+            GameLevelTypeId = gameLevel.GameLevelTypeId,
+            LevelDetail = levelInformation.Select(item => new LevelDetail()
+            {
+                VPosition = item.VPosition,
+                TypeId = item.PositionTypeId,
+            }).ToList()
+        };
+
+        return result;
+    }
+
+    public async Task<List<LevelDataResponse>> GetLevelsByMode(int modeId)
+    {
+        var query = await _unitOfWork.GameLevelRepository.GetAsync(o => o.GameLevelTypeId == modeId, null);
+        if (!query.Any())
+        {
+            throw new NotFoundException("Not found any level");
+        }
+
+        var result = query.Select(gameLevel => new LevelDataResponse()
+        {
+            Id = gameLevel.Id,
+            LevelIndex = gameLevel.LevelIndex ?? 0,
+            CoinReward = gameLevel.CoinReward ?? 0,
+            GemReward = gameLevel.GameReward ?? 0,
+            VStartPosition = gameLevel.VStartPosition,
+            GameLevelTypeId = gameLevel.GameLevelTypeId,
+            LevelDetail = new List<LevelDetail>()
+        }).ToList();
+
+        foreach (var resultItem in result)
+        {
+            var levelInformation = await _unitOfWork.GameLevelDetailRepository
+                .GetAsync(o => o.GameLevelId == resultItem.Id, null);
+
+            resultItem.LevelDetail = levelInformation.Select(item => new LevelDetail()
+            {
+                VPosition = item.VPosition,
+                TypeId = item.PositionTypeId,
+            }).ToList();
+        }
+
+        return result;
+    }
+
     private async Task<GameLevel?> GetGameLevelByTypeAndIndex(int gameModeId, int levelIndex)
     {
         var result = await _unitOfWork.GameLevelRepository.GetAsync(
