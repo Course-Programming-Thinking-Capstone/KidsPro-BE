@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(Order), nameof(CourseId), IsUnique = true)]
+// [Index(nameof(Order), nameof(CourseId), IsUnique = true)]
 public class Section : BaseEntity
 {
     [Column(TypeName = "tinyint")]

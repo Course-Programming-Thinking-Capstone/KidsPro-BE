@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(Order), nameof(SectionId), IsUnique = true)]
+// [Index(nameof(Order), nameof(SectionId), IsUnique = true)]
 public class Lesson : BaseEntity
 {
     [MaxLength(250)] public string Name { get; set; } = null!;

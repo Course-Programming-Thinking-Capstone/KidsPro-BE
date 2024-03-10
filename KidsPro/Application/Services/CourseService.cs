@@ -244,4 +244,33 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.LessonToLessonDto(lessonEntity);
     }
+
+    public async Task<LessonDto> UpdateVideoAsync(int videoId, UpdateVideoDto dto)
+    {
+        var video = await _unitOfWork.LessonRepository.GetByIdAsync(videoId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Lesson {videoId} not found."));
+        if (video.Type != LessonType.Video)
+            throw new BadRequestException("Lesson is not video.");
+
+        CourseMapper.UpdateLessonDtoToLesson(dto, ref video);
+        _unitOfWork.LessonRepository.Update(video);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.LessonToLessonDto(video);
+    }
+
+    public async Task<ICollection<LessonDto>> UpdateLessonOrderAsync(List<UpdateLessonOrderDto> dtos)
+    {
+        var entities = new List<Lesson>();
+
+        foreach (var dto in dtos)
+        {
+            var entity = await _unitOfWork.LessonRepository.GetByIdAsync(dto.LessonId)
+                .ContinueWith(t => t.Result ?? throw new NotFoundException($"Lesson {dto.LessonId} not found."));
+            entities.Add(entity);
+        }
+
+        _unitOfWork.LessonRepository.UpdateRange(entities);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.LessonToLessonDto(entities);
+    }
 }

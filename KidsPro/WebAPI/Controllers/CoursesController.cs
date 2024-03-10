@@ -182,4 +182,32 @@ public class CoursesController : ControllerBase
         var result = await _courseService.AddVideoAsync(sectionId, dto);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Update video information 
+    /// </summary>
+    /// <param name="videoId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPatch("section/video/{videoId}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<LessonDto>> UpdateVideoAsync([FromRoute] int videoId, [FromBody] UpdateVideoDto dto)
+    {
+        var result = await _courseService.UpdateVideoAsync(videoId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Update lesson order
+    /// </summary>
+    /// <param name="dtos"></param>
+    /// <returns></returns>
+    [HttpPatch("section/lesson/order")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<ICollection<LessonDto>>> UpdateLessonOrderAsync(
+        [FromBody] List<UpdateLessonOrderDto> dtos)
+    {
+        var result = await _courseService.UpdateLessonOrderAsync(dtos);
+        return Ok(result);
+    }
 }

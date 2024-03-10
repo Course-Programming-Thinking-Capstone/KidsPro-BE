@@ -153,4 +153,35 @@ public static class CourseMapper
             entity.Name = dto.Name;
         }
     }
+
+    public static void UpdateLessonDtoToLesson(UpdateLessonDto dto, ref Lesson entity)
+    {
+        if (!string.IsNullOrEmpty(dto.Name))
+        {
+            entity.Name = dto.Name;
+        }
+
+        if (dto.Duration.HasValue)
+        {
+            entity.Duration = dto.Duration.Value;
+        }
+
+        if (dto.IsFree.HasValue)
+        {
+            entity.IsFree = dto.IsFree.Value;
+        }
+
+        if (dto is UpdateVideoDto updateVideoDto)
+        {
+            if (!string.IsNullOrEmpty(updateVideoDto.ResourceUrl))
+                entity.ResourceUrl = updateVideoDto.ResourceUrl;
+        }
+        else if (dto is UpdateDocumentDto updateDocumentDto)
+        {
+            if (!string.IsNullOrEmpty(updateDocumentDto.Content))
+            {
+                entity.Content = updateDocumentDto.Content;
+            }
+        }
+    }
 }

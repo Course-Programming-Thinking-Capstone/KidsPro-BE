@@ -29,4 +29,8 @@ public interface ICourseService
     Task RemoveSectionAsync(int id);
 
     Task<LessonDto> AddVideoAsync(int sectionId, CreateVideoDto dto);
+
+    Task<LessonDto> UpdateVideoAsync(int videoId, UpdateVideoDto dto);
+
+    Task<ICollection<LessonDto>> UpdateLessonOrderAsync(List<UpdateLessonOrderDto> dtos);
 }

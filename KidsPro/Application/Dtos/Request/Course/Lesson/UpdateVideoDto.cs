@@ -2,7 +2,7 @@
 
 namespace Application.Dtos.Request.Course.Lesson;
 
-public record CreateVideoDto : CreateLessonDto
+public record UpdateVideoDto : UpdateLessonDto
 {
     [StringLength(250)] public string? ResourceUrl { get; init; }
 };
