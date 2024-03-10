@@ -113,7 +113,7 @@ public class GamesController : ControllerBase
     /// Get Level information by id
     /// </summary>
     /// <returns></returns>
-    [HttpGet("admin/getLevelsByMode/{id}")]
+    [HttpGet("admin/getLevelsByMode/{modeId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<LevelDataResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId)
