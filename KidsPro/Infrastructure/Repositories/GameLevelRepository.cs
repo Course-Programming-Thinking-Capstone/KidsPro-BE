@@ -11,4 +11,6 @@ public class GameLevelRepository:BaseRepository<GameLevel>, IGameLevelRepository
     public GameLevelRepository(AppDbContext context, ILogger<BaseRepository<GameLevel>> logger) : base(context, logger)
     {
     }
+    
+    
 }
