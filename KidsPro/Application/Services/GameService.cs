@@ -81,7 +81,7 @@ public class GameService : IGameService
         return new LevelInformationResponse
         {
             CoinReward = firstItem.CoinReward ?? 0,
-            GameReward = firstItem.GameReward ?? 0,
+            GameReward = firstItem.GemReward ?? 0,
             VStartPosition = firstItem.VStartPosition,
             levelDetail = levelInformation.Select(item => new LevelPositionData
             {
@@ -145,7 +145,7 @@ public class GameService : IGameService
         {
             LevelIndex = modifiedLevelData.LevelIndex,
             CoinReward = modifiedLevelData.CoinReward,
-            GameReward = modifiedLevelData.GemReward,
+            GemReward = modifiedLevelData.GemReward,
             Max = 0,
             VStartPosition = modifiedLevelData.VStartPosition,
             GameLevelTypeId = modifiedLevelData.GameLevelTypeId
@@ -205,7 +205,7 @@ public class GameService : IGameService
             Id = gameLevel.Id,
             LevelIndex = gameLevel.LevelIndex ?? 0,
             CoinReward = gameLevel.CoinReward ?? 0,
-            GemReward = gameLevel.GameReward ?? 0,
+            GemReward = gameLevel.GemReward ?? 0,
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
             LevelDetail = levelInformation.Select(item => new LevelDetail()
@@ -231,7 +231,7 @@ public class GameService : IGameService
             Id = gameLevel.Id,
             LevelIndex = gameLevel.LevelIndex ?? 0,
             CoinReward = gameLevel.CoinReward ?? 0,
-            GemReward = gameLevel.GameReward ?? 0,
+            GemReward = gameLevel.GemReward ?? 0,
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
             LevelDetail = new List<LevelDetail>()
