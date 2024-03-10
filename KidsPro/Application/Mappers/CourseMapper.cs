@@ -85,7 +85,7 @@ public static class CourseMapper
                 Name = createDocumentDto.Name,
                 Order = createDocumentDto.Order,
                 IsFree = createDocumentDto.IsFree,
-                Type = LessonType.Video,
+                Type = LessonType.Document,
                 Duration = createDocumentDto.Duration,
                 Content = createDocumentDto.Content
             },
@@ -109,7 +109,7 @@ public static class CourseMapper
                 ResourceUrl = entity.ResourceUrl,
                 SectionId = entity.SectionId
             },
-            LessonType.Reading => new DocumentDto()
+            LessonType.Document => new DocumentDto()
             {
                 Id = entity.Id,
                 Name = entity.Name,

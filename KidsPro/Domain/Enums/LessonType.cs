@@ -3,5 +3,5 @@
 public enum LessonType
 {
     Video = 1,
-    Reading = 2
+    Document = 2
 }
