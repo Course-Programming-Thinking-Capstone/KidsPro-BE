@@ -22,9 +22,9 @@ public static class AccountMapper
         => new StudentGameLoginDto()
         {
             UserId = entity.Id,
-            DisplayName = entity.GameUserProfile.DisplayName,
-            UserCoin = entity.GameUserProfile.Coin,
-            UserGem = entity.GameUserProfile.Gem
+            DisplayName = entity?.GameUserProfile?.DisplayName ?? "",
+            UserCoin = entity?.GameUserProfile?.Coin ?? 0,
+            UserGem = entity?.GameUserProfile?.Gem ?? 0
         };
 
     public static AccountDto AccountToAccountDto(Account entity) => new AccountDto()
