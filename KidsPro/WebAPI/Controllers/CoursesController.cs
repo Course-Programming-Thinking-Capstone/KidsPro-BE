@@ -1,6 +1,8 @@
 ﻿using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Lesson;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.Lesson;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -151,6 +153,61 @@ public class CoursesController : ControllerBase
         [FromBody] List<UpdateSectionComponentNumberDto> dtos)
     {
         var result = await _courseService.UpdateSectionComponentNumberAsync(dtos);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// remove course section
+    /// </summary>
+    /// <param name="sectionId"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
+    [HttpDelete("section/{sectionId}")]
+    public async Task<ActionResult> RemoveSectionAsync([FromRoute] int sectionId)
+    {
+        await _courseService.RemoveSectionAsync(sectionId);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Add video to course section
+    /// </summary>
+    /// <param name="sectionId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost("section/{sectionId}/video")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<LessonDto>> AddVideoAsync([FromRoute] int sectionId, [FromBody] CreateVideoDto dto)
+    {
+        var result = await _courseService.AddVideoAsync(sectionId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Update video information 
+    /// </summary>
+    /// <param name="videoId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPatch("section/video/{videoId}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<LessonDto>> UpdateVideoAsync([FromRoute] int videoId, [FromBody] UpdateVideoDto dto)
+    {
+        var result = await _courseService.UpdateVideoAsync(videoId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Update lesson order
+    /// </summary>
+    /// <param name="dtos"></param>
+    /// <returns></returns>
+    [HttpPatch("section/lesson/order")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<ICollection<LessonDto>>> UpdateLessonOrderAsync(
+        [FromBody] List<UpdateLessonOrderDto> dtos)
+    {
+        var result = await _courseService.UpdateLessonOrderAsync(dtos);
         return Ok(result);
     }
 }
