@@ -27,8 +27,6 @@ public class GamesController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpGet("setup/init-database")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGameLoginDto))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<StudentGameLoginDto>> InitDatabase()
     {
         await _gameService.InitDatabase();
