@@ -245,6 +245,46 @@ public class CourseService : ICourseService
         return CourseMapper.LessonToLessonDto(lessonEntity);
     }
 
+    public async Task<LessonDto> AddDocumentAsync(int sectionId, CreateDocumentDto dto)
+    {
+        var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
+
+        var sectionDocumentNumber =
+            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Document);
+        if (sectionDocumentNumber == null)
+        {
+            _logger.LogError("Section component type {} can not found.", SectionComponentType.Document);
+            throw new Exception($"Section component type {SectionComponentType.Document} can not found.");
+        }
+
+        var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
+        lessonEntity.SectionId = sectionId;
+
+        var documentNumber = 0;
+
+        foreach (var lesson in section.Lessons)
+        {
+            if (lesson.Order == dto.Order)
+            {
+                throw new ConflictException($"Lesson order {dto.Order} has been existed.");
+            }
+
+            if (lesson.Type == LessonType.Document)
+                documentNumber++;
+        }
+
+        if (documentNumber > sectionDocumentNumber.MaxNumber)
+        {
+            throw new BadRequestException(
+                $"Can not add more than {sectionDocumentNumber.MaxNumber} document in this section.");
+        }
+
+        await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.LessonToLessonDto(lessonEntity);
+    }
+
     public async Task<LessonDto> UpdateVideoAsync(int videoId, UpdateVideoDto dto)
     {
         var video = await _unitOfWork.LessonRepository.GetByIdAsync(videoId)
@@ -256,6 +296,19 @@ public class CourseService : ICourseService
         _unitOfWork.LessonRepository.Update(video);
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.LessonToLessonDto(video);
+    }
+
+    public async Task<LessonDto> UpdateDocumentAsync(int documentId, UpdateDocumentDto dto)
+    {
+        var document = await _unitOfWork.LessonRepository.GetByIdAsync(documentId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Lesson {documentId} not found."));
+        if (document.Type != LessonType.Document)
+            throw new BadRequestException("Lesson is not document.");
+
+        CourseMapper.UpdateLessonDtoToLesson(dto, ref document);
+        _unitOfWork.LessonRepository.Update(document);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.LessonToLessonDto(document);
     }
 
     public async Task<ICollection<LessonDto>> UpdateLessonOrderAsync(List<UpdateLessonOrderDto> dtos)

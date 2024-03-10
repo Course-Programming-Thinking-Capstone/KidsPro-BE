@@ -107,7 +107,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<SectionComponentNumber>().HasData(
             new SectionComponentNumber() { Id = 1, SectionComponentType = SectionComponentType.Video, MaxNumber = 5 },
-            new SectionComponentNumber() { Id = 2, SectionComponentType = SectionComponentType.Reading, MaxNumber = 3 },
+            new SectionComponentNumber() { Id = 2, SectionComponentType = SectionComponentType.Document, MaxNumber = 3 },
             new SectionComponentNumber() { Id = 3, SectionComponentType = SectionComponentType.Quiz, MaxNumber = 1 },
             new SectionComponentNumber() { Id = 4, SectionComponentType = SectionComponentType.Game, MaxNumber = 1 }
         );

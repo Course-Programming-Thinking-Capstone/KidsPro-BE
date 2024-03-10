@@ -28,7 +28,7 @@ public class CoursesController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id)
@@ -61,7 +61,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPatch("{id}")]
+    [HttpPatch("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
@@ -79,7 +79,7 @@ public class CoursesController : ControllerBase
     /// <param name="file"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPatch("{id}/picture")]
+    [HttpPatch("{id:int}/picture")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     public async Task<ActionResult<CourseDto>> UpdateCoursePictureAsync([FromRoute] int id, [FromForm] IFormFile file)
     {
@@ -95,7 +95,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPost("{id}/section")]
+    [HttpPost("{id:int}/section")]
     public async Task<ActionResult<SectionDto>> CreateSectionAsync([FromRoute] int id, [FromBody] CreateSectionDto dto)
     {
         var result = await _courseService.CreateSectionAsync(id, dto);
@@ -109,7 +109,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPatch("section/{sectionId}")]
+    [HttpPatch("section/{sectionId:int}")]
     public async Task<ActionResult<SectionDto>> UpdateSectionAsync([FromRoute] int sectionId,
         [FromBody] UpdateSectionDto dto)
     {
@@ -124,7 +124,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    [HttpPatch("{courseId}/section/order")]
+    [HttpPatch("{courseId:int}/section/order")]
     public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int courseId,
         [FromBody] List<UpdateSectionOrderDto> dto)
     {
@@ -162,7 +162,7 @@ public class CoursesController : ControllerBase
     /// <param name="sectionId"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole}")]
-    [HttpDelete("section/{sectionId}")]
+    [HttpDelete("section/{sectionId:int}")]
     public async Task<ActionResult> RemoveSectionAsync([FromRoute] int sectionId)
     {
         await _courseService.RemoveSectionAsync(sectionId);
@@ -175,7 +175,7 @@ public class CoursesController : ControllerBase
     /// <param name="sectionId"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
-    [HttpPost("section/{sectionId}/video")]
+    [HttpPost("section/{sectionId:int}/video")]
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     public async Task<ActionResult<LessonDto>> AddVideoAsync([FromRoute] int sectionId, [FromBody] CreateVideoDto dto)
     {
@@ -189,11 +189,41 @@ public class CoursesController : ControllerBase
     /// <param name="videoId"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
-    [HttpPatch("section/video/{videoId}")]
+    [HttpPatch("section/video/{videoId:int}")]
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     public async Task<ActionResult<LessonDto>> UpdateVideoAsync([FromRoute] int videoId, [FromBody] UpdateVideoDto dto)
     {
         var result = await _courseService.UpdateVideoAsync(videoId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Add document to section
+    /// </summary>
+    /// <param name="sectionId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost("section/{sectionId:int}/document")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<LessonDto>> AddDocumentAsync([FromRoute] int sectionId,
+        [FromBody] CreateDocumentDto dto)
+    {
+        var result = await _courseService.AddDocumentAsync(sectionId, dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Update document information
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPatch("section/document/{documentId:int}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<LessonDto>> UpdateDocumentAsync([FromRoute] int documentId,
+        [FromBody] UpdateDocumentDto dto)
+    {
+        var result = await _courseService.UpdateDocumentAsync(documentId, dto);
         return Ok(result);
     }
 
