@@ -1,7 +1,9 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Lesson;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.Lesson;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -192,5 +194,54 @@ public class CourseService : ICourseService
         _unitOfWork.SectionComponentNumberRepository.UpdateRange(entities);
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.EntityToSectionComponentNumberDto(entities);
+    }
+
+    public async Task RemoveSectionAsync(int id)
+    {
+        var entity = await _unitOfWork.SectionRepository.GetByIdAsync(id)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {id} not found."));
+
+        _unitOfWork.SectionRepository.Delete(entity);
+        await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task<LessonDto> AddVideoAsync(int sectionId, CreateVideoDto dto)
+    {
+        var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
+
+        var sectionVideoNumber =
+            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Video);
+        if (sectionVideoNumber == null)
+        {
+            _logger.LogError("Section component type {} can not found.", SectionComponentType.Video);
+            throw new Exception($"Section component type {SectionComponentType.Video} can not found.");
+        }
+
+        var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
+        lessonEntity.SectionId = sectionId;
+
+        var videoNumber = 0;
+
+        foreach (var lesson in section.Lessons)
+        {
+            if (lesson.Order == dto.Order)
+            {
+                throw new ConflictException($"Lesson order {dto.Order} has been existed.");
+            }
+
+            if (lesson.Type == LessonType.Video)
+                videoNumber++;
+        }
+
+        if (videoNumber > sectionVideoNumber.MaxNumber)
+        {
+            throw new BadRequestException(
+                $"Can not add more than {sectionVideoNumber.MaxNumber} video in this section.");
+        }
+
+        await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.LessonToLessonDto(lessonEntity);
     }
 }

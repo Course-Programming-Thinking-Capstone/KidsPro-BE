@@ -7,7 +7,7 @@ public class GameLevel : BaseEntity
     public int? LevelIndex { get; set; }
 
     public int? CoinReward { get; set; }
-    public int? GameReward { get; set; }
+    public int? GemReward { get; set; }
     public int? Max { get; set; }
 
     public int VStartPosition { get; set; }
