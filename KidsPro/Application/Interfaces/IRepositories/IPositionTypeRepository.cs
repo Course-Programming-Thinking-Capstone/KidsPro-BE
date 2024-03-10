@@ -5,5 +5,5 @@ namespace Application.Interfaces.IRepositories;
 
 public interface IPositionTypeRepository:IBaseRepository<PositionType>
 {
-    
+    public Task ForceAddRangeAsync(IEnumerable<PositionType> entities);
 }
