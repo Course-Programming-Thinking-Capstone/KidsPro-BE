@@ -3,7 +3,6 @@
     public class ModifiedLevelDataRequest
     {
         public int Id { get; set; }
-        public int LevelIndex { get; set; }
         public int CoinReward { get; set; }
         public int GemReward { get; set; }
         public int VStartPosition { get; set; }

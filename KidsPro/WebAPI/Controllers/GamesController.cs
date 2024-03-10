@@ -146,9 +146,11 @@ public class GamesController : ControllerBase
     public async Task<ActionResult> UpdateLevel(
         [FromBody] ModifiedLevelDataRequest modifiedLevelData)
     {
-        //await _gameService.AddNewLevel(modifiedLevelData);
+        await _gameService.UpdateLevel(modifiedLevelData);
         return Ok();
     }
 
     #endregion
+
+
 }
