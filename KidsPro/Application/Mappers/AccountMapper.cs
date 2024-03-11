@@ -166,8 +166,8 @@ public static class AccountMapper
            // student.StudentCertificate = new List<(string, string)>();
             foreach (var x in entity.Certificates)
             {
-                var _course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
-                student.StudentCourse.Add(_course);
+                //var _course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
+                //student.StudentCourse.Add(_course);
                 var _certificate = new CertificateDto() {title= x.Course.Name,url= x.ResourceUrl };
                 student.StudentCertificate.Add(_certificate);
             }

@@ -11,7 +11,7 @@ namespace Application.Dtos.Response.Account
     public class StudentDetailDto:StudentDto
     {
        // public int CourseTotal { get; set; }
-        public List<TitleDto> StudentCourse { get; set; } = new List<TitleDto>();
+        //public List<TitleDto> StudentCourse { get; set; } = new List<TitleDto>();
         public int CertificateTotal { get; set; }
         public List<CertificateDto> StudentCertificate { get; set; } = new List<CertificateDto>();
     }
