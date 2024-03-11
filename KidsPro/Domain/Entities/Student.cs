@@ -15,4 +15,6 @@ public class Student : BaseEntity
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
 
     public virtual ICollection<Certificate>? Certificates { get; set; }
+
+    public virtual ICollection<StudentProgress>? StudentProgresses { get; set; }
 }

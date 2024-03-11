@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Domain.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[PrimaryKey(nameof(StudentId), nameof(CourseId))]
-public class Certificate
+[Index(nameof(StudentId), nameof(CourseId), IsUnique = true)]
+public class Certificate : BaseEntity
 {
     public virtual Student Student { get; set; } = null!;
     public int StudentId { get; set; }
@@ -22,5 +21,4 @@ public class Certificate
     public DateTime CompletionDate { get; set; }
 
     [StringLength(750)] public string? Description { get; set; }
-
 }

@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Domain.Entities.Generic;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[PrimaryKey(nameof(StudentId), nameof(CourseId))]
-public class StudentProgress
+[Index(nameof(StudentId), nameof(CourseId), IsUnique = true)]
+public class StudentProgress:BaseEntity
 {
     public virtual Student Student { get; set; } = null!;
     public int StudentId { get; set; }
