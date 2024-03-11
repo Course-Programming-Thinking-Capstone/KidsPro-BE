@@ -5,5 +5,5 @@ namespace Application.Interfaces.IRepositories;
 
 public interface ILevelTypeRepository:IBaseRepository<LevelType>
 {
-    
+    public Task ForceAddRangeAsync(IEnumerable<LevelType> entities);
 }

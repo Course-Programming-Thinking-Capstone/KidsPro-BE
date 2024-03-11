@@ -8,4 +8,5 @@ public interface IParentRepository:IBaseRepository<Parent>
     Task<Parent?> LoginByPhoneNumberAsync(string phoneNumber);
 
     Task<bool> ExistByPhoneNumberAsync(string phoneNumber);
+   
 }

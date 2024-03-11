@@ -19,6 +19,237 @@ public class GameService : IGameService
         _logger = logger;
     }
 
+    public async Task InitDatabase()
+    {
+        if (!_unitOfWork.LevelTypeRepository.GetAll().Any())
+        {
+            await _unitOfWork.BeginTransactionAsync();
+            var gameMode = new List<LevelType>()
+            {
+                new LevelType
+                {
+                    Id = 1,
+                    TypeName = "Basic"
+                },
+                new LevelType
+                {
+                    Id = 2,
+                    TypeName = "Sequence"
+                },
+                new LevelType
+                {
+                    Id = 3,
+                    TypeName = "Loop"
+                },
+                new LevelType
+                {
+                    Id = 4,
+                    TypeName = "Function"
+                },
+                new LevelType
+                {
+                    Id = 5,
+                    TypeName = "Condition"
+                }
+            };
+
+            var positionTypes = new List<PositionType>()
+            {
+                new PositionType
+                {
+                    Id = 1,
+                    TypeName = "Board"
+                },
+                new PositionType
+                {
+                    Id = 2,
+
+                    TypeName = "Target"
+                },
+                new PositionType
+                {
+                    Id = 3,
+
+                    TypeName = "Rock"
+                },
+            };
+
+            try
+            {
+                await _unitOfWork.LevelTypeRepository.ForceAddRangeAsync(gameMode);
+                await _unitOfWork.PositionTypeRepository.ForceAddRangeAsync(positionTypes);
+                await _unitOfWork.SaveChangeAsync();
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
+
+            await _unitOfWork.CommitAsync();
+        }
+
+        if (!_unitOfWork.GameLevelRepository.GetAll().Any())
+        {
+            await _unitOfWork.BeginTransactionAsync();
+
+            var sampleBasicLevel = new List<ModifiedLevelDataRequest>()
+            {
+                new ModifiedLevelDataRequest
+                {
+                    CoinReward = 100,
+                    GemReward = 100,
+                    VStartPosition = 26,
+                    GameLevelTypeId = 1,
+                    LevelDetail = new List<LevelDetailRequest>()
+                    {
+                        new LevelDetailRequest
+                        {
+                            VPosition = 27,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 28,
+                            TypeId = 2
+                        },
+                    }
+                },
+                new ModifiedLevelDataRequest
+                {
+                    CoinReward = 100,
+                    GemReward = 100,
+                    VStartPosition = 26,
+                    GameLevelTypeId = 1,
+                    LevelDetail = new List<LevelDetailRequest>()
+                    {
+                        new LevelDetailRequest
+                        {
+                            VPosition = 27,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 28,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 29,
+                            TypeId = 2
+                        },
+                    }
+                },
+                new ModifiedLevelDataRequest
+                {
+                    CoinReward = 100,
+                    GemReward = 100,
+                    VStartPosition = 26,
+                    GameLevelTypeId = 1,
+                    LevelDetail = new List<LevelDetailRequest>()
+                    {
+                        new LevelDetailRequest
+                        {
+                            VPosition = 27,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 28,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 29,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 21,
+                            TypeId = 2
+                        },
+                    }
+                }
+            };
+
+            var sampleSequenceLevel = new List<ModifiedLevelDataRequest>()
+            {
+                new ModifiedLevelDataRequest
+                {
+                    CoinReward = 100,
+                    GemReward = 100,
+                    VStartPosition = 26,
+                    GameLevelTypeId = 2,
+                    LevelDetail = new List<LevelDetailRequest>()
+                    {
+                        new LevelDetailRequest
+                        {
+                            VPosition = 29,
+                            TypeId = 2
+                        },
+                    }
+                },
+                new ModifiedLevelDataRequest
+                {
+                    CoinReward = 100,
+                    GemReward = 100,
+                    VStartPosition = 26,
+                    GameLevelTypeId = 2,
+                    LevelDetail = new List<LevelDetailRequest>()
+                    {
+                        new LevelDetailRequest
+                        {
+                            VPosition = 21,
+                            TypeId = 2
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 29,
+                            TypeId = 2
+                        },
+                    }
+                },
+                new ModifiedLevelDataRequest
+                {
+                    CoinReward = 100,
+                    GemReward = 100,
+                    VStartPosition = 9,
+                    GameLevelTypeId = 2,
+                    LevelDetail = new List<LevelDetailRequest>()
+                    {
+                        new LevelDetailRequest
+                        {
+                            VPosition = 28,
+                            TypeId = 2
+                        },
+                    }
+                }
+            };
+
+            try
+            {
+                foreach (var basic in sampleBasicLevel)
+                {
+                    await AddNewLevel(basic, false);
+                }
+
+                foreach (var sequence in sampleSequenceLevel)
+                {
+                    await AddNewLevel(sequence, false);
+                }
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
+
+            await _unitOfWork.CommitAsync();
+        }
+    }
+
+    #region GAME CLIENT
+
     public async Task<List<ModeType>> GetAllGameMode()
     {
         var result2 = await _unitOfWork.GameLevelRepository
@@ -130,20 +361,21 @@ public class GameService : IGameService
         return userCoin;
     }
 
-    public async Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData)
-    {
-        var checkExisted =
-            await GetGameLevelByTypeAndIndex(modifiedLevelData.GameLevelTypeId, modifiedLevelData.LevelIndex);
-        if (checkExisted != null)
-        {
-            throw new BadRequestException("This level with game mode " + modifiedLevelData.GameLevelTypeId +
-                                          " at index " + modifiedLevelData.LevelIndex + " already existed");
-        }
+    #endregion
 
+    #region ADMIN SERVICES
+
+    public async Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData, bool onTransaction = true)
+    {
+        var currentList =
+            await _unitOfWork.GameLevelRepository.GetAsync(o => o.GameLevelTypeId == modifiedLevelData.GameLevelTypeId,
+                null);
+        var levelIndex = currentList.Max(o => o.LevelIndex) ?? -1;
+        levelIndex++;
         var gameLevelId = 0;
         var newData = new GameLevel
         {
-            LevelIndex = modifiedLevelData.LevelIndex,
+            LevelIndex = levelIndex,
             CoinReward = modifiedLevelData.CoinReward,
             GemReward = modifiedLevelData.GemReward,
             Max = 0,
@@ -151,17 +383,25 @@ public class GameService : IGameService
             GameLevelTypeId = modifiedLevelData.GameLevelTypeId
         };
         var details = new List<GameLevelDetail>();
-        await _unitOfWork.BeginTransactionAsync();
+        if (onTransaction)
+        {
+            await _unitOfWork.BeginTransactionAsync();
+        }
 
         try
         {
             await _unitOfWork.GameLevelRepository.AddAsync(newData);
+            await _unitOfWork.SaveChangeAsync();
             var result = await GetGameLevelByTypeAndIndex(newData.GameLevelTypeId, (int)newData.LevelIndex);
             gameLevelId = result!.Id;
         }
         catch (Exception e)
         {
-            await _unitOfWork.RollbackAsync();
+            if (onTransaction)
+            {
+                await _unitOfWork.RollbackAsync();
+            }
+
             throw;
         }
 
@@ -180,6 +420,71 @@ public class GameService : IGameService
             await _unitOfWork.GameLevelDetailRepository.AddRangeAsync(
                 details
             );
+            await _unitOfWork.SaveChangeAsync();
+        }
+        catch (Exception e)
+        {
+            if (onTransaction)
+            {
+                await _unitOfWork.RollbackAsync();
+            }
+
+            throw;
+        }
+    }
+
+    public async Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData)
+    {
+        var checkExisted =
+            await GetLevelDataById(modifiedLevelData.Id);
+        if (checkExisted == null)
+        {
+            throw new BadRequestException("Game level not found");
+        }
+
+        // REMOVE CURRENT DETAILS
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var currentList = await
+                _unitOfWork.GameLevelDetailRepository
+                    .GetAsync(o => o.GameLevelId == modifiedLevelData.Id, null);
+            _unitOfWork.GameLevelDetailRepository.DeleteRange(
+                currentList
+            );
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        List<GameLevelDetail> details = new List<GameLevelDetail>();
+        foreach (var detail in modifiedLevelData.LevelDetail)
+        {
+            details.Add(new GameLevelDetail
+            {
+                GameLevelId = modifiedLevelData.Id,
+                VPosition = detail.VPosition,
+                PositionTypeId = detail.TypeId
+            });
+        }
+
+        try
+        {
+            _unitOfWork.GameLevelRepository.Update(new GameLevel
+            {
+                Id = checkExisted.Id,
+                LevelIndex = checkExisted.LevelIndex,
+                CoinReward = modifiedLevelData.CoinReward,
+                GemReward = modifiedLevelData.GemReward,
+                VStartPosition = modifiedLevelData.VStartPosition,
+                GameLevelTypeId = modifiedLevelData.GameLevelTypeId,
+            });
+            await _unitOfWork.GameLevelDetailRepository.AddRangeAsync(
+                details
+            );
+            await _unitOfWork.SaveChangeAsync();
         }
         catch (Exception e)
         {
@@ -252,6 +557,10 @@ public class GameService : IGameService
         return result;
     }
 
+    #endregion
+
+    #region Helper
+
     private async Task<GameLevel?> GetGameLevelByTypeAndIndex(int gameModeId, int levelIndex)
     {
         var result = await _unitOfWork.GameLevelRepository.GetAsync(
@@ -259,4 +568,6 @@ public class GameService : IGameService
             , null);
         return result.FirstOrDefault();
     }
+
+    #endregion
 }

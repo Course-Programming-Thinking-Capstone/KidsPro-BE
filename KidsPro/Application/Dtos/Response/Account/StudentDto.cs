@@ -2,5 +2,5 @@
 
 public class StudentDto:AccountDto
 {
-    
+    public int? Age { get; set; }
 }

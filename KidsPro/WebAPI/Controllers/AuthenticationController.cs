@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Request.Authentication;
+﻿using Application.Configurations;
+using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -80,4 +81,6 @@ public class AuthenticationController : ControllerBase
         var result = await _accountService.LoginByPhoneNumberAsync(request);
         return Ok(result);
     }
+
+   
 }

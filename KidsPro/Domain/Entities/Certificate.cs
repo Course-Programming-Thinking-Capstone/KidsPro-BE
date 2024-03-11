@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[PrimaryKey(nameof(StudentId), nameof(CourseId))]
-public class Certificate
+[Index(nameof(StudentId), nameof(CourseId), IsUnique = true)]
+public class Certificate : BaseEntity
 {
     public virtual Student Student { get; set; } = null!;
     public int StudentId { get; set; }

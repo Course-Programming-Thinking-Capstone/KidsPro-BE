@@ -21,6 +21,18 @@ public class GamesController : ControllerBase
         _gameService = gameService;
     }
 
+    /// <summary>
+    /// Student login vào game
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpGet("setup/init-database")]
+    public async Task<ActionResult<StudentGameLoginDto>> InitDatabase()
+    {
+        await _gameService.InitDatabase();
+        return Ok();
+    }
+
     #region GAME CLIENT
 
     /// <summary>
@@ -146,7 +158,7 @@ public class GamesController : ControllerBase
     public async Task<ActionResult> UpdateLevel(
         [FromBody] ModifiedLevelDataRequest modifiedLevelData)
     {
-        //await _gameService.AddNewLevel(modifiedLevelData);
+        await _gameService.UpdateLevel(modifiedLevelData);
         return Ok();
     }
 
