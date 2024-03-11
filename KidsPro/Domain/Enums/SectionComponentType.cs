@@ -3,7 +3,7 @@
 public enum SectionComponentType
 {
     Video = 1,
-    Reading = 2,
+    Document = 2,
     Game = 3,
     Quiz = 4
 }
