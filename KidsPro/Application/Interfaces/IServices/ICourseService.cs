@@ -11,9 +11,13 @@ public interface ICourseService
 {
     Task<CourseDto> GetByIdAsync(int id);
 
+    Task<CourseDto> CreateCourseOldAsync(CreateCourseDto dto);
+
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 
-    Task<CourseDto> UpdateCourseAsync(int id, UpdateCourseDto dto);
+    Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto);
+
+    Task<CourseDto> CommonUpdateCourseAsync(int id, UpdateCourseDto dto);
 
     Task<string> UpdateCoursePictureAsync(int id, IFormFile file);
 

@@ -175,11 +175,6 @@ namespace Infrastructure.Migrations
                     b.Property<byte?>("Duration")
                         .HasColumnType("tinyint");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
                     b.Property<DateTime?>("OpenDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
@@ -1159,8 +1154,9 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinScore")
-                        .HasColumnType("int");
+                    b.Property<decimal>("MinScore")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("decimal(4,2)");
 
                     b.Property<int?>("NumberOfAttempt")
                         .HasColumnType("int");
@@ -1182,8 +1178,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("TotalQuestion")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalScore")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalScore")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
@@ -2001,7 +1998,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Option", b =>
                 {
                     b.HasOne("Domain.Entities.Question", "Question")
-                        .WithMany("Answers")
+                        .WithMany("Options")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2341,7 +2338,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
-                    b.Navigation("Answers");
+                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>

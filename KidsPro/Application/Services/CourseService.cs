@@ -12,7 +12,6 @@ using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using CreateCourseDto = Application.Dtos.Request.Course.CreateCourseDto;
 
 namespace Application.Services;
 
@@ -40,7 +39,7 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCourseDto(course);
     }
 
-    public async Task<CourseDto> CreateCourseAsync(CreateCourseDto dto)
+    public async Task<CourseDto> CreateCourseOldAsync(CreateCourseDto dto)
     {
         var entity = new Course();
 
@@ -56,7 +55,6 @@ public class CourseService : ICourseService
         entity.CreatedBy = currentAccount;
         entity.ModifiedBy = currentAccount;
         entity.Status = CourseStatus.Draft;
-
 
         if (dto.Sections != null)
         {
@@ -82,7 +80,7 @@ public class CourseService : ICourseService
                         {
                             // Duplicate order detected
                             _logger.LogError("Error at {}: \nDuplicate order {} found within lessons.",
-                                nameof(CreateCourseAsync), lessonDto.Order);
+                                nameof(CreateCourseOldAsync), lessonDto.Order);
                             throw new BadRequestException($"Duplicate order '{lessonDto.Order}' found within lessons.");
                         }
 
@@ -163,7 +161,240 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCourseDto(entity);
     }
 
-    public async Task<CourseDto> UpdateCourseAsync(int id, UpdateCourseDto dto)
+    /// <summary>
+    /// Admin create course with exist section and assign teacher to edit course
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    /// <exception cref="UnauthorizedException"></exception>
+    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="BadRequestException"></exception>
+    public async Task<CourseDto> CreateCourseAsync(CreateCourseDto dto)
+    {
+        var entity = new Course();
+
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+
+        var teacherAccount = await _unitOfWork.AccountRepository.GetByIdAsync(dto.TeacherId, disableTracking: true)
+            .ContinueWith(t =>
+                t.Result ?? throw new NotFoundException($"Teacher account {dto.TeacherId} not found."));
+
+        //Check teacher role
+        if (teacherAccount.Role.Name != Constant.TeacherRole)
+        {
+            throw new BadRequestException("Id is not teacher.");
+        }
+
+        entity.Name = dto.Name;
+        entity.Description = dto.Description;
+        entity.CreatedDate = DateTime.UtcNow;
+        entity.ModifiedDate = DateTime.UtcNow;
+        entity.CreatedBy = currentAccount;
+        entity.ModifiedBy = teacherAccount;
+        entity.Status = CourseStatus.Draft;
+
+        if (dto.Sections != null)
+        {
+            var sections = new List<Section>();
+
+            var sectionIndex = 1;
+
+            foreach (var sectionDto in dto.Sections)
+            {
+                var section = new Section
+                {
+                    Name = sectionDto.Name,
+                    Order = sectionIndex
+                };
+
+                section.Order = sectionIndex;
+
+                sections.Add(section);
+                sectionIndex++;
+            }
+
+            entity.Sections = sections;
+        }
+
+        await _unitOfWork.CourseRepository.AddAsync(entity);
+
+        //need to create notification for admin and teacher
+
+        await _unitOfWork.SaveChangeAsync();
+        return CourseMapper.CourseToCourseDto(entity);
+    }
+
+    public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto)
+    {
+        // check course
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+
+        if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Id != courseEntity.ModifiedById)
+        {
+            throw new ForbiddenException($"Access denied.");
+        }
+
+        // update course 
+        if (dto.Sections != null)
+        {
+            foreach (var sectionDto in dto.Sections)
+            {
+                var section = courseEntity.Sections.FirstOrDefault(s => s.Id == sectionDto.Id);
+
+                if (section != null)
+                {
+                    //update section lesson
+                    if (sectionDto.Lessons != null)
+                    {
+                        var lessons = new List<Lesson>();
+                        var lessonOrder = 1;
+                        foreach (var lessonDto in sectionDto.Lessons)
+                        {
+                            if (!lessonDto.Id.HasValue)
+                            {
+                                var lesson = CourseMapper.UpdateLessonDtoToLesson(lessonDto);
+                                lesson.Order = lessonOrder;
+                                lessons.Add(lesson);
+                            }
+                            else
+                            {
+                                var lessonToUpdate = section.Lessons.FirstOrDefault(l => l.Id == lessonDto.Id);
+                                if (lessonToUpdate != null)
+                                {
+                                    CourseMapper.UpdateLessonDtoToLesson(lessonDto, ref lessonToUpdate);
+                                    lessons.Add(lessonToUpdate);
+                                }
+                                else
+                                {
+                                    throw new BadRequestException($"Lesson {lessonDto.Id} does not exist.");
+                                }
+                            }
+
+                            lessonOrder++;
+                        }
+
+                        //Assign new lesson to course section
+                        section.Lessons = lessons;
+                    }
+
+                    //update section quiz
+                    if (sectionDto.Quizzes != null)
+                    {
+                        var quizzes = new List<Quiz>();
+                        var quizOrder = 1;
+                        foreach (var sectionDtoQuiz in sectionDto.Quizzes)
+                        {
+                            Quiz quiz;
+                            decimal totalScore = 0;
+
+                            if (sectionDtoQuiz.Id.HasValue)
+                            {
+                                quiz = section.Quizzes.FirstOrDefault(q => q.Id == sectionDtoQuiz.Id);
+                                if (quiz == null)
+                                    throw new NotFoundException($"Quiz {sectionDtoQuiz.Id} does not exist.");
+
+                                //Update quiz information
+                                CourseMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
+                            }
+                            else
+                            {
+                                // Create new quiz
+                                quiz = CourseMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz);
+                                quiz.CreatedDate = DateTime.UtcNow;
+                                quiz.CreatedById = accountId;
+                                quiz.CreatedBy = currentAccount;
+                            }
+
+                            // Update quiz question
+                            if (sectionDtoQuiz.Questions != null)
+                            {
+                                var questions = new List<Question>();
+                                var questionOrder = 1;
+
+                                foreach (var updateQuestionDto in sectionDtoQuiz.Questions)
+                                {
+                                    var question = quiz.Questions.FirstOrDefault(q => q.Id == updateQuestionDto.Id);
+                                    if (question != null)
+                                    {
+                                        //Update section information
+                                        CourseMapper.UpdateQuestionDtoToQuestion(updateQuestionDto, ref question);
+                                    }
+                                    else
+                                    {
+                                        question = CourseMapper.UpdateQuestionDtoToQuestion(updateQuestionDto);
+                                    }
+
+                                    // update total score
+                                    totalScore += question.Score;
+
+                                    if (updateQuestionDto.Options != null)
+                                    {
+                                        var options = new List<Option>();
+                                        var optionOrder = 1;
+
+                                        foreach (var updateOption in updateQuestionDto.Options)
+                                        {
+                                            var option =
+                                                question.Options.FirstOrDefault(o => o.Id == updateOption.Id);
+                                            if (option == null)
+                                            {
+                                                option = CourseMapper.UpdateOptionDtoToOption(updateOption);
+                                            }
+                                            else
+                                            {
+                                                CourseMapper.UpdateOptionDtoToOption(updateOption, ref option);
+                                            }
+
+                                            option.Order = optionOrder;
+                                            options.Add(option);
+                                            optionOrder++;
+                                        }
+
+                                        question.Options = options;
+                                    }
+
+                                    question.Order = questionOrder;
+                                    questions.Add(question);
+                                    questionOrder++;
+                                }
+
+                                // Update quiz
+                                quiz.TotalScore = totalScore;
+                                quiz.TotalQuestion = questionOrder - 1;
+                                quiz.Questions = questions;
+                            }
+
+                            quiz.Order = quizOrder;
+                            quizzes.Add(quiz);
+                            quizOrder++;
+                        }
+
+                        section.Quizzes = quizzes;
+                    }
+                }
+                else
+                {
+                    throw new BadRequestException($"Section {sectionDto.Id} does not exist.");
+                }
+            }
+        }
+
+        _unitOfWork.CourseRepository.Update(courseEntity);
+        await _unitOfWork.SaveChangeAsync();
+
+        return CourseMapper.CourseToCourseDto(courseEntity);
+    }
+
+    public async Task<CourseDto> CommonUpdateCourseAsync(int id, UpdateCourseDto dto)
     {
         var entity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
@@ -190,15 +421,11 @@ public class CourseService : ICourseService
 
         _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
-        var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
-
         var avatarFileName = $"picture_{entity.Id}";
 
         var uploadedFile = await _imageService.UploadImage(file, Constant.FirebaseCoursePictureFolder, avatarFileName);
 
         entity.PictureUrl = uploadedFile;
-        entity.ModifiedBy = account;
 
         _unitOfWork.CourseRepository.Update(entity);
         await _unitOfWork.SaveChangeAsync();

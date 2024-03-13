@@ -10,9 +10,6 @@ public record CreateSectionDto
     [StringLength(250, ErrorMessage = "Name can not exceed 2520 characters.")]
     public string Name { get; init; } = null!;
 
-    // public int Order { get; init; }
-    
     public ICollection<CreateLessonDto>? Lessons { get; set; }
     public ICollection<CreateQuizDto>? Quizzes { get; init; }
-
 }

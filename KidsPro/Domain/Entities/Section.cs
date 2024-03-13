@@ -18,9 +18,9 @@ public class Section : BaseEntity
 
     public int CourseId { get; set; }
 
-    public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public virtual List<Lesson> Lessons { get; set; } = new List<Lesson>();
 
-    public virtual ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
+    public virtual List<Quiz> Quizzes { get; set; } = new List<Quiz>();
 
-    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
+    public virtual List<Game> Games { get; set; } = new List<Game>();
 }

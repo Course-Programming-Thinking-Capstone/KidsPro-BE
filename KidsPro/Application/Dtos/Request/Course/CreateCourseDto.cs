@@ -11,6 +11,8 @@ public record CreateCourseDto
 
     [StringLength(3000, ErrorMessage = "Description can not exceed 3000 character")]
     public string? Description { get; set; }
-    
-    public ICollection<CreateSectionDto>? Sections { get; init; } 
+
+    public ICollection<CreateSectionDto>? Sections { get; init; }
+
+    public int TeacherId { get; init; }
 }

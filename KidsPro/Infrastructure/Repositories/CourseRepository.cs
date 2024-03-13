@@ -25,6 +25,13 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
         return await query.Include(c => c.CreatedBy)
             .Include(c => c.ModifiedBy)
             .Include(c => c.Sections.OrderBy(s => s.Order))
+            .ThenInclude(s => s.Lessons.OrderBy(l => l.Order))
+            .Include(c => c.Sections.OrderBy(s => s.Order))
+            .ThenInclude(s => s.Quizzes.OrderBy(q => q.Order))
+            .ThenInclude(q => q.Questions.OrderBy(qu => qu.Order))
+            .ThenInclude(q => q.Options.OrderBy(o => o.Order))
+            .Include(c => c.Sections.OrderBy(s => s.Order))
+            .ThenInclude(s => s.Games)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
 }
