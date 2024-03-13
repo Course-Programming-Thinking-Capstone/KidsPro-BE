@@ -6,15 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Dtos.Request.Authentication
+namespace Application.Dtos.Request.Student
 {
-    public record StudentRequest
+    public record StudentAddDto
     {
         [Required] public int ParentId { get; set; }
         [Required] public string FullName { get; set; } = null!;
 
-        [Required] public DateTime Birthday { get; set; } 
-        [Required] public int Gender { get; set; } 
+        [Required] public DateTime Birthday { get; set; }
+        [Required] public int Gender { get; set; }
     };
 }
 

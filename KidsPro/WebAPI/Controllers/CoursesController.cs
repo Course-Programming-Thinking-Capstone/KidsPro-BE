@@ -43,7 +43,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    //[Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
