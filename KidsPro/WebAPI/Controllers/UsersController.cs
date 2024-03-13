@@ -138,49 +138,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Phụ huynh thêm trẻ vào hệ thống
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpPost("parents/add")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGameLoginDto))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<LoginAccountDto>> AddStudent(StudentRequest request)
-    {
-        var result = await _accountService.AddStudent(request);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Phụ huynh Lấy danh sách student hiển thị by Id
-    /// </summary>
-    /// <param name="id">Parent Id</param>
-    /// <returns></returns>
-   // [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpGet("parents/stduents/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentDto))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentDto>> GetStudentsByParentId(int id)
-    {
-        var result = await _accountService.GetStudents(id);
-        return Ok(result);
-    }
-    /// <summary>
-    /// Phụ huynh xem thông tin chi tiết của 1 trẻ
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    // [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpGet("parents/stduent-detail/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentDto))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentDetailDto>> GetStudentDetail(int id)
-    {
-        var result = await _accountService.GetDetailStudent(id);
-        return Ok(result);
-    }
+   
 
 
 }

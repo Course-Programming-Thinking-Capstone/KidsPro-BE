@@ -455,46 +455,7 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<StudentDto> AddStudent(StudentRequest request)
-    {
-        var studentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.StudentRole)
-            .ContinueWith(t => t.Result ?? throw new Exception("Role student name is incorrect."));
-
-        var accountEntity = new Account()
-        {
-            PasswordHash = "000000",
-            FullName = StringUtils.FormatName(request.FullName),
-            Role = studentRole,
-            DateOfBirth = request.Birthday,
-            Gender =(Gender) request.Gender,
-            CreatedDate = DateTime.UtcNow,
-            Status = UserStatus.Active
-        };
-
-        var studentEntity = new Student()
-        {
-            ParentId = request.ParentId,
-            Account = accountEntity
-        };
-
-        await _unitOfWork.StudentRepository.AddAsync(studentEntity);
-        await _unitOfWork.SaveChangeAsync();
-
-        var result = AccountMapper.AccountToStudentDto(accountEntity);
-        return result;
-    }
-
-    public async Task<List<StudentDto>> GetStudents(int parentId)
-    {
-        var list = await _unitOfWork.StudentRepository.GetStudents(parentId);
-        return AccountMapper.ParentToListStudentDto(list);
-    }
-
-    public async Task<StudentDetailDto> GetDetailStudent(int studentId)
-    {
-        var student= await _unitOfWork.StudentRepository.GetByIdAsync(studentId);
-        return AccountMapper.ShowStudentDetail(student);
-    }
+   
 
 
 }

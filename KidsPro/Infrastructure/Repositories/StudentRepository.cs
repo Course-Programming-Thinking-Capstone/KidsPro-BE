@@ -30,8 +30,9 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
     public override async Task<Student?> GetByIdAsync(int id, bool disableTracking = false)
     {
         return await _dbSet.Where(x => x.Id == id)
-            .Include(x => x.Account).ThenInclude(x=> x.Role)
-            .Include(x=> x.Certificates).ThenInclude(x=> x.Course)
+            .Include(x => x.Account).ThenInclude(x => x.Role)
+            .Include(x => x.Certificates)
+            .Include(x => x.StudentProgresses).ThenInclude(x => x.Course)
             .FirstOrDefaultAsync();
     }
 
