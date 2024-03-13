@@ -96,6 +96,11 @@ public class AppDbContext : DbContext
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<StudentOption>()
+            .HasOne<Question>(so => so.Question)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
         //data seeding
         modelBuilder.Entity<Role>().HasData(
             new Role() { Id = 1, Name = Constant.AdminRole },
@@ -107,7 +112,8 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<SectionComponentNumber>().HasData(
             new SectionComponentNumber() { Id = 1, SectionComponentType = SectionComponentType.Video, MaxNumber = 5 },
-            new SectionComponentNumber() { Id = 2, SectionComponentType = SectionComponentType.Document, MaxNumber = 3 },
+            new SectionComponentNumber()
+                { Id = 2, SectionComponentType = SectionComponentType.Document, MaxNumber = 3 },
             new SectionComponentNumber() { Id = 3, SectionComponentType = SectionComponentType.Quiz, MaxNumber = 1 },
             new SectionComponentNumber() { Id = 4, SectionComponentType = SectionComponentType.Game, MaxNumber = 1 }
         );

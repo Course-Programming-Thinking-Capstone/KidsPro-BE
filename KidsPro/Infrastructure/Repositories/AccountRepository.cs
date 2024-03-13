@@ -60,4 +60,17 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
             .Include(a => a.Staff)
             .FirstOrDefaultAsync(a => a.Id == accountId && !a.IsDelete && a.Status == UserStatus.Active);
     }
+
+    public override async Task<Account?> GetByIdAsync(int id, bool disableTracking = false)
+    {
+        IQueryable<Account> query = _dbSet;
+
+        if (disableTracking)
+        {
+            query.AsNoTracking();
+        }
+
+        return await query.Include(a => a.Role)
+            .FirstOrDefaultAsync(a => a.Id == id && !a.IsDelete && a.Status == UserStatus.Active);
+    }
 }

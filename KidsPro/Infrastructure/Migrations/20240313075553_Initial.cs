@@ -22,7 +22,8 @@ namespace Infrastructure.Migrations
                     GameId = table.Column<int>(type: "int", nullable: false),
                     ItemName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Details = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    SpritesUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
+                    SpritesUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,7 +51,8 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TypeName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    TypeName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,7 +67,8 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false)
+                    Date = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +81,8 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TypeName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    TypeName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,7 +95,8 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,7 +110,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SectionComponentType = table.Column<byte>(type: "tinyint", nullable: false),
-                    MaxNumber = table.Column<int>(type: "int", nullable: false)
+                    MaxNumber = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,10 +126,11 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LevelIndex = table.Column<int>(type: "int", nullable: true),
                     CoinReward = table.Column<int>(type: "int", nullable: true),
-                    GameReward = table.Column<int>(type: "int", nullable: true),
+                    GemReward = table.Column<int>(type: "int", nullable: true),
                     Max = table.Column<int>(type: "int", nullable: true),
                     VStartPosition = table.Column<int>(type: "int", nullable: false),
-                    GameLevelTypeId = table.Column<int>(type: "int", nullable: false)
+                    GameLevelTypeId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,7 +158,8 @@ namespace Infrastructure.Migrations
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -172,7 +180,8 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VPosition = table.Column<int>(type: "int", nullable: false),
                     GameLevelId = table.Column<int>(type: "int", nullable: false),
-                    PositionTypeId = table.Column<int>(type: "int", nullable: false)
+                    PositionTypeId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,7 +208,8 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GameLevelId = table.Column<int>(type: "int", nullable: false),
                     GameId = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -224,7 +234,8 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccountId = table.Column<int>(type: "int", nullable: false)
+                    AccountId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -245,24 +256,20 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
-                    FromAge = table.Column<byte>(type: "tinyint", nullable: true),
-                    ToAge = table.Column<byte>(type: "tinyint", nullable: true),
-                    PreRequire = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     PictureUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     StartSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     EndSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     Price = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
                     DiscountPrice = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: true),
                     TotalLesson = table.Column<short>(type: "smallint", nullable: true),
-                    Language = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    GraduateCondition = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     IsFree = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
-                    ModifiedById = table.Column<int>(type: "int", nullable: false)
+                    ModifiedById = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -288,7 +295,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
-                    AccountId = table.Column<int>(type: "int", nullable: false)
+                    AccountId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,7 +318,8 @@ namespace Infrastructure.Migrations
                     Biography = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     ProfilePicture = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
-                    AccountId = table.Column<int>(type: "int", nullable: false)
+                    AccountId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -334,7 +343,8 @@ namespace Infrastructure.Migrations
                     Biography = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     ProfilePicture = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
-                    AccountId = table.Column<int>(type: "int", nullable: false)
+                    AccountId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -355,7 +365,8 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
                     AccountId = table.Column<int>(type: "int", nullable: false),
-                    NotificationId = table.Column<int>(type: "int", nullable: false)
+                    NotificationId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -375,34 +386,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Vouchers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    VoucherCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    ExpirationDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    UsageLimit = table.Column<int>(type: "int", nullable: true),
-                    NumberOfUsed = table.Column<int>(type: "int", nullable: false),
-                    DiscountAmount = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
-                    DiscountType = table.Column<byte>(type: "tinyint", nullable: false),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
-                    CreatedById = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vouchers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Vouchers_Accounts_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CourseResources",
                 columns: table => new
                 {
@@ -411,7 +394,8 @@ namespace Infrastructure.Migrations
                     ResourceUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    CourseId = table.Column<int>(type: "int", nullable: false)
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -432,7 +416,8 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Order = table.Column<byte>(type: "tinyint", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false)
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -446,6 +431,30 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GameVouchers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ConvertedPoint = table.Column<int>(type: "int", nullable: false),
+                    DiscountAmount = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
+                    ExpiredDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    ParentId = table.Column<int>(type: "int", nullable: true),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameVouchers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GameVouchers_Parents_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Parents",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Payments",
                 columns: table => new
                 {
@@ -454,7 +463,8 @@ namespace Infrastructure.Migrations
                     AccountNumber = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     IsDefault = table.Column<bool>(type: "bit", nullable: false),
                     Type = table.Column<byte>(type: "tinyint", nullable: false),
-                    ParentId = table.Column<int>(type: "int", nullable: false)
+                    ParentId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -474,7 +484,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountId = table.Column<int>(type: "int", nullable: false),
-                    ParentId = table.Column<int>(type: "int", nullable: false)
+                    ParentId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -500,7 +511,6 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Duration = table.Column<byte>(type: "tinyint", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     TotalSlot = table.Column<int>(type: "int", nullable: false),
@@ -508,7 +518,8 @@ namespace Infrastructure.Migrations
                     OpenDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     TeacherId = table.Column<int>(type: "int", nullable: false),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false)
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -534,7 +545,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GameQuizRooms",
+                name: "MiniGames",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -543,19 +554,20 @@ namespace Infrastructure.Migrations
                     Duration = table.Column<int>(type: "int", nullable: false),
                     JoinCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     GameLevelId = table.Column<int>(type: "int", nullable: false),
-                    TeacherId = table.Column<int>(type: "int", nullable: false)
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GameQuizRooms", x => x.Id);
+                    table.PrimaryKey("PK_MiniGames", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GameQuizRooms_GameLevels_GameLevelId",
+                        name: "FK_MiniGames_GameLevels_GameLevelId",
                         column: x => x.GameLevelId,
                         principalTable: "GameLevels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GameQuizRooms_Teachers_TeacherId",
+                        name: "FK_MiniGames_Teachers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "Teachers",
                         principalColumn: "Id",
@@ -572,7 +584,8 @@ namespace Infrastructure.Migrations
                     ToDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
                     CertificatePicture = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    TeacherId = table.Column<int>(type: "int", nullable: false)
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -586,39 +599,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PaymentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
-                    VoucherId = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Orders_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_Vouchers_VoucherId",
-                        column: x => x.VoucherId,
-                        principalTable: "Vouchers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Games",
                 columns: table => new
                 {
@@ -626,7 +606,8 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RequiredLevel = table.Column<int>(type: "int", nullable: false),
                     SectionId = table.Column<int>(type: "int", nullable: false),
-                    LevelTypeId = table.Column<int>(type: "int", nullable: false)
+                    LevelTypeId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -653,17 +634,24 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Order = table.Column<byte>(type: "tinyint", nullable: false),
-                    ResourceUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    ResourceUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
                     IsFree = table.Column<bool>(type: "bit", nullable: false),
-                    IsRequired = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     Type = table.Column<byte>(type: "tinyint", nullable: false),
-                    SectionId = table.Column<int>(type: "int", nullable: false)
+                    SectionId = table.Column<int>(type: "int", nullable: false),
+                    LessonId = table.Column<int>(type: "int", nullable: true),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Lessons", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Lessons_Sections_SectionId",
                         column: x => x.SectionId,
@@ -673,38 +661,27 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Quizzes",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Order = table.Column<int>(type: "int", nullable: false),
-                    TotalQuestion = table.Column<int>(type: "int", nullable: false),
-                    TotalScore = table.Column<int>(type: "int", nullable: false),
-                    MinScore = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
-                    Duration = table.Column<int>(type: "int", nullable: true),
-                    NumberOfQuestion = table.Column<int>(type: "int", nullable: false),
-                    IsOrderRandom = table.Column<bool>(type: "bit", nullable: false),
-                    NumberOfAttempt = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    CreatedById = table.Column<int>(type: "int", nullable: false),
-                    SectionId = table.Column<int>(type: "int", nullable: false)
+                    PaymentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    VoucherId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Quizzes", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Quizzes_Accounts_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Quizzes_Sections_SectionId",
-                        column: x => x.SectionId,
-                        principalTable: "Sections",
+                        name: "FK_Orders_GameVouchers_VoucherId",
+                        column: x => x.VoucherId,
+                        principalTable: "GameVouchers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -713,15 +690,18 @@ namespace Infrastructure.Migrations
                 name: "Certificates",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     StudentId = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
                     ResourceUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     CompletionDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Certificates", x => new { x.StudentId, x.CourseId });
+                    table.PrimaryKey("PK_Certificates", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Certificates_Courses_CourseId",
                         column: x => x.CourseId,
@@ -747,7 +727,8 @@ namespace Infrastructure.Migrations
                     FinishTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     GameLevelTypeId = table.Column<int>(type: "int", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false)
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -775,7 +756,8 @@ namespace Infrastructure.Migrations
                     DisplayName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Coin = table.Column<int>(type: "int", nullable: false),
                     Gem = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false)
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -797,7 +779,8 @@ namespace Infrastructure.Migrations
                     DisplayName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false),
-                    GameItemId = table.Column<int>(type: "int", nullable: false)
+                    GameItemId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -820,16 +803,19 @@ namespace Infrastructure.Migrations
                 name: "StudentProgresses",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     StudentId = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     EnrolledDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     CompletedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
-                    SectionId = table.Column<int>(type: "int", nullable: false)
+                    SectionId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentProgresses", x => new { x.StudentId, x.CourseId });
+                    table.PrimaryKey("PK_StudentProgresses", x => x.Id);
                     table.ForeignKey(
                         name: "FK_StudentProgresses_Courses_CourseId",
                         column: x => x.CourseId,
@@ -859,7 +845,8 @@ namespace Infrastructure.Migrations
                     RoomUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     StartTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    ClassId = table.Column<int>(type: "int", nullable: false)
+                    ClassId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -873,7 +860,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GameStudentQuizzes",
+                name: "StudentMiniGames",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -882,19 +869,21 @@ namespace Infrastructure.Migrations
                     FinishTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     StepCount = table.Column<int>(type: "int", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false),
-                    GameQuizRoomId = table.Column<int>(type: "int", nullable: false)
+                    MiniGameId = table.Column<int>(type: "int", nullable: false),
+                    GameQuizRoomId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GameStudentQuizzes", x => x.Id);
+                    table.PrimaryKey("PK_StudentMiniGames", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GameStudentQuizzes_GameQuizRooms_GameQuizRoomId",
-                        column: x => x.GameQuizRoomId,
-                        principalTable: "GameQuizRooms",
+                        name: "FK_StudentMiniGames_MiniGames_MiniGameId",
+                        column: x => x.MiniGameId,
+                        principalTable: "MiniGames",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GameStudentQuizzes_Students_StudentId",
+                        name: "FK_StudentMiniGames_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id",
@@ -902,27 +891,47 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderDetails",
+                name: "Quizzes",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    TotalQuestion = table.Column<int>(type: "int", nullable: false),
+                    TotalScore = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    MinScore = table.Column<decimal>(type: "decimal(4,2)", precision: 4, scale: 2, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
+                    Duration = table.Column<int>(type: "int", nullable: true),
+                    NumberOfQuestion = table.Column<int>(type: "int", nullable: false),
+                    IsOrderRandom = table.Column<bool>(type: "bit", nullable: false),
+                    NumberOfAttempt = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: false),
+                    SectionId = table.Column<int>(type: "int", nullable: false),
+                    LessonId = table.Column<int>(type: "int", nullable: true),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderDetails", x => new { x.OrderId, x.StudentId });
+                    table.PrimaryKey("PK_Quizzes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
+                        name: "FK_Quizzes_Accounts_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Accounts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
+                        name: "FK_Quizzes_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Quizzes_Sections_SectionId",
+                        column: x => x.SectionId,
+                        principalTable: "Sections",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -951,6 +960,35 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Price = table.Column<decimal>(type: "decimal(11,2)", precision: 11, scale: 2, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Questions",
                 columns: table => new
                 {
@@ -959,7 +997,8 @@ namespace Infrastructure.Migrations
                     Order = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: false),
                     Score = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
-                    QuizId = table.Column<int>(type: "int", nullable: false)
+                    QuizId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1003,7 +1042,31 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Answers",
+                name: "OrderDetailStudent",
+                columns: table => new
+                {
+                    OrderDetailsId = table.Column<int>(type: "int", nullable: false),
+                    StudentsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDetailStudent", x => new { x.OrderDetailsId, x.StudentsId });
+                    table.ForeignKey(
+                        name: "FK_OrderDetailStudent_OrderDetails_OrderDetailsId",
+                        column: x => x.OrderDetailsId,
+                        principalTable: "OrderDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderDetailStudent_Students_StudentsId",
+                        column: x => x.StudentsId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Options",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -1012,13 +1075,14 @@ namespace Infrastructure.Migrations
                     Content = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: false),
                     AnswerExplain = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
                     IsCorrect = table.Column<bool>(type: "bit", nullable: false),
-                    QuestionId = table.Column<int>(type: "int", nullable: false)
+                    QuestionId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Answers", x => x.Id);
+                    table.PrimaryKey("PK_Options", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Answers_Questions_QuestionId",
+                        name: "FK_Options_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "Id",
@@ -1026,23 +1090,30 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentAnswers",
+                name: "StudentOptions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    QuestionId = table.Column<int>(type: "int", nullable: false),
-                    AnswerId = table.Column<int>(type: "int", nullable: false),
+                    OptionId = table.Column<int>(type: "int", nullable: false),
                     QuestionOrder = table.Column<int>(type: "int", nullable: false),
                     StudentQuizStudentId = table.Column<int>(type: "int", nullable: false),
                     StudentQuizQuizId = table.Column<int>(type: "int", nullable: false),
-                    StudentQuizId = table.Column<int>(type: "int", nullable: false)
+                    StudentQuizId = table.Column<int>(type: "int", nullable: false),
+                    QuestionId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentAnswers", x => x.Id);
+                    table.PrimaryKey("PK_StudentOptions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudentAnswers_StudentQuizzes_StudentQuizStudentId_StudentQuizQuizId",
+                        name: "FK_StudentOptions_Questions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "Questions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StudentOptions_StudentQuizzes_StudentQuizStudentId_StudentQuizQuizId",
                         columns: x => new { x.StudentQuizStudentId, x.StudentQuizQuizId },
                         principalTable: "StudentQuizzes",
                         principalColumns: new[] { "StudentId", "QuizId" },
@@ -1059,6 +1130,17 @@ namespace Infrastructure.Migrations
                     { 3, "Teacher" },
                     { 4, "Parent" },
                     { 5, "Student" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "SectionComponentNumbers",
+                columns: new[] { "Id", "MaxNumber", "SectionComponentType" },
+                values: new object[,]
+                {
+                    { 1, 5, (byte)1 },
+                    { 2, 3, (byte)2 },
+                    { 3, 1, (byte)4 },
+                    { 4, 1, (byte)3 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1080,20 +1162,15 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Answers_Order_QuestionId",
-                table: "Answers",
-                columns: new[] { "Order", "QuestionId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Answers_QuestionId",
-                table: "Answers",
-                column: "QuestionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Certificates_CourseId",
                 table: "Certificates",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Certificates_StudentId_CourseId",
+                table: "Certificates",
+                columns: new[] { "StudentId", "CourseId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_Code",
@@ -1172,16 +1249,6 @@ namespace Infrastructure.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GameQuizRooms_GameLevelId",
-                table: "GameQuizRooms",
-                column: "GameLevelId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GameQuizRooms_TeacherId",
-                table: "GameQuizRooms",
-                column: "TeacherId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Games_LevelTypeId",
                 table: "Games",
                 column: "LevelTypeId");
@@ -1192,20 +1259,15 @@ namespace Infrastructure.Migrations
                 column: "SectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GameStudentQuizzes_GameQuizRoomId",
-                table: "GameStudentQuizzes",
-                column: "GameQuizRoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GameStudentQuizzes_StudentId",
-                table: "GameStudentQuizzes",
-                column: "StudentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_GameUserProfiles_StudentId",
                 table: "GameUserProfiles",
                 column: "StudentId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameVouchers_ParentId",
+                table: "GameVouchers",
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemOwneds_GameItemId",
@@ -1218,10 +1280,9 @@ namespace Infrastructure.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lessons_Order_SectionId",
+                name: "IX_Lessons_LessonId",
                 table: "Lessons",
-                columns: new[] { "Order", "SectionId" },
-                unique: true);
+                column: "LessonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lessons_SectionId",
@@ -1229,14 +1290,40 @@ namespace Infrastructure.Migrations
                 column: "SectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetails_StudentId",
-                table: "OrderDetails",
-                column: "StudentId");
+                name: "IX_MiniGames_GameLevelId",
+                table: "MiniGames",
+                column: "GameLevelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_CourseId",
-                table: "Orders",
+                name: "IX_MiniGames_TeacherId",
+                table: "MiniGames",
+                column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Options_Order_QuestionId",
+                table: "Options",
+                columns: new[] { "Order", "QuestionId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Options_QuestionId",
+                table: "Options",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_CourseId",
+                table: "OrderDetails",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_OrderId",
+                table: "OrderDetails",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetailStudent_StudentsId",
+                table: "OrderDetailStudent",
+                column: "StudentsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_VoucherId",
@@ -1278,6 +1365,11 @@ namespace Infrastructure.Migrations
                 column: "CreatedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Quizzes_LessonId",
+                table: "Quizzes",
+                column: "LessonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Quizzes_Order_SectionId",
                 table: "Quizzes",
                 columns: new[] { "Order", "SectionId" },
@@ -1306,26 +1398,35 @@ namespace Infrastructure.Migrations
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sections_Order_CourseId",
-                table: "Sections",
-                columns: new[] { "Order", "CourseId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Staves_AccountId",
                 table: "Staves",
                 column: "AccountId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudentAnswers_StudentQuizStudentId_StudentQuizQuizId",
-                table: "StudentAnswers",
-                columns: new[] { "StudentQuizStudentId", "StudentQuizQuizId" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StudentLessons_LessonId",
                 table: "StudentLessons",
                 column: "LessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentMiniGames_MiniGameId",
+                table: "StudentMiniGames",
+                column: "MiniGameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentMiniGames_StudentId",
+                table: "StudentMiniGames",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentOptions_QuestionId",
+                table: "StudentOptions",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentOptions_StudentQuizStudentId_StudentQuizQuizId",
+                table: "StudentOptions",
+                columns: new[] { "StudentQuizStudentId", "StudentQuizQuizId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentProgresses_CourseId",
@@ -1336,6 +1437,12 @@ namespace Infrastructure.Migrations
                 name: "IX_StudentProgresses_SectionId",
                 table: "StudentProgresses",
                 column: "SectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentProgresses_StudentId_CourseId",
+                table: "StudentProgresses",
+                columns: new[] { "StudentId", "CourseId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentQuizzes_QuizId",
@@ -1374,11 +1481,6 @@ namespace Infrastructure.Migrations
                 table: "UserNotification",
                 columns: new[] { "NotificationId", "AccountId" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Vouchers_CreatedById",
-                table: "Vouchers",
-                column: "CreatedById");
         }
 
         /// <inheritdoc />
@@ -1386,9 +1488,6 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Admins");
-
-            migrationBuilder.DropTable(
-                name: "Answers");
 
             migrationBuilder.DropTable(
                 name: "Certificates");
@@ -1412,16 +1511,16 @@ namespace Infrastructure.Migrations
                 name: "Games");
 
             migrationBuilder.DropTable(
-                name: "GameStudentQuizzes");
-
-            migrationBuilder.DropTable(
                 name: "GameUserProfiles");
 
             migrationBuilder.DropTable(
                 name: "ItemOwneds");
 
             migrationBuilder.DropTable(
-                name: "OrderDetails");
+                name: "Options");
+
+            migrationBuilder.DropTable(
+                name: "OrderDetailStudent");
 
             migrationBuilder.DropTable(
                 name: "Payments");
@@ -1433,10 +1532,13 @@ namespace Infrastructure.Migrations
                 name: "Staves");
 
             migrationBuilder.DropTable(
-                name: "StudentAnswers");
+                name: "StudentLessons");
 
             migrationBuilder.DropTable(
-                name: "StudentLessons");
+                name: "StudentMiniGames");
+
+            migrationBuilder.DropTable(
+                name: "StudentOptions");
 
             migrationBuilder.DropTable(
                 name: "StudentProgresses");
@@ -1448,9 +1550,6 @@ namespace Infrastructure.Migrations
                 name: "UserNotification");
 
             migrationBuilder.DropTable(
-                name: "Questions");
-
-            migrationBuilder.DropTable(
                 name: "Classes");
 
             migrationBuilder.DropTable(
@@ -1460,22 +1559,25 @@ namespace Infrastructure.Migrations
                 name: "GameVersions");
 
             migrationBuilder.DropTable(
-                name: "GameQuizRooms");
-
-            migrationBuilder.DropTable(
                 name: "GameItems");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "OrderDetails");
+
+            migrationBuilder.DropTable(
+                name: "MiniGames");
+
+            migrationBuilder.DropTable(
+                name: "Questions");
 
             migrationBuilder.DropTable(
                 name: "StudentQuizzes");
 
             migrationBuilder.DropTable(
-                name: "Lessons");
+                name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "Notifications");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "GameLevels");
@@ -1484,22 +1586,25 @@ namespace Infrastructure.Migrations
                 name: "Teachers");
 
             migrationBuilder.DropTable(
-                name: "Vouchers");
-
-            migrationBuilder.DropTable(
                 name: "Quizzes");
 
             migrationBuilder.DropTable(
                 name: "Students");
 
             migrationBuilder.DropTable(
+                name: "GameVouchers");
+
+            migrationBuilder.DropTable(
                 name: "LevelTypes");
 
             migrationBuilder.DropTable(
-                name: "Sections");
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Parents");
+
+            migrationBuilder.DropTable(
+                name: "Sections");
 
             migrationBuilder.DropTable(
                 name: "Courses");

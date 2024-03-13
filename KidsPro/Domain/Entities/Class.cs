@@ -11,8 +11,6 @@ public class Class : BaseEntity
 {
     [MaxLength(20)] public string Code { get; set; } = null!;
 
-    [MaxLength(250)] public string Name { get; set; } = null!;
-
     [Column(TypeName = "tinyint")]
     [Range(0, 250)]
     public int? Duration { get; set; }
@@ -22,7 +20,7 @@ public class Class : BaseEntity
     public int TotalSlot { get; set; }
 
     public int TotalStudent { get; set; }
-    
+
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     [Precision(2)]
