@@ -13,7 +13,7 @@ namespace Infrastructure.Migrations
             migrationBuilder.DropPrimaryKey(
                 name: "PK_StudentProgresses",
                 table: "StudentProgresses");
-
+            
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Certificates",
                 table: "Certificates");
@@ -41,7 +41,7 @@ namespace Infrastructure.Migrations
                 nullable: false,
                 defaultValue: 0)
                 .Annotation("SqlServer:Identity", "1, 1");
-
+            
             migrationBuilder.AddColumn<byte[]>(
                 name: "Version",
                 table: "Certificates",
@@ -49,17 +49,17 @@ namespace Infrastructure.Migrations
                 rowVersion: true,
                 nullable: false,
                 defaultValue: new byte[0]);
-
+            
             migrationBuilder.AddPrimaryKey(
                 name: "PK_StudentProgresses",
                 table: "StudentProgresses",
                 column: "Id");
-
+            
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Certificates",
                 table: "Certificates",
                 column: "Id");
-
+            
             migrationBuilder.CreateIndex(
                 name: "IX_StudentProgresses_StudentId_CourseId",
                 table: "StudentProgresses",
@@ -67,15 +67,32 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudentOptions_QuestionId",
+                table: "StudentOptions",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Certificates_StudentId_CourseId",
                 table: "Certificates",
                 columns: new[] { "StudentId", "CourseId" },
                 unique: true);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_StudentOptions_Questions_QuestionId",
+                table: "StudentOptions",
+                column: "QuestionId",
+                principalTable: "Questions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_StudentOptions_Questions_QuestionId",
+                table: "StudentOptions");
+
             migrationBuilder.DropPrimaryKey(
                 name: "PK_StudentProgresses",
                 table: "StudentProgresses");
@@ -83,6 +100,10 @@ namespace Infrastructure.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_StudentProgresses_StudentId_CourseId",
                 table: "StudentProgresses");
+
+            migrationBuilder.DropIndex(
+                name: "IX_StudentOptions_QuestionId",
+                table: "StudentOptions");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Certificates",

@@ -10,9 +10,9 @@ public class Quiz : BaseEntity
     [Range(1, 100)] public int Order { get; set; }
     [Range(0, 100)] public int TotalQuestion { get; set; }
 
-    public int TotalScore { get; set; }
+    public decimal TotalScore { get; set; }
 
-    public int MinScore { get; set; }
+    public decimal MinScore { get; set; }
 
     [MaxLength(250)] public string Title { get; set; } = null!;
 

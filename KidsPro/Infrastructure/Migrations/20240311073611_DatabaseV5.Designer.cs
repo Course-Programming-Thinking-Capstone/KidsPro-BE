@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240311064456_DatabaseV5")]
+    [Migration("20240311073611_DatabaseV5")]
     partial class DatabaseV5
     {
         /// <inheritdoc />
@@ -1510,6 +1510,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("QuestionId");
+
                     b.HasIndex("StudentQuizStudentId", "StudentQuizQuizId");
 
                     b.ToTable("StudentOptions");
@@ -2177,11 +2179,19 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.StudentOption", b =>
                 {
+                    b.HasOne("Domain.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.StudentQuiz", "StudentQuiz")
                         .WithMany("StudentAnswers")
                         .HasForeignKey("StudentQuizStudentId", "StudentQuizQuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Question");
 
                     b.Navigation("StudentQuiz");
                 });

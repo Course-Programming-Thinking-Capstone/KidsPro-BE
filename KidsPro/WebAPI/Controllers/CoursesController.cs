@@ -175,13 +175,13 @@ public class CoursesController : ControllerBase
     /// <param name="sectionId"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
-    [HttpPost("section/{sectionId:int}/video")]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    public async Task<ActionResult<LessonDto>> AddVideoAsync([FromRoute] int sectionId, [FromBody] CreateVideoDto dto)
-    {
-        var result = await _courseService.AddVideoAsync(sectionId, dto);
-        return Ok(result);
-    }
+    // [HttpPost("section/{sectionId:int}/video")]
+    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    // public async Task<ActionResult<LessonDto>> AddVideoAsync([FromRoute] int sectionId, [FromBody] CreateVideoDto dto)
+    // {
+    //     var result = await _courseService.AddVideoAsync(sectionId, dto);
+    //     return Ok(result);
+    // }
 
     /// <summary>
     /// Update video information 
@@ -203,14 +203,14 @@ public class CoursesController : ControllerBase
     /// <param name="sectionId"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
-    [HttpPost("section/{sectionId:int}/document")]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    public async Task<ActionResult<LessonDto>> AddDocumentAsync([FromRoute] int sectionId,
-        [FromBody] CreateDocumentDto dto)
-    {
-        var result = await _courseService.AddDocumentAsync(sectionId, dto);
-        return Ok(result);
-    }
+    // [HttpPost("section/{sectionId:int}/document")]
+    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    // public async Task<ActionResult<LessonDto>> AddDocumentAsync([FromRoute] int sectionId,
+    //     [FromBody] CreateDocumentDto dto)
+    // {
+    //     var result = await _courseService.AddDocumentAsync(sectionId, dto);
+    //     return Ok(result);
+    // }
 
     /// <summary>
     /// Update document information

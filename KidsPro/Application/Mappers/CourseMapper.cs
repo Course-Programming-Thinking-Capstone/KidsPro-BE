@@ -1,23 +1,26 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Lesson;
+using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.Lesson;
+using Application.Dtos.Response.Course.Quiz;
 using Application.ErrorHandlers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Options;
 
 namespace Application.Mappers;
 
 public static class CourseMapper
 {
-    public static Course CreateCourseDtoToEntity(CreateCourseDto dto)
-        => new Course()
-        {
-            Name = dto.Name,
-            Description = dto.Description
-        };
+    // public static Course CreateCourseDtoToEntity(CreateCourseDto dto)
+    //     => new Course()
+    //     {
+    //         Name = dto.Name,
+    //         Description = dto.Description
+    //     };
 
     public static SectionDto SectionToSectionDto(Section entity)
         => new SectionDto()
@@ -26,7 +29,8 @@ public static class CourseMapper
             Name = entity.Name,
             Order = entity.Order,
             CourseId = entity.CourseId,
-            Lessons = entity.Lessons.Select(LessonToLessonDto).ToList()
+            Lessons = entity.Lessons.Select(LessonToLessonDto).ToList(),
+            Quizzes = entity.Quizzes.Select(QuizToQuizDto).ToList()
         };
 
     public static List<SectionDto> SectionToSectionDto(IEnumerable<Section> entities)
@@ -68,30 +72,17 @@ public static class CourseMapper
 
 
     public static Lesson CreateLessonDtoToLesson(CreateLessonDto dto)
-    {
-        return dto switch
+        => new Lesson()
         {
-            CreateVideoDto createVideoDto => new Lesson()
-            {
-                Name = createVideoDto.Name,
-                Order = createVideoDto.Order,
-                IsFree = createVideoDto.IsFree,
-                Type = LessonType.Video,
-                Duration = createVideoDto.Duration,
-                ResourceUrl = createVideoDto.ResourceUrl
-            },
-            CreateDocumentDto createDocumentDto => new Lesson()
-            {
-                Name = createDocumentDto.Name,
-                Order = createDocumentDto.Order,
-                IsFree = createDocumentDto.IsFree,
-                Type = LessonType.Document,
-                Duration = createDocumentDto.Duration,
-                Content = createDocumentDto.Content
-            },
-            _ => throw new UnsupportedException("Unsupported lesson type.")
+            Name = dto.Name,
+            Order = dto.Order,
+            IsFree = dto.IsFree,
+            Type = dto.Type,
+            Content = dto.Content,
+            Duration = dto.Duration,
+            ResourceUrl = dto.ResourceUrl
         };
-    }
+
 
     public static LessonDto LessonToLessonDto(Lesson entity)
     {
@@ -125,8 +116,74 @@ public static class CourseMapper
         };
     }
 
+
+    public static Option CreateOptionDtoToOption(CreateOptionDto dto)
+        => new()
+        {
+            Content = dto.Content,
+            AnswerExplain = dto.AnswerExplain,
+            IsCorrect = dto.IsCorrect
+        };
+
+    public static Question CreateQuestionDtoToQuestion(CreateQuestionDto dto)
+        => new()
+        {
+            Title = dto.Title,
+            Score = dto.Score ?? 1
+        };
+
+    public static Quiz CreateQuizDtoToQuiz(CreateQuizDto dto)
+        => new()
+        {
+            MinScore = dto.MinScore ?? 0,
+            Title = dto.Title,
+            Description = dto.Description,
+            Duration = dto.Duration,
+            NumberOfAttempt = dto.NumberOfAttempt,
+            IsOrderRandom = dto.IsOrderRandom ?? false
+        };
+
+
     public static List<LessonDto> LessonToLessonDto(IEnumerable<Lesson> entities)
         => entities.Select(LessonToLessonDto).ToList();
+
+    public static OptionDto OptionToOptionDto(Option entity)
+        => new OptionDto()
+        {
+            Order = entity.Order,
+            Content = entity.Content,
+            AnswerExplain = entity.AnswerExplain,
+            IsCorrect = entity.IsCorrect
+        };
+
+    public static QuestionDto QuestionToQuestionDto(Question entity)
+        => new QuestionDto()
+        {
+            Order = entity.Order,
+            Title = entity.Title,
+            Score = entity.Score,
+            Options = entity.Options.Select(OptionToOptionDto).ToList()
+        };
+
+    public static QuizDto QuizToQuizDto(Quiz entity)
+        => new QuizDto()
+        {
+            Id = entity.Id,
+            Order = entity.Order,
+            Description = entity.Description,
+            Duration = entity.Duration,
+            IsOrderRandom = entity.IsOrderRandom,
+            NumberOfAttempt = entity.NumberOfQuestion,
+            Title = entity.Title,
+            MinScore = entity.MinScore,
+            TotalQuestion = entity.TotalQuestion,
+            TotalScore = entity.TotalScore,
+            NumberOfQuestion = entity.NumberOfQuestion,
+            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+            CreatedById = entity.CreatedById,
+            CreatedByName = entity.CreatedBy.FullName,
+            Questions = entity.Questions.Select(QuestionToQuestionDto).ToList()
+        };
 
     public static void UpdateCourseDtoToEntity(UpdateCourseDto dto, ref Course entity)
     {
@@ -153,6 +210,7 @@ public static class CourseMapper
             entity.Name = dto.Name;
         }
     }
+
 
     public static void UpdateLessonDtoToLesson(UpdateLessonDto dto, ref Lesson entity)
     {

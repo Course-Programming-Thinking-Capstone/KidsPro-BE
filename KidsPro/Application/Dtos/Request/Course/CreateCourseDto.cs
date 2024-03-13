@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.Dtos.Request.Course.Section;
 
 namespace Application.Dtos.Request.Course;
 
@@ -10,7 +11,6 @@ public record CreateCourseDto
 
     [StringLength(3000, ErrorMessage = "Description can not exceed 3000 character")]
     public string? Description { get; set; }
-
-    [StringLength(250, ErrorMessage = "Prerequisite can not exceed 250 character")]
-    public string? Prerequisite { get; set; }
+    
+    public ICollection<CreateSectionDto>? Sections { get; init; } 
 }

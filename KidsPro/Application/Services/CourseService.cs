@@ -42,18 +42,121 @@ public class CourseService : ICourseService
 
     public async Task<CourseDto> CreateCourseAsync(CreateCourseDto dto)
     {
-        var entity = CourseMapper.CreateCourseDtoToEntity(dto);
+        var entity = new Course();
 
         _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
 
+        entity.Name = dto.Name;
+        entity.Description = dto.Description;
         entity.CreatedDate = DateTime.UtcNow;
         entity.ModifiedDate = DateTime.UtcNow;
         entity.CreatedBy = currentAccount;
         entity.ModifiedBy = currentAccount;
         entity.Status = CourseStatus.Draft;
+
+
+        if (dto.Sections != null)
+        {
+            var sections = new List<Section>();
+
+            var sectionIndex = 1;
+
+            foreach (var sectionDto in dto.Sections)
+            {
+                var section = new Section
+                {
+                    Name = sectionDto.Name,
+                    Order = sectionIndex
+                };
+
+                if (sectionDto.Lessons != null)
+                {
+                    var lessons = new List<Lesson>();
+                    var seenOrders = new HashSet<int>();
+                    foreach (var lessonDto in sectionDto.Lessons)
+                    {
+                        if (!seenOrders.Add(lessonDto.Order))
+                        {
+                            // Duplicate order detected
+                            _logger.LogError("Error at {}: \nDuplicate order {} found within lessons.",
+                                nameof(CreateCourseAsync), lessonDto.Order);
+                            throw new BadRequestException($"Duplicate order '{lessonDto.Order}' found within lessons.");
+                        }
+
+                        var lesson = CourseMapper.CreateLessonDtoToLesson(lessonDto);
+                        lessons.Add(lesson);
+                    }
+
+                    section.Lessons = lessons;
+                }
+
+                if (sectionDto.Quizzes != null)
+                {
+                    var quizzes = new List<Quiz>();
+                    var quizIndex = 1;
+                    foreach (var sectionDtoQuiz in sectionDto.Quizzes)
+                    {
+                        var quiz = CourseMapper.CreateQuizDtoToQuiz(sectionDtoQuiz);
+                        var questions = new List<Question>();
+                        var questionOrder = 1;
+                        decimal totalScore = 0;
+
+                        foreach (var createQuestionDto in sectionDtoQuiz.Questions)
+                        {
+                            var question = CourseMapper.CreateQuestionDtoToQuestion(createQuestionDto);
+                            question.Order = questionOrder;
+                            totalScore += question.Score;
+
+                            var options = new List<Option>();
+                            var optionOrder = 1;
+                            foreach (var createOptionDto in createQuestionDto.Options)
+                            {
+                                var option = CourseMapper.CreateOptionDtoToOption(createOptionDto);
+                                option.Order = optionOrder;
+                                options.Add(option);
+                                optionOrder++;
+                            }
+
+                            question.Options = options;
+                            questions.Add(question);
+                            questionOrder++;
+                        }
+
+                        if (sectionDtoQuiz.NumberOfQuestion.HasValue)
+                        {
+                            quiz.NumberOfQuestion = sectionDtoQuiz.NumberOfQuestion.Value;
+                        }
+                        else
+                        {
+                            quiz.NumberOfQuestion = questionOrder - 1;
+                        }
+
+                        quiz.TotalScore = totalScore;
+                        quiz.TotalQuestion = questionOrder - 1;
+                        quiz.Questions = questions;
+                        quiz.CreatedDate = DateTime.UtcNow;
+                        quiz.CreatedById = accountId;
+                        quiz.CreatedBy = currentAccount;
+                        quiz.Order = quizIndex;
+
+                        quizzes.Add(quiz);
+                        quizIndex++;
+                    }
+
+                    section.Quizzes = quizzes;
+                }
+
+                section.Order = sectionIndex;
+
+                sections.Add(section);
+                sectionIndex++;
+            }
+
+            entity.Sections = sections;
+        }
 
         await _unitOfWork.CourseRepository.AddAsync(entity);
         await _unitOfWork.SaveChangeAsync();
@@ -105,31 +208,33 @@ public class CourseService : ICourseService
 
     public async Task<SectionDto> CreateSectionAsync(int courseId, CreateSectionDto dto)
     {
-        if (await _unitOfWork.SectionRepository.ExistByOrderAsync(courseId, dto.Order))
-            throw new ConflictException($"Order {dto.Order} has been existed.");
+        // if (await _unitOfWork.SectionRepository.ExistByOrderAsync(courseId, dto.Order))
+        //     throw new ConflictException($"Order {dto.Order} has been existed.");
+        //
+        // var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
+        //     .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} not found."));
+        //
+        // _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        //
+        // var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
+        //     .ContinueWith(t => t.Result ?? throw new NotFoundException("Invalid token."));
+        //
+        // var entity = new Section()
+        // {
+        //     Name = dto.Name,
+        //     Order = dto.Order,
+        //     CourseId = courseId
+        // };
+        //
+        // courseEntity.ModifiedDate = DateTime.UtcNow;
+        // courseEntity.ModifiedBy = account;
+        //
+        // await _unitOfWork.SectionRepository.AddAsync(entity);
+        // _unitOfWork.CourseRepository.Update(courseEntity);
+        // await _unitOfWork.SaveChangeAsync();
+        // return CourseMapper.SectionToSectionDto(entity);
 
-        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} not found."));
-
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
-
-        var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException("Invalid token."));
-
-        var entity = new Section()
-        {
-            Name = dto.Name,
-            Order = dto.Order,
-            CourseId = courseId
-        };
-
-        courseEntity.ModifiedDate = DateTime.UtcNow;
-        courseEntity.ModifiedBy = account;
-
-        await _unitOfWork.SectionRepository.AddAsync(entity);
-        _unitOfWork.CourseRepository.Update(courseEntity);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.SectionToSectionDto(entity);
+        throw new NotImplementedException();
     }
 
     public async Task<SectionDto> UpdateSectionAsync(int sectionId, UpdateSectionDto dto)
@@ -205,85 +310,85 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
     }
 
-    public async Task<LessonDto> AddVideoAsync(int sectionId, CreateVideoDto dto)
-    {
-        var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
-
-        var sectionVideoNumber =
-            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Video);
-        if (sectionVideoNumber == null)
-        {
-            _logger.LogError("Section component type {} can not found.", SectionComponentType.Video);
-            throw new Exception($"Section component type {SectionComponentType.Video} can not found.");
-        }
-
-        var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
-        lessonEntity.SectionId = sectionId;
-
-        var videoNumber = 0;
-
-        foreach (var lesson in section.Lessons)
-        {
-            if (lesson.Order == dto.Order)
-            {
-                throw new ConflictException($"Lesson order {dto.Order} has been existed.");
-            }
-
-            if (lesson.Type == LessonType.Video)
-                videoNumber++;
-        }
-
-        if (videoNumber > sectionVideoNumber.MaxNumber)
-        {
-            throw new BadRequestException(
-                $"Can not add more than {sectionVideoNumber.MaxNumber} video in this section.");
-        }
-
-        await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.LessonToLessonDto(lessonEntity);
-    }
-
-    public async Task<LessonDto> AddDocumentAsync(int sectionId, CreateDocumentDto dto)
-    {
-        var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
-
-        var sectionDocumentNumber =
-            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Document);
-        if (sectionDocumentNumber == null)
-        {
-            _logger.LogError("Section component type {} can not found.", SectionComponentType.Document);
-            throw new Exception($"Section component type {SectionComponentType.Document} can not found.");
-        }
-
-        var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
-        lessonEntity.SectionId = sectionId;
-
-        var documentNumber = 0;
-
-        foreach (var lesson in section.Lessons)
-        {
-            if (lesson.Order == dto.Order)
-            {
-                throw new ConflictException($"Lesson order {dto.Order} has been existed.");
-            }
-
-            if (lesson.Type == LessonType.Document)
-                documentNumber++;
-        }
-
-        if (documentNumber > sectionDocumentNumber.MaxNumber)
-        {
-            throw new BadRequestException(
-                $"Can not add more than {sectionDocumentNumber.MaxNumber} document in this section.");
-        }
-
-        await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.LessonToLessonDto(lessonEntity);
-    }
+    // public async Task<LessonDto> AddVideoAsync(int sectionId, CreateVideoDto dto)
+    // {
+    //     var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
+    //         .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
+    //
+    //     var sectionVideoNumber =
+    //         await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Video);
+    //     if (sectionVideoNumber == null)
+    //     {
+    //         _logger.LogError("Section component type {} can not found.", SectionComponentType.Video);
+    //         throw new Exception($"Section component type {SectionComponentType.Video} can not found.");
+    //     }
+    //
+    //     var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
+    //     lessonEntity.SectionId = sectionId;
+    //
+    //     var videoNumber = 0;
+    //
+    //     foreach (var lesson in section.Lessons)
+    //     {
+    //         if (lesson.Order == dto.Order)
+    //         {
+    //             throw new ConflictException($"Lesson order {dto.Order} has been existed.");
+    //         }
+    //
+    //         if (lesson.Type == LessonType.Video)
+    //             videoNumber++;
+    //     }
+    //
+    //     if (videoNumber > sectionVideoNumber.MaxNumber)
+    //     {
+    //         throw new BadRequestException(
+    //             $"Can not add more than {sectionVideoNumber.MaxNumber} video in this section.");
+    //     }
+    //
+    //     await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
+    //     await _unitOfWork.SaveChangeAsync();
+    //     return CourseMapper.LessonToLessonDto(lessonEntity);
+    // }
+    //
+    // public async Task<LessonDto> AddDocumentAsync(int sectionId, CreateDocumentDto dto)
+    // {
+    //     var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
+    //         .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
+    //
+    //     var sectionDocumentNumber =
+    //         await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Document);
+    //     if (sectionDocumentNumber == null)
+    //     {
+    //         _logger.LogError("Section component type {} can not found.", SectionComponentType.Document);
+    //         throw new Exception($"Section component type {SectionComponentType.Document} can not found.");
+    //     }
+    //
+    //     var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
+    //     lessonEntity.SectionId = sectionId;
+    //
+    //     var documentNumber = 0;
+    //
+    //     foreach (var lesson in section.Lessons)
+    //     {
+    //         if (lesson.Order == dto.Order)
+    //         {
+    //             throw new ConflictException($"Lesson order {dto.Order} has been existed.");
+    //         }
+    //
+    //         if (lesson.Type == LessonType.Document)
+    //             documentNumber++;
+    //     }
+    //
+    //     if (documentNumber > sectionDocumentNumber.MaxNumber)
+    //     {
+    //         throw new BadRequestException(
+    //             $"Can not add more than {sectionDocumentNumber.MaxNumber} document in this section.");
+    //     }
+    //
+    //     await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
+    //     await _unitOfWork.SaveChangeAsync();
+    //     return CourseMapper.LessonToLessonDto(lessonEntity);
+    // }
 
     public async Task<LessonDto> UpdateVideoAsync(int videoId, UpdateVideoDto dto)
     {
