@@ -12,8 +12,8 @@ public class OrderDetail : BaseEntity
     public virtual Order Order { get; set; } = null!;
     public int OrderId { get; set; }
 
-    public virtual ICollection<Student> Students { get; set; } = null!;
-    
+    public virtual List<Student>? Students { get; set; } 
+
     public virtual Course Course { get; set; } = null!;
     public int CourseId { get; set; }
 }

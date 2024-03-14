@@ -242,7 +242,32 @@ public class CourseService : ICourseService
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Id != courseEntity.ModifiedById)
         {
-            throw new ForbiddenException($"Access denied.");
+            throw new ForbiddenException("Access denied.");
+        }
+
+        //Get Section component number of each type in section
+        var sectionVideoNumber =
+            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Video);
+        if (sectionVideoNumber == null)
+        {
+            _logger.LogError("Section component type {} can not found.", SectionComponentType.Video);
+            throw new Exception($"Section component type {SectionComponentType.Video} can not found.");
+        }
+
+        var sectionDocumentNumber =
+            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Document);
+        if (sectionDocumentNumber == null)
+        {
+            _logger.LogError("Section component type {} can not found.", SectionComponentType.Document);
+            throw new Exception($"Section component type {SectionComponentType.Document} can not found.");
+        }
+
+        var sectionQuizNumber =
+            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Quiz);
+        if (sectionQuizNumber == null)
+        {
+            _logger.LogError("Section component type {} can not found.", SectionComponentType.Quiz);
+            throw new Exception($"Section component type {SectionComponentType.Quiz} can not found.");
         }
 
         // update course 
@@ -259,6 +284,8 @@ public class CourseService : ICourseService
                     {
                         var lessons = new List<Lesson>();
                         var lessonOrder = 1;
+                        var videoNumber = 0;
+                        var documentNumber = 0;
                         foreach (var lessonDto in sectionDto.Lessons)
                         {
                             if (!lessonDto.Id.HasValue)
@@ -281,8 +308,36 @@ public class CourseService : ICourseService
                                 }
                             }
 
+                            switch (lessonDto.Type)
+                            {
+                                case LessonType.Video:
+                                {
+                                    videoNumber++;
+                                    break;
+                                }
+                                case LessonType.Document:
+                                {
+                                    documentNumber++;
+                                    break;
+                                }
+                                default:
+                                {
+                                    _logger.LogError("Lesson type {} does not exist.", lessonDto.Type);
+                                    throw new UnsupportedException($"Lesson type {lessonDto.Type} does not exist.");
+                                }
+                            }
+
                             lessonOrder++;
                         }
+
+                        //Check validation
+                        if (videoNumber > sectionVideoNumber.MaxNumber)
+                            throw new BadRequestException(
+                                $"Number of video type exceed max number {sectionVideoNumber}");
+
+                        if (documentNumber > sectionDocumentNumber.MaxNumber)
+                            throw new BadRequestException(
+                                $"Number of document type exceed max number {sectionDocumentNumber}");
 
                         //Assign new lesson to course section
                         section.Lessons = lessons;
@@ -380,6 +435,11 @@ public class CourseService : ICourseService
                             quizOrder++;
                         }
 
+                        //Check validation
+                        if (quizOrder - 1 > sectionQuizNumber.MaxNumber)
+                            throw new BadRequestException(
+                                $"Number of quiz type exceed max number {sectionQuizNumber}");
+
                         section.Quizzes = quizzes;
                     }
                 }
@@ -393,6 +453,8 @@ public class CourseService : ICourseService
         courseEntity.Status = CourseStatus.Pending;
 
         _unitOfWork.CourseRepository.Update(courseEntity);
+        //Create notification
+
         await _unitOfWork.SaveChangeAsync();
 
         return CourseMapper.CourseToCourseDto(courseEntity);

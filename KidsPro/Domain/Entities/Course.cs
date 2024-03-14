@@ -11,6 +11,7 @@ public class Course : BaseEntity
     [MaxLength(250)] public string Name { get; set; } = null!;
 
     [MaxLength(3000)] public string? Description { get; set; }
+    [MaxLength(3000)] public string? CourseTarget { get; set; }
 
     [MaxLength(250)] public string? PictureUrl { get; set; }
 

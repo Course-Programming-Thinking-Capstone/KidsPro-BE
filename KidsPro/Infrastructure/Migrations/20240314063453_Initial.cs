@@ -256,6 +256,7 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
+                    CourseTarget = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     PictureUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     StartSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     EndSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
@@ -485,6 +486,7 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     ParentId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
@@ -673,6 +675,7 @@ namespace Infrastructure.Migrations
                     Note = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     VoucherId = table.Column<int>(type: "int", nullable: false),
+                    ParentId = table.Column<int>(type: "int", nullable: false),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
@@ -682,6 +685,12 @@ namespace Infrastructure.Migrations
                         name: "FK_Orders_GameVouchers_VoucherId",
                         column: x => x.VoucherId,
                         principalTable: "GameVouchers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Orders_Parents_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Parents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1056,13 +1065,13 @@ namespace Infrastructure.Migrations
                         column: x => x.OrderDetailsId,
                         principalTable: "OrderDetails",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_OrderDetailStudent_Students_StudentsId",
                         column: x => x.StudentsId,
                         principalTable: "Students",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -1141,6 +1150,41 @@ namespace Infrastructure.Migrations
                     { 2, 3, (byte)2 },
                     { 3, 1, (byte)4 },
                     { 4, 1, (byte)3 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Accounts",
+                columns: new[] { "Id", "CreatedDate", "DateOfBirth", "Email", "FullName", "Gender", "IsDelete", "PasswordHash", "PictureUrl", "RoleId", "Status" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 3, 14, 6, 34, 52, 632, DateTimeKind.Utc).AddTicks(2986), null, "admin@gmail.com", "Admin", null, false, "$2a$11$1dZ9tNxUt0cN5O1VbUfUxuzhjZpPiDdxofKqQzviYeu/6uVLanUwi", null, 1, (byte)1 },
+                    { 2, new DateTime(2024, 3, 14, 6, 34, 52, 857, DateTimeKind.Utc).AddTicks(1171), null, "subadmin@gmail.com", "Sub Admin", null, false, "$2a$11$5.F2oevaphet9WZ/QST20./wuqAjWwtXYBTs5.HFIWzWz70RKibki", null, 1, (byte)1 },
+                    { 3, new DateTime(2024, 3, 14, 6, 34, 53, 92, DateTimeKind.Utc).AddTicks(1909), null, "teacher@gmail.com", "Teacher", null, false, "$2a$11$fKugQx8Sel0agFiNvk4vEebA/TrRCAdng0YEdozKbyLsZuRP2OqmS", null, 3, (byte)1 },
+                    { 4, new DateTime(2024, 3, 14, 6, 34, 53, 385, DateTimeKind.Utc).AddTicks(6295), null, "teacher2@gmail.com", "Teacher 2", null, false, "$2a$11$PPfsxUzt0dpzQIN.OYp5DuJTNLLiNEMAquKDBxNwaaBIdFGb3iz36", null, 3, (byte)1 },
+                    { 5, new DateTime(2024, 3, 14, 6, 34, 53, 634, DateTimeKind.Utc).AddTicks(1462), null, "staff@gmail.com", "Staff", null, false, "$2a$11$D8GFxAlDgq58icKo2szZ/uCxL.ZJ6EJvF6gJuQCz0z9ybO88l5EiC", null, 2, (byte)1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Admins",
+                columns: new[] { "Id", "AccountId" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 2, 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Staves",
+                columns: new[] { "Id", "AccountId", "Biography", "PhoneNumber", "ProfilePicture" },
+                values: new object[] { 1, 5, null, null, null });
+
+            migrationBuilder.InsertData(
+                table: "Teachers",
+                columns: new[] { "Id", "AccountId", "Biography", "Field", "PersonalInformation", "PhoneNumber", "ProfilePicture" },
+                values: new object[,]
+                {
+                    { 1, 3, null, null, null, null, null },
+                    { 2, 4, null, null, null, null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1326,6 +1370,11 @@ namespace Infrastructure.Migrations
                 column: "StudentsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_ParentId",
+                table: "Orders",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_VoucherId",
                 table: "Orders",
                 column: "VoucherId");
@@ -1459,6 +1508,13 @@ namespace Infrastructure.Migrations
                 name: "IX_Students_ParentId",
                 table: "Students",
                 column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_UserName",
+                table: "Students",
+                column: "UserName",
+                unique: true,
+                filter: "[UserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeacherProfiles_TeacherId",

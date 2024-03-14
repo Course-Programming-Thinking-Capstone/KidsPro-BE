@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240313075553_Initial")]
+    [Migration("20240314063453_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -86,6 +86,63 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Accounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedDate = new DateTime(2024, 3, 14, 6, 34, 52, 632, DateTimeKind.Utc).AddTicks(2986),
+                            Email = "admin@gmail.com",
+                            FullName = "Admin",
+                            IsDelete = false,
+                            PasswordHash = "$2a$11$1dZ9tNxUt0cN5O1VbUfUxuzhjZpPiDdxofKqQzviYeu/6uVLanUwi",
+                            RoleId = 1,
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedDate = new DateTime(2024, 3, 14, 6, 34, 52, 857, DateTimeKind.Utc).AddTicks(1171),
+                            Email = "subadmin@gmail.com",
+                            FullName = "Sub Admin",
+                            IsDelete = false,
+                            PasswordHash = "$2a$11$5.F2oevaphet9WZ/QST20./wuqAjWwtXYBTs5.HFIWzWz70RKibki",
+                            RoleId = 1,
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedDate = new DateTime(2024, 3, 14, 6, 34, 53, 92, DateTimeKind.Utc).AddTicks(1909),
+                            Email = "teacher@gmail.com",
+                            FullName = "Teacher",
+                            IsDelete = false,
+                            PasswordHash = "$2a$11$fKugQx8Sel0agFiNvk4vEebA/TrRCAdng0YEdozKbyLsZuRP2OqmS",
+                            RoleId = 3,
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedDate = new DateTime(2024, 3, 14, 6, 34, 53, 385, DateTimeKind.Utc).AddTicks(6295),
+                            Email = "teacher2@gmail.com",
+                            FullName = "Teacher 2",
+                            IsDelete = false,
+                            PasswordHash = "$2a$11$PPfsxUzt0dpzQIN.OYp5DuJTNLLiNEMAquKDBxNwaaBIdFGb3iz36",
+                            RoleId = 3,
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedDate = new DateTime(2024, 3, 14, 6, 34, 53, 634, DateTimeKind.Utc).AddTicks(1462),
+                            Email = "staff@gmail.com",
+                            FullName = "Staff",
+                            IsDelete = false,
+                            PasswordHash = "$2a$11$D8GFxAlDgq58icKo2szZ/uCxL.ZJ6EJvF6gJuQCz0z9ybO88l5EiC",
+                            RoleId = 2,
+                            Status = (byte)1
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Admin", b =>
@@ -111,6 +168,18 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Admins");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccountId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccountId = 2
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Certificate", b =>
@@ -257,6 +326,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CourseTarget")
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
 
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
@@ -931,6 +1004,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PaymentType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -956,6 +1032,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("VoucherId");
 
@@ -1380,6 +1458,13 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Staves");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccountId = 5
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Student", b =>
@@ -1396,6 +1481,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ParentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserName")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -1408,6 +1497,10 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("Students");
                 });
@@ -1639,6 +1732,18 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Teachers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccountId = 3
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccountId = 4
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
@@ -2011,11 +2116,19 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
+                    b.HasOne("Domain.Entities.Parent", "Parent")
+                        .WithMany("Orders")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.GameVoucher", "Voucher")
                         .WithMany()
                         .HasForeignKey("VoucherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Parent");
 
                     b.Navigation("Voucher");
                 });
@@ -2336,6 +2449,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Parent", b =>
                 {
+                    b.Navigation("Orders");
+
                     b.Navigation("Vouchers");
                 });
 
