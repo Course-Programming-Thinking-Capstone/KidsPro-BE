@@ -79,10 +79,12 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Update course 
+    /// Update course. Teacher can save course as draft or post course base on the value of action parameter:
+    /// "Save": save as draft; "Post" create post request. Can not update after create post request
     /// </summary>
     /// <param name="id"></param>
     /// <param name="dto"></param>
+    /// <param name="action"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [HttpPut("{id:int}")]
@@ -90,9 +92,10 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto)
+    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto,
+        [FromQuery] string? action)
     {
-        var result = await _courseService.UpdateCourseAsync(id, dto);
+        var result = await _courseService.UpdateCourseAsync(id, dto, action);
         return Ok(result);
     }
 
@@ -138,15 +141,6 @@ public class CoursesController : ControllerBase
         return Ok();
     }
 
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // [HttpPatch("{courseId:int}/section/order")]
-    // public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int courseId,
-    //     [FromBody] List<UpdateSectionOrderDto> dto)
-    // {
-    //     var result = await _courseService.UpdateSectionOrderAsync(courseId, dto);
-    //     return Ok(result);
-    // }
-
     /// <summary>
     /// Get Section component number of section in course. Ex a section has at most 5 videos, 3 documents,...
     /// </summary>
@@ -170,38 +164,4 @@ public class CoursesController : ControllerBase
         var result = await _courseService.UpdateSectionComponentNumberAsync(dtos);
         return Ok(result);
     }
-
-    // [Authorize(Roles = $"{Constant.AdminRole}")]
-    // [HttpDelete("section/{sectionId:int}")]
-    // public async Task<ActionResult> RemoveSectionAsync([FromRoute] int sectionId)
-    // {
-    //     await _courseService.RemoveSectionAsync(sectionId);
-    //     return Ok();
-    // }
-
-    // [HttpPatch("section/video/{videoId:int}")]
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // public async Task<ActionResult<LessonDto>> UpdateVideoAsync([FromRoute] int videoId, [FromBody] UpdateVideoDto dto)
-    // {
-    //     var result = await _courseService.UpdateVideoAsync(videoId, dto);
-    //     return Ok(result);
-    // }
-
-    // [HttpPatch("section/document/{documentId:int}")]
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // public async Task<ActionResult<LessonDto>> UpdateDocumentAsync([FromRoute] int documentId,
-    //     [FromBody] UpdateDocumentDto dto)
-    // {
-    //     var result = await _courseService.UpdateDocumentAsync(documentId, dto);
-    //     return Ok(result);
-    // }
-
-    // [HttpPatch("section/lesson/order")]
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // public async Task<ActionResult<ICollection<LessonDto>>> UpdateLessonOrderAsync(
-    //     [FromBody] List<UpdateLessonOrderDto> dtos)
-    // {
-    //     var result = await _courseService.UpdateLessonOrderAsync(dtos);
-    //     return Ok(result);
-    // }
 }

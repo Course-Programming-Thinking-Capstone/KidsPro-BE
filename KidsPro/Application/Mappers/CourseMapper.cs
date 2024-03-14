@@ -55,7 +55,9 @@ public static class CourseMapper
             CreatedByName = entity.CreatedBy.FullName,
             EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
             ModifiedById = entity.ModifiedById,
-            ModifiedByName = entity.ModifiedBy.FullName,
+            ModifiedByName = entity.ModifiedBy?.FullName,
+            ApprovedById = entity.ApprovedById,
+            ApprovedByName = entity.ApprovedBy?.FullName,
             StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             IsFree = entity.IsFree,
             Sections = entity.Sections.Select(SectionToSectionDto).ToList()
