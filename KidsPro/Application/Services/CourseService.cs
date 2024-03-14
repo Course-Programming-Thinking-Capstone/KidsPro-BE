@@ -1,9 +1,11 @@
-﻿using Application.Configurations;
+﻿using System.Linq.Expressions;
+using Application.Configurations;
 using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Lesson;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.Lesson;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -388,10 +390,69 @@ public class CourseService : ICourseService
             }
         }
 
+        courseEntity.Status = CourseStatus.Pending;
+
         _unitOfWork.CourseRepository.Update(courseEntity);
         await _unitOfWork.SaveChangeAsync();
 
         return CourseMapper.CourseToCourseDto(courseEntity);
+    }
+
+    public async Task ApproveCourseAsync(int id)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+
+        if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Role.Name != Constant.StaffRole)
+        {
+            _logger.LogInformation("Account {} try to access function {}. Date {}", accountId,
+                nameof(this.ApproveCourseAsync), DateTime.UtcNow);
+            throw new ForbiddenException($"Access denied.");
+        }
+
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
+
+        if (courseEntity.Status != CourseStatus.Pending)
+            throw new BadRequestException($"Course {id} is not waiting for approve.");
+        courseEntity.Status = CourseStatus.Active;
+
+        _unitOfWork.CourseRepository.Update(courseEntity);
+
+        //Create notification
+        await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task DenyCourseAsync(int id, string? reason)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+
+        if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Role.Name != Constant.StaffRole)
+        {
+            _logger.LogInformation("Account {} try to access function {}. Date {}", accountId,
+                nameof(this.ApproveCourseAsync), DateTime.UtcNow);
+            throw new ForbiddenException($"Access denied.");
+        }
+
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
+
+        if (courseEntity.Status != CourseStatus.Pending)
+            throw new BadRequestException($"Course {id} is not waiting for approve.");
+
+        courseEntity.Status = CourseStatus.Denied;
+
+        _unitOfWork.CourseRepository.Update(courseEntity);
+
+        //Create notification
+        await _unitOfWork.SaveChangeAsync();
     }
 
     public async Task<CourseDto> CommonUpdateCourseAsync(int id, UpdateCourseDto dto)
@@ -431,6 +492,72 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
 
         return entity.PictureUrl;
+    }
+
+    public async Task<PagingResponse<FilterCourseDto>> FilterCourseAsync(string? name, CourseStatus? status,
+        string? sortName, int? page, int? size)
+    {
+        //need to check role
+        var parameter = Expression.Parameter(typeof(Course));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
+                    Expression.Constant(false)));
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Course.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            if (status.HasValue)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                        Expression.Constant(status)));
+            }
+
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(c => c.Id);
+
+            if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Name);
+            }
+            else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+
+            var entities = await _unitOfWork.CourseRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Course, bool>>(filter, parameter),
+                orderBy: orderBy,
+                page: page,
+                size: size
+            );
+            var result = CourseMapper.CourseToFilterCourseDto(entities);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.FilterCourseAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterCourseAsync)} method");
+        }
     }
 
     public async Task<SectionDto> CreateSectionAsync(int courseId, CreateSectionDto dto)
