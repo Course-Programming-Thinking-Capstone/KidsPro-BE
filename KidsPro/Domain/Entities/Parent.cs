@@ -14,4 +14,6 @@ public class Parent : BaseEntity
 
     public virtual ICollection<GameVoucher>? Vouchers { get; set; }
 
+    public virtual ICollection<Order> Orders { get; set; } = null!;
+
 }

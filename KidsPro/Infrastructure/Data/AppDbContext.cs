@@ -1,6 +1,8 @@
 ﻿using Application.Configurations;
 using Domain.Entities;
 using Domain.Enums;
+using Firebase.Auth;
+using FirebaseAdmin.Auth.Hash;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -101,6 +103,10 @@ public class AppDbContext : DbContext
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<Student>()
+            .HasMany<OrderDetail>(s => s.OrderDetails)
+            .WithMany(o => o.Students);
+
         //data seeding
         modelBuilder.Entity<Role>().HasData(
             new Role() { Id = 1, Name = Constant.AdminRole },
@@ -116,6 +122,68 @@ public class AppDbContext : DbContext
                 { Id = 2, SectionComponentType = SectionComponentType.Document, MaxNumber = 3 },
             new SectionComponentNumber() { Id = 3, SectionComponentType = SectionComponentType.Quiz, MaxNumber = 1 },
             new SectionComponentNumber() { Id = 4, SectionComponentType = SectionComponentType.Game, MaxNumber = 1 }
+        );
+
+        modelBuilder.Entity<Account>().HasData(
+            new Account()
+            {
+                Id = 1, Email = "admin@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
+                FullName = "Admin", CreatedDate = DateTime.UtcNow, RoleId = 1
+            },
+            new Account()
+            {
+                Id = 2, Email = "subadmin@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
+                FullName = "Sub Admin", CreatedDate = DateTime.UtcNow, RoleId = 1
+            },
+            new Account()
+            {
+                Id = 3, Email = "teacher@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
+                FullName = "Teacher", CreatedDate = DateTime.UtcNow, RoleId = 3
+            },
+            new Account()
+            {
+                Id = 4, Email = "teacher2@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
+                FullName = "Teacher 2", CreatedDate = DateTime.UtcNow, RoleId = 3
+            },
+            new Account()
+            {
+                Id = 5, Email = "staff@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
+                FullName = "Staff", CreatedDate = DateTime.UtcNow, RoleId = 2
+            }
+        );
+
+        modelBuilder.Entity<Admin>().HasData(
+            new Admin()
+            {
+                Id = 1,
+                AccountId = 1
+            },
+            new Admin()
+            {
+                Id = 2,
+                AccountId = 2
+            }
+        );
+
+        modelBuilder.Entity<Teacher>().HasData(
+            new Teacher()
+            {
+                Id = 1,
+                AccountId = 3,
+            },
+            new Teacher()
+            {
+                Id = 2,
+                AccountId = 4,
+            }
+        );
+
+        modelBuilder.Entity<Staff>().HasData(
+            new Staff()
+            {
+                Id = 1,
+                AccountId = 5
+            }
         );
     }
 }

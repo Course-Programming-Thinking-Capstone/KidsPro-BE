@@ -25,5 +25,8 @@ public class Order : BaseEntity
     public virtual GameVoucher? Voucher { get; set; }
     public int VoucherId { get; set; }
 
+    public virtual Parent? Parent { get; set; }
+    public int ParentId { get; set; }
+
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
 }
