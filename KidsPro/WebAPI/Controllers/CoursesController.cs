@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Constant = Application.Configurations.Constant;
@@ -34,6 +36,29 @@ public class CoursesController : ControllerBase
 
     {
         var result = await _courseService.GetByIdAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Admin, staff, teacher filter course on the system
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="status"></param>
+    /// <param name="sortName"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<FilterCourseDto>))]
+    public async Task<ActionResult<PagingResponse<FilterCourseDto>>> FilterCourseAsync(
+        [FromQuery] string? name,
+        [FromQuery] CourseStatus? status,
+        [FromQuery] string? sortName,
+        [FromQuery] int? page,
+        [FromQuery] int? size)
+    {
+        var result = await _courseService.FilterCourseAsync(name, status, sortName, page, size);
         return Ok(result);
     }
 
@@ -85,7 +110,34 @@ public class CoursesController : ControllerBase
         var result = await _courseService.UpdateCoursePictureAsync(id, file);
         return Ok(result);
     }
-    
+
+    /// <summary>
+    /// Admin or staff approve pending course
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPatch("{id:int}/approve")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
+    public async Task<ActionResult> ApproveCourseAsync([FromRoute] int id)
+    {
+        await _courseService.ApproveCourseAsync(id);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Admin or staff approve pending course
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="reason"></param>
+    /// <returns></returns>
+    [HttpPatch("{id:int}/deny")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
+    public async Task<ActionResult> DenyCourseAsync([FromRoute] int id, [FromQuery] string? reason)
+    {
+        await _courseService.DenyCourseAsync(id, reason);
+        return Ok();
+    }
+
     // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     // [HttpPatch("{courseId:int}/section/order")]
     // public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int courseId,
@@ -118,7 +170,7 @@ public class CoursesController : ControllerBase
         var result = await _courseService.UpdateSectionComponentNumberAsync(dtos);
         return Ok(result);
     }
-    
+
     // [Authorize(Roles = $"{Constant.AdminRole}")]
     // [HttpDelete("section/{sectionId:int}")]
     // public async Task<ActionResult> RemoveSectionAsync([FromRoute] int sectionId)
@@ -126,7 +178,7 @@ public class CoursesController : ControllerBase
     //     await _courseService.RemoveSectionAsync(sectionId);
     //     return Ok();
     // }
-    
+
     // [HttpPatch("section/video/{videoId:int}")]
     // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     // public async Task<ActionResult<LessonDto>> UpdateVideoAsync([FromRoute] int videoId, [FromBody] UpdateVideoDto dto)
@@ -134,7 +186,7 @@ public class CoursesController : ControllerBase
     //     var result = await _courseService.UpdateVideoAsync(videoId, dto);
     //     return Ok(result);
     // }
-    
+
     // [HttpPatch("section/document/{documentId:int}")]
     // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     // public async Task<ActionResult<LessonDto>> UpdateDocumentAsync([FromRoute] int documentId,
@@ -143,7 +195,7 @@ public class CoursesController : ControllerBase
     //     var result = await _courseService.UpdateDocumentAsync(documentId, dto);
     //     return Ok(result);
     // }
-    
+
     // [HttpPatch("section/lesson/order")]
     // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     // public async Task<ActionResult<ICollection<LessonDto>>> UpdateLessonOrderAsync(
