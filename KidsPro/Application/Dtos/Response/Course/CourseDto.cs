@@ -8,6 +8,8 @@ public class CourseDto
 
     public string? Description { get; set; }
 
+    public string? CourseTarget { get; set; }
+
     public string? PictureUrl { get; set; }
 
     public string? StartSaleDate { get; set; }

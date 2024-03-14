@@ -22,7 +22,6 @@ public class Lesson : BaseEntity
     [Range(0, 1000)] public int? Duration { get; set; }
 
     public bool IsFree { get; set; }
-    public bool IsDelete { get; set; }
 
     [Column(TypeName = "tinyint")] public LessonType Type { get; set; }
 

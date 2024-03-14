@@ -4,7 +4,6 @@ namespace Application.Dtos.Request.Course.Quiz;
 
 public record CreateQuizDto
 {
-    public int? MinScore { get; init; }
 
     [StringLength(250, ErrorMessage = "Title can not exceed 250 characters")]
     public string Title { get; init; } = null!;

@@ -44,6 +44,7 @@ public static class CourseMapper
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
+            CourseTarget = entity.CourseTarget,
             Price = entity.Price,
             CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
             PictureUrl = entity.PictureUrl,
@@ -80,7 +81,6 @@ public static class CourseMapper
         {
             Name = dto.Name,
             Order = dto.Order,
-            IsFree = dto.IsFree,
             Type = dto.Type,
             Content = dto.Content,
             Duration = dto.Duration,
@@ -97,24 +97,18 @@ public static class CourseMapper
                 Id = entity.Id,
                 Name = entity.Name,
                 Order = entity.Order,
-                IsFree = entity.IsFree,
                 Type = entity.Type.ToString(),
                 Duration = entity.Duration,
-                IsDelete = entity.IsDelete,
-                ResourceUrl = entity.ResourceUrl,
-                SectionId = entity.SectionId
+                ResourceUrl = entity.ResourceUrl
             },
             LessonType.Document => new DocumentDto()
             {
                 Id = entity.Id,
                 Name = entity.Name,
                 Order = entity.Order,
-                IsFree = entity.IsFree,
                 Type = entity.Type.ToString(),
                 Duration = entity.Duration,
-                IsDelete = entity.IsDelete,
-                Content = entity.Content,
-                SectionId = entity.SectionId
+                Content = entity.Content
             },
             _ => throw new UnsupportedException("Unsupported lesson type.")
         };
@@ -139,7 +133,6 @@ public static class CourseMapper
     public static Quiz CreateQuizDtoToQuiz(CreateQuizDto dto)
         => new()
         {
-            MinScore = dto.MinScore ?? 0,
             Title = dto.Title,
             Description = dto.Description,
             Duration = dto.Duration,
@@ -179,7 +172,6 @@ public static class CourseMapper
             IsOrderRandom = entity.IsOrderRandom,
             NumberOfAttempt = entity.NumberOfQuestion,
             Title = entity.Title,
-            MinScore = entity.MinScore,
             TotalQuestion = entity.TotalQuestion,
             TotalScore = entity.TotalScore,
             NumberOfQuestion = entity.NumberOfQuestion,
@@ -196,8 +188,7 @@ public static class CourseMapper
             Duration = dto.Duration,
             Content = dto.Content,
             ResourceUrl = dto.ResourceUrl,
-            Type = dto.Type ?? throw new BadRequestException("Lesson type is required!"),
-            IsFree = dto.IsFree ?? false
+            Type = dto.Type ?? throw new BadRequestException("Lesson type is required!")
         };
 
     public static void UpdateLessonDtoToLesson(Dtos.Request.Course.Update.Lesson.UpdateLessonDto dto, ref Lesson entity)
@@ -223,11 +214,6 @@ public static class CourseMapper
         if (!string.IsNullOrEmpty(dto.ResourceUrl))
         {
             entity.ResourceUrl = dto.ResourceUrl;
-        }
-
-        if (dto.IsFree.HasValue)
-        {
-            entity.IsFree = dto.IsFree.Value;
         }
     }
 
@@ -286,7 +272,6 @@ public static class CourseMapper
     public static Quiz UpdateQuizDtoToQuiz(UpdateQuizDto dto)
         => new Quiz()
         {
-            MinScore = dto.MinScore ?? 0,
             Title = dto.Title ?? throw new BadRequestException("Quiz title is missing."),
             Description = dto.Description,
             Duration = dto.Duration,
@@ -299,8 +284,6 @@ public static class CourseMapper
     {
         if (!dto.Id.HasValue)
             throw new BadRequestException("Quiz id is missing.");
-        if (dto.MinScore.HasValue)
-            entity.MinScore = dto.MinScore.Value;
         if (!string.IsNullOrEmpty(dto.Title))
             entity.Title = dto.Title;
         if (!string.IsNullOrEmpty(dto.Description))
@@ -371,11 +354,6 @@ public static class CourseMapper
         if (dto.Duration.HasValue)
         {
             entity.Duration = dto.Duration.Value;
-        }
-
-        if (dto.IsFree.HasValue)
-        {
-            entity.IsFree = dto.IsFree.Value;
         }
 
         if (dto is UpdateVideoDto updateVideoDto)

@@ -22,5 +22,4 @@ public record CreateLessonDto
 
     [Required] public LessonType Type { get; init; }
 
-    public bool IsFree { get; init; }
 };

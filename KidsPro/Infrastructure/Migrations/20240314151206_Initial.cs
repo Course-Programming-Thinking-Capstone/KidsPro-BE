@@ -266,15 +266,22 @@ namespace Infrastructure.Migrations
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     IsFree = table.Column<bool>(type: "bit", nullable: false),
+                    RequireAdminApproval = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
-                    ModifiedById = table.Column<int>(type: "int", nullable: false),
+                    ModifiedById = table.Column<int>(type: "int", nullable: true),
+                    ApprovedById = table.Column<int>(type: "int", nullable: true),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Courses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Courses_Accounts_ApprovedById",
+                        column: x => x.ApprovedById,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Courses_Accounts_CreatedById",
                         column: x => x.CreatedById,
@@ -640,7 +647,6 @@ namespace Infrastructure.Migrations
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
                     IsFree = table.Column<bool>(type: "bit", nullable: false),
-                    IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     Type = table.Column<byte>(type: "tinyint", nullable: false),
                     SectionId = table.Column<int>(type: "int", nullable: false),
                     LessonId = table.Column<int>(type: "int", nullable: true),
@@ -908,7 +914,6 @@ namespace Infrastructure.Migrations
                     Order = table.Column<int>(type: "int", nullable: false),
                     TotalQuestion = table.Column<int>(type: "int", nullable: false),
                     TotalScore = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
-                    MinScore = table.Column<decimal>(type: "decimal(4,2)", precision: 4, scale: 2, nullable: false),
                     Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(750)", maxLength: 750, nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
@@ -1157,11 +1162,11 @@ namespace Infrastructure.Migrations
                 columns: new[] { "Id", "CreatedDate", "DateOfBirth", "Email", "FullName", "Gender", "IsDelete", "PasswordHash", "PictureUrl", "RoleId", "Status" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 3, 14, 6, 34, 52, 632, DateTimeKind.Utc).AddTicks(2986), null, "admin@gmail.com", "Admin", null, false, "$2a$11$1dZ9tNxUt0cN5O1VbUfUxuzhjZpPiDdxofKqQzviYeu/6uVLanUwi", null, 1, (byte)1 },
-                    { 2, new DateTime(2024, 3, 14, 6, 34, 52, 857, DateTimeKind.Utc).AddTicks(1171), null, "subadmin@gmail.com", "Sub Admin", null, false, "$2a$11$5.F2oevaphet9WZ/QST20./wuqAjWwtXYBTs5.HFIWzWz70RKibki", null, 1, (byte)1 },
-                    { 3, new DateTime(2024, 3, 14, 6, 34, 53, 92, DateTimeKind.Utc).AddTicks(1909), null, "teacher@gmail.com", "Teacher", null, false, "$2a$11$fKugQx8Sel0agFiNvk4vEebA/TrRCAdng0YEdozKbyLsZuRP2OqmS", null, 3, (byte)1 },
-                    { 4, new DateTime(2024, 3, 14, 6, 34, 53, 385, DateTimeKind.Utc).AddTicks(6295), null, "teacher2@gmail.com", "Teacher 2", null, false, "$2a$11$PPfsxUzt0dpzQIN.OYp5DuJTNLLiNEMAquKDBxNwaaBIdFGb3iz36", null, 3, (byte)1 },
-                    { 5, new DateTime(2024, 3, 14, 6, 34, 53, 634, DateTimeKind.Utc).AddTicks(1462), null, "staff@gmail.com", "Staff", null, false, "$2a$11$D8GFxAlDgq58icKo2szZ/uCxL.ZJ6EJvF6gJuQCz0z9ybO88l5EiC", null, 2, (byte)1 }
+                    { 1, new DateTime(2024, 3, 14, 15, 12, 5, 191, DateTimeKind.Utc).AddTicks(6185), null, "admin@gmail.com", "Admin", null, false, "$2a$11$CjspdyErdQ1cSyMwGF6AMeStlyE2GZlZ6W.fTLiTYxWT0HKql19c2", null, 1, (byte)1 },
+                    { 2, new DateTime(2024, 3, 14, 15, 12, 5, 523, DateTimeKind.Utc).AddTicks(1324), null, "subadmin@gmail.com", "Sub Admin", null, false, "$2a$11$hiM0/B471yMQfCMG9cXH2OjtspQ/x/YRY131511/ECQvoqsVlIV6.", null, 1, (byte)1 },
+                    { 3, new DateTime(2024, 3, 14, 15, 12, 5, 813, DateTimeKind.Utc).AddTicks(8629), null, "teacher@gmail.com", "Teacher", null, false, "$2a$11$3rrUgIRl3aciCRtXllhXSO5zteRadS9XfqQNd/DMQLbSxk1HU1DlC", null, 3, (byte)1 },
+                    { 4, new DateTime(2024, 3, 14, 15, 12, 6, 111, DateTimeKind.Utc).AddTicks(9642), null, "teacher2@gmail.com", "Teacher 2", null, false, "$2a$11$rFtXmsAhwabCqA1mfqYiZ.x9rPvXowv2BT5h2is82Nkbn3wsUNrDy", null, 3, (byte)1 },
+                    { 5, new DateTime(2024, 3, 14, 15, 12, 6, 403, DateTimeKind.Utc).AddTicks(8352), null, "staff@gmail.com", "Staff", null, false, "$2a$11$SuJ5w4u7IlG4imQAbxeD4eDuQNkFoPXSOOZcHKkrPpPpcYvQ2p8Iu", null, 2, (byte)1 }
                 });
 
             migrationBuilder.InsertData(
@@ -1246,6 +1251,11 @@ namespace Infrastructure.Migrations
                 name: "IX_CourseResources_CourseId",
                 table: "CourseResources",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_ApprovedById",
+                table: "Courses",
+                column: "ApprovedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_CreatedById",

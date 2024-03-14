@@ -7,8 +7,6 @@ public class UpdateQuizDto
 {
     public int? Id { get; init; }
 
-    public decimal? MinScore { get; init; }
-
     [StringLength(250, ErrorMessage = "Title can not exceed 250 characters")]
     // [Required]
     public string? Title { get; init; } = null!;

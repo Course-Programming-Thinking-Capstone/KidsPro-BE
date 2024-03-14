@@ -27,6 +27,6 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             query.AsNoTracking();
         }
 
-        return await query.FirstOrDefaultAsync(l => l.Id == id && !l.IsDelete);
+        return await query.FirstOrDefaultAsync(l => l.Id == id);
     }
 }

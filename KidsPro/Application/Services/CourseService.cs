@@ -49,7 +49,7 @@ public class CourseService : ICourseService
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
 
         entity.Name = dto.Name;
-        entity.Description = dto.Description;
+        entity.CourseTarget = dto.CourseTarget;
         entity.CreatedDate = DateTime.UtcNow;
         entity.ModifiedDate = DateTime.UtcNow;
         entity.CreatedBy = currentAccount;
@@ -189,7 +189,7 @@ public class CourseService : ICourseService
         }
 
         entity.Name = dto.Name;
-        entity.Description = dto.Description;
+        entity.CourseTarget = dto.CourseTarget;
         entity.CreatedDate = DateTime.UtcNow;
         entity.ModifiedDate = DateTime.UtcNow;
         entity.CreatedBy = currentAccount;
@@ -274,6 +274,9 @@ public class CourseService : ICourseService
         }
 
         // update course 
+        if (!string.IsNullOrEmpty(dto.Description))
+            courseEntity.Description = dto.Description;
+
         if (dto.Sections != null)
         {
             foreach (var sectionDto in dto.Sections)

@@ -28,7 +28,7 @@ public class SectionRepository : BaseRepository<Section>, ISectionRepository
             query.AsNoTracking();
         }
 
-        return await query.Include(s => s.Lessons.Where(l => !l.IsDelete).OrderBy(l => l.Order))
+        return await query.Include(s => s.Lessons.OrderBy(l => l.Order))
             .Include(s => s.Quizzes.OrderBy(q => q.Order))
             .Include(s => s.Games)
             .FirstOrDefaultAsync(s => s.Id == id);
