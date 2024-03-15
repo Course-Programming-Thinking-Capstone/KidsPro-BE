@@ -1,5 +1,4 @@
-﻿using Application.Dtos.Request.Student;
-using Application.Interfaces.IRepositories.Generic;
+﻿using Application.Interfaces.IRepositories.Generic;
 using Domain.Entities;
 
 namespace Application.Interfaces.IRepositories;

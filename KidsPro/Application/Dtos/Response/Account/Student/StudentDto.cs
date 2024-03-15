@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.Response.Account;
 
-namespace Application.Dtos.Response.Student;
+namespace Application.Dtos.Response.Account.Student;
 
 public class StudentDto : AccountDto
 {

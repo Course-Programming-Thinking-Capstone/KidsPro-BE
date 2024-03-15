@@ -342,8 +342,6 @@ public static class CourseMapper
             entity.Name = dto.Name;
         }
     }
-
-
     public static void UpdateLessonDtoToLesson(UpdateLessonDto dto, ref Lesson entity)
     {
         if (!string.IsNullOrEmpty(dto.Name))
@@ -369,4 +367,14 @@ public static class CourseMapper
             }
         }
     }
+
+    public static CourseOrderDto ShowCoursePayment(Course dto) => new CourseOrderDto()
+    {
+        CourseId = dto.Id,
+        TeacherId = dto?.ModifiedBy?.Id,
+        Picture = dto?.ModifiedBy?.PictureUrl,
+        CourseName = dto?.Name,
+        TeacherName = dto?.ModifiedBy?.FullName,
+        Price = dto?.Price
+    };
 }

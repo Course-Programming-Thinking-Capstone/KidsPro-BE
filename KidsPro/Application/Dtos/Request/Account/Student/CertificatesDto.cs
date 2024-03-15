@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Application.Dtos.Request.Student
+namespace Application.Dtos.Request.Account.Student
 {
     public class CertificatesDto
     {

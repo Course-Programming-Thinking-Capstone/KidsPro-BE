@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Dtos.Request.Student
+namespace Application.Dtos.Request.Account.Student
 {
     public record StudentAddDto
     {

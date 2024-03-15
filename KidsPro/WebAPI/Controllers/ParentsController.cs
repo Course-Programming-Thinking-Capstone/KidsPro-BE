@@ -1,7 +1,8 @@
 ﻿using Application.Configurations;
-using Application.Dtos.Request.Student;
+using Application.Dtos.Request.Account.Student;
 using Application.Dtos.Response.Account;
-using Application.Dtos.Response.Student;
+using Application.Dtos.Response.Account.Parent;
+using Application.Dtos.Response.Account.Student;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -26,12 +27,12 @@ public class ParentsController : ControllerBase
     /// <param name="request">Gender is enum: "Male: 1, Female: 2".</param>
     /// <returns></returns>
    // [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpPost("add")]
+    [HttpPost("student")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginAccountDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<LoginAccountDto>> AddStudent(StudentAddDto request)
     {
-        var result = await _parent.AddStudent(request);
+        var result = await _parent.AddStudentAsync(request);
         return Ok(result);
     }
 
@@ -46,7 +47,7 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<StudentDto>> GetStudentsByParentId(int id)
     {
-        var result = await _parent.GetStudents(id);
+        var result = await _parent.GetStudentsAsync(id);
         return Ok(result);
     }
 
@@ -61,7 +62,7 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<StudentDetailDto>> GetStudentDetail(int id)
     {
-        var result = await _parent.GetDetailStudent(id);
+        var result = await _parent.GetDetailStudentAsync(id);
         return Ok(result);
     }
     /// <summary>
@@ -74,7 +75,22 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> UpdateStudentInformation(StudentUpdateDto dto)
     {
-        await _parent.UpdateStudent(dto);
+        await _parent.UpdateStudentAsync(dto);
         return Ok("Update Student Information Success!");
+    }
+
+    /// <summary>
+    /// Get email and zalo của parent
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    // [Authorize(Roles = $"{Constant.ParentRole}")]
+    [HttpGet("email-zalo/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public ActionResult<ParentOrderDto> GetEmailZalo(int id)
+    {
+        var result= _parent.GetEmailZalo(id);
+        return Ok(result);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Request.Student;
+﻿using Application.Dtos.Request.Account.Student;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
