@@ -32,4 +32,6 @@ public interface IUnitOfWork : IDisposable
     public Task BeginTransactionAsync();
     public Task CommitAsync();
     public Task RollbackAsync();
+
+    public ICertificateRepository CertificateRepository { get; }
 }

@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Dtos.Request.Student
+namespace Application.Dtos.Request.Account.Student
 {
     public class StudentUpdateDto
     {
-        public int Id {  get; set; }
+        public int Id { get; set; }
 
         public string FullName { get; set; } = string.Empty;
 
+        [DataType(DataType.Date)]
         public DateTime BirthDay { get; set; }
 
 
@@ -21,7 +22,7 @@ namespace Application.Dtos.Request.Student
 
         public string Password { get; set; } = string.Empty;
 
-        public int Gender { get; set; } 
+        public int Gender { get; set; }
 
     }
 }

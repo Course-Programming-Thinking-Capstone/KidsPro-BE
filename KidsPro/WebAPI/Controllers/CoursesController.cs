@@ -164,4 +164,19 @@ public class CoursesController : ControllerBase
         var result = await _courseService.UpdateSectionComponentNumberAsync(dtos);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Get thông tin course hiển thị ra trong màn hình coursepayment
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [AllowAnonymous]
+    [HttpGet("payment/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int id)
+    {
+        var result= await _courseService.GetCoursePaymentAsync(id);
+        return Ok(result);
+    }
 }

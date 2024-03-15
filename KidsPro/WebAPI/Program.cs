@@ -1,5 +1,6 @@
 using Application.Configurations;
 using WebAPI;
+using WebAPI.Gateway.Configuration;
 using WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,8 @@ if (configuration != null)
     builder.Services.AddApiService(configuration.Key, configuration.Issuer, configuration.Audience);
     builder.Services.AddSingleton(configuration);
 }
+//Gateway
+builder.Services.Configure<MomoConfig>(builder.Configuration.GetSection(MomoConfig.ConfigName));
 
 var app = builder.Build();
 

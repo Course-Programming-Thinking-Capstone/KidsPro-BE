@@ -28,5 +28,9 @@ public class ParentRepository : BaseRepository<Parent>, IParentRepository
             .ContinueWith(t => t.Result != null);
     }
 
+    public Parent? GetEmailZalo(int parentId)
+    {
+        return _dbSet.Include(x=> x.Account).FirstOrDefault(x => x.Id == parentId);
+    }
    
 }

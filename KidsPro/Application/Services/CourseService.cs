@@ -666,4 +666,12 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.EntityToSectionComponentNumberDto(entities);
     }
+
+    public async Task<CourseOrderDto> GetCoursePaymentAsync(int id)
+    {
+        var result= await _unitOfWork.CourseRepository.GetCoursePayment(id);
+        if (result != null)
+            return CourseMapper.ShowCoursePayment(result);
+        throw new NotFoundException("courseId doesn't exist");
+    }
 }

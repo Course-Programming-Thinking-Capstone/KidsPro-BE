@@ -34,4 +34,16 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .ThenInclude(s => s.Games)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
+
+    public async Task<Course?> GetCoursePayment(int id, bool disableTracking = false)
+    {
+        IQueryable<Course> query = _dbSet;
+
+        if (disableTracking)
+        {
+            query.AsNoTracking();
+        }
+
+        return await query.Include(x=> x.ModifiedBy).FirstOrDefaultAsync(x=> x.Id==id);
+    }
 }
