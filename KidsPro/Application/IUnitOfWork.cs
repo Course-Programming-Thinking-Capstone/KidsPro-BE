@@ -34,4 +34,6 @@ public interface IUnitOfWork : IDisposable
     public Task RollbackAsync();
 
     public ICertificateRepository CertificateRepository { get; }
+    public IOrderRepository OrderRepository { get; }
+    public IVoucherRepository VoucherRepository { get; }
 }
