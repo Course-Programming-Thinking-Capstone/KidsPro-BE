@@ -29,4 +29,5 @@ public class Order : BaseEntity
     public int ParentId { get; set; }
 
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
+    public virtual Transaction? Transaction { get; set; }
 }
