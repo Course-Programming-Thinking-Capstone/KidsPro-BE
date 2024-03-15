@@ -38,6 +38,8 @@ public class UnitOfWork : IUnitOfWork
     public ISectionComponentNumberRepository SectionComponentNumberRepository { get; set; }
     public ILessonRepository LessonRepository { get; set; }
 
+    public ICertificateRepository CertificateRepository { get; set; }
+
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
         IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository,
@@ -47,7 +49,8 @@ public class UnitOfWork : IUnitOfWork
         IGamePlayHistoryRepository gamePlayHistoryRepository, IGameQuizRoomRepository gameQuizRoomRepository,
         IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
-        IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository)
+        IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
+        , ICertificateRepository certificateRepository)
     {
         _context = context;
         _logger = logger;
@@ -74,6 +77,8 @@ public class UnitOfWork : IUnitOfWork
         SectionRepository = sectionRepository;
         SectionComponentNumberRepository = sectionComponentNumberRepository;
         LessonRepository = lessonRepository;
+        CertificateRepository = certificateRepository;
+
     }
 
     public async Task<int> SaveChangeAsync()

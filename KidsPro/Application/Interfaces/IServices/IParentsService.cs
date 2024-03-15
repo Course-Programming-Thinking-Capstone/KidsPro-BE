@@ -1,5 +1,5 @@
 ﻿using Application.Dtos.Request.Student;
-using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Student;
 using System;
 using System.Collections.Generic;
 using System.Linq;

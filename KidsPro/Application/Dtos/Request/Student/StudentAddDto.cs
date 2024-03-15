@@ -12,7 +12,7 @@ namespace Application.Dtos.Request.Student
     {
         [Required] public int ParentId { get; set; }
         [Required] public string FullName { get; set; } = null!;
-
+        [DataType(DataType.Date)]
         [Required] public DateTime Birthday { get; set; }
         [Required] public int Gender { get; set; }
     };

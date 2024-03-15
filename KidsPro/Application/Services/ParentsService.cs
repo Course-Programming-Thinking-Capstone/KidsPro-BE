@@ -1,6 +1,6 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Student;
-using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Student;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
