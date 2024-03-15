@@ -13,6 +13,7 @@ namespace Application.Dtos.Request.Student
 
         public string FullName { get; set; } = string.Empty;
 
+        [DataType(DataType.Date)]
         public DateTime BirthDay { get; set; }
 
 

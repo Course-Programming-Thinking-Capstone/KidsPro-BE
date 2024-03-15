@@ -2,6 +2,7 @@
 using Application.Dtos.Response.Certificate;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Paging;
+using Application.Dtos.Response.Student;
 using Application.Utils;
 using Domain.Entities;
 
@@ -160,18 +161,23 @@ public static class AccountMapper
             
         };
 
-        if(entity.Certificates != null)
+        if(entity.Certificates != null && entity.StudentProgresses != null)
         {
-           // student.StudentCourse = new List<(int, string)>();
-           // student.StudentCertificate = new List<(string, string)>();
             foreach (var x in entity.Certificates)
             {
-                //var _course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
-                //student.StudentCourse.Add(_course);
+                //List certificate
                 var _certificate = new CertificateDto() {title= x.Course.Name,url= x.ResourceUrl };
-                student.StudentCertificate.Add(_certificate);
+                student.StudentsCertificate.Add(_certificate);
             }
             student.CertificateTotal = entity.Certificates.Count();
+
+            foreach(var x in entity.StudentProgresses)
+            {
+                //List courses
+                var _course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
+                student.StudentsCourse.Add(_course);
+            }
+            student.CourseTotal = entity.StudentProgresses.Count();
         }
 
         return student;

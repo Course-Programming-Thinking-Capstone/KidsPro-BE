@@ -1,6 +1,7 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Student;
 using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Student;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/parents")]
-public class ParentsController : Controller
+public class ParentsController : ControllerBase
 {
     IParentsService _parent;
 
@@ -24,7 +25,7 @@ public class ParentsController : Controller
     /// </summary>
     /// <param name="request">Gender is enum: "Male: 1, Female: 2".</param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.ParentRole}")]
+   // [Authorize(Roles = $"{Constant.ParentRole}")]
     [HttpPost("add")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginAccountDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -68,7 +69,7 @@ public class ParentsController : Controller
     /// </summary>
     /// <param name="dto">Gender is enum: "Male: 1, Female: 2".</param>
     /// <returns></returns>
-    [HttpPut("update-student")]
+    [HttpPut("student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> UpdateStudentInformation(StudentUpdateDto dto)
