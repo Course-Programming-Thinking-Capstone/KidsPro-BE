@@ -118,12 +118,13 @@ public class CoursesController : ControllerBase
     /// Admin or staff approve pending course
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPatch("{id:int}/approve")]
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
-    public async Task<ActionResult> ApproveCourseAsync([FromRoute] int id)
+    public async Task<ActionResult> ApproveCourseAsync([FromRoute] int id, [FromBody] AcceptCourseDto dto)
     {
-        await _courseService.ApproveCourseAsync(id);
+        await _courseService.ApproveCourseAsync(id, dto);
         return Ok();
     }
 
@@ -176,7 +177,7 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int id)
     {
-        var result= await _courseService.GetCoursePaymentAsync(id);
+        var result = await _courseService.GetCoursePaymentAsync(id);
         return Ok(result);
     }
 }

@@ -43,8 +43,6 @@ public class Course : BaseEntity
 
     public bool IsFree { get; set; }
 
-    public bool RequireAdminApproval { get; set; }
-
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]

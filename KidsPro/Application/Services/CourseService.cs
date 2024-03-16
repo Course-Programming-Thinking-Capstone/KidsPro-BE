@@ -477,7 +477,7 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCourseDto(courseEntity);
     }
 
-    public async Task ApproveCourseAsync(int id)
+    public async Task ApproveCourseAsync(int id, AcceptCourseDto dto)
     {
         // check authorize
         _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
@@ -495,9 +495,54 @@ public class CourseService : ICourseService
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
 
-        if (courseEntity.Status != CourseStatus.Pending)
-            throw new BadRequestException($"Course {id} is not waiting for approve.");
-        courseEntity.Status = CourseStatus.Active;
+        switch (currentAccount.Role.Name)
+        {
+            case Constant.StaffRole when courseEntity.Status != CourseStatus.Pending:
+                throw new BadRequestException($"Course {id} is not waiting for approve.");
+            case Constant.StaffRole when dto.IsAdminSetup:
+                courseEntity.Status = CourseStatus.Waiting;
+                break;
+            case Constant.StaffRole:
+            {
+                if (dto.IsFree)
+                {
+                    courseEntity.IsFree = true;
+                }
+                else
+                {
+                    courseEntity.IsFree = false;
+                    courseEntity.Price = dto.Price ?? throw new BadRequestException("Course price is missing.");
+                }
+
+                courseEntity.ApprovedById = currentAccount.Id;
+                courseEntity.ApprovedBy = currentAccount;
+
+                courseEntity.Status = CourseStatus.Active;
+                break;
+            }
+            case Constant.AdminRole:
+            {
+                if (courseEntity.Status != CourseStatus.Pending && courseEntity.Status != CourseStatus.Waiting)
+                    throw new BadRequestException($"Course {id} is not waiting for approve.");
+                if (dto.IsFree)
+                {
+                    courseEntity.IsFree = true;
+                }
+                else
+                {
+                    courseEntity.IsFree = false;
+                    courseEntity.Price = dto.Price ?? throw new BadRequestException("Course price is missing.");
+                }
+
+                courseEntity.ApprovedById = currentAccount.Id;
+                courseEntity.ApprovedBy = currentAccount;
+
+                courseEntity.Status = CourseStatus.Active;
+                break;
+            }
+            default:
+                throw new ForbiddenException("Access denied.");
+        }
 
         _unitOfWork.CourseRepository.Update(courseEntity);
 
@@ -523,8 +568,23 @@ public class CourseService : ICourseService
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
 
-        if (courseEntity.Status != CourseStatus.Pending)
-            throw new BadRequestException($"Course {id} is not waiting for approve.");
+        switch (currentAccount.Role.Name)
+        {
+            case Constant.StaffRole:
+            {
+                if (courseEntity.Status != CourseStatus.Pending)
+                    throw new BadRequestException($"Course {id} is not waiting for approve.");
+                break;
+            }
+            case Constant.AdminRole:
+            {
+                if (courseEntity.Status != CourseStatus.Pending && courseEntity.Status != CourseStatus.Waiting)
+                    throw new BadRequestException($"Course {id} is not waiting for approve.");
+                break;
+            }
+            default:
+                throw new ForbiddenException("Access denied.");
+        }
 
         courseEntity.Status = CourseStatus.Denied;
 
@@ -669,7 +729,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseOrderDto> GetCoursePaymentAsync(int id)
     {
-        var result= await _unitOfWork.CourseRepository.GetCoursePayment(id);
+        var result = await _unitOfWork.CourseRepository.GetCoursePayment(id);
         if (result != null)
             return CourseMapper.ShowCoursePayment(result);
         throw new NotFoundException("courseId doesn't exist");

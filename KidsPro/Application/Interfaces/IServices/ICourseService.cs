@@ -17,7 +17,7 @@ public interface ICourseService
 
     Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto, string? action );
 
-    Task ApproveCourseAsync(int id);
+    Task ApproveCourseAsync(int id, AcceptCourseDto to);
 
     Task DenyCourseAsync(int id, string? reason);
 
