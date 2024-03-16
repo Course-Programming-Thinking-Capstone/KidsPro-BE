@@ -6,11 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(OrderCode), IsUnique = true)]
+
 public class Transaction : BaseEntity
 {
-    [MaxLength(50)] public string OrderCode { get; set; } = null!;
-    [Column(TypeName = "tinyint")] public PaymentType PaymentType { get; set; }
 
     [Precision(11, 2)] public decimal Amount { get; set; }
 
