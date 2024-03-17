@@ -37,6 +37,8 @@ public class UnitOfWork : IUnitOfWork
     public ISectionRepository SectionRepository { get; }
     public ISectionComponentNumberRepository SectionComponentNumberRepository { get; set; }
     public ILessonRepository LessonRepository { get; set; }
+    public IUserNotificationRepository UserNotificationRepository { get; set; }
+    public INotificationRepository NotificationRepository { get; set; }
 
     public ICertificateRepository CertificateRepository { get; set; }
 
@@ -54,7 +56,7 @@ public class UnitOfWork : IUnitOfWork
         IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
-        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository)
+        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository)
     {
         _context = context;
         _logger = logger;
@@ -84,6 +86,8 @@ public class UnitOfWork : IUnitOfWork
         CertificateRepository = certificateRepository;
         OrderRepository = orderRepository;
         VoucherRepository = voucherRepository;
+        UserNotificationRepository = userNotificationRepository;
+        NotificationRepository = notificationRepository;
     }
 
     public async Task<int> SaveChangeAsync()

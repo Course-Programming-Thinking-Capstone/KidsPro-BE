@@ -43,7 +43,7 @@ public class CourseService : ICourseService
     {
         var entity = new Course();
 
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -173,7 +173,7 @@ public class CourseService : ICourseService
     {
         var entity = new Course();
 
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -223,6 +223,40 @@ public class CourseService : ICourseService
 
         //need to create notification for admin and teacher
 
+        //create notification for admin
+        var adminUserNotifications = new List<UserNotification>
+        {
+            new()
+            {
+                AccountId = accountId
+            }
+        };
+
+        var adminNotification = new Notification()
+        {
+            Title = "Create course success",
+            Content = "You have successfully created a new course",
+            Date = DateTime.UtcNow,
+            UserNotifications = adminUserNotifications
+        };
+
+        var teacherUserNotifications = new List<UserNotification>
+        {
+            new()
+            {
+                AccountId = dto.TeacherId
+            }
+        };
+
+        var teacherNotification = new Notification()
+        {
+            Title = "Create new course",
+            Content = "You have been designate to create content for new course by admin.",
+            Date = DateTime.UtcNow,
+            UserNotifications = teacherUserNotifications
+        };
+        await _unitOfWork.NotificationRepository.AddRangeAsync(new[] { adminNotification, teacherNotification });
+
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.CourseToCourseDto(entity);
     }
@@ -238,7 +272,7 @@ public class CourseService : ICourseService
             throw new BadRequestException("Can only update course wih status draft.");
 
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -480,7 +514,7 @@ public class CourseService : ICourseService
     public async Task ApproveCourseAsync(int id, AcceptCourseDto dto)
     {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -553,7 +587,7 @@ public class CourseService : ICourseService
     public async Task DenyCourseAsync(int id, string? reason)
     {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -599,7 +633,7 @@ public class CourseService : ICourseService
         var entity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
 
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -618,8 +652,6 @@ public class CourseService : ICourseService
     {
         var entity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
-
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
         var avatarFileName = $"picture_{entity.Id}";
 
