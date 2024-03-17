@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.Request.Order;
+using Application.Dtos.Request.Order.Momo;
 using Application.Dtos.Response.Order;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
+using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -29,11 +31,18 @@ namespace Application.Services
 
             //Kiểm tra lấy order code, nếu đã tồn tại phải tạo ordercode mới
             string? getOrderCode = string.Empty;
+            Course? _course;
+
             do
             {
-                var _result = await _unitOfWork.OrderRepository.GetByOrderCode(GenerateOrderCode, false);
-                getOrderCode = _result.Item1 != null ? null : _result.Item2;
-            } while (getOrderCode != null);
+                var _checkOrderCode = await _unitOfWork.OrderRepository.GetByOrderCode(HashingUtils.GenerateRandomString, false);
+                getOrderCode = _checkOrderCode.Item1 != null ? null : _checkOrderCode.Item2;
+
+                _course= await _unitOfWork.CourseRepository.CheckCourseExist(dto.CourseId);
+                if (_course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
+
+            } while (getOrderCode == null);
+
 
             //Create Order
             var _order = new Order()
@@ -42,17 +51,19 @@ namespace Application.Services
                 VoucherId = _voucher != null ? dto.VoucherId : null,
                 PaymentType = (PaymentType)dto.PaymentType,
                 Quantity = dto.Quantity,
-                TotalPrice = (dto.Price * dto.Quantity) - (_voucher != null ? _voucher.DiscountAmount : 0),
+                TotalPrice = (_course.Price * dto.Quantity) - (_voucher != null ? _voucher.DiscountAmount : 0),
                 Date = DateTime.UtcNow,
-                Status = OrderStatus.Pending,
+                Status = OrderStatus.Payment,
                 OrderCode =getOrderCode,
+                Note="course: "+_course.Name
             };
 
             //Create OrderDetail
             var _orderDetail = new OrderDetail()
             {
-                Price = dto.Price,
+                Price = _course.Price,
                 CourseId = dto.CourseId,
+                Quantity=dto.Quantity,
                 Order = _order
             };
 
@@ -81,21 +92,18 @@ namespace Application.Services
             return OrderMapper.OrderToOrderResponse(_order);
         }
 
-        private string GenerateOrderCode(int length)
+        public async Task<bool> StatusToPendingAsync(int orderId, int parentId)
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            Random random = new Random();
-            StringBuilder stringBuilder = new StringBuilder(length);
-
-            for (int i = 0; i < length; i++)
+            var _order = await _unitOfWork.OrderRepository.GetOrderPaymentAsync(parentId, orderId);
+            if (_order != null)
             {
-                stringBuilder.Append(chars[random.Next(chars.Length)]);
+                _order.Status = OrderStatus.Pending;
+                _unitOfWork.OrderRepository.Update(_order);
+                await _unitOfWork.SaveChangeAsync();
+                return true;
             }
-
-            return stringBuilder.ToString();
+            throw new NotImplementException($"Update orderID {orderId} to status pending failed");
         }
-
-       
 
     }
 }

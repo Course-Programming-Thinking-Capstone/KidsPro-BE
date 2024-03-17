@@ -39,4 +39,5 @@ public interface IUnitOfWork : IDisposable
     public IOrderRepository OrderRepository { get; }
     public IVoucherRepository VoucherRepository { get; }
     public IOrderDetailRepository OrderDetailRepository { get; }
+    public ITransactionRepository TransactionRepository { get; }
 }

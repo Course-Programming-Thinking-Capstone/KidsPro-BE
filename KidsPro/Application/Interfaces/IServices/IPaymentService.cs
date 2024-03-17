@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Application.Dtos.Request.Order.Momo;
+using Application.Dtos.Response.Order;
+using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +11,9 @@ namespace Application.Interfaces.IServices
 {
     public interface IPaymentService
     {
+        Task<Order?> GetOrderPaymentAsync(OrderResponseDto dto);
+        string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequestDto momo);
+        (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequestDto momoRequest);
+        Task CreateTransactionAsync(MomoResultRequestDto dto);
     }
 }

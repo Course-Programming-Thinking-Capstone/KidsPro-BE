@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Order;
+using Application.Dtos.Request.Order.Momo;
 using Application.Dtos.Response.Order;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,7 @@ namespace Application.Interfaces.IServices
     public interface IOrderService
     {
         Task<OrderResponseDto> CreateOrderAsync(OrderRequestDto dto);
+
+        Task<bool> StatusToPendingAsync(int orderId, int parentId);
     }
 }

@@ -14,7 +14,6 @@ namespace Application.Dtos.Request.Order
         public int CourseId { get; set; }
         public int VoucherId { get; set; }
         public int PaymentType { get; set; }
-        public decimal Price { get; set; }
         public int Quantity { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IRepositories;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,12 @@ namespace Infrastructure.Repositories
                 case false:
                     return (await _dbSet.FirstOrDefaultAsync(x => x.OrderCode == orderCode),orderCode);
             }
+        }
+
+        public async Task<Order?> GetOrderPaymentAsync(int parentId, int orderId)
+        {
+            return await _dbSet.FirstOrDefaultAsync
+                (x=> x.Id == orderId && x.ParentId==parentId && x.Status == OrderStatus.Payment);
         }
     }
 }

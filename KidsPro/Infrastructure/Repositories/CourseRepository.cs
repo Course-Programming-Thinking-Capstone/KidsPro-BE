@@ -46,4 +46,9 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
 
         return await query.Include(x=> x.ModifiedBy).FirstOrDefaultAsync(x=> x.Id==id);
     }
+
+    public async Task<Course?> CheckCourseExist(int id)
+    {
+        return await _dbSet.FirstOrDefaultAsync(x=> x.Id==id);
+    }
 }

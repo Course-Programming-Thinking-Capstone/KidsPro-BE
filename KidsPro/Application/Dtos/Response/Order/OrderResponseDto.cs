@@ -9,6 +9,6 @@ namespace Application.Dtos.Response.Order
     public class OrderResponseDto
     {
         public int OrderId { get; set; }
-        public decimal Amount { get; set; }
+        public int ParentId { get; set; }
     }
 }

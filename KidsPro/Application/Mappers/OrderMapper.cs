@@ -12,8 +12,8 @@ namespace Application.Mappers
     {
         public static OrderResponseDto OrderToOrderResponse(Order order) => new OrderResponseDto()
         {
+            ParentId=order.ParentId,
             OrderId = order.Id,
-            Amount = order.TotalPrice
         };
     }
 }

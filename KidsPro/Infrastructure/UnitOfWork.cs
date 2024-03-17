@@ -48,6 +48,8 @@ public class UnitOfWork : IUnitOfWork
 
     public IOrderDetailRepository OrderDetailRepository { get; set; }
 
+    public ITransactionRepository TransactionRepository { get; set; }
+
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
         IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository,
@@ -59,7 +61,7 @@ public class UnitOfWork : IUnitOfWork
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
         , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
-        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository)
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository)
     {
         _context = context;
         _logger = logger;
@@ -93,6 +95,8 @@ public class UnitOfWork : IUnitOfWork
 
         UserNotificationRepository = userNotificationRepository;
         NotificationRepository = notificationRepository;
+        TransactionRepository = transactionRepository;
+
     }
 
     public async Task<int> SaveChangeAsync()
