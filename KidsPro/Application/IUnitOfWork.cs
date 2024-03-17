@@ -27,6 +27,8 @@ public interface IUnitOfWork : IDisposable
     public ISectionRepository SectionRepository { get; }
     public ISectionComponentNumberRepository SectionComponentNumberRepository { get; set; }
     public ILessonRepository LessonRepository { get; set; }
+    public IUserNotificationRepository UserNotificationRepository { get; set; }
+    public INotificationRepository NotificationRepository { get; set; }
     public Task<int> SaveChangeAsync();
 
     public Task BeginTransactionAsync();

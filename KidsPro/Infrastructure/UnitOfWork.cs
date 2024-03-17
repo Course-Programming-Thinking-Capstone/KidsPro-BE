@@ -37,6 +37,8 @@ public class UnitOfWork : IUnitOfWork
     public ISectionRepository SectionRepository { get; }
     public ISectionComponentNumberRepository SectionComponentNumberRepository { get; set; }
     public ILessonRepository LessonRepository { get; set; }
+    public IUserNotificationRepository UserNotificationRepository { get; set; }
+    public INotificationRepository NotificationRepository { get; set; }
 
     public ICertificateRepository CertificateRepository { get; set; }
 
@@ -44,7 +46,6 @@ public class UnitOfWork : IUnitOfWork
 
     public IVoucherRepository VoucherRepository { get; set; }
 
-    public IOrderDetailRepository OrderDetailRepository { get; set; }
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
         IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository,
@@ -55,7 +56,8 @@ public class UnitOfWork : IUnitOfWork
         IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
-        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository)
+        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository)
     {
         _context = context;
         _logger = logger;
@@ -87,6 +89,8 @@ public class UnitOfWork : IUnitOfWork
         VoucherRepository = voucherRepository;
         OrderDetailRepository = orderDetailRepository;
 
+        UserNotificationRepository = userNotificationRepository;
+        NotificationRepository = notificationRepository;
     }
 
     public async Task<int> SaveChangeAsync()
