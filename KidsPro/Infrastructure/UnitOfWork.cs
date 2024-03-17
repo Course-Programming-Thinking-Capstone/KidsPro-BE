@@ -46,6 +46,8 @@ public class UnitOfWork : IUnitOfWork
 
     public IVoucherRepository VoucherRepository { get; set; }
 
+    public IOrderDetailRepository OrderDetailRepository { get; set; }
+
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
         IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository,
