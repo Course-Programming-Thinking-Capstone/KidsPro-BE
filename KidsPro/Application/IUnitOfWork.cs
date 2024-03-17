@@ -36,4 +36,5 @@ public interface IUnitOfWork : IDisposable
     public ICertificateRepository CertificateRepository { get; }
     public IOrderRepository OrderRepository { get; }
     public IVoucherRepository VoucherRepository { get; }
+    public IOrderDetailRepository OrderDetailRepository { get; }
 }

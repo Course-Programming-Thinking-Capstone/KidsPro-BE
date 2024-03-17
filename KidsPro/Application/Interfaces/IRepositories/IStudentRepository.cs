@@ -7,5 +7,7 @@ public interface IStudentRepository:IBaseRepository<Student>
 {
     Task<Student?> GameStudentLoginAsync(string email);
     Task<List<Student>> GetStudents(int parentId);
-   
+    Task<Student?> GetStudentInformation(int id);
+
+
 }

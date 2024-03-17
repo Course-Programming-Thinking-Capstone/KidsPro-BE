@@ -11,13 +11,13 @@ namespace Application.Interfaces.IServices
 {
     public interface IParentsService
     {
-        Task<StudentDto> AddStudentAsync(StudentAddDto request);
+        Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request);
 
-        Task<List<StudentDto>> GetStudentsAsync(int parentId);
+        Task<List<StudentResponseDto>> GetStudentsAsync(int parentId);
 
-        Task<StudentDetailDto> GetDetailStudentAsync(int studentId);
-        Task UpdateStudentAsync(StudentUpdateDto dto);
+        Task<StudentDetailResponseDto> GetDetailStudentAsync(int studentId);
+        Task UpdateStudentAsync(StudentUpdateRequestDto dto);
 
-        ParentOrderDto GetEmailZalo(int parentId);
+        ParentOrderResponseDto GetEmailZalo(int parentId);
     }
 }

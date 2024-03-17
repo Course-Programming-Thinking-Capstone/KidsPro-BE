@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Request.Account.Student
 {
-    public record StudentAddDto
+    public record StudentAddRequestDto
     {
         [Required] public int ParentId { get; set; }
         [Required] public string FullName { get; set; } = null!;

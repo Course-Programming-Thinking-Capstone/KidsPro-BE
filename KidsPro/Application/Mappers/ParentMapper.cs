@@ -14,12 +14,12 @@ namespace Application.Mappers
 {
     public class ParentMapper
     {
-        public static List<StudentDto> ParentShowListStudent(List<Student> entity)
+        public static List<StudentResponseDto> ParentShowListStudent(List<Student> entity)
         {
-            var list = new List<StudentDto>();
+            var list = new List<StudentResponseDto>();
             foreach (var x in entity)
             {
-                var student = new StudentDto();
+                var student = new StudentResponseDto();
                 student.Id = x.Id;
                 student.FullName = x.Account.FullName;
                 student.Age = DateTime.Now.Year -
@@ -29,9 +29,9 @@ namespace Application.Mappers
             return list;
         }
 
-        public static StudentDetailDto ParentShowStudentDetail(Student entity)
+        public static StudentDetailResponseDto ParentShowStudentDetail(Student entity)
         {
-            var student = new StudentDetailDto()
+            var student = new StudentDetailResponseDto()
             {
                 Id = entity.Id,
                 Email = entity.Account.Email,
@@ -52,7 +52,7 @@ namespace Application.Mappers
                 foreach (var x in entity.Certificates)
                 {
                     //List certificate
-                    var _certificate = new CertificateDto() { title = x.Course.Name, url = x.ResourceUrl };
+                    var _certificate = new CertificateResponseDto() { title = x.Course.Name, url = x.ResourceUrl };
                     student.StudentsCertificate.Add(_certificate);
                 }
                 student.CertificateTotal = entity.Certificates.Count();
@@ -69,7 +69,7 @@ namespace Application.Mappers
             return student;
         }
 
-        public static ParentOrderDto ParentShowEmailZalo(Parent entity) => new ParentOrderDto()
+        public static ParentOrderResponseDto ParentShowEmailZalo(Parent entity) => new ParentOrderResponseDto()
         {
             Email = entity?.Account?.Email,
             PhoneNumber = entity?.PhoneNumber

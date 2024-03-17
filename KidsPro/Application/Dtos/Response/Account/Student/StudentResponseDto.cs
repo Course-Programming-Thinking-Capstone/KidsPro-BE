@@ -2,7 +2,7 @@
 
 namespace Application.Dtos.Response.Account.Student;
 
-public class StudentDto : AccountDto
+public class StudentResponseDto : AccountDto
 {
     public int? Age { get; set; }
 }

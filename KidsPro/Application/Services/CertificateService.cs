@@ -14,7 +14,7 @@ public class CertificateService: ICertificateService
         _unitOfWork = unit;
     }
 
-    public async Task AddCertificateAsync(CertificatesDto dto)
+    public async Task AddCertificateAsync(CertificatesRequestDto dto)
     {
         var _value = new Certificate()
         {

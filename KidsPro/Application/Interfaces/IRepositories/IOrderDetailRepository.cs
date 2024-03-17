@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.IRepositories
 {
-    public interface IOrderRepository:IBaseRepository<Order>
+    public interface IOrderDetailRepository:IBaseRepository<OrderDetail>
     {
-        Task<(Order?, string?)> GetByOrderCode(Func<int, string> GenerateOrderCode, bool decision);
     }
 }

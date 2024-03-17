@@ -44,6 +44,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IVoucherRepository VoucherRepository { get; set; }
 
+    public IOrderDetailRepository OrderDetailRepository { get; set; }
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
         IStaffRepository staffRepository, ITeacherRepository teacherRepository, ICourseRepository courseRepository,
@@ -54,7 +55,7 @@ public class UnitOfWork : IUnitOfWork
         IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
-        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository)
+        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository)
     {
         _context = context;
         _logger = logger;
@@ -84,6 +85,8 @@ public class UnitOfWork : IUnitOfWork
         CertificateRepository = certificateRepository;
         OrderRepository = orderRepository;
         VoucherRepository = voucherRepository;
+        OrderDetailRepository = orderDetailRepository;
+
     }
 
     public async Task<int> SaveChangeAsync()

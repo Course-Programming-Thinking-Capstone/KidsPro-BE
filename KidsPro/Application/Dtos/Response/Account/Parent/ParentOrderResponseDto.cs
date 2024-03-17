@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Response.Account.Parent
 {
-    public class ParentOrderDto
+    public class ParentOrderResponseDto
     {
         public string? Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; } = string.Empty;

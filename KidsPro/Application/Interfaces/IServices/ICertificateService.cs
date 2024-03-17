@@ -9,6 +9,6 @@ namespace Application.Interfaces.IServices
 {
     public interface ICertificateService
     {
-        Task AddCertificateAsync(CertificatesDto dto);
+        Task AddCertificateAsync(CertificatesRequestDto dto);
     }
 }
