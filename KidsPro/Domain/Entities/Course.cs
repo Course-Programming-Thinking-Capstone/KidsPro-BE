@@ -59,6 +59,8 @@ public class Course : BaseEntity
     public virtual Account? ModifiedBy { get; set; }
     public int? ModifiedById { get; set; }
 
+    public bool RequireAdminApproval { get; set; }
+
     public virtual Account? ApprovedBy { get; set; }
     public int? ApprovedById { get; set; }
 
