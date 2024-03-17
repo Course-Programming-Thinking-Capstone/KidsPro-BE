@@ -1,10 +1,8 @@
 ﻿using System.Linq.Expressions;
 using Application.Configurations;
 using Application.Dtos.Request.Course;
-using Application.Dtos.Request.Course.Lesson;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
-using Application.Dtos.Response.Course.Lesson;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -41,128 +39,6 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCourseDto(course);
     }
 
-    public async Task<CourseDto> CreateCourseOldAsync(CreateCourseDto dto)
-    {
-        var entity = new Course();
-
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
-
-        var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
-
-        entity.Name = dto.Name;
-        entity.Description = dto.Description;
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.ModifiedDate = DateTime.UtcNow;
-        entity.CreatedBy = currentAccount;
-        entity.ModifiedBy = currentAccount;
-        entity.Status = CourseStatus.Draft;
-
-        if (dto.Sections != null)
-        {
-            var sections = new List<Section>();
-
-            var sectionIndex = 1;
-
-            foreach (var sectionDto in dto.Sections)
-            {
-                var section = new Section
-                {
-                    Name = sectionDto.Name,
-                    Order = sectionIndex
-                };
-
-                if (sectionDto.Lessons != null)
-                {
-                    var lessons = new List<Lesson>();
-                    var seenOrders = new HashSet<int>();
-                    foreach (var lessonDto in sectionDto.Lessons)
-                    {
-                        if (!seenOrders.Add(lessonDto.Order))
-                        {
-                            // Duplicate order detected
-                            _logger.LogError("Error at {}: \nDuplicate order {} found within lessons.",
-                                nameof(CreateCourseOldAsync), lessonDto.Order);
-                            throw new BadRequestException($"Duplicate order '{lessonDto.Order}' found within lessons.");
-                        }
-
-                        var lesson = CourseMapper.CreateLessonDtoToLesson(lessonDto);
-                        lessons.Add(lesson);
-                    }
-
-                    section.Lessons = lessons;
-                }
-
-                if (sectionDto.Quizzes != null)
-                {
-                    var quizzes = new List<Quiz>();
-                    var quizIndex = 1;
-                    foreach (var sectionDtoQuiz in sectionDto.Quizzes)
-                    {
-                        var quiz = CourseMapper.CreateQuizDtoToQuiz(sectionDtoQuiz);
-                        var questions = new List<Question>();
-                        var questionOrder = 1;
-                        decimal totalScore = 0;
-
-                        foreach (var createQuestionDto in sectionDtoQuiz.Questions)
-                        {
-                            var question = CourseMapper.CreateQuestionDtoToQuestion(createQuestionDto);
-                            question.Order = questionOrder;
-                            totalScore += question.Score;
-
-                            var options = new List<Option>();
-                            var optionOrder = 1;
-                            foreach (var createOptionDto in createQuestionDto.Options)
-                            {
-                                var option = CourseMapper.CreateOptionDtoToOption(createOptionDto);
-                                option.Order = optionOrder;
-                                options.Add(option);
-                                optionOrder++;
-                            }
-
-                            question.Options = options;
-                            questions.Add(question);
-                            questionOrder++;
-                        }
-
-                        if (sectionDtoQuiz.NumberOfQuestion.HasValue)
-                        {
-                            quiz.NumberOfQuestion = sectionDtoQuiz.NumberOfQuestion.Value;
-                        }
-                        else
-                        {
-                            quiz.NumberOfQuestion = questionOrder - 1;
-                        }
-
-                        quiz.TotalScore = totalScore;
-                        quiz.TotalQuestion = questionOrder - 1;
-                        quiz.Questions = questions;
-                        quiz.CreatedDate = DateTime.UtcNow;
-                        quiz.CreatedById = accountId;
-                        quiz.CreatedBy = currentAccount;
-                        quiz.Order = quizIndex;
-
-                        quizzes.Add(quiz);
-                        quizIndex++;
-                    }
-
-                    section.Quizzes = quizzes;
-                }
-
-                section.Order = sectionIndex;
-
-                sections.Add(section);
-                sectionIndex++;
-            }
-
-            entity.Sections = sections;
-        }
-
-        await _unitOfWork.CourseRepository.AddAsync(entity);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.CourseToCourseDto(entity);
-    }
-
     /// <summary>
     /// Admin create course with exist section and assign teacher to edit course
     /// </summary>
@@ -175,7 +51,7 @@ public class CourseService : ICourseService
     {
         var entity = new Course();
 
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -191,7 +67,7 @@ public class CourseService : ICourseService
         }
 
         entity.Name = dto.Name;
-        entity.Description = dto.Description;
+        entity.CourseTarget = dto.CourseTarget;
         entity.CreatedDate = DateTime.UtcNow;
         entity.ModifiedDate = DateTime.UtcNow;
         entity.CreatedBy = currentAccount;
@@ -225,17 +101,56 @@ public class CourseService : ICourseService
 
         //need to create notification for admin and teacher
 
+        //create notification for admin
+        var adminUserNotifications = new List<UserNotification>
+        {
+            new()
+            {
+                AccountId = accountId
+            }
+        };
+
+        var adminNotification = new Notification()
+        {
+            Title = "Create course success",
+            Content = "You have successfully created a new course",
+            Date = DateTime.UtcNow,
+            UserNotifications = adminUserNotifications
+        };
+
+        var teacherUserNotifications = new List<UserNotification>
+        {
+            new()
+            {
+                AccountId = dto.TeacherId
+            }
+        };
+
+        var teacherNotification = new Notification()
+        {
+            Title = "Create new course",
+            Content = "You have been designate to create content for new course by admin.",
+            Date = DateTime.UtcNow,
+            UserNotifications = teacherUserNotifications
+        };
+        await _unitOfWork.NotificationRepository.AddRangeAsync(new[] { adminNotification, teacherNotification });
+
         await _unitOfWork.SaveChangeAsync();
         return CourseMapper.CourseToCourseDto(entity);
     }
 
-    public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto)
+    public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
+        string? action)
     {
         // check course
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
+
+        if (courseEntity.Status != CourseStatus.Draft)
+            throw new BadRequestException("Can only update course wih status draft.");
+
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -271,6 +186,9 @@ public class CourseService : ICourseService
         }
 
         // update course 
+        if (!string.IsNullOrEmpty(dto.Description))
+            courseEntity.Description = dto.Description;
+
         if (dto.Sections != null)
         {
             foreach (var sectionDto in dto.Sections)
@@ -450,20 +368,71 @@ public class CourseService : ICourseService
             }
         }
 
-        courseEntity.Status = CourseStatus.Pending;
+        if (string.IsNullOrEmpty(action) || action.Equals("Save"))
+        {
+            courseEntity.Status = CourseStatus.Draft;
+        }
+        else if (action.Equals("Post"))
+        {
+            courseEntity.Status = CourseStatus.Pending;
+
+            //Create notification
+            var notificationAccounts = await _unitOfWork.AccountRepository.GetAsync(
+                filter: a => a.Role.Name == Constant.StaffRole || a.Role.Name == Constant.AdminRole
+                    && a.Status == UserStatus.Active && !a.IsDelete,
+                orderBy: null,
+                includeProperties: $"{nameof(Account.Role)}",
+                disableTracking: true
+            );
+
+            var adminStaffNotifications = notificationAccounts.Select(t => new UserNotification()
+            {
+                AccountId = t.Id
+            }).ToList();
+
+            var adminStaffNotification = new Notification()
+            {
+                Title = "Request accept course",
+                Content = $"Teacher {currentAccount.FullName} has create a course approval request.",
+                Date = DateTime.UtcNow,
+                UserNotifications = adminStaffNotifications
+            };
+
+            var teacherNotifications = new List<UserNotification>
+            {
+                new()
+                {
+                    AccountId = accountId
+                }
+            };
+
+            var teacherNotification = new Notification()
+            {
+                Title = "Success create course approval request.",
+                Content = "You have create a course approval request. Your course is waiting for processing.",
+                Date = DateTime.UtcNow,
+                UserNotifications = teacherNotifications
+            };
+
+            await _unitOfWork.NotificationRepository.AddRangeAsync(
+                new[] { adminStaffNotification, teacherNotification });
+        }
+        else
+        {
+            throw new BadRequestException($"Unsupported update course action {action}");
+        }
 
         _unitOfWork.CourseRepository.Update(courseEntity);
-        //Create notification
 
         await _unitOfWork.SaveChangeAsync();
 
         return CourseMapper.CourseToCourseDto(courseEntity);
     }
 
-    public async Task ApproveCourseAsync(int id)
+    public async Task ApproveCourseAsync(int id, AcceptCourseDto dto)
     {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -478,9 +447,54 @@ public class CourseService : ICourseService
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
 
-        if (courseEntity.Status != CourseStatus.Pending)
-            throw new BadRequestException($"Course {id} is not waiting for approve.");
-        courseEntity.Status = CourseStatus.Active;
+        switch (currentAccount.Role.Name)
+        {
+            case Constant.StaffRole when courseEntity.Status != CourseStatus.Pending:
+                throw new BadRequestException($"Course {id} is not waiting for approve.");
+            case Constant.StaffRole when dto.IsAdminSetup:
+                courseEntity.Status = CourseStatus.Waiting;
+                break;
+            case Constant.StaffRole:
+            {
+                if (dto.IsFree)
+                {
+                    courseEntity.IsFree = true;
+                }
+                else
+                {
+                    courseEntity.IsFree = false;
+                    courseEntity.Price = dto.Price ?? throw new BadRequestException("Course price is missing.");
+                }
+
+                courseEntity.ApprovedById = currentAccount.Id;
+                courseEntity.ApprovedBy = currentAccount;
+
+                courseEntity.Status = CourseStatus.Active;
+                break;
+            }
+            case Constant.AdminRole:
+            {
+                if (courseEntity.Status != CourseStatus.Pending && courseEntity.Status != CourseStatus.Waiting)
+                    throw new BadRequestException($"Course {id} is not waiting for approve.");
+                if (dto.IsFree)
+                {
+                    courseEntity.IsFree = true;
+                }
+                else
+                {
+                    courseEntity.IsFree = false;
+                    courseEntity.Price = dto.Price ?? throw new BadRequestException("Course price is missing.");
+                }
+
+                courseEntity.ApprovedById = currentAccount.Id;
+                courseEntity.ApprovedBy = currentAccount;
+
+                courseEntity.Status = CourseStatus.Active;
+                break;
+            }
+            default:
+                throw new ForbiddenException("Access denied.");
+        }
 
         _unitOfWork.CourseRepository.Update(courseEntity);
 
@@ -491,7 +505,7 @@ public class CourseService : ICourseService
     public async Task DenyCourseAsync(int id, string? reason)
     {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -506,10 +520,48 @@ public class CourseService : ICourseService
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
 
-        if (courseEntity.Status != CourseStatus.Pending)
-            throw new BadRequestException($"Course {id} is not waiting for approve.");
+        switch (currentAccount.Role.Name)
+        {
+            case Constant.StaffRole:
+            {
+                if (courseEntity.Status != CourseStatus.Pending)
+                    throw new BadRequestException($"Course {id} is not waiting for approve.");
+                break;
+            }
+            case Constant.AdminRole:
+            {
+                if (courseEntity.Status != CourseStatus.Pending && courseEntity.Status != CourseStatus.Waiting)
+                    throw new BadRequestException($"Course {id} is not waiting for approve.");
+                break;
+            }
+            default:
+                throw new ForbiddenException("Access denied.");
+        }
 
         courseEntity.Status = CourseStatus.Denied;
+
+        if (courseEntity.ModifiedById == null)
+        {
+            throw new BadRequestException($"Teacher id in course is null.");
+        }
+
+        var teacherNotifications = new List<UserNotification>
+        {
+            new()
+            {
+                AccountId = courseEntity.ModifiedById.Value
+            }
+        };
+
+        var teacherNotification = new Notification()
+        {
+            Title = "Your course has been denied.",
+            Content = $"Reason: {reason}",
+            Date = DateTime.UtcNow,
+            UserNotifications = teacherNotifications
+        };
+
+        await _unitOfWork.NotificationRepository.AddAsync(teacherNotification);
 
         _unitOfWork.CourseRepository.Update(courseEntity);
 
@@ -522,7 +574,7 @@ public class CourseService : ICourseService
         var entity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
 
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
@@ -541,8 +593,6 @@ public class CourseService : ICourseService
     {
         var entity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} not found."));
-
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
         var avatarFileName = $"picture_{entity.Id}";
 
@@ -622,78 +672,11 @@ public class CourseService : ICourseService
         }
     }
 
-    public async Task<SectionDto> CreateSectionAsync(int courseId, CreateSectionDto dto)
-    {
-        // if (await _unitOfWork.SectionRepository.ExistByOrderAsync(courseId, dto.Order))
-        //     throw new ConflictException($"Order {dto.Order} has been existed.");
-        //
-        // var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
-        //     .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} not found."));
-        //
-        // _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
-        //
-        // var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
-        //     .ContinueWith(t => t.Result ?? throw new NotFoundException("Invalid token."));
-        //
-        // var entity = new Section()
-        // {
-        //     Name = dto.Name,
-        //     Order = dto.Order,
-        //     CourseId = courseId
-        // };
-        //
-        // courseEntity.ModifiedDate = DateTime.UtcNow;
-        // courseEntity.ModifiedBy = account;
-        //
-        // await _unitOfWork.SectionRepository.AddAsync(entity);
-        // _unitOfWork.CourseRepository.Update(courseEntity);
-        // await _unitOfWork.SaveChangeAsync();
-        // return CourseMapper.SectionToSectionDto(entity);
-
-        throw new NotImplementedException();
-    }
-
-    public async Task<SectionDto> UpdateSectionAsync(int sectionId, UpdateSectionDto dto)
-    {
-        var entity = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} can not found."));
-
-        CourseMapper.UpdateSectionDtoToSection(dto, ref entity);
-        _unitOfWork.SectionRepository.Update(entity);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.SectionToSectionDto(entity);
-    }
-
-    public async Task<List<SectionDto>> UpdateSectionOrderAsync(int courseId, List<UpdateSectionOrderDto> dtos)
-    {
-        if (!await _unitOfWork.CourseRepository.ExistByIdAsync(courseId))
-            throw new BadRequestException($"Course {courseId} does not exist.");
-
-        var entities = new List<Section>();
-
-        foreach (var dto in dtos)
-        {
-            var entity = await _unitOfWork.SectionRepository.GetByIdAsync(dto.Id)
-                .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {dto.Id} not found."));
-
-            if (entity.CourseId != courseId)
-                throw new BadRequestException($"Section {dto.Id} do not belong to course {courseId}");
-
-            entity.Order = dto.Order;
-            entities.Add(entity);
-        }
-
-        _unitOfWork.SectionRepository.UpdateRange(entities);
-        await _unitOfWork.SaveChangeAsync();
-
-        return CourseMapper.SectionToSectionDto(entities);
-    }
-
     public async Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync()
     {
         var entities = await _unitOfWork.SectionComponentNumberRepository.GetAsync(
             filter: null,
-            orderBy: s => s.OrderBy(s => s.Id),
+            orderBy: s => s.OrderBy(sc => sc.Id),
             disableTracking: true
         );
 
@@ -701,7 +684,7 @@ public class CourseService : ICourseService
     }
 
     public async Task<ICollection<SectionComponentNumberDto>> UpdateSectionComponentNumberAsync(
-        List<UpdateSectionComponentNumberDto> dtos)
+        IEnumerable<UpdateSectionComponentNumberDto> dtos)
     {
         var entities = new List<SectionComponentNumber>();
 
@@ -717,134 +700,11 @@ public class CourseService : ICourseService
         return CourseMapper.EntityToSectionComponentNumberDto(entities);
     }
 
-    public async Task RemoveSectionAsync(int id)
+    public async Task<CourseOrderDto> GetCoursePaymentAsync(int id)
     {
-        var entity = await _unitOfWork.SectionRepository.GetByIdAsync(id)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {id} not found."));
-
-        _unitOfWork.SectionRepository.Delete(entity);
-        await _unitOfWork.SaveChangeAsync();
-    }
-
-    // public async Task<LessonDto> AddVideoAsync(int sectionId, CreateVideoDto dto)
-    // {
-    //     var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
-    //         .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
-    //
-    //     var sectionVideoNumber =
-    //         await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Video);
-    //     if (sectionVideoNumber == null)
-    //     {
-    //         _logger.LogError("Section component type {} can not found.", SectionComponentType.Video);
-    //         throw new Exception($"Section component type {SectionComponentType.Video} can not found.");
-    //     }
-    //
-    //     var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
-    //     lessonEntity.SectionId = sectionId;
-    //
-    //     var videoNumber = 0;
-    //
-    //     foreach (var lesson in section.Lessons)
-    //     {
-    //         if (lesson.Order == dto.Order)
-    //         {
-    //             throw new ConflictException($"Lesson order {dto.Order} has been existed.");
-    //         }
-    //
-    //         if (lesson.Type == LessonType.Video)
-    //             videoNumber++;
-    //     }
-    //
-    //     if (videoNumber > sectionVideoNumber.MaxNumber)
-    //     {
-    //         throw new BadRequestException(
-    //             $"Can not add more than {sectionVideoNumber.MaxNumber} video in this section.");
-    //     }
-    //
-    //     await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
-    //     await _unitOfWork.SaveChangeAsync();
-    //     return CourseMapper.LessonToLessonDto(lessonEntity);
-    // }
-    //
-    // public async Task<LessonDto> AddDocumentAsync(int sectionId, CreateDocumentDto dto)
-    // {
-    //     var section = await _unitOfWork.SectionRepository.GetByIdAsync(sectionId)
-    //         .ContinueWith(t => t.Result ?? throw new NotFoundException($"Section {sectionId} does not exist"));
-    //
-    //     var sectionDocumentNumber =
-    //         await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Document);
-    //     if (sectionDocumentNumber == null)
-    //     {
-    //         _logger.LogError("Section component type {} can not found.", SectionComponentType.Document);
-    //         throw new Exception($"Section component type {SectionComponentType.Document} can not found.");
-    //     }
-    //
-    //     var lessonEntity = CourseMapper.CreateLessonDtoToLesson(dto);
-    //     lessonEntity.SectionId = sectionId;
-    //
-    //     var documentNumber = 0;
-    //
-    //     foreach (var lesson in section.Lessons)
-    //     {
-    //         if (lesson.Order == dto.Order)
-    //         {
-    //             throw new ConflictException($"Lesson order {dto.Order} has been existed.");
-    //         }
-    //
-    //         if (lesson.Type == LessonType.Document)
-    //             documentNumber++;
-    //     }
-    //
-    //     if (documentNumber > sectionDocumentNumber.MaxNumber)
-    //     {
-    //         throw new BadRequestException(
-    //             $"Can not add more than {sectionDocumentNumber.MaxNumber} document in this section.");
-    //     }
-    //
-    //     await _unitOfWork.LessonRepository.AddAsync(lessonEntity);
-    //     await _unitOfWork.SaveChangeAsync();
-    //     return CourseMapper.LessonToLessonDto(lessonEntity);
-    // }
-
-    public async Task<LessonDto> UpdateVideoAsync(int videoId, UpdateVideoDto dto)
-    {
-        var video = await _unitOfWork.LessonRepository.GetByIdAsync(videoId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Lesson {videoId} not found."));
-        if (video.Type != LessonType.Video)
-            throw new BadRequestException("Lesson is not video.");
-
-        CourseMapper.UpdateLessonDtoToLesson(dto, ref video);
-        _unitOfWork.LessonRepository.Update(video);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.LessonToLessonDto(video);
-    }
-
-    public async Task<LessonDto> UpdateDocumentAsync(int documentId, UpdateDocumentDto dto)
-    {
-        var document = await _unitOfWork.LessonRepository.GetByIdAsync(documentId)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Lesson {documentId} not found."));
-        if (document.Type != LessonType.Document)
-            throw new BadRequestException("Lesson is not document.");
-
-        CourseMapper.UpdateLessonDtoToLesson(dto, ref document);
-        _unitOfWork.LessonRepository.Update(document);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.LessonToLessonDto(document);
-    }
-
-    public async Task<ICollection<LessonDto>> UpdateLessonOrderAsync(List<UpdateLessonOrderDto> dtos)
-    {
-        var entities = new List<Lesson>();
-
-        foreach (var dto in dtos)
-        {
-            var entity = await _unitOfWork.LessonRepository.GetByIdAsync(dto.LessonId)
-                .ContinueWith(t => t.Result ?? throw new NotFoundException($"Lesson {dto.LessonId} not found."));
-            entities.Add(entity);
-        }
-
-        _unitOfWork.LessonRepository.UpdateRange(entities);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.LessonToLessonDto(entities);
+        var result = await _unitOfWork.CourseRepository.GetCoursePayment(id);
+        if (result != null)
+            return CourseMapper.ShowCoursePayment(result);
+        throw new NotFoundException("courseId doesn't exist");
     }
 }

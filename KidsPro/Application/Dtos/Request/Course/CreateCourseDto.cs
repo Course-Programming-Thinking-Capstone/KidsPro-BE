@@ -9,8 +9,8 @@ public record CreateCourseDto
     [Required(ErrorMessage = "Class name is required.")]
     public string Name { get; set; } = null!;
 
-    [StringLength(3000, ErrorMessage = "Description can not exceed 3000 character")]
-    public string? Description { get; set; }
+    [StringLength(3000, ErrorMessage = "CourseTarget can not exceed 3000 character")]
+    public string? CourseTarget { get; set; }
 
     public ICollection<CreateSectionDto>? Sections { get; init; }
 

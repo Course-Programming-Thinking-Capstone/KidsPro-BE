@@ -41,7 +41,7 @@ public class Course : BaseEntity
 
     public bool IsDelete { get; set; }
 
-    public bool IsFree { get; set; } = false;
+    public bool IsFree { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
@@ -56,8 +56,13 @@ public class Course : BaseEntity
     public virtual Account CreatedBy { get; set; } = null!;
     public int CreatedById { get; set; }
 
-    public virtual Account ModifiedBy { get; set; } = null!;
-    public int ModifiedById { get; set; }
+    public virtual Account? ModifiedBy { get; set; }
+    public int? ModifiedById { get; set; }
+
+    public bool RequireAdminApproval { get; set; }
+
+    public virtual Account? ApprovedBy { get; set; }
+    public int? ApprovedById { get; set; }
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 

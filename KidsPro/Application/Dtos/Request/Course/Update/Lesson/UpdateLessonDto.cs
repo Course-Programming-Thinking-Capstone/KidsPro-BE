@@ -20,6 +20,4 @@ public record UpdateLessonDto
 
     // [Required] 
     public LessonType? Type { get; init; }
-
-    public bool? IsFree { get; init; }
 }

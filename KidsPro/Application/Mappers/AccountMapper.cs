@@ -1,4 +1,6 @@
 ﻿using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Account.Parent;
+using Application.Dtos.Response.Account.Student;
 using Application.Dtos.Response.Certificate;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Paging;
@@ -90,7 +92,7 @@ public static class AccountMapper
         PersonalInformation = entity.Teacher?.PersonalInformation
     };
 
-    public static ParentDto AccountToParentDto(Account entity) => new ParentDto()
+    public static ParentResponseDto AccountToParentDto(Account entity) => new ParentResponseDto()
     {
         Id = entity.Id,
         Email = entity.Email,
@@ -104,7 +106,7 @@ public static class AccountMapper
         PhoneNumber = entity.Parent?.PhoneNumber
     };
 
-    public static StudentDto AccountToStudentDto(Account entity) => new StudentDto()
+    public static StudentResponseDto AccountToStudentDto(Account entity) => new StudentResponseDto()
     {
         Id = entity.Id,
         Email = entity.Email,
@@ -127,54 +129,6 @@ public static class AccountMapper
             Results = entities.Results.Select(AccountToAccountDto).ToList()
         };
 
-    public static List<StudentDto> ParentToListStudentDto(List<Student> entity)
-    {
-        var list =new List<StudentDto>();
-        foreach (var x in entity)
-        {
-            var student = new StudentDto();
-            student.Id = x.Id;
-            student.FullName=x.Account.FullName;
-            student.Age =DateTime.Now.Year -
-                (x.Account.DateOfBirth!=null?x.Account.DateOfBirth.Value.Year:0);
-            list.Add(student);
-        }
-        return list;
-    }
-
-    public static StudentDetailDto ShowStudentDetail(Student entity)
-    {
-        var student = new StudentDetailDto()
-        {
-            Id = entity.Id,
-            Email = entity.Account.Email,
-            FullName = entity.Account.FullName,
-            PictureUrl = entity.Account.PictureUrl,
-            Gender = entity.Account.Gender?.ToString(),
-            DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.Account.DateOfBirth),
-            Status = entity.Account.Status.ToString(),
-            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.Account.CreatedDate),
-            Role = entity.Account.Role.Name,
-            Age = DateTime.Now.Year -
-                (entity.Account.DateOfBirth != null ? entity.Account.DateOfBirth.Value.Year : 0),
-            
-        };
-
-        if(entity.Certificates != null)
-        {
-           // student.StudentCourse = new List<(int, string)>();
-           // student.StudentCertificate = new List<(string, string)>();
-            foreach (var x in entity.Certificates)
-            {
-                //var _course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
-                //student.StudentCourse.Add(_course);
-                var _certificate = new CertificateDto() {title= x.Course.Name,url= x.ResourceUrl };
-                student.StudentCertificate.Add(_certificate);
-            }
-            student.CertificateTotal = entity.Certificates.Count();
-        }
-
-        return student;
-    }
+    
 
 }

@@ -13,9 +13,6 @@ public class Quiz : BaseEntity
     [Precision(5,2)]
     public decimal TotalScore { get; set; }
 
-    [Precision(4,2)]
-    public decimal MinScore { get; set; }
-
     [MaxLength(250)] public string Title { get; set; } = null!;
 
     [MaxLength(750)] public string? Description { get; set; }

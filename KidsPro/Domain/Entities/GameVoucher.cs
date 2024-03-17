@@ -24,6 +24,8 @@ public class GameVoucher : BaseEntity
 
     [Column(TypeName = "tinyint")] public VoucherStatus Status { get; set; } = VoucherStatus.Valid;
 
+    public virtual Order? Order { get; set; }
+    
     public virtual Parent? Parent { get; set; }
     public int? ParentId { get; set; }
 }

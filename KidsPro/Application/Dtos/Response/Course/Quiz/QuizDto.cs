@@ -9,8 +9,6 @@ public class QuizDto
 
     public decimal TotalScore { get; set; }
 
-    public decimal MinScore { get; set; }
-
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }

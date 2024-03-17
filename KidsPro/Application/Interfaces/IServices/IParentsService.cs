@@ -1,5 +1,6 @@
-﻿using Application.Dtos.Request.Student;
-using Application.Dtos.Response.Account;
+﻿using Application.Dtos.Request.Account.Student;
+using Application.Dtos.Response.Account.Parent;
+using Application.Dtos.Response.Account.Student;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,13 @@ namespace Application.Interfaces.IServices
 {
     public interface IParentsService
     {
-        Task<StudentDto> AddStudent(StudentAddDto request);
+        Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request);
 
-        Task<List<StudentDto>> GetStudents(int parentId);
+        Task<List<StudentResponseDto>> GetStudentsAsync(int parentId);
 
-        Task<StudentDetailDto> GetDetailStudent(int studentId);
-        Task UpdateStudent(StudentUpdateDto dto);
+        Task<StudentDetailResponseDto> GetDetailStudentAsync(int studentId);
+        Task UpdateStudentAsync(StudentUpdateRequestDto dto);
+
+        ParentOrderResponseDto GetEmailZalo(int parentId);
     }
 }

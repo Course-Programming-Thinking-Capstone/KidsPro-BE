@@ -30,6 +30,7 @@ public class CoursesController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id:int}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id)
@@ -68,7 +69,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
-    //[Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.AdminRole}")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
@@ -79,20 +80,23 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Update course 
+    /// Update course. Teacher can save course as draft or post course base on the value of action parameter:
+    /// "Save": save as draft; "Post" create post request. Can not update after create post request
     /// </summary>
     /// <param name="id"></param>
     /// <param name="dto"></param>
+    /// <param name="action"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole}")]
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto)
+    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto,
+        [FromQuery] string? action)
     {
-        var result = await _courseService.UpdateCourseAsync(id, dto);
+        var result = await _courseService.UpdateCourseAsync(id, dto, action);
         return Ok(result);
     }
 
@@ -102,7 +106,7 @@ public class CoursesController : ControllerBase
     /// <param name="id"></param>
     /// <param name="file"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole}")]
     [HttpPatch("{id:int}/picture")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     public async Task<ActionResult<CourseDto>> UpdateCoursePictureAsync([FromRoute] int id, [FromForm] IFormFile file)
@@ -115,12 +119,13 @@ public class CoursesController : ControllerBase
     /// Admin or staff approve pending course
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPatch("{id:int}/approve")]
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
-    public async Task<ActionResult> ApproveCourseAsync([FromRoute] int id)
+    public async Task<ActionResult> ApproveCourseAsync([FromRoute] int id, [FromBody] AcceptCourseDto dto)
     {
-        await _courseService.ApproveCourseAsync(id);
+        await _courseService.ApproveCourseAsync(id, dto);
         return Ok();
     }
 
@@ -137,15 +142,6 @@ public class CoursesController : ControllerBase
         await _courseService.DenyCourseAsync(id, reason);
         return Ok();
     }
-
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // [HttpPatch("{courseId:int}/section/order")]
-    // public async Task<ActionResult<SectionDto>> UpdateSectionOrderAsync([FromRoute] int courseId,
-    //     [FromBody] List<UpdateSectionOrderDto> dto)
-    // {
-    //     var result = await _courseService.UpdateSectionOrderAsync(courseId, dto);
-    //     return Ok(result);
-    // }
 
     /// <summary>
     /// Get Section component number of section in course. Ex a section has at most 5 videos, 3 documents,...
@@ -171,37 +167,18 @@ public class CoursesController : ControllerBase
         return Ok(result);
     }
 
-    // [Authorize(Roles = $"{Constant.AdminRole}")]
-    // [HttpDelete("section/{sectionId:int}")]
-    // public async Task<ActionResult> RemoveSectionAsync([FromRoute] int sectionId)
-    // {
-    //     await _courseService.RemoveSectionAsync(sectionId);
-    //     return Ok();
-    // }
-
-    // [HttpPatch("section/video/{videoId:int}")]
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // public async Task<ActionResult<LessonDto>> UpdateVideoAsync([FromRoute] int videoId, [FromBody] UpdateVideoDto dto)
-    // {
-    //     var result = await _courseService.UpdateVideoAsync(videoId, dto);
-    //     return Ok(result);
-    // }
-
-    // [HttpPatch("section/document/{documentId:int}")]
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // public async Task<ActionResult<LessonDto>> UpdateDocumentAsync([FromRoute] int documentId,
-    //     [FromBody] UpdateDocumentDto dto)
-    // {
-    //     var result = await _courseService.UpdateDocumentAsync(documentId, dto);
-    //     return Ok(result);
-    // }
-
-    // [HttpPatch("section/lesson/order")]
-    // [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
-    // public async Task<ActionResult<ICollection<LessonDto>>> UpdateLessonOrderAsync(
-    //     [FromBody] List<UpdateLessonOrderDto> dtos)
-    // {
-    //     var result = await _courseService.UpdateLessonOrderAsync(dtos);
-    //     return Ok(result);
-    // }
+    /// <summary>
+    /// Get thông tin course hiển thị ra trong màn hình coursepayment
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [AllowAnonymous]
+    [HttpGet("payment/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int id)
+    {
+        var result = await _courseService.GetCoursePaymentAsync(id);
+        return Ok(result);
+    }
 }

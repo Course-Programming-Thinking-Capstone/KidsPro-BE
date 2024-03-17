@@ -37,6 +37,18 @@ public class UnitOfWork : IUnitOfWork
     public ISectionRepository SectionRepository { get; }
     public ISectionComponentNumberRepository SectionComponentNumberRepository { get; set; }
     public ILessonRepository LessonRepository { get; set; }
+    public IUserNotificationRepository UserNotificationRepository { get; set; }
+    public INotificationRepository NotificationRepository { get; set; }
+
+    public ICertificateRepository CertificateRepository { get; set; }
+
+    public IOrderRepository OrderRepository { get; set; }
+
+    public IVoucherRepository VoucherRepository { get; set; }
+
+    public IOrderDetailRepository OrderDetailRepository { get; set; }
+
+    public ITransactionRepository TransactionRepository { get; set; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
@@ -47,7 +59,9 @@ public class UnitOfWork : IUnitOfWork
         IGamePlayHistoryRepository gamePlayHistoryRepository, IGameQuizRoomRepository gameQuizRoomRepository,
         IGameStudentQuizRepository gameStudentQuizRepository, IGameVersionRepository gameVersionRepository,
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
-        IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository)
+        IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
+        , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository)
     {
         _context = context;
         _logger = logger;
@@ -74,6 +88,15 @@ public class UnitOfWork : IUnitOfWork
         SectionRepository = sectionRepository;
         SectionComponentNumberRepository = sectionComponentNumberRepository;
         LessonRepository = lessonRepository;
+        CertificateRepository = certificateRepository;
+        OrderRepository = orderRepository;
+        VoucherRepository = voucherRepository;
+        OrderDetailRepository = orderDetailRepository;
+
+        UserNotificationRepository = userNotificationRepository;
+        NotificationRepository = notificationRepository;
+        TransactionRepository = transactionRepository;
+
     }
 
     public async Task<int> SaveChangeAsync()
