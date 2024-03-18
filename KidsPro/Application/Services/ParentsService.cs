@@ -8,18 +8,13 @@ using Application.Mappers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Application.Services
-{
-    public class ParentsService: IParentsService
+namespace Application.Services;
+
+    public class ParentsService : IParentsService
     {
-        public IUnitOfWork _unitOfWork;
-        public IAuthenticationService _authentication;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuthenticationService _authentication;
 
         public ParentsService(IUnitOfWork unitOfWork, IAuthenticationService authentication)
         {
@@ -30,7 +25,7 @@ namespace Application.Services
         private async Task<Parent?> GetInformationCurrentAsync()
         {
             _authentication.GetCurrentUserInformation(out var accountId, out var role);
-            if(role.CompareTo(Constant.ParentRole)==0)
+            if (String.Compare(role, Constant.ParentRole, StringComparison.Ordinal) == 0)
                 return await _unitOfWork.ParentRepository.GetByIdAsync(accountId);
             throw new BadRequestException("Account doesn't Parent Role");
         }
@@ -40,7 +35,7 @@ namespace Application.Services
             var studentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.StudentRole)
                 .ContinueWith(t => t.Result ?? throw new Exception("Role student name is incorrect."));
 
-            var _parent=await GetInformationCurrentAsync();
+            var parent = await GetInformationCurrentAsync();
 
             var accountEntity = new Account()
             {
@@ -55,7 +50,7 @@ namespace Application.Services
 
             var studentEntity = new Student()
             {
-                ParentId = _parent!=null?_parent.Id:throw new NotFoundException("ParentId not found"),
+                ParentId = parent != null ? parent.Id : throw new NotFoundException("ParentId not found"),
                 Account = accountEntity
             };
 
@@ -68,31 +63,36 @@ namespace Application.Services
 
         public async Task<List<StudentResponseDto>> GetStudentsAsync()
         {
-            var _parent =await GetInformationCurrentAsync();
-            var list = await _unitOfWork.StudentRepository.GetStudents(_parent.Id);
-            return  ParentMapper.ParentShowListStudent(list);
+            var parent = await GetInformationCurrentAsync();
+            if (parent != null)
+            {
+                var list = await _unitOfWork.StudentRepository.GetStudents(parent.Id);
+                return ParentMapper.ParentShowListStudent(list);
+            }
+
+            throw new UnauthorizedException("Parent doesn't exist");
         }
 
         public async Task<StudentDetailResponseDto> GetDetailStudentAsync(int studentId)
         {
             var student = await _unitOfWork.StudentRepository.GetStudentInformation(studentId);
-            if(student != null)
+            if (student != null)
                 return ParentMapper.ParentShowStudentDetail(student);
             throw new NotFoundException("studentId doesn't exist");
         }
 
         public async Task UpdateStudentAsync(StudentUpdateRequestDto dto)
         {
-            var _student= await _unitOfWork.StudentRepository.GetByIdAsync(dto.Id);
-            if (_student != null)
+            var student = await _unitOfWork.StudentRepository.GetByIdAsync(dto.Id);
+            if (student != null)
             {
-                _student.Account.FullName = StringUtils.FormatName(dto.FullName);
-                _student.Account.DateOfBirth = dto.BirthDay;
-                _student.Account.Gender = (Gender)dto.Gender;
-                _student.Account.Email = dto.Email;
-                _student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
+                student.Account.FullName = StringUtils.FormatName(dto.FullName);
+                student.Account.DateOfBirth = dto.BirthDay;
+                student.Account.Gender = (Gender)dto.Gender;
+                student.Account.Email = dto.Email;
+                student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
 
-                _unitOfWork.StudentRepository.Update(_student);
+                _unitOfWork.StudentRepository.Update(student);
                 await _unitOfWork.SaveChangeAsync();
             }
             else
@@ -101,11 +101,14 @@ namespace Application.Services
 
         public async Task<ParentOrderResponseDto> GetEmailZalo()
         {
-            var _parent =await GetInformationCurrentAsync();
-            var _result= _unitOfWork.ParentRepository.GetEmailZalo(_parent.Id);
-            if (_result != null)
-                return ParentMapper.ParentShowEmailZalo(_result);
+            var parent = await GetInformationCurrentAsync();
+            if (parent != null)
+            {
+                var result = _unitOfWork.ParentRepository.GetEmailZalo(parent.Id);
+                if (result != null)
+                    return ParentMapper.ParentShowEmailZalo(result);
+            }
+
             throw new NotFoundException("Parent doesn't exist");
         }
     }
-}

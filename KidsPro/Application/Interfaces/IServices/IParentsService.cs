@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces.IServices
-{
+namespace Application.Interfaces.IServices;
+
     public interface IParentsService
     {
         Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request);
@@ -20,4 +20,4 @@ namespace Application.Interfaces.IServices
 
         Task<ParentOrderResponseDto> GetEmailZalo();
     }
-}
+
