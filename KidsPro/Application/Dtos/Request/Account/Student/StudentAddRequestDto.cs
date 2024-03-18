@@ -10,7 +10,6 @@ namespace Application.Dtos.Request.Account.Student
 {
     public record StudentAddRequestDto
     {
-        [Required] public int ParentId { get; set; }
         [Required] public string FullName { get; set; } = null!;
         [DataType(DataType.Date)]
         [Required] public DateTime Birthday { get; set; }

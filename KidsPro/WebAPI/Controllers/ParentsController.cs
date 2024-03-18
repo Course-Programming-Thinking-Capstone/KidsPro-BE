@@ -26,7 +26,7 @@ public class ParentsController : ControllerBase
     /// </summary>
     /// <param name="request">Gender is enum: "Male: 1, Female: 2".</param>
     /// <returns></returns>
-   // [Authorize(Roles = $"{Constant.ParentRole}")]
+    [Authorize(Roles = $"{Constant.ParentRole}")]
     [HttpPost("student")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginAccountDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -41,13 +41,13 @@ public class ParentsController : ControllerBase
     /// </summary>
     /// <param name="id">Parent Id</param>
     /// <returns></returns>
-   // [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpGet("stduents/{id}")]
+    [Authorize(Roles = $"{Constant.ParentRole}")]
+    [HttpGet("students")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentResponseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentResponseDto>> GetStudentsByParentId(int id)
+    public async Task<ActionResult<StudentResponseDto>> GetStudentsByParentId()
     {
-        var result = await _parent.GetStudentsAsync(id);
+        var result = await _parent.GetStudentsAsync();
         return Ok(result);
     }
 
@@ -56,8 +56,8 @@ public class ParentsController : ControllerBase
     /// </summary>
     /// <param name="id"> </param>
     /// <returns></returns>
-    // [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpGet("stduent-detail/{id}")]
+    [Authorize(Roles = $"{Constant.ParentRole}")]
+    [HttpGet("student-detail/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentDetailResponseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<StudentDetailResponseDto>> GetStudentDetail(int id)
@@ -70,6 +70,7 @@ public class ParentsController : ControllerBase
     /// </summary>
     /// <param name="dto">Gender is enum: "Male: 1, Female: 2".</param>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.ParentRole}")]
     [HttpPut("student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -84,13 +85,13 @@ public class ParentsController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    // [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpGet("email-zalo/{id}")]
+    [Authorize(Roles = $"{Constant.ParentRole}")]
+    [HttpGet("email-zalo")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public ActionResult<ParentOrderResponseDto> GetEmailZalo(int id)
+    public async Task<ActionResult<ParentOrderResponseDto>> GetEmailZalo()
     {
-        var result= _parent.GetEmailZalo(id);
+        var result=await _parent.GetEmailZalo();
         return Ok(result);
     }
 }

@@ -19,16 +19,28 @@ namespace Application.Services
     public class ParentsService: IParentsService
     {
         public IUnitOfWork _unitOfWork;
+        public IAuthenticationService _authentication;
 
-        public ParentsService(IUnitOfWork unit)
+        public ParentsService(IUnitOfWork unitOfWork, IAuthenticationService authentication)
         {
-            _unitOfWork = unit;
+            _unitOfWork = unitOfWork;
+            _authentication = authentication;
+        }
+
+        private async Task<Parent?> GetInformationCurrentAsync()
+        {
+            _authentication.GetCurrentUserInformation(out var accountId, out var role);
+            if(role.CompareTo(Constant.ParentRole)==0)
+                return await _unitOfWork.ParentRepository.GetByIdAsync(accountId);
+            throw new BadRequestException("Account doesn't Parent Role");
         }
 
         public async Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request)
         {
             var studentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.StudentRole)
                 .ContinueWith(t => t.Result ?? throw new Exception("Role student name is incorrect."));
+
+            var _parent=await GetInformationCurrentAsync();
 
             var accountEntity = new Account()
             {
@@ -43,7 +55,7 @@ namespace Application.Services
 
             var studentEntity = new Student()
             {
-                ParentId = request.ParentId,
+                ParentId = _parent!=null?_parent.Id:throw new NotFoundException("ParentId not found"),
                 Account = accountEntity
             };
 
@@ -54,9 +66,10 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<List<StudentResponseDto>> GetStudentsAsync(int parentId)
+        public async Task<List<StudentResponseDto>> GetStudentsAsync()
         {
-            var list = await _unitOfWork.StudentRepository.GetStudents(parentId);
+            var _parent =await GetInformationCurrentAsync();
+            var list = await _unitOfWork.StudentRepository.GetStudents(_parent.Id);
             return  ParentMapper.ParentShowListStudent(list);
         }
 
@@ -86,12 +99,13 @@ namespace Application.Services
                 throw new NotFoundException($"Student Id {dto.Id} not found");
         }
 
-        public ParentOrderResponseDto GetEmailZalo(int parentId)
+        public async Task<ParentOrderResponseDto> GetEmailZalo()
         {
-            var _result= _unitOfWork.ParentRepository.GetEmailZalo(parentId);
+            var _parent =await GetInformationCurrentAsync();
+            var _result= _unitOfWork.ParentRepository.GetEmailZalo(_parent.Id);
             if (_result != null)
                 return ParentMapper.ParentShowEmailZalo(_result);
-            throw new NotFoundException("Parent Id doesn't exist");
+            throw new NotFoundException("Parent doesn't exist");
         }
     }
 }

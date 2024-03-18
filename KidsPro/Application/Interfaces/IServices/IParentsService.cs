@@ -13,11 +13,11 @@ namespace Application.Interfaces.IServices
     {
         Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request);
 
-        Task<List<StudentResponseDto>> GetStudentsAsync(int parentId);
+        Task<List<StudentResponseDto>> GetStudentsAsync();
 
         Task<StudentDetailResponseDto> GetDetailStudentAsync(int studentId);
         Task UpdateStudentAsync(StudentUpdateRequestDto dto);
 
-        ParentOrderResponseDto GetEmailZalo(int parentId);
+        Task<ParentOrderResponseDto> GetEmailZalo();
     }
 }

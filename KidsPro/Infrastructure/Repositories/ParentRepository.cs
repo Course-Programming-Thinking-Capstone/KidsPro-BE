@@ -35,6 +35,8 @@ public class ParentRepository : BaseRepository<Parent>, IParentRepository
 
     public override Task<Parent?> GetByIdAsync(int id, bool disableTracking = false)
     {
-        return _dbSet.Include(_ => _.Account).FirstOrDefaultAsync(x => x.Id == id);
+        return _dbSet.Include(_ => _.Account).FirstOrDefaultAsync(x => x.AccountId == id);
     }
+
+    
 }
