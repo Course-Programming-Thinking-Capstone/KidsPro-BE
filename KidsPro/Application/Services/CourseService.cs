@@ -39,128 +39,6 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCourseDto(course);
     }
 
-    public async Task<CourseDto> CreateCourseOldAsync(CreateCourseDto dto)
-    {
-        var entity = new Course();
-
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-
-        var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
-
-        entity.Name = dto.Name;
-        entity.CourseTarget = dto.CourseTarget;
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.ModifiedDate = DateTime.UtcNow;
-        entity.CreatedBy = currentAccount;
-        entity.ModifiedBy = currentAccount;
-        entity.Status = CourseStatus.Draft;
-
-        if (dto.Sections != null)
-        {
-            var sections = new List<Section>();
-
-            var sectionIndex = 1;
-
-            foreach (var sectionDto in dto.Sections)
-            {
-                var section = new Section
-                {
-                    Name = sectionDto.Name,
-                    Order = sectionIndex
-                };
-
-                if (sectionDto.Lessons != null)
-                {
-                    var lessons = new List<Lesson>();
-                    var seenOrders = new HashSet<int>();
-                    foreach (var lessonDto in sectionDto.Lessons)
-                    {
-                        if (!seenOrders.Add(lessonDto.Order))
-                        {
-                            // Duplicate order detected
-                            _logger.LogError("Error at {}: \nDuplicate order {} found within lessons.",
-                                nameof(CreateCourseOldAsync), lessonDto.Order);
-                            throw new BadRequestException($"Duplicate order '{lessonDto.Order}' found within lessons.");
-                        }
-
-                        var lesson = CourseMapper.CreateLessonDtoToLesson(lessonDto);
-                        lessons.Add(lesson);
-                    }
-
-                    section.Lessons = lessons;
-                }
-
-                if (sectionDto.Quizzes != null)
-                {
-                    var quizzes = new List<Quiz>();
-                    var quizIndex = 1;
-                    foreach (var sectionDtoQuiz in sectionDto.Quizzes)
-                    {
-                        var quiz = CourseMapper.CreateQuizDtoToQuiz(sectionDtoQuiz);
-                        var questions = new List<Question>();
-                        var questionOrder = 1;
-                        decimal totalScore = 0;
-
-                        foreach (var createQuestionDto in sectionDtoQuiz.Questions)
-                        {
-                            var question = CourseMapper.CreateQuestionDtoToQuestion(createQuestionDto);
-                            question.Order = questionOrder;
-                            totalScore += question.Score;
-
-                            var options = new List<Option>();
-                            var optionOrder = 1;
-                            foreach (var createOptionDto in createQuestionDto.Options)
-                            {
-                                var option = CourseMapper.CreateOptionDtoToOption(createOptionDto);
-                                option.Order = optionOrder;
-                                options.Add(option);
-                                optionOrder++;
-                            }
-
-                            question.Options = options;
-                            questions.Add(question);
-                            questionOrder++;
-                        }
-
-                        if (sectionDtoQuiz.NumberOfQuestion.HasValue)
-                        {
-                            quiz.NumberOfQuestion = sectionDtoQuiz.NumberOfQuestion.Value;
-                        }
-                        else
-                        {
-                            quiz.NumberOfQuestion = questionOrder - 1;
-                        }
-
-                        quiz.TotalScore = totalScore;
-                        quiz.TotalQuestion = questionOrder - 1;
-                        quiz.Questions = questions;
-                        quiz.CreatedDate = DateTime.UtcNow;
-                        quiz.CreatedById = accountId;
-                        quiz.CreatedBy = currentAccount;
-                        quiz.Order = quizIndex;
-
-                        quizzes.Add(quiz);
-                        quizIndex++;
-                    }
-
-                    section.Quizzes = quizzes;
-                }
-
-                section.Order = sectionIndex;
-
-                sections.Add(section);
-                sectionIndex++;
-            }
-
-            entity.Sections = sections;
-        }
-
-        await _unitOfWork.CourseRepository.AddAsync(entity);
-        await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.CourseToCourseDto(entity);
-    }
-
     /// <summary>
     /// Admin create course with exist section and assign teacher to edit course
     /// </summary>
@@ -497,6 +375,47 @@ public class CourseService : ICourseService
         else if (action.Equals("Post"))
         {
             courseEntity.Status = CourseStatus.Pending;
+
+            //Create notification
+            var notificationAccounts = await _unitOfWork.AccountRepository.GetAsync(
+                filter: a => a.Role.Name == Constant.StaffRole || a.Role.Name == Constant.AdminRole
+                    && a.Status == UserStatus.Active && !a.IsDelete,
+                orderBy: null,
+                includeProperties: $"{nameof(Account.Role)}",
+                disableTracking: true
+            );
+
+            var adminStaffNotifications = notificationAccounts.Select(t => new UserNotification()
+            {
+                AccountId = t.Id
+            }).ToList();
+
+            var adminStaffNotification = new Notification()
+            {
+                Title = "Request accept course",
+                Content = $"Teacher {currentAccount.FullName} has create a course approval request.",
+                Date = DateTime.UtcNow,
+                UserNotifications = adminStaffNotifications
+            };
+
+            var teacherNotifications = new List<UserNotification>
+            {
+                new()
+                {
+                    AccountId = accountId
+                }
+            };
+
+            var teacherNotification = new Notification()
+            {
+                Title = "Success create course approval request.",
+                Content = "You have create a course approval request. Your course is waiting for processing.",
+                Date = DateTime.UtcNow,
+                UserNotifications = teacherNotifications
+            };
+
+            await _unitOfWork.NotificationRepository.AddRangeAsync(
+                new[] { adminStaffNotification, teacherNotification });
         }
         else
         {
@@ -504,7 +423,6 @@ public class CourseService : ICourseService
         }
 
         _unitOfWork.CourseRepository.Update(courseEntity);
-        //Create notification
 
         await _unitOfWork.SaveChangeAsync();
 
@@ -621,6 +539,29 @@ public class CourseService : ICourseService
         }
 
         courseEntity.Status = CourseStatus.Denied;
+
+        if (courseEntity.ModifiedById == null)
+        {
+            throw new BadRequestException($"Teacher id in course is null.");
+        }
+
+        var teacherNotifications = new List<UserNotification>
+        {
+            new()
+            {
+                AccountId = courseEntity.ModifiedById.Value
+            }
+        };
+
+        var teacherNotification = new Notification()
+        {
+            Title = "Your course has been denied.",
+            Content = $"Reason: {reason}",
+            Date = DateTime.UtcNow,
+            UserNotifications = teacherNotifications
+        };
+
+        await _unitOfWork.NotificationRepository.AddAsync(teacherNotification);
 
         _unitOfWork.CourseRepository.Update(courseEntity);
 
