@@ -1,11 +1,9 @@
 ﻿using Application.Dtos.Request.Account.Student;
 using Application.Dtos.Response.Account.Parent;
 using Application.Dtos.Response.Account.Student;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Application.ErrorHandlers;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Interfaces.IServices;
 
@@ -19,5 +17,10 @@ namespace Application.Interfaces.IServices;
         Task UpdateStudentAsync(StudentUpdateRequestDto dto);
 
         Task<ParentOrderResponseDto> GetEmailZalo();
+
+        Task<Parent?> GetInformationParentCurrentAsync();
+
+        Task<List<GameVoucher>?> GetListVoucherAsync(VoucherStatus status);
+
     }
 

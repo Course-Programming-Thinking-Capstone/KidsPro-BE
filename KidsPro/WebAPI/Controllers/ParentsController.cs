@@ -5,6 +5,7 @@ using Application.Dtos.Response.Account.Parent;
 using Application.Dtos.Response.Account.Student;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,7 +40,6 @@ public class ParentsController : ControllerBase
     /// <summary>
     /// Phụ huynh Lấy danh sách student hiển thị by ParentId
     /// </summary>
-    /// <param name="id">Parent Id</param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.ParentRole}")]
     [HttpGet("students")]
@@ -83,15 +83,29 @@ public class ParentsController : ControllerBase
     /// <summary>
     /// Get email and zalo của parent
     /// </summary>
-    /// <param name="id"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.ParentRole}")]
-    [HttpGet("email-zalo")]
+    [HttpGet("contact")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ParentOrderResponseDto>> GetEmailZalo()
     {
         var result=await _parent.GetEmailZalo();
+        return Ok(result);
+    }
+    
+    /// <summary>
+    /// Get list voucher of parent
+    /// </summary>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.ParentRole}")]
+    [HttpGet("vouchers")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<ParentOrderResponseDto>> GetListVoucherAsync(VoucherStatus status)
+    {
+        var result=await _parent.GetListVoucherAsync(status);
         return Ok(result);
     }
 }

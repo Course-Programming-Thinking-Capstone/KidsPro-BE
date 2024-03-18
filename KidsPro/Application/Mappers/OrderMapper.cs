@@ -1,19 +1,36 @@
 ﻿using Application.Dtos.Response.Order;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Mappers
 {
     public class OrderMapper
     {
-        public static OrderResponseDto OrderToOrderResponse(Order order) => new OrderResponseDto()
+        public static OrderPaymentResponseDto OrderToOrderPaymentResponse(Order order) => new OrderPaymentResponseDto()
         {
-            ParentId=order.ParentId,
+            ParentId = order.ParentId,
             OrderId = order.Id,
         };
+
+        public static List<OrderResponseDto> ParentShowOrder(List<Order> orders)
+        {
+            var list = new List<OrderResponseDto>();
+            foreach (var x in orders)
+            {
+                var dto = new OrderResponseDto()
+                {
+                    OrderId = x.Id,
+                    OrderCode = x.OrderCode,
+                    CourseName = x.OrderDetails!.FirstOrDefault()?.Course.Name,
+                    PictureUrl = x.OrderDetails!.FirstOrDefault()?.Course.PictureUrl,
+                    Quantity = x.Quantity,
+                    TotalPrice = x.TotalPrice,
+                    OrderStatus = x.Status.ToString()
+                };
+                list.Add(dto);
+            }
+
+            return list;
+        }
+        
     }
 }

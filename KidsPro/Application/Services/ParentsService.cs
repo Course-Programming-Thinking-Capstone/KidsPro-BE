@@ -22,7 +22,7 @@ namespace Application.Services;
             _authentication = authentication;
         }
 
-        private async Task<Parent?> GetInformationCurrentAsync()
+        public async Task<Parent?> GetInformationParentCurrentAsync()
         {
             _authentication.GetCurrentUserInformation(out var accountId, out var role);
             if (String.Compare(role, Constant.ParentRole, StringComparison.Ordinal) == 0)
@@ -35,7 +35,7 @@ namespace Application.Services;
             var studentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.StudentRole)
                 .ContinueWith(t => t.Result ?? throw new Exception("Role student name is incorrect."));
 
-            var parent = await GetInformationCurrentAsync();
+            var parent = await GetInformationParentCurrentAsync();
 
             var accountEntity = new Account()
             {
@@ -63,11 +63,11 @@ namespace Application.Services;
 
         public async Task<List<StudentResponseDto>> GetStudentsAsync()
         {
-            var parent = await GetInformationCurrentAsync();
+            var parent = await GetInformationParentCurrentAsync();
             if (parent != null)
             {
                 var list = await _unitOfWork.StudentRepository.GetStudents(parent.Id);
-                return ParentMapper.ParentShowListStudent(list);
+                return ParentMapper.ParentShowStudentList(list);
             }
 
             throw new UnauthorizedException("Parent doesn't exist");
@@ -101,14 +101,25 @@ namespace Application.Services;
 
         public async Task<ParentOrderResponseDto> GetEmailZalo()
         {
-            var parent = await GetInformationCurrentAsync();
+            var parent = await GetInformationParentCurrentAsync();
             if (parent != null)
             {
                 var result = _unitOfWork.ParentRepository.GetEmailZalo(parent.Id);
                 if (result != null)
-                    return ParentMapper.ParentShowEmailZalo(result);
+                    return ParentMapper.ParentShowContact(result);
             }
-
             throw new NotFoundException("Parent doesn't exist");
         }
+        
+        public async Task<List<GameVoucher>?> GetListVoucherAsync(VoucherStatus status)
+        {
+            var parent = await GetInformationParentCurrentAsync();
+            if (parent != null)
+            {
+                var vouchers = await _unitOfWork.VoucherRepository.GetListVoucher(parent.Id, status);
+                return vouchers;
+            }
+            throw new NotFoundException("Parent doesn't exist");
+        }
+        
     }

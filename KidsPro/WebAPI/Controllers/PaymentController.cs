@@ -1,9 +1,7 @@
 ﻿using Application.Dtos.Request.Order.Momo;
 using Application.Dtos.Response.Order;
-using Application.Dtos.Response.Order.Momo;
 using Application.Interfaces.IServices;
 using Application.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Gateway.IConfig;
 
@@ -28,27 +26,27 @@ namespace WebAPI.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("momo")]
-        public async Task<ActionResult> CreatePaymentMomoAsync(OrderResponseDto dto)
+        public async Task<ActionResult> CreatePaymentMomoAsync(OrderPaymentResponseDto dto)
         {
-            var _momoRequest = new MomoPaymentRequestDto();
+            var momoRequest = new MomoPaymentRequestDto();
             //Get order có parent id và order id vs status payment
-            var _order = await _payment.GetOrderPaymentAsync(dto);
-            if (_order != null)
+            var order = await _payment.GetOrderPaymentAsync(dto);
+            if (order != null)
             {
                 // Lấy thông tin cho payment
-                _momoRequest.requestId = HashingUtils.GenerateRandomString(4) + "-" + dto.ParentId.ToString();
-                _momoRequest.orderId = HashingUtils.GenerateRandomString(4) + "-" + dto.OrderId.ToString();
-                _momoRequest.amount =(long) _order.TotalPrice;
+                momoRequest.requestId = HashingUtils.GenerateRandomString(4) + "-" + dto.ParentId.ToString();
+                momoRequest.orderId = HashingUtils.GenerateRandomString(4) + "-" + dto.OrderId.ToString();
+                momoRequest.amount =(long) order.TotalPrice;
                 //_momoRequest.extraData = DateTime.UtcNow.AddDays(1).ToString();
-                _momoRequest.redirectUrl = _momoConfig.ReturnUrl;
-                _momoRequest.ipnUrl = _momoConfig.IpnUrl;
-                _momoRequest.partnerCode = _momoConfig.PartnerCode;
-                _momoRequest.orderInfo = " 'KidsPro Service' - You are payment for " + _order.Note;
-                _momoRequest.signature = _payment.MakeSignatureMomoPayment
-                (_momoConfig.AccessKey, _momoConfig.SecretKey, _momoRequest);
+                momoRequest.redirectUrl = _momoConfig.ReturnUrl;
+                momoRequest.ipnUrl = _momoConfig.IpnUrl;
+                momoRequest.partnerCode = _momoConfig.PartnerCode;
+                momoRequest.orderInfo = " 'KidsPro Service' - You are payment for " + order.Note;
+                momoRequest.signature = _payment.MakeSignatureMomoPayment
+                (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
             }
             // lấy link QR momo
-            var result = _payment.GetLinkGatewayMomo(_momoConfig.PaymentUrl, _momoRequest);
+            var result = _payment.GetLinkGatewayMomo(_momoConfig.PaymentUrl, momoRequest);
             return Ok(new
             {
                 payUrl= result.Item1,

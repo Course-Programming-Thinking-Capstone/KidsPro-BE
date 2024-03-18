@@ -14,7 +14,7 @@ namespace Application.Mappers
 {
     public class ParentMapper
     {
-        public static List<StudentResponseDto> ParentShowListStudent(List<Student> entity)
+        public static List<StudentResponseDto> ParentShowStudentList(List<Student> entity)
         {
             var list = new List<StudentResponseDto>();
             foreach (var x in entity)
@@ -70,7 +70,7 @@ namespace Application.Mappers
             return student;
         }
 
-        public static ParentOrderResponseDto ParentShowEmailZalo(Parent entity) => new ParentOrderResponseDto()
+        public static ParentOrderResponseDto ParentShowContact(Parent entity) => new ParentOrderResponseDto()
         {
             Email = entity?.Account?.Email,
             PhoneNumber = entity?.PhoneNumber
