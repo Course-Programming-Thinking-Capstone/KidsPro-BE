@@ -4,6 +4,7 @@ using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Course.Update.Quiz;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Lesson;
 using Application.Dtos.Response.Course.Quiz;
 using Application.Dtos.Response.Paging;
@@ -16,12 +17,9 @@ namespace Application.Mappers;
 
 public static class CourseMapper
 {
-    // public static Course CreateCourseDtoToEntity(CreateCourseDto dto)
-    //     => new Course()
-    //     {
-    //         Name = dto.Name,
-    //         Description = dto.Description
-    //     };
+
+    public const string FilterCommonCourseType = "Common";
+    public const string FilterManageCourseType = "Manage";
 
     public static SectionDto SectionToSectionDto(Section entity)
         => new SectionDto()
@@ -73,8 +71,7 @@ public static class CourseMapper
     public static List<SectionComponentNumberDto> EntityToSectionComponentNumberDto(
         IEnumerable<SectionComponentNumber> entities)
         => entities.Select(EntityToSectionComponentNumberDto).ToList();
-
-
+    
     public static Lesson CreateLessonDtoToLesson(CreateLessonDto dto)
         => new Lesson()
         {
@@ -85,7 +82,6 @@ public static class CourseMapper
             Duration = dto.Duration,
             ResourceUrl = dto.ResourceUrl
         };
-
 
     public static LessonDto LessonToLessonDto(Lesson entity)
     {
@@ -113,7 +109,6 @@ public static class CourseMapper
         };
     }
 
-
     public static Option CreateOptionDtoToOption(CreateOptionDto dto)
         => new()
         {
@@ -138,7 +133,6 @@ public static class CourseMapper
             NumberOfAttempt = dto.NumberOfAttempt,
             IsOrderRandom = dto.IsOrderRandom ?? false
         };
-
 
     public static List<LessonDto> LessonToLessonDto(IEnumerable<Lesson> entities)
         => entities.Select(LessonToLessonDto).ToList();
@@ -305,16 +299,56 @@ public static class CourseMapper
             Description = entity.Description,
             Price = entity.Price,
             IsFree = entity.IsFree,
+            PictureUrl = entity.PictureUrl
+        };
+
+
+    public static CommonFilterCourseDto CourseToCommonFilterCourseDto(Course entity)
+        => new CommonFilterCourseDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            Price = entity.Price,
+            IsFree = entity.IsFree,
+            PictureUrl = entity.PictureUrl
+        };
+
+    public static ManageFilterCourseDto CourseToManageFilterCourseDto(Course entity)
+        => new()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            Price = entity.Price,
+            IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,
-            Status = entity.Status.ToString()
+            Status = entity.Status.ToString(),
+            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate)
         };
 
     public static PagingResponse<FilterCourseDto> CourseToFilterCourseDto(PagingResponse<Course> entities)
-        => new PagingResponse<FilterCourseDto>()
+        => new()
         {
             TotalPages = entities.TotalPages,
             TotalRecords = entities.TotalRecords,
             Results = entities.Results.Select(CourseToFilterCourseDto).ToList()
+        };
+
+    public static PagingResponse<CommonFilterCourseDto> CourseToCommonFilterCourseDto(PagingResponse<Course> entities)
+        => new()
+        {
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords,
+            Results = entities.Results.Select(CourseToCommonFilterCourseDto).ToList()
+        };
+
+    public static PagingResponse<ManageFilterCourseDto> CourseToManageFilterCourseDto(PagingResponse<Course> entities)
+        => new()
+        {
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords,
+            Results = entities.Results.Select(CourseToManageFilterCourseDto).ToList()
         };
 
     public static void UpdateCourseDtoToEntity(UpdateCourseDto dto, ref Course entity)

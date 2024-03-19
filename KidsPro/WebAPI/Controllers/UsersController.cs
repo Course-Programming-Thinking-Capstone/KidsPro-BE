@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.Configurations;
-using Application.Dtos.Request.Authentication;
-using Application.Dtos.Request.User;
+using Application.Dtos.Request.Account;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
@@ -137,8 +136,4 @@ public class UsersController : ControllerBase
 
         return Ok(result);
     }
-
-   
-
-
 }

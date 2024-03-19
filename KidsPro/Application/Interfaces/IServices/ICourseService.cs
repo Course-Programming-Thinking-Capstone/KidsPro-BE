@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
@@ -23,11 +24,16 @@ public interface ICourseService
 
     Task<string> UpdateCoursePictureAsync(int id, IFormFile file);
 
-    Task<PagingResponse<FilterCourseDto>> FilterCourseAsync(string? name, CourseStatus? status, string? sortName,
-        int? page, int? size);
-
-    Task<PagingResponse<FilterCourseDto>> FilterDraftCourseAsync(string? name, string? sortName, string? sortDate,
-        int? page, int? size);
+    Task<IPagingResponse<FilterCourseDto>> FilterCourseAsync(
+        string? name,
+        CourseStatus? status,
+        string? sortName,
+        string? sortCreatedDate,
+        string? sortModifiedDate,
+        string? action,
+        int? page,
+        int? size
+    );
 
     Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync();
 

@@ -3,6 +3,7 @@ using Application.Configurations;
 using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -608,7 +609,22 @@ public class CourseService : ICourseService
         return entity.PictureUrl;
     }
 
-    public async Task<PagingResponse<FilterCourseDto>> FilterCourseAsync(string? name, CourseStatus? status,
+    public async Task<IPagingResponse<FilterCourseDto>> FilterCourseAsync(string? name, CourseStatus? status,
+        string? sortName, string? sortCreatedDate,
+        string? sortModifiedDate, string? action, int? page, int? size)
+    {
+        if (action == "manage")
+        {
+            return await FilterManageCourseAsync(name, status, sortName, sortCreatedDate, sortModifiedDate, page, size);
+        }
+        else
+        {
+            return await FilterCommonCourseAsync(name, sortName, page, size);
+        }
+    }
+
+    private async Task<PagingResponse<CommonFilterCourseDto>> FilterCommonCourseAsync(
+        string? name,
         string? sortName, int? page, int? size)
     {
         //need to check role
@@ -639,14 +655,12 @@ public class CourseService : ICourseService
                         Expression.Constant(name)));
             }
 
-            if (status.HasValue)
-            {
-                filter = Expression.AndAlso(filter,
-                    Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
-                        Expression.Constant(status)));
-            }
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                    Expression.Constant(CourseStatus.Active)));
 
-            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(c => c.Id);
+            //Default sort by modified date desc
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.ModifiedDate);
 
             if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
             {
@@ -663,28 +677,25 @@ public class CourseService : ICourseService
                 page: page,
                 size: size
             );
-            var result = CourseMapper.CourseToFilterCourseDto(entities);
+            var result = CourseMapper.CourseToCommonFilterCourseDto(entities);
             return result;
         }
         catch (Exception e)
         {
             _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
-                nameof(this.FilterCourseAsync), e.Message);
-            throw new Exception($"Error when execute {nameof(this.FilterCourseAsync)} method");
+                nameof(this.FilterCommonCourseAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterCommonCourseAsync)} method");
         }
     }
 
-    public async Task<PagingResponse<FilterCourseDto>> FilterDraftCourseAsync(string? name, string? sortName,
-        string? sortDate, int? page, int? size)
+    private async Task<PagingResponse<ManageFilterCourseDto>> FilterManageCourseAsync(
+        string? name, CourseStatus? status,
+        string? sortName, string? sortCreatedDate,
+        string? sortModifiedDate, int? page, int? size)
     {
         _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
-        if (role != Constant.TeacherRole && role != Constant.AdminRole)
-        {
-            _logger.LogWarning("Account {} is trying to filter pending course.\nDate: {}", accountId, DateTime.UtcNow);
-            throw new ForbiddenException("Access denied.");
-        }
-
+        //need to check role
         var parameter = Expression.Parameter(typeof(Course));
         Expression filter = Expression.Constant(true); // default is "where true"
 
@@ -701,17 +712,6 @@ public class CourseService : ICourseService
                 Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
                     Expression.Constant(false)));
 
-            filter = Expression.AndAlso(filter,
-                Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
-                    Expression.Constant(CourseStatus.Draft)));
-
-            if (role == Constant.TeacherRole)
-            {
-                filter = Expression.AndAlso(filter,
-                    Expression.Equal(Expression.Property(parameter, nameof(Course.ModifiedById)),
-                        Expression.Constant(accountId, typeof(int?))));
-            }
-
             if (!string.IsNullOrEmpty(name))
             {
                 filter = Expression.AndAlso(filter,
@@ -721,6 +721,31 @@ public class CourseService : ICourseService
                         ?? throw new NotImplementException(
                             $"{nameof(string.Contains)} method is deprecated or not supported."),
                         Expression.Constant(name)));
+            }
+
+            if (status.HasValue)
+            {
+                if (status.Equals(CourseStatus.Draft))
+                {
+                    //Check role
+                    if (role != Constant.TeacherRole && role != Constant.AdminRole)
+                    {
+                        _logger.LogWarning("Account {} is trying to filter pending course.\nDate: {}", accountId,
+                            DateTime.UtcNow);
+                        throw new ForbiddenException("Access denied.");
+                    }
+
+                    if (role == Constant.TeacherRole)
+                    {
+                        filter = Expression.AndAlso(filter,
+                            Expression.Equal(Expression.Property(parameter, nameof(Course.ModifiedById)),
+                                Expression.Constant(accountId, typeof(int?))));
+                    }
+                }
+
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                        Expression.Constant(status)));
             }
 
             Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(c => c.Id);
@@ -733,11 +758,19 @@ public class CourseService : ICourseService
             {
                 orderBy = q => q.OrderByDescending(s => s.Name);
             }
-            else if (sortDate != null && sortDate.Trim().ToLower().Equals("asc"))
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.CreatedDate);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.CreatedDate);
+            }
+            else if (sortModifiedDate != null && sortModifiedDate.Trim().ToLower().Equals("asc"))
             {
                 orderBy = q => q.OrderBy(s => s.ModifiedDate);
             }
-            else if (sortDate != null && sortDate.Trim().ToLower().Equals("desc"))
+            else if (sortModifiedDate != null && sortModifiedDate.Trim().ToLower().Equals("desc"))
             {
                 orderBy = q => q.OrderByDescending(s => s.ModifiedDate);
             }
@@ -748,17 +781,17 @@ public class CourseService : ICourseService
                 page: page,
                 size: size
             );
-            var result = CourseMapper.CourseToFilterCourseDto(entities);
+            var result = CourseMapper.CourseToManageFilterCourseDto(entities);
             return result;
         }
         catch (Exception e)
         {
             _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
-                nameof(this.FilterCourseAsync), e.Message);
-            throw new Exception($"Error when execute {nameof(this.FilterCourseAsync)} method");
+                nameof(this.FilterManageCourseAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterManageCourseAsync)} method");
         }
     }
-
+    
     public async Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync()
     {
         var entities = await _unitOfWork.SectionComponentNumberRepository.GetAsync(
