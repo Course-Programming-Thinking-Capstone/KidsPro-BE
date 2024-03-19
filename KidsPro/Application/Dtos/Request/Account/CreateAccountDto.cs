@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
 
-namespace Application.Dtos.Request.User;
+namespace Application.Dtos.Request.Account;
 
 public record CreateAccountDto
 {

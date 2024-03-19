@@ -14,7 +14,7 @@ public class SectionDto
 
     public int CourseId { get; set; }
 
-    public ICollection<LessonDto>? Lessons { get; set; }
+    public IEnumerable<LessonDto>? Lessons { get; set; }
 
     public ICollection<QuizDto>? Quizzes { get; set; }
 }

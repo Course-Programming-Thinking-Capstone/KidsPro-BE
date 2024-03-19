@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Application.Dtos.Request.User;
+namespace Application.Dtos.Request.Account;
 
 public record ChangePasswordDto
 {
