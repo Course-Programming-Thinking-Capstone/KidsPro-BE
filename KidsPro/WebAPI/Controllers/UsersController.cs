@@ -97,10 +97,11 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Admin filter account. Gender is enum: "Male: 1, Female: 2".
+    /// Admin filter account. Gender is enum: "Male: 1, Female: 2". Role can be "Teacher" "Staff" "Student" or "Parent"
     /// </summary>
     /// <param name="fullName"></param>
     /// <param name="gender"></param>
+    /// <param name="role"></param>
     /// <param name="status"></param>
     /// <param name="sortFullName"></param>
     /// <param name="sortCreatedDate"></param>
@@ -117,6 +118,7 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<PagingResponse<AccountDto>>> FilterAccountAsync(
         [FromQuery] string? fullName,
         [FromQuery] Gender? gender,
+        [FromQuery] string? role,
         [FromQuery] string? status,
         [FromQuery] string? sortFullName,
         [FromQuery] string? sortCreatedDate,
@@ -127,6 +129,7 @@ public class UsersController : ControllerBase
         var result = await _accountService.FilterAccountAsync(
             fullName,
             gender,
+            role,
             status,
             sortFullName,
             sortCreatedDate,

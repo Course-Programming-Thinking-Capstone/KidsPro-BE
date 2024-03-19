@@ -1,4 +1,4 @@
-﻿namespace Application.Dtos.Response.Course;
+﻿namespace Application.Dtos.Response.Old.Course;
 
 public class CommonCourseDto
 {

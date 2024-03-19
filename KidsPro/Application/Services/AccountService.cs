@@ -359,7 +359,10 @@ public class AccountService : IAccountService
         return result;
     }
 
-    public async Task<PagingResponse<AccountDto>> FilterAccountAsync(string? fullName, Gender? gender, string? status,
+    public async Task<PagingResponse<AccountDto>> FilterAccountAsync(
+        string? fullName, Gender? gender,
+        string? role,
+        string? status,
         string? sortFullName, string? sortCreatedDate, int? page,
         int? size)
     {
@@ -385,6 +388,19 @@ public class AccountService : IAccountService
             filter = Expression.AndAlso(filter,
                 Expression.NotEqual(Expression.Property(parameter, nameof(Account.RoleId)),
                     Expression.Constant(1)));
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                if (role is Constant.StaffRole or Constant.ParentRole or Constant.TeacherRole or Constant.StudentRole)
+                {
+                    filter = Expression.AndAlso(filter,
+                        Expression.Equal(
+                            Expression.Property(
+                                Expression.Property(parameter, nameof(Account.Role)),
+                                nameof(Role.Name)),
+                            Expression.Constant(role)));
+                }
+            }
 
             if (!string.IsNullOrEmpty(fullName))
             {
@@ -454,8 +470,4 @@ public class AccountService : IAccountService
             throw new Exception($"Error when execute {nameof(this.FilterAccountAsync)} method");
         }
     }
-
-   
-
-
 }

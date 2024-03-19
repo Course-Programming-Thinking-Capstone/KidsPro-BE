@@ -5,7 +5,6 @@ using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
-using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,23 +26,26 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Get by course Id
+    /// Get by course Id, param action (can be null or "manage") is used to define whether api used for common user (parent, guest) view course detail or
+    /// for managing purpose.
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="action"></param>
     /// <returns></returns>
     [HttpGet("{id:int}")]
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id)
-
+    public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id, [FromQuery] string? action)
     {
-        var result = await _courseService.GetByIdAsync(id);
+        var result = await _courseService.GetByIdAsync(id, action);
         return Ok(result);
     }
 
     /// <summary>
-    /// Admin, staff, teacher filter course on the system
+    /// Admin, staff, teacher filter course on the system. action can be null or "manage". If action is null, the api is use
+    /// for common user/ parent to view course on system (no need to login to use api). If action is "manage", filter is used for
+    /// manage course on the system (require login).
     /// </summary>
     /// <param name="name"></param>
     /// <param name="status"></param>

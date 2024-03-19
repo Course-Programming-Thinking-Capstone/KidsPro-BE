@@ -8,8 +8,5 @@ public record UpdateCourseDto
     [Required(ErrorMessage = "Class name is required.")]
     public string? Name { get; init; } = null!;
 
-    [StringLength(3000, ErrorMessage = "Description can not exceed 3000 character")]
-    public string? Description { get; init; }
-
     public bool? IsFree { get; init; }
 }
