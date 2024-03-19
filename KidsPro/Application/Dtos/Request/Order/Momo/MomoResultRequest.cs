@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Request.Order.Momo
 {
-    public class MomoResultRequestDto
+    public class MomoResultRequest
     {
         public string partnerCode { get; set; } = "";
         public string orderId { get; set; } = "";

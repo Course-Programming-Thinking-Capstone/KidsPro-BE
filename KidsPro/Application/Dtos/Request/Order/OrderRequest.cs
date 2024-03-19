@@ -1,6 +1,6 @@
 ﻿namespace Application.Dtos.Request.Order
 {
-    public class OrderRequestDto
+    public class OrderRequest
     {
         public List<int> StudentId { get; set; } = new List<int>();
         public int CourseId { get; set; }

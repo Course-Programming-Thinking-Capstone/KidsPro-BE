@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Request.Account.Student
 {
-    public class StudentUpdateRequestDto
+    public class StudentUpdateRequest
     {
         public int Id { get; set; }
 

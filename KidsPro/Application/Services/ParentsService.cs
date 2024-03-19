@@ -30,7 +30,7 @@ namespace Application.Services;
             throw new BadRequestException("Account doesn't Parent Role");
         }
 
-        public async Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request)
+        public async Task<StudentResponse> AddStudentAsync(StudentAddRequest request)
         {
             var studentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.StudentRole)
                 .ContinueWith(t => t.Result ?? throw new Exception("Role student name is incorrect."));
@@ -61,7 +61,7 @@ namespace Application.Services;
             return result;
         }
 
-        public async Task<List<StudentResponseDto>> GetStudentsAsync()
+        public async Task<List<StudentResponse>> GetStudentsAsync()
         {
             var parent = await GetInformationParentCurrentAsync();
             if (parent != null)
@@ -73,7 +73,7 @@ namespace Application.Services;
             throw new UnauthorizedException("Parent doesn't exist");
         }
 
-        public async Task<StudentDetailResponseDto> GetDetailStudentAsync(int studentId)
+        public async Task<StudentDetailResponse> GetDetailStudentAsync(int studentId)
         {
             var student = await _unitOfWork.StudentRepository.GetStudentInformation(studentId);
             if (student != null)
@@ -81,7 +81,7 @@ namespace Application.Services;
             throw new NotFoundException("studentId doesn't exist");
         }
 
-        public async Task UpdateStudentAsync(StudentUpdateRequestDto dto)
+        public async Task UpdateStudentAsync(StudentUpdateRequest dto)
         {
             var student = await _unitOfWork.StudentRepository.GetByIdAsync(dto.Id);
             if (student != null)
@@ -99,7 +99,7 @@ namespace Application.Services;
                 throw new NotFoundException($"Student Id {dto.Id} not found");
         }
 
-        public async Task<ParentOrderResponseDto> GetEmailZalo()
+        public async Task<ParentOrderResponse> GetEmailZalo()
         {
             var parent = await GetInformationParentCurrentAsync();
             if (parent != null)

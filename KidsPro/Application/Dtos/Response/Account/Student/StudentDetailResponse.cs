@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Response.Account.Student
 {
-    public class StudentDetailResponseDto : StudentResponseDto
+    public class StudentDetailResponse : StudentResponse
     {
         public int CourseTotal { get; set; }
         public List<TitleDto> StudentsCourse { get; set; } = new List<TitleDto>();

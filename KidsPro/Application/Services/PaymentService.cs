@@ -23,7 +23,7 @@ public class PaymentService : IPaymentService
         _orderService = orderService;
     }
 
-    public async Task<Order?> GetOrderPaymentAsync(OrderPaymentResponseDto dto)
+    public async Task<Order?> GetOrderPaymentAsync(OrderPaymentResponse dto)
     {
         var order = await _unitOfWork.OrderRepository.GetOrderPaymentAsync(dto.ParentId, dto.OrderId);
         if (order != null)
@@ -31,7 +31,7 @@ public class PaymentService : IPaymentService
         throw new NotFoundException($"OrderId {dto.OrderId} of ParentId {dto.ParentId} doesn't payment status");
     }
 
-    public string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequestDto momo)
+    public string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo)
     {
         var rawHash = "accessKey=" + accessKey +
                       "&amount=" + momo.amount + "&extraData=" + momo.extraData +
@@ -42,7 +42,7 @@ public class PaymentService : IPaymentService
         return momo.signature = HashingUtils.HmacSHA256(rawHash, secretKey);
     }
 
-    public (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequestDto momoRequest)
+    public (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest)
     {
         using HttpClient client = new HttpClient();
         var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
@@ -56,7 +56,7 @@ public class PaymentService : IPaymentService
         if (createPaymentLink.IsSuccessStatusCode)
         {
             var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
-            var responeseData = JsonConvert.DeserializeObject<MomoPaymentResponseDto>(responseContent);
+            var responeseData = JsonConvert.DeserializeObject<MomoPaymentResponse>(responseContent);
             // return QRcode
             if (responeseData?.resultCode == "0")
                 return (responeseData.payUrl, responeseData.qrCodeUrl);
@@ -67,7 +67,7 @@ public class PaymentService : IPaymentService
     }
 
 
-    public async Task CreateTransactionAsync(MomoResultRequestDto dto)
+    public async Task CreateTransactionAsync(MomoResultRequest dto)
     {
         var orderId = HashingUtils.GetIdMomoResponse(dto.orderId);
         var parentId = HashingUtils.GetIdMomoResponse(dto.requestId);

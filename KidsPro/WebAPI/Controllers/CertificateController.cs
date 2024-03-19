@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-        public async Task<IActionResult> AddCertificateAsync(CertificatesRequestDto dto)
+        public async Task<IActionResult> AddCertificateAsync(CertificatesRequest dto)
         {
             await _service.AddCertificateAsync(dto);
             return Ok();

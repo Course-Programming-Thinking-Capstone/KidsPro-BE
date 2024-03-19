@@ -9,14 +9,14 @@ namespace Application.Interfaces.IServices;
 
     public interface IParentsService
     {
-        Task<StudentResponseDto> AddStudentAsync(StudentAddRequestDto request);
+        Task<StudentResponse> AddStudentAsync(StudentAddRequest request);
 
-        Task<List<StudentResponseDto>> GetStudentsAsync();
+        Task<List<StudentResponse>> GetStudentsAsync();
 
-        Task<StudentDetailResponseDto> GetDetailStudentAsync(int studentId);
-        Task UpdateStudentAsync(StudentUpdateRequestDto dto);
+        Task<StudentDetailResponse> GetDetailStudentAsync(int studentId);
+        Task UpdateStudentAsync(StudentUpdateRequest dto);
 
-        Task<ParentOrderResponseDto> GetEmailZalo();
+        Task<ParentOrderResponse> GetEmailZalo();
 
         Task<Parent?> GetInformationParentCurrentAsync();
 

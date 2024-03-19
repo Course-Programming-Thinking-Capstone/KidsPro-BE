@@ -19,7 +19,7 @@ namespace Application.Services
             _parentsService = parentsService;
         }
 
-        public async Task<OrderPaymentResponseDto> CreateOrderAsync(OrderRequestDto dto)
+        public async Task<OrderPaymentResponse> CreateOrderAsync(OrderRequest dto)
         {
             var voucher = await _unitOfWork.VoucherRepository.GetVoucher(dto.VoucherId);
             //Kiểm tra lấy order code, nếu đã tồn tại phải tạo ordercode mới
@@ -96,7 +96,7 @@ namespace Application.Services
             throw new NotImplementException($"Update orderID {orderId} to status pending failed");
         }
 
-        public async Task<List<OrderResponseDto>> GetListOrderAsync(OrderStatus status)
+        public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
         {
             var parent = await _parentsService.GetInformationParentCurrentAsync();
             if (parent != null)
@@ -107,6 +107,21 @@ namespace Application.Services
 
             throw new UnauthorizedException("ParentId doesn't exist");
         }
+        
+        public async Task<OrderDetailResponse> GetOrderDetail (int orderId)
+        {
+            var parent = await _parentsService.GetInformationParentCurrentAsync();
+            if (parent != null)
+            {
+                var order = await _unitOfWork.OrderRepository.GetOrderDetail( parent.Id,orderId);
+                if (order != null)
+                    return OrderMapper.ParentShowOrderDetail(order);
+                throw new UnauthorizedException("OrderId doesn't exist");       
+            }
+
+            throw new UnauthorizedException("ParentId doesn't exist");
+        }
+        
         
     }
 }
