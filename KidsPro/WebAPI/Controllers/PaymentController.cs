@@ -30,7 +30,7 @@ namespace WebAPI.Controllers
         {
             var momoRequest = new MomoPaymentRequest();
             //Get order có parent id và order id vs status payment
-            var order = await _payment.GetOrderPaymentAsync(dto);
+            var order = await _payment.GetOrderStatusPaymentAsync(dto);
             if (order != null)
             {
                 // Lấy thông tin cho payment

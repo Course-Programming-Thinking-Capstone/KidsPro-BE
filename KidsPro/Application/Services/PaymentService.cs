@@ -23,9 +23,10 @@ public class PaymentService : IPaymentService
         _orderService = orderService;
     }
 
-    public async Task<Order?> GetOrderPaymentAsync(OrderPaymentResponse dto)
+    public async Task<Order?> GetOrderStatusPaymentAsync(OrderPaymentResponse dto)
     {
-        var order = await _unitOfWork.OrderRepository.GetOrderPaymentAsync(dto.ParentId, dto.OrderId);
+        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(dto.ParentId, dto.OrderId,
+            OrderStatus.Payment);
         if (order != null)
             return order;
         throw new NotFoundException($"OrderId {dto.OrderId} of ParentId {dto.ParentId} doesn't payment status");
@@ -72,20 +73,17 @@ public class PaymentService : IPaymentService
         var orderId = HashingUtils.GetIdMomoResponse(dto.orderId);
         var parentId = HashingUtils.GetIdMomoResponse(dto.requestId);
 
-        var resultUpdateStatus = await _orderService.StatusToPendingAsync(orderId, parentId);
-        if (resultUpdateStatus)
+        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Payment, OrderStatus.Pending);
+        var transaction = new Transaction()
         {
-            var transaction = new Transaction()
-            {
-                OrderId = orderId,
-                CreatedDate = DateTime.UtcNow,
-                TransactionCode = dto.transId,
-                Amount = dto.amount,
-                Status = TransactionStatus.Success
-            };
-            await _unitOfWork.TransactionRepository.AddAsync(transaction);
-            var result = await _unitOfWork.SaveChangeAsync();
-            if (result < 0) throw new NotImplementException("Add transaction failed");
-        }
+            OrderId = orderId,
+            CreatedDate = DateTime.UtcNow,
+            TransactionCode = dto.transId,
+            Amount = dto.amount,
+            Status = TransactionStatus.Success
+        };
+        await _unitOfWork.TransactionRepository.AddAsync(transaction);
+        var result = await _unitOfWork.SaveChangeAsync();
+        if (result < 0) throw new NotImplementException("Add transaction failed");
     }
 }
