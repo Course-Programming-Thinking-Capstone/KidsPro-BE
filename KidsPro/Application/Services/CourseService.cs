@@ -32,12 +32,14 @@ public class CourseService : ICourseService
         _logger = logger;
     }
 
-    public async Task<CourseDto> GetByIdAsync(int id)
+    public async Task<CourseDto> GetByIdAsync(int id, string? action)
     {
         var course = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} can not found."));
 
-        return CourseMapper.CourseToCourseDto(course);
+        if (action == "manage")
+            return CourseMapper.CourseToManageCourseDto(course);
+        return CourseMapper.CourseToCommonCourseDto(course);
     }
 
     /// <summary>
@@ -137,7 +139,7 @@ public class CourseService : ICourseService
         await _unitOfWork.NotificationRepository.AddRangeAsync(new[] { adminNotification, teacherNotification });
 
         await _unitOfWork.SaveChangeAsync();
-        return CourseMapper.CourseToCourseDto(entity);
+        return CourseMapper.CourseToManageCourseDto(entity);
     }
 
     public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
@@ -192,6 +194,8 @@ public class CourseService : ICourseService
 
         if (dto.Sections != null)
         {
+            var totalLesson = courseEntity.TotalLesson;
+
             foreach (var sectionDto in dto.Sections)
             {
                 var section = courseEntity.Sections.FirstOrDefault(s => s.Id == sectionDto.Id);
@@ -205,6 +209,12 @@ public class CourseService : ICourseService
                         var lessonOrder = 1;
                         var videoNumber = 0;
                         var documentNumber = 0;
+
+                        //Count total lesson
+                        var originNumberSectionLesson = section.Lessons.Count;
+                        var updateNumberSectionLesson = sectionDto.Lessons.Count;
+                        totalLesson += updateNumberSectionLesson - originNumberSectionLesson;
+
                         foreach (var lessonDto in sectionDto.Lessons)
                         {
                             if (!lessonDto.Id.HasValue)
@@ -367,6 +377,9 @@ public class CourseService : ICourseService
                     throw new BadRequestException($"Section {sectionDto.Id} does not exist.");
                 }
             }
+
+            //update total lesson
+            courseEntity.TotalLesson = totalLesson;
         }
 
         if (string.IsNullOrEmpty(action) || action.Equals("Save"))
@@ -429,7 +442,7 @@ public class CourseService : ICourseService
 
         await _unitOfWork.SaveChangeAsync();
 
-        return CourseMapper.CourseToCourseDto(courseEntity);
+        return CourseMapper.CourseToManageCourseDto(courseEntity);
     }
 
     public async Task ApproveCourseAsync(int id, AcceptCourseDto dto)
@@ -589,7 +602,7 @@ public class CourseService : ICourseService
         _unitOfWork.CourseRepository.Update(entity);
         await _unitOfWork.SaveChangeAsync();
 
-        return CourseMapper.CourseToCourseDto(entity);
+        return CourseMapper.CourseToManageCourseDto(entity);
     }
 
     public async Task<string> UpdateCoursePictureAsync(int id, IFormFile file)
@@ -791,7 +804,7 @@ public class CourseService : ICourseService
             throw new Exception($"Error when execute {nameof(this.FilterManageCourseAsync)} method");
         }
     }
-    
+
     public async Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync()
     {
         var entities = await _unitOfWork.SectionComponentNumberRepository.GetAsync(

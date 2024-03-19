@@ -11,7 +11,7 @@ using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Utils;
 using Domain.Entities;
-using Domain.Enums;
+using CommonCourseDto = Application.Dtos.Response.Course.CommonCourseDto;
 
 namespace Application.Mappers;
 
@@ -34,19 +34,18 @@ public static class CourseMapper
     public static List<SectionDto> SectionToSectionDto(IEnumerable<Section> entities)
         => entities.Select(SectionToSectionDto).ToList();
 
-    public static CourseDto CourseToCourseDto(Course entity)
-        => new CourseDto()
+    public static ManageCourseDto CourseToManageCourseDto(Course entity)
+        => new()
         {
             Id = entity.Id,
             Name = entity.Name,
-            Description = entity.Description,
             CourseTarget = entity.CourseTarget,
             Price = entity.Price,
-            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+            CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.CreatedDate),
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString(),
             DiscountPrice = entity.DiscountPrice,
-            ModifiedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
+            ModifiedDate = DateUtils.FormatDateTimeToDateV1(entity.ModifiedDate),
             TotalLesson = entity.TotalLesson,
             CreatedById = entity.CreatedById,
             CreatedByName = entity.CreatedBy.FullName,
@@ -55,6 +54,22 @@ public static class CourseMapper
             ModifiedByName = entity.ModifiedBy?.FullName,
             ApprovedById = entity.ApprovedById,
             ApprovedByName = entity.ApprovedBy?.FullName,
+            StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
+            IsFree = entity.IsFree,
+            Sections = entity.Sections.Select(SectionToSectionDto).ToList()
+        };
+
+    public static CommonCourseDto CourseToCommonCourseDto(Course entity)
+        => new CommonCourseDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            CourseTarget = entity.CourseTarget,
+            Price = entity.Price,
+            PictureUrl = entity.PictureUrl,
+            DiscountPrice = entity.DiscountPrice,
+            TotalLesson = entity.TotalLesson,
+            EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
             StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             IsFree = entity.IsFree,
             Sections = entity.Sections.Select(SectionToSectionDto).ToList()
@@ -93,7 +108,7 @@ public static class CourseMapper
             ResourceUrl = entity.ResourceUrl,
             Content = entity.Content
         };
-    
+
     public static Option CreateOptionDtoToOption(CreateOptionDto dto)
         => new()
         {
@@ -309,7 +324,7 @@ public static class CourseMapper
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString(),
-            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate)
+            CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.CreatedDate)
         };
 
     public static PagingResponse<FilterCourseDto> CourseToFilterCourseDto(PagingResponse<Course> entities)
@@ -341,11 +356,6 @@ public static class CourseMapper
         if (!string.IsNullOrEmpty(dto.Name))
         {
             entity.Name = dto.Name;
-        }
-
-        if (!string.IsNullOrEmpty(dto.Description))
-        {
-            entity.Description = dto.Description;
         }
 
         if (dto.IsFree.HasValue)

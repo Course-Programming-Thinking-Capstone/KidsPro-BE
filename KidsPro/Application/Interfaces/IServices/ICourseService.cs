@@ -10,7 +10,7 @@ namespace Application.Interfaces.IServices;
 
 public interface ICourseService
 {
-    Task<CourseDto> GetByIdAsync(int id);
+    Task<CourseDto> GetByIdAsync(int id, string? action);
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 

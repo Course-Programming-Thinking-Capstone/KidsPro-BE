@@ -26,17 +26,19 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Get by course Id
+    /// Get by course Id, param action (can be null or "manage") is used to define whether api used for common user (parent, guest) view course detail or
+    /// for managing purpose.
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="action"></param>
     /// <returns></returns>
     [HttpGet("{id:int}")]
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id, [FromQuery] string? action)
     {
-        var result = await _courseService.GetByIdAsync(id);
+        var result = await _courseService.GetByIdAsync(id, action);
         return Ok(result);
     }
 
