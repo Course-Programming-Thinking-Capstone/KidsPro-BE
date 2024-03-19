@@ -4,6 +4,7 @@ using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,6 +61,25 @@ public class CoursesController : ControllerBase
         [FromQuery] int? size)
     {
         var result = await _courseService.FilterCourseAsync(name, status, sortName, page, size);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Filter draft course (for teacher and admin)
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="sortName"></param>
+    /// <param name="sortDate"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet("status/draft")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole}")]
+    public async Task<ActionResult<PagingResponse<FilterCourseDto>>> FilterDraftCourseAsync(
+        [FromQuery] string? name, [FromQuery] string? sortName,
+        [FromQuery] string? sortDate, [FromQuery] int? page, [FromQuery] int? size)
+    {
+        var result = await _courseService.FilterDraftCourseAsync(name, sortName, sortDate, page, size);
         return Ok(result);
     }
 

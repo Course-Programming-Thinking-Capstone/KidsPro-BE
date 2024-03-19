@@ -148,7 +148,7 @@ public class AuthenticationService : IAuthenticationService
             }
         }
 
-        throw new NotFoundException();
+        throw new UnauthorizedException("Invalid token.");
     }
 
     // public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)

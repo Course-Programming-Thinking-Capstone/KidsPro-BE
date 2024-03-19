@@ -11,7 +11,6 @@ using Application.ErrorHandlers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
-using Microsoft.Extensions.Options;
 
 namespace Application.Mappers;
 
@@ -304,6 +303,7 @@ public static class CourseMapper
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
+            Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString()
@@ -342,6 +342,7 @@ public static class CourseMapper
             entity.Name = dto.Name;
         }
     }
+
     public static void UpdateLessonDtoToLesson(UpdateLessonDto dto, ref Lesson entity)
     {
         if (!string.IsNullOrEmpty(dto.Name))
@@ -371,10 +372,10 @@ public static class CourseMapper
     public static CourseOrderDto ShowCoursePayment(Course dto) => new CourseOrderDto()
     {
         CourseId = dto.Id,
-        TeacherId = dto?.ModifiedBy?.Id,
-        Picture = dto?.ModifiedBy?.PictureUrl,
-        CourseName = dto?.Name,
-        TeacherName = dto?.ModifiedBy?.FullName,
-        Price = dto?.Price
+        TeacherId = dto.ModifiedBy?.Id,
+        Picture = dto.ModifiedBy?.PictureUrl,
+        CourseName = dto.Name,
+        TeacherName = dto.ModifiedBy?.FullName,
+        Price = dto.Price
     };
 }

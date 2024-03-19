@@ -13,7 +13,7 @@ public interface ICourseService
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 
-    Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto, string? action );
+    Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto, string? action);
 
     Task ApproveCourseAsync(int id, AcceptCourseDto to);
 
@@ -24,6 +24,9 @@ public interface ICourseService
     Task<string> UpdateCoursePictureAsync(int id, IFormFile file);
 
     Task<PagingResponse<FilterCourseDto>> FilterCourseAsync(string? name, CourseStatus? status, string? sortName,
+        int? page, int? size);
+
+    Task<PagingResponse<FilterCourseDto>> FilterDraftCourseAsync(string? name, string? sortName, string? sortDate,
         int? page, int? size);
 
     Task<ICollection<SectionComponentNumberDto>> GetSectionComponentNumberAsync();

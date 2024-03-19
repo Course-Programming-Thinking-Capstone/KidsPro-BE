@@ -422,6 +422,8 @@ public class CourseService : ICourseService
             throw new BadRequestException($"Unsupported update course action {action}");
         }
 
+        courseEntity.ModifiedDate = DateTime.UtcNow;
+
         _unitOfWork.CourseRepository.Update(courseEntity);
 
         await _unitOfWork.SaveChangeAsync();
@@ -653,6 +655,91 @@ public class CourseService : ICourseService
             else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
             {
                 orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+
+            var entities = await _unitOfWork.CourseRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Course, bool>>(filter, parameter),
+                orderBy: orderBy,
+                page: page,
+                size: size
+            );
+            var result = CourseMapper.CourseToFilterCourseDto(entities);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.FilterCourseAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterCourseAsync)} method");
+        }
+    }
+
+    public async Task<PagingResponse<FilterCourseDto>> FilterDraftCourseAsync(string? name, string? sortName,
+        string? sortDate, int? page, int? size)
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        if (role != Constant.TeacherRole && role != Constant.AdminRole)
+        {
+            _logger.LogWarning("Account {} is trying to filter pending course.\nDate: {}", accountId, DateTime.UtcNow);
+            throw new ForbiddenException("Access denied.");
+        }
+
+        var parameter = Expression.Parameter(typeof(Course));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
+                    Expression.Constant(false)));
+
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                    Expression.Constant(CourseStatus.Draft)));
+
+            if (role == Constant.TeacherRole)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.ModifiedById)),
+                        Expression.Constant(accountId, typeof(int?))));
+            }
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Course.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(c => c.Id);
+
+            if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Name);
+            }
+            else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+            else if (sortDate != null && sortDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.ModifiedDate);
+            }
+            else if (sortDate != null && sortDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.ModifiedDate);
             }
 
             var entities = await _unitOfWork.CourseRepository.GetPaginateAsync(
