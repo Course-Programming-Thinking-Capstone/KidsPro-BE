@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enums;
 
 namespace Application.Interfaces.IRepositories
 {
     public interface IOrderRepository:IBaseRepository<Order>
     {
-        Task<(Order?, string?)> GetByOrderCode(Func<int, string> GenerateOrderCode, bool decision);
+        Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision);
         Task<Order?> GetOrderPaymentAsync(int parentId, int orderId);
+
+        Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId);
     }
 }

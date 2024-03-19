@@ -5,11 +5,8 @@ using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Application.ErrorHandlers;
+using static Domain.Enums.VoucherStatus;
 
 namespace Infrastructure.Repositories
 {
@@ -22,7 +19,25 @@ namespace Infrastructure.Repositories
         public async Task<GameVoucher?> GetVoucher(int id)
         {
             return await _dbSet.FirstOrDefaultAsync(x => x.Id == id &&
-            x.Status == VoucherStatus.Valid && (x.ExpiredDate <= DateTime.UtcNow));
+            x.Status == Valid && (x.ExpiredDate <= DateTime.UtcNow));
         }
+        
+        public async Task<List<GameVoucher>?> GetListVoucher(int parentId, VoucherStatus status)
+        {
+            switch (status)
+            {
+                case Valid:
+                    return await _dbSet.Where(x => x.ParentId == parentId &&
+                                                   x.Status == Valid && (x.ExpiredDate <= DateTime.UtcNow)).ToListAsync();
+                case Expired:
+                    return await _dbSet.Where(x => x.ParentId == parentId &&
+                                                   x.Status == Expired && (x.ExpiredDate > DateTime.UtcNow)).ToListAsync();
+                case Used:
+                    return await _dbSet.Where(x => x.ParentId == parentId &&
+                                                   x.Status == Used && (x.ExpiredDate <= DateTime.UtcNow)).ToListAsync();
+            }
+            throw new BadRequestException("Get list voucher error");
+        }
+        
     }
 }

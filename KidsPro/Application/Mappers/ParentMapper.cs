@@ -14,7 +14,7 @@ namespace Application.Mappers
 {
     public class ParentMapper
     {
-        public static List<StudentResponseDto> ParentShowListStudent(List<Student> entity)
+        public static List<StudentResponseDto> ParentShowStudentList(List<Student> entity)
         {
             var list = new List<StudentResponseDto>();
             foreach (var x in entity)
@@ -24,6 +24,7 @@ namespace Application.Mappers
                 student.FullName = x.Account.FullName;
                 student.Age = DateTime.Now.Year -
                     (x.Account.DateOfBirth != null ? x.Account.DateOfBirth.Value.Year : 0);
+                student.Gender=x.Account?.Gender?.ToString();
                 list.Add(student);
             }
             return list;
@@ -38,9 +39,9 @@ namespace Application.Mappers
                 FullName = entity.Account.FullName,
                 PictureUrl = entity.Account.PictureUrl,
                 Gender = entity.Account.Gender?.ToString(),
-                DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.Account.DateOfBirth),
+                DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.Account.DateOfBirth),
                 Status = entity.Account.Status.ToString(),
-                CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.Account.CreatedDate),
+                CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.Account.CreatedDate),
                 Role = entity.Account.Role.Name,
                 Age = DateTime.Now.Year -
                     (entity.Account.DateOfBirth != null ? entity.Account.DateOfBirth.Value.Year : 0),
@@ -69,7 +70,7 @@ namespace Application.Mappers
             return student;
         }
 
-        public static ParentOrderResponseDto ParentShowEmailZalo(Parent entity) => new ParentOrderResponseDto()
+        public static ParentOrderResponseDto ParentShowContact(Parent entity) => new ParentOrderResponseDto()
         {
             Email = entity?.Account?.Email,
             PhoneNumber = entity?.PhoneNumber

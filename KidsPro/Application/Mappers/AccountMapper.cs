@@ -99,9 +99,9 @@ public static class AccountMapper
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
         Gender = entity.Gender?.ToString(),
-        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.DateOfBirth),
         Status = entity.Status.ToString(),
-        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
         PhoneNumber = entity.Parent?.PhoneNumber
     };
@@ -113,9 +113,9 @@ public static class AccountMapper
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
         Gender = entity.Gender?.ToString(),
-        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.DateOfBirth),
         Status = entity.Status.ToString(),
-        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
         Age= DateTime.Now.Year -
                 (entity.DateOfBirth != null ? entity.DateOfBirth.Value.Year : 0)
