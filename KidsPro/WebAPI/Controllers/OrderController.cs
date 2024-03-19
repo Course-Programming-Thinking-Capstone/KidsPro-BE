@@ -35,7 +35,7 @@ namespace WebAPI.Controllers
         }
         
         /// <summary>
-        /// Get order list by order status, Role Parent
+        /// Get order list
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
@@ -63,5 +63,21 @@ namespace WebAPI.Controllers
             var result=await _order.GetOrderDetail(orderId);
             return Ok(result);
         }
+        
+        /// <summary>
+        /// Parent send request to staff for order cancel
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [Authorize(Roles = $"{Constant.ParentRole}")]
+        [HttpPost("cancel")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+        public async Task<IActionResult> CanCelOrderAsync(OrderCancelRequest dto)
+        {
+            await _order.CanCelOrder(dto);
+            return Ok();
+        }
+        
     }
 }

@@ -12,7 +12,7 @@ namespace Application.Interfaces.IRepositories
     public interface IOrderRepository:IBaseRepository<Order>
     {
         Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision);
-        Task<Order?> GetOrderPaymentAsync(int parentId, int orderId);
+        Task<Order?> GetOrderByStatusAsync(int parentId, int orderId,OrderStatus status);
 
         Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId);
         Task<Order?> GetOrderDetail(int parentId, int orderId);

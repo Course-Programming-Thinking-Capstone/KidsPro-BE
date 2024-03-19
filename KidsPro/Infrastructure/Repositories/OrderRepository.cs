@@ -32,10 +32,10 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<Order?> GetOrderPaymentAsync(int parentId, int orderId)
+        public async Task<Order?> GetOrderByStatusAsync(int parentId, int orderId,OrderStatus status)
         {
             return await _dbSet.AsNoTracking().FirstOrDefaultAsync
-                (x=> x.Id == orderId && x.ParentId==parentId && x.Status == OrderStatus.Payment);
+                (x=> x.Id == orderId && x.ParentId==parentId && x.Status == status);
         }
 
         public async Task<List<Order>?> GetListOrderAsync(OrderStatus status,int parentId)

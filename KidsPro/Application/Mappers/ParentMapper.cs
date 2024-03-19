@@ -4,15 +4,10 @@ using Application.Dtos.Response.Certificate;
 using Application.Dtos.Response.Course;
 using Application.Utils;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Mappers
 {
-    public class ParentMapper
+    public static class ParentMapper
     {
         public static List<StudentResponse> ParentShowStudentList(List<Student> entity)
         {
@@ -24,7 +19,7 @@ namespace Application.Mappers
                 student.FullName = x.Account.FullName;
                 student.Age = DateTime.Now.Year -
                     (x.Account.DateOfBirth != null ? x.Account.DateOfBirth.Value.Year : 0);
-                student.Gender=x.Account?.Gender?.ToString();
+                student.Gender=x.Account.Gender?.ToString();
                 list.Add(student);
             }
             return list;
@@ -34,6 +29,7 @@ namespace Application.Mappers
         {
             var student = new StudentDetailResponse()
             {
+                Account = entity.UserName,
                 Id = entity.Id,
                 Email = entity.Account.Email,
                 FullName = entity.Account.FullName,
@@ -53,16 +49,16 @@ namespace Application.Mappers
                 foreach (var x in entity.Certificates)
                 {
                     //List certificate
-                    var _certificate = new CertificateResponseDto() { title = x.Course.Name, url = x.ResourceUrl };
-                    student.StudentsCertificate.Add(_certificate);
+                    var certificate = new CertificateResponseDto() { title = x.Course.Name, url = x.ResourceUrl };
+                    student.StudentsCertificate.Add(certificate);
                 }
                 student.CertificateTotal = entity.Certificates.Count();
 
                 foreach (var x in entity.StudentProgresses)
                 {
                     //List courses
-                    var _course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
-                    student.StudentsCourse.Add(_course);
+                    var course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
+                    student.StudentsCourse.Add(course);
                 }
                 student.CourseTotal = entity.StudentProgresses.Count();
             }
@@ -72,8 +68,8 @@ namespace Application.Mappers
 
         public static ParentOrderResponse ParentShowContact(Parent entity) => new ParentOrderResponse()
         {
-            Email = entity?.Account?.Email,
-            PhoneNumber = entity?.PhoneNumber
+            Email = entity.Account.Email,
+            PhoneNumber = entity.PhoneNumber
         };
         
     }

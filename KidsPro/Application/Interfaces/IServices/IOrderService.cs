@@ -8,10 +8,13 @@ namespace Application.Interfaces.IServices
     {
         Task<OrderPaymentResponse> CreateOrderAsync(OrderRequest dto);
 
-        Task<bool> StatusToPendingAsync(int orderId, int parentId);
+        Task UpdateOrderStatusAsync(int orderId, int parentId,
+            OrderStatus currentStatus, OrderStatus toStatus, string? reason="");
 
         Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status);
 
         Task<OrderDetailResponse> GetOrderDetail(int orderId);
+
+        Task CanCelOrder(OrderCancelRequest dto);
     }
 }
