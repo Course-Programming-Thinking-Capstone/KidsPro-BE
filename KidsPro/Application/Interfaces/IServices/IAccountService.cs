@@ -31,6 +31,7 @@ public interface IAccountService
     Task<PagingResponse<AccountDto>> FilterAccountAsync(
         string? fullName,
         Gender? gender,
+        string? role,
         string? status,
         string? sortFullName,
         string? sortCreatedDate,

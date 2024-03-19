@@ -5,7 +5,6 @@ using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
-using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,14 +35,15 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id)
-
     {
         var result = await _courseService.GetByIdAsync(id);
         return Ok(result);
     }
 
     /// <summary>
-    /// Admin, staff, teacher filter course on the system
+    /// Admin, staff, teacher filter course on the system. action can be null or "manage". If action is null, the api is use
+    /// for common user/ parent to view course on system (no need to login to use api). If action is "manage", filter is used for
+    /// manage course on the system (require login).
     /// </summary>
     /// <param name="name"></param>
     /// <param name="status"></param>
