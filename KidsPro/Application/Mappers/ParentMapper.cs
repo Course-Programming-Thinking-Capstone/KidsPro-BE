@@ -14,12 +14,12 @@ namespace Application.Mappers
 {
     public class ParentMapper
     {
-        public static List<StudentResponseDto> ParentShowStudentList(List<Student> entity)
+        public static List<StudentResponse> ParentShowStudentList(List<Student> entity)
         {
-            var list = new List<StudentResponseDto>();
+            var list = new List<StudentResponse>();
             foreach (var x in entity)
             {
-                var student = new StudentResponseDto();
+                var student = new StudentResponse();
                 student.Id = x.Id;
                 student.FullName = x.Account.FullName;
                 student.Age = DateTime.Now.Year -
@@ -30,9 +30,9 @@ namespace Application.Mappers
             return list;
         }
 
-        public static StudentDetailResponseDto ParentShowStudentDetail(Student entity)
+        public static StudentDetailResponse ParentShowStudentDetail(Student entity)
         {
-            var student = new StudentDetailResponseDto()
+            var student = new StudentDetailResponse()
             {
                 Id = entity.Id,
                 Email = entity.Account.Email,
@@ -70,7 +70,7 @@ namespace Application.Mappers
             return student;
         }
 
-        public static ParentOrderResponseDto ParentShowContact(Parent entity) => new ParentOrderResponseDto()
+        public static ParentOrderResponse ParentShowContact(Parent entity) => new ParentOrderResponse()
         {
             Email = entity?.Account?.Email,
             PhoneNumber = entity?.PhoneNumber

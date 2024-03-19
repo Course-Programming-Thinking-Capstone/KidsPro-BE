@@ -21,14 +21,14 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Tạo order và order detail
+        /// Create order
         /// </summary>
         /// <param name="dto">Payment Type: 1.ZaloPay, 2.Momo</param>
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status501NotImplemented, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<OrderPaymentResponseDto>> CreateOrderAsync(OrderRequestDto dto)
+        public async Task<ActionResult<OrderPaymentResponse>> CreateOrderAsync(OrderRequest dto)
         {
             var result=await _order.CreateOrderAsync(dto);
             return Ok(result);
@@ -43,9 +43,24 @@ namespace WebAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<List<OrderResponseDto>>> GetOrdersAsync(OrderStatus status)
+        public async Task<ActionResult<List<OrderResponse>>> GetOrdersAsync(OrderStatus status)
         {
             var result=await _order.GetListOrderAsync(status);
+            return Ok(result);
+        }
+        
+        /// <summary>
+        /// Get order detail
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        [Authorize(Roles = $"{Constant.ParentRole}")]
+        [HttpGet("detail")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+        public async Task<ActionResult<OrderDetailResponse>> GetOrdersAsync(int orderId)
+        {
+            var result=await _order.GetOrderDetail(orderId);
             return Ok(result);
         }
     }

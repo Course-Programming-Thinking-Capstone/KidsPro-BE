@@ -34,7 +34,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Order?> GetOrderPaymentAsync(int parentId, int orderId)
         {
-            return await _dbSet.FirstOrDefaultAsync
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync
                 (x=> x.Id == orderId && x.ParentId==parentId && x.Status == OrderStatus.Payment);
         }
 
@@ -43,25 +43,34 @@ namespace Infrastructure.Repositories
             switch (status)
             {
                 case OrderStatus.Pending:
-                    return await _dbSet
+                    return await _dbSet.AsNoTracking()
                         .Where(x => x.ParentId == parentId && x.Status == OrderStatus.Pending)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Success:
-                    return await _dbSet
+                    return await _dbSet.AsNoTracking()
                         .Where(x => x.ParentId == parentId && x.Status == OrderStatus.Success)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.RequestRefund:
-                    return await _dbSet
+                    return await _dbSet.AsNoTracking()
                         .Where(x => x.ParentId == parentId && x.Status == OrderStatus.RequestRefund)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Refunded:
-                    return await _dbSet
+                    return await _dbSet.AsNoTracking()
                         .Where(x => x.ParentId == parentId && x.Status == OrderStatus.Refunded)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
             }
             throw new UnauthorizedException("Parent Id doesn't exist");
         }
-        
+
+        public async Task<Order?> GetOrderDetail(int parentId, int orderId)
+        {
+            return (await _dbSet.AsNoTracking().Include(x => x.OrderDetails)!
+                .ThenInclude(x=> x.Students)!.ThenInclude(x=> x.Account)
+                .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
+                .Include(x => x.Transaction).Include(x => x.Voucher)
+                .Include(x=>x.Parent).ThenInclude(x=>x!.Account)
+                .FirstOrDefaultAsync(x => x.Id == orderId && x.ParentId == parentId));
+        }
         
     }
 }

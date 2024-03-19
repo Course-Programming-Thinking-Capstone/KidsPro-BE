@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Response.Order.Momo;
 
-public class MomoPaymentResponseDto
+public class MomoPaymentResponse
 {
     public string partnerCode { get; set; } = string.Empty;
     public string amount { get; set; } = string.Empty;

@@ -26,9 +26,9 @@ namespace WebAPI.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("momo")]
-        public async Task<ActionResult> CreatePaymentMomoAsync(OrderPaymentResponseDto dto)
+        public async Task<ActionResult> CreatePaymentMomoAsync(OrderPaymentResponse dto)
         {
-            var momoRequest = new MomoPaymentRequestDto();
+            var momoRequest = new MomoPaymentRequest();
             //Get order có parent id và order id vs status payment
             var order = await _payment.GetOrderPaymentAsync(dto);
             if (order != null)
@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("momo-return")]
-        public async Task<IActionResult> MomoReturnAsync([FromQuery] MomoResultRequestDto dto)
+        public async Task<IActionResult> MomoReturnAsync([FromQuery] MomoResultRequest dto)
         {
             await _payment.CreateTransactionAsync(dto);
             return Ok(new

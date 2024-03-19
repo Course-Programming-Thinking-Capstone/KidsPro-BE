@@ -15,5 +15,6 @@ namespace Application.Interfaces.IRepositories
         Task<Order?> GetOrderPaymentAsync(int parentId, int orderId);
 
         Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId);
+        Task<Order?> GetOrderDetail(int parentId, int orderId);
     }
 }

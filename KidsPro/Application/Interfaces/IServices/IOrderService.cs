@@ -6,10 +6,12 @@ namespace Application.Interfaces.IServices
 {
     public interface IOrderService
     {
-        Task<OrderPaymentResponseDto> CreateOrderAsync(OrderRequestDto dto);
+        Task<OrderPaymentResponse> CreateOrderAsync(OrderRequest dto);
 
         Task<bool> StatusToPendingAsync(int orderId, int parentId);
 
-        Task<List<OrderResponseDto>> GetListOrderAsync(OrderStatus status);
+        Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status);
+
+        Task<OrderDetailResponse> GetOrderDetail(int orderId);
     }
 }

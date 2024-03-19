@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Request.Account.Student
 {
-    public record StudentAddRequestDto
+    public record StudentAddRequest
     {
         [Required] public string FullName { get; set; } = null!;
         [DataType(DataType.Date)]

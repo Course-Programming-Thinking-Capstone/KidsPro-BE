@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Request.Account.Student
 {
-    public class CertificatesRequestDto
+    public class CertificatesRequest
     {
         [JsonIgnore]
         public int Id { get; set; }

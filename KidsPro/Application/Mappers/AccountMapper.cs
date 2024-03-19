@@ -92,7 +92,7 @@ public static class AccountMapper
         PersonalInformation = entity.Teacher?.PersonalInformation
     };
 
-    public static ParentResponseDto AccountToParentDto(Account entity) => new ParentResponseDto()
+    public static ParentResponse AccountToParentDto(Account entity) => new ParentResponse()
     {
         Id = entity.Id,
         Email = entity.Email,
@@ -106,7 +106,7 @@ public static class AccountMapper
         PhoneNumber = entity.Parent?.PhoneNumber
     };
 
-    public static StudentResponseDto AccountToStudentDto(Account entity) => new StudentResponseDto()
+    public static StudentResponse AccountToStudentDto(Account entity) => new StudentResponse()
     {
         Id = entity.Id,
         Email = entity.Email,

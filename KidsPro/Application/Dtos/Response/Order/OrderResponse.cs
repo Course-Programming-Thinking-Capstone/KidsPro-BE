@@ -2,7 +2,7 @@
 
 namespace Application.Dtos.Response.Order;
 
-public class OrderResponseDto
+public class OrderResponse
 {
     public int OrderId { get; set; }
     public string? OrderCode { get; set; }
