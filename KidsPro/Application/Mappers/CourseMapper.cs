@@ -17,7 +17,6 @@ namespace Application.Mappers;
 
 public static class CourseMapper
 {
-
     public const string FilterCommonCourseType = "Common";
     public const string FilterManageCourseType = "Manage";
 
@@ -71,7 +70,7 @@ public static class CourseMapper
     public static List<SectionComponentNumberDto> EntityToSectionComponentNumberDto(
         IEnumerable<SectionComponentNumber> entities)
         => entities.Select(EntityToSectionComponentNumberDto).ToList();
-    
+
     public static Lesson CreateLessonDtoToLesson(CreateLessonDto dto)
         => new Lesson()
         {
@@ -84,31 +83,17 @@ public static class CourseMapper
         };
 
     public static LessonDto LessonToLessonDto(Lesson entity)
-    {
-        return entity.Type switch
+        => new LessonDto()
         {
-            LessonType.Video => new VideoDto()
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                Order = entity.Order,
-                Type = entity.Type.ToString(),
-                Duration = entity.Duration,
-                ResourceUrl = entity.ResourceUrl
-            },
-            LessonType.Document => new DocumentDto()
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                Order = entity.Order,
-                Type = entity.Type.ToString(),
-                Duration = entity.Duration,
-                Content = entity.Content
-            },
-            _ => throw new UnsupportedException("Unsupported lesson type.")
+            Id = entity.Id,
+            Name = entity.Name,
+            Order = entity.Order,
+            Type = entity.Type.ToString(),
+            Duration = entity.Duration,
+            ResourceUrl = entity.ResourceUrl,
+            Content = entity.Content
         };
-    }
-
+    
     public static Option CreateOptionDtoToOption(CreateOptionDto dto)
         => new()
         {
