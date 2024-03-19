@@ -1,4 +1,4 @@
-﻿namespace Application.Dtos.Response.Course;
+﻿namespace Application.Dtos.Response.Course.FilterCourse;
 
 public class FilterCourseDto
 {
@@ -10,7 +10,9 @@ public class FilterCourseDto
 
     public string? PictureUrl { get; set; }
     
+    public decimal? Price { get; set; }
+    
     public bool IsFree { get; set; }
     
-    public string Status { get; set; } = string.Empty;
+    
 }

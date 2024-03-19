@@ -1,9 +1,11 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,20 +48,33 @@ public class CoursesController : ControllerBase
     /// <param name="name"></param>
     /// <param name="status"></param>
     /// <param name="sortName"></param>
+    /// <param name="action"></param>
     /// <param name="page"></param>
     /// <param name="size"></param>
+    /// <param name="sortCreatedDate"></param>
+    /// <param name="sortModifiedDate"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<FilterCourseDto>))]
-    public async Task<ActionResult<PagingResponse<FilterCourseDto>>> FilterCourseAsync(
+    public async Task<ActionResult<IPagingResponse<FilterCourseDto>>> FilterCourseAsync(
         [FromQuery] string? name,
         [FromQuery] CourseStatus? status,
         [FromQuery] string? sortName,
+        [FromQuery] string? sortCreatedDate,
+        [FromQuery] string? sortModifiedDate,
+        [FromQuery] string? action,
         [FromQuery] int? page,
         [FromQuery] int? size)
     {
-        var result = await _courseService.FilterCourseAsync(name, status, sortName, page, size);
+        var result = await _courseService.FilterCourseAsync(
+            name,
+            status,
+            sortName,
+            sortCreatedDate,
+            sortModifiedDate,
+            action,
+            page,
+            size);
         return Ok(result);
     }
 

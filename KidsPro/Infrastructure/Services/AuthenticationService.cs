@@ -21,10 +21,10 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<AuthenticationService> _logger;
 
     private readonly IUnitOfWork _unit;
-    private  TokenValidationParameters _tokenValidation;
-    private  JwtSecurityTokenHandler _jwtSecurity;
+    private TokenValidationParameters _tokenValidation;
+    private JwtSecurityTokenHandler _jwtSecurity;
 
-    public AuthenticationService(AppConfiguration appConfiguration, 
+    public AuthenticationService(AppConfiguration appConfiguration,
         IServiceProvider serviceProvider, ILogger<AuthenticationService> logger,
         IUnitOfWork unit, TokenValidationParameters tokenValidation, JwtSecurityTokenHandler jwtSecurity)
     {
@@ -51,7 +51,7 @@ public class AuthenticationService : IAuthenticationService
                 issuer: _appConfiguration.Issuer,
                 audience: _appConfiguration.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: credentials
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -77,7 +77,7 @@ public class AuthenticationService : IAuthenticationService
                 issuer: _appConfiguration.Issuer,
                 audience: _appConfiguration.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(3),
+                expires: DateTime.UtcNow.AddDays(14),
                 signingCredentials: credentials
             );
             var refreshToken = new JwtSecurityTokenHandler().WriteToken(token);
@@ -148,7 +148,7 @@ public class AuthenticationService : IAuthenticationService
             }
         }
 
-        throw new NotFoundException();
+        throw new UnauthorizedException("Invalid token.");
     }
 
     // public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)

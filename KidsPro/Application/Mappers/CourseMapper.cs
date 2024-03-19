@@ -4,6 +4,7 @@ using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Course.Update.Quiz;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Lesson;
 using Application.Dtos.Response.Course.Quiz;
 using Application.Dtos.Response.Paging;
@@ -11,18 +12,13 @@ using Application.ErrorHandlers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
-using Microsoft.Extensions.Options;
 
 namespace Application.Mappers;
 
 public static class CourseMapper
 {
-    // public static Course CreateCourseDtoToEntity(CreateCourseDto dto)
-    //     => new Course()
-    //     {
-    //         Name = dto.Name,
-    //         Description = dto.Description
-    //     };
+    public const string FilterCommonCourseType = "Common";
+    public const string FilterManageCourseType = "Manage";
 
     public static SectionDto SectionToSectionDto(Section entity)
         => new SectionDto()
@@ -75,7 +71,6 @@ public static class CourseMapper
         IEnumerable<SectionComponentNumber> entities)
         => entities.Select(EntityToSectionComponentNumberDto).ToList();
 
-
     public static Lesson CreateLessonDtoToLesson(CreateLessonDto dto)
         => new Lesson()
         {
@@ -87,34 +82,18 @@ public static class CourseMapper
             ResourceUrl = dto.ResourceUrl
         };
 
-
     public static LessonDto LessonToLessonDto(Lesson entity)
-    {
-        return entity.Type switch
+        => new LessonDto()
         {
-            LessonType.Video => new VideoDto()
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                Order = entity.Order,
-                Type = entity.Type.ToString(),
-                Duration = entity.Duration,
-                ResourceUrl = entity.ResourceUrl
-            },
-            LessonType.Document => new DocumentDto()
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                Order = entity.Order,
-                Type = entity.Type.ToString(),
-                Duration = entity.Duration,
-                Content = entity.Content
-            },
-            _ => throw new UnsupportedException("Unsupported lesson type.")
+            Id = entity.Id,
+            Name = entity.Name,
+            Order = entity.Order,
+            Type = entity.Type.ToString(),
+            Duration = entity.Duration,
+            ResourceUrl = entity.ResourceUrl,
+            Content = entity.Content
         };
-    }
-
-
+    
     public static Option CreateOptionDtoToOption(CreateOptionDto dto)
         => new()
         {
@@ -139,7 +118,6 @@ public static class CourseMapper
             NumberOfAttempt = dto.NumberOfAttempt,
             IsOrderRandom = dto.IsOrderRandom ?? false
         };
-
 
     public static List<LessonDto> LessonToLessonDto(IEnumerable<Lesson> entities)
         => entities.Select(LessonToLessonDto).ToList();
@@ -304,17 +282,58 @@ public static class CourseMapper
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
+            Price = entity.Price,
+            IsFree = entity.IsFree,
+            PictureUrl = entity.PictureUrl
+        };
+
+
+    public static CommonFilterCourseDto CourseToCommonFilterCourseDto(Course entity)
+        => new CommonFilterCourseDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            Price = entity.Price,
+            IsFree = entity.IsFree,
+            PictureUrl = entity.PictureUrl
+        };
+
+    public static ManageFilterCourseDto CourseToManageFilterCourseDto(Course entity)
+        => new()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,
-            Status = entity.Status.ToString()
+            Status = entity.Status.ToString(),
+            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate)
         };
 
     public static PagingResponse<FilterCourseDto> CourseToFilterCourseDto(PagingResponse<Course> entities)
-        => new PagingResponse<FilterCourseDto>()
+        => new()
         {
             TotalPages = entities.TotalPages,
             TotalRecords = entities.TotalRecords,
             Results = entities.Results.Select(CourseToFilterCourseDto).ToList()
+        };
+
+    public static PagingResponse<CommonFilterCourseDto> CourseToCommonFilterCourseDto(PagingResponse<Course> entities)
+        => new()
+        {
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords,
+            Results = entities.Results.Select(CourseToCommonFilterCourseDto).ToList()
+        };
+
+    public static PagingResponse<ManageFilterCourseDto> CourseToManageFilterCourseDto(PagingResponse<Course> entities)
+        => new()
+        {
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords,
+            Results = entities.Results.Select(CourseToManageFilterCourseDto).ToList()
         };
 
     public static void UpdateCourseDtoToEntity(UpdateCourseDto dto, ref Course entity)
@@ -342,6 +361,7 @@ public static class CourseMapper
             entity.Name = dto.Name;
         }
     }
+
     public static void UpdateLessonDtoToLesson(UpdateLessonDto dto, ref Lesson entity)
     {
         if (!string.IsNullOrEmpty(dto.Name))
@@ -371,10 +391,10 @@ public static class CourseMapper
     public static CourseOrderDto ShowCoursePayment(Course dto) => new CourseOrderDto()
     {
         CourseId = dto.Id,
-        TeacherId = dto?.ModifiedBy?.Id,
-        Picture = dto?.ModifiedBy?.PictureUrl,
-        CourseName = dto?.Name,
-        TeacherName = dto?.ModifiedBy?.FullName,
-        Price = dto?.Price
+        TeacherId = dto.ModifiedBy?.Id,
+        Picture = dto.ModifiedBy?.PictureUrl,
+        CourseName = dto.Name,
+        TeacherName = dto.ModifiedBy?.FullName,
+        Price = dto.Price
     };
 }
