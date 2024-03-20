@@ -62,7 +62,8 @@ namespace Application.Mappers
                 var stu = new StudentOrderDetail()
                 {
                     AcountId = dto.Account.Id,
-                    StudentName = dto.Account.FullName
+                    StudentName = dto.Account.FullName,
+                    DateOfBirth = DateUtils.FormatDateTimeToDateV1(dto.Account.DateOfBirth)
                 };
                 x.Students?.Add(stu);
             }

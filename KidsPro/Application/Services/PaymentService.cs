@@ -9,6 +9,7 @@ using Domain.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Application.Services;
 
@@ -40,7 +41,7 @@ public class PaymentService : IPaymentService
                       "&orderInfo=" + momo.orderInfo + "&partnerCode=" + momo.partnerCode +
                       "&redirectUrl=" + momo.redirectUrl + "&requestId=" + momo.requestId + "&requestType=" +
                       momo.requestType;
-        return momo.signature = HashingUtils.HmacSHA256(rawHash, secretKey);
+        return momo.signature = HashingUtils.HmacSha256(rawHash, secretKey);
     }
 
     public (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest)
@@ -49,7 +50,7 @@ public class PaymentService : IPaymentService
         var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Formatting = Newtonsoft.Json.Formatting.Indented,
+            Formatting = Formatting.Indented,
         });
         var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
 
@@ -67,11 +68,17 @@ public class PaymentService : IPaymentService
             throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
     }
 
-
+    private  int GetIdMomoResponse(string id)
+    {
+        Regex regex = new Regex("-(\\d+)");
+        var macth = regex.Match(id);
+        if (macth.Success) return Int32.Parse(macth.Groups[1].Value);
+        return 0;
+    }
     public async Task CreateTransactionAsync(MomoResultRequest dto)
     {
-        var orderId = HashingUtils.GetIdMomoResponse(dto.orderId);
-        var parentId = HashingUtils.GetIdMomoResponse(dto.requestId);
+        var orderId = GetIdMomoResponse(dto.orderId);
+        var parentId = GetIdMomoResponse(dto.requestId);
 
         await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Payment, OrderStatus.Pending);
         var transaction = new Transaction()

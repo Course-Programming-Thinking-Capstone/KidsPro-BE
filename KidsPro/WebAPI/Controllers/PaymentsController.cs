@@ -9,12 +9,12 @@ namespace WebAPI.Controllers
 {
     [Route("api/v1/payment")]
     [ApiController]
-    public class PaymentController : ControllerBase
+    public class PaymentsController : ControllerBase
     {
         IPaymentService _payment;
         IMomoConfig _momoConfig;
 
-        public PaymentController(IPaymentService payment, IMomoConfig momoConfig)
+        public PaymentsController(IPaymentService payment, IMomoConfig momoConfig)
         {
             _payment = payment;
             _momoConfig = momoConfig;
@@ -34,8 +34,8 @@ namespace WebAPI.Controllers
             if (order != null)
             {
                 // Lấy thông tin cho payment
-                momoRequest.requestId = HashingUtils.GenerateRandomString(4) + "-" + dto.ParentId.ToString();
-                momoRequest.orderId = HashingUtils.GenerateRandomString(4) + "-" + dto.OrderId.ToString();
+                momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + dto.ParentId.ToString();
+                momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + dto.OrderId.ToString();
                 momoRequest.amount =(long) order.TotalPrice;
                 //_momoRequest.extraData = DateTime.UtcNow.AddDays(1).ToString();
                 momoRequest.redirectUrl = _momoConfig.ReturnUrl;

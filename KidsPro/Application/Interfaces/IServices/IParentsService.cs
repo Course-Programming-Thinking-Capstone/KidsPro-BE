@@ -11,10 +11,7 @@ namespace Application.Interfaces.IServices;
     {
         Task<StudentResponse> AddStudentAsync(StudentAddRequest request);
 
-        Task<List<StudentResponse>> GetStudentsAsync();
-
-        Task<StudentDetailResponse> GetDetailStudentAsync(int studentId);
-        Task UpdateStudentAsync(StudentUpdateRequest dto);
+       
 
         Task<ParentOrderResponse> GetEmailZalo();
 

@@ -31,4 +31,19 @@ public class StringUtils
 
         return formattedName.ToString();
     }
+    
+    public static string GenerateRandomString(int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder stringBuilder = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++)
+        {
+            stringBuilder.Append(chars[random.Next(chars.Length)]);
+        }
+
+        return stringBuilder.ToString();
+    }
+   
 }
