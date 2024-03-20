@@ -11,5 +11,7 @@ public class OrderResponse
     public int Quantity { get; set; }
     public decimal TotalPrice { get; set; }
     public string? OrderStatus { get; set; }
-    public int ParentId { get; set; }
+   // public int ParentId { get; set; }
+    public string? ParentName { get; set; }
+    public string? PaymentType { get; set; }
 }

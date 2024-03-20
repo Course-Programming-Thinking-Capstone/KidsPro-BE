@@ -127,7 +127,7 @@ namespace Application.Services
             var account = await _accountService.GetCurrentAccountInformationAsync();
             var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
             if (order != null)
-                return OrderMapper.ParentShowOrderDetail(order);
+                return OrderMapper.ShowOrderDetail(order);
             throw new UnauthorizedException("OrderId doesn't exist");
         }
 

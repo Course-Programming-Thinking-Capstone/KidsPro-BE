@@ -50,18 +50,23 @@ namespace Infrastructure.Repositories
             {
                 case OrderStatus.Payment:
                     return await query.Where(x => x.Status == OrderStatus.Payment)
+                        .Include(x=> x.Parent).ThenInclude(x=>x.Account)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Pending:
                     return await query.Where(x => x.Status == OrderStatus.Pending)
+                        .Include(x=> x.Parent).ThenInclude(x=>x.Account)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Success:
                     return await query.Where(x => x.Status == OrderStatus.Success)
+                        .Include(x=> x.Parent).ThenInclude(x=>x.Account)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.RequestRefund:
                     return await query.Where(x => x.Status == OrderStatus.RequestRefund)
+                        .Include(x=> x.Parent).ThenInclude(x=>x.Account)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Refunded:
                     return await query.Where(x => x.Status == OrderStatus.Refunded)
+                        .Include(x=> x.Parent).ThenInclude(x=>x.Account)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
             }
             throw new UnauthorizedException("Parent Id doesn't exist");

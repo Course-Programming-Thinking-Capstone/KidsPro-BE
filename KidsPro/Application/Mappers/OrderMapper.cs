@@ -27,7 +27,8 @@ namespace Application.Mappers
                     Quantity = x.Quantity,
                     TotalPrice = x.TotalPrice,
                     OrderStatus = x.Status.ToString(),
-                    ParentId = x.ParentId
+                    ParentName = x.Parent!.Account!.FullName,
+                    PaymentType = x.PaymentType.ToString()
                 };
                 list.Add(dto);
             }
@@ -35,7 +36,7 @@ namespace Application.Mappers
             return list;
         }
 
-        public static OrderDetailResponse ParentShowOrderDetail(Order order)
+        public static OrderDetailResponse ShowOrderDetail(Order order)
         {
             var x = new OrderDetailResponse()
             {
@@ -54,6 +55,7 @@ namespace Application.Mappers
                 TotalPrice = order.TotalPrice,
                 Discount = order.Voucher?.DiscountAmount,
                 NumberChildren = order.OrderDetails!.FirstOrDefault()!.Students!.Count,
+                ParentName = order.Parent!.Account.FullName
             };
             foreach (var dto in order.OrderDetails!.FirstOrDefault()!.Students!)
             {
