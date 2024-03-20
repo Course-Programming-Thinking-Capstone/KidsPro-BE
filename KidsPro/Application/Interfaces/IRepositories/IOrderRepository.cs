@@ -14,7 +14,7 @@ namespace Application.Interfaces.IRepositories
         Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision);
         Task<Order?> GetOrderByStatusAsync(int parentId, int orderId,OrderStatus status);
 
-        Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId);
+        Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId,string role);
         Task<Order?> GetOrderDetail(int parentId, int orderId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.ErrorHandlers;
+﻿using Application.Configurations;
+using Application.ErrorHandlers;
 using Application.Interfaces.IRepositories;
 using Domain.Entities;
 using Domain.Enums;
@@ -26,7 +27,7 @@ namespace Infrastructure.Repositories
                     return (await _dbSet.Include(x=> x.OrderDetails)!.ThenInclude(x=> x.Course)
                             .FirstOrDefaultAsync(x=> x.OrderCode == orderCode),null);
                 // tìm kiếm xem order code có tồn tại trong system chưa, truyền vào false, nếu mà tìm không có bằng null thì trả về 
-                // theo order code để tạo mới, còn nếu trùng thì trả về 1 order để check rồi tạo orderCode khác
+                // theo order code để tạo mới order, còn nếu trùng thì trả về 1 order để check rồi tạo orderCode khác
                 case false:
                     return (await _dbSet.FirstOrDefaultAsync(x => x.OrderCode == orderCode),orderCode);
             }
@@ -38,25 +39,29 @@ namespace Infrastructure.Repositories
                 (x=> x.Id == orderId && x.ParentId==parentId && x.Status == status);
         }
 
-        public async Task<List<Order>?> GetListOrderAsync(OrderStatus status,int parentId)
+        public async Task<List<Order>?> GetListOrderAsync(OrderStatus status,int parentId,string role)
         {
+            var query = _dbSet.AsNoTracking();
+            if (role == Constant.ParentRole)
+            {
+                query = query.Where(x => x.ParentId == parentId);
+            }
             switch (status)
             {
+                case OrderStatus.Payment:
+                    return await query.Where(x => x.Status == OrderStatus.Payment)
+                        .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Pending:
-                    return await _dbSet.AsNoTracking()
-                        .Where(x => x.ParentId == parentId && x.Status == OrderStatus.Pending)
+                    return await query.Where(x => x.Status == OrderStatus.Pending)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Success:
-                    return await _dbSet.AsNoTracking()
-                        .Where(x => x.ParentId == parentId && x.Status == OrderStatus.Success)
+                    return await query.Where(x => x.Status == OrderStatus.Success)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.RequestRefund:
-                    return await _dbSet.AsNoTracking()
-                        .Where(x => x.ParentId == parentId && x.Status == OrderStatus.RequestRefund)
+                    return await query.Where(x => x.Status == OrderStatus.RequestRefund)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
                 case OrderStatus.Refunded:
-                    return await _dbSet.AsNoTracking()
-                        .Where(x => x.ParentId == parentId && x.Status == OrderStatus.Refunded)
+                    return await query.Where(x => x.Status == OrderStatus.Refunded)
                         .Include(x=>x.OrderDetails)!.ThenInclude(x=>x.Course).ToListAsync();
             }
             throw new UnauthorizedException("Parent Id doesn't exist");

@@ -39,7 +39,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        [Authorize(Roles = $"{Constant.ParentRole}")]
+        [Authorize(Roles = $"{Constant.ParentRole},{Constant.StaffRole},{Constant.AdminRole},")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]

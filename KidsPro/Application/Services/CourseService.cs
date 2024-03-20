@@ -57,7 +57,7 @@ public class CourseService : ICourseService
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         var teacherAccount = await _unitOfWork.AccountRepository.GetByIdAsync(dto.TeacherId, disableTracking: true)
             .ContinueWith(t =>
@@ -76,6 +76,7 @@ public class CourseService : ICourseService
         entity.CreatedBy = currentAccount;
         entity.ModifiedBy = teacherAccount;
         entity.Status = CourseStatus.Draft;
+        entity.Price = 1000;
 
         if (dto.Sections != null)
         {
@@ -156,7 +157,7 @@ public class CourseService : ICourseService
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Id != courseEntity.ModifiedById)
         {
@@ -451,11 +452,11 @@ public class CourseService : ICourseService
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Role.Name != Constant.StaffRole)
         {
-            _logger.LogInformation("Account {} try to access function {}. Date {}", accountId,
+            _logger.LogInformation("UserName {} try to access function {}. Date {}", accountId,
                 nameof(this.ApproveCourseAsync), DateTime.UtcNow);
             throw new ForbiddenException($"Access denied.");
         }
@@ -524,11 +525,11 @@ public class CourseService : ICourseService
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId, disableTracking: true)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Role.Name != Constant.StaffRole)
         {
-            _logger.LogInformation("Account {} try to access function {}. Date {}", accountId,
+            _logger.LogInformation("UserName {} try to access function {}. Date {}", accountId,
                 nameof(this.ApproveCourseAsync), DateTime.UtcNow);
             throw new ForbiddenException($"Access denied.");
         }
@@ -593,7 +594,7 @@ public class CourseService : ICourseService
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
 
         var currentAccount = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         CourseMapper.UpdateCourseDtoToEntity(dto, ref entity);
         entity.ModifiedDate = DateTime.UtcNow;
@@ -743,7 +744,7 @@ public class CourseService : ICourseService
                     //Check role
                     if (role != Constant.TeacherRole && role != Constant.AdminRole)
                     {
-                        _logger.LogWarning("Account {} is trying to filter pending course.\nDate: {}", accountId,
+                        _logger.LogWarning("UserName {} is trying to filter pending course.\nDate: {}", accountId,
                             DateTime.UtcNow);
                         throw new ForbiddenException("Access denied.");
                     }

@@ -71,7 +71,8 @@ public static class AccountMapper
         Role = entity.Role.Name,
         Biography = entity.Staff?.Biography,
         PhoneNumber = entity.Staff?.PhoneNumber,
-        ProfilePicture = entity.Staff?.ProfilePicture
+        ProfilePicture = entity.Staff?.ProfilePicture,
+        IdSubRole = entity.Staff!.Id
     };
 
     public static TeacherDto AccountToTeacherDto(Account entity) => new TeacherDto()
@@ -89,7 +90,8 @@ public static class AccountMapper
         Biography = entity.Teacher?.Biography,
         PhoneNumber = entity.Teacher?.PhoneNumber,
         ProfilePicture = entity.Teacher?.ProfilePicture,
-        PersonalInformation = entity.Teacher?.PersonalInformation
+        PersonalInformation = entity.Teacher?.PersonalInformation,
+        IdSubRole = entity.Teacher!.Id
     };
 
     public static ParentResponse AccountToParentDto(Account entity) => new ParentResponse()
@@ -103,7 +105,8 @@ public static class AccountMapper
         Status = entity.Status.ToString(),
         CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
-        PhoneNumber = entity.Parent?.PhoneNumber
+        PhoneNumber = entity.Parent?.PhoneNumber,
+        IdSubRole = entity.Parent!.Id
     };
 
     public static StudentResponse AccountToStudentDto(Account entity) => new StudentResponse()
@@ -118,7 +121,8 @@ public static class AccountMapper
         CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
         Age= DateTime.Now.Year -
-                (entity.DateOfBirth != null ? entity.DateOfBirth.Value.Year : 0)
+                (entity.DateOfBirth != null ? entity.DateOfBirth.Value.Year : 0),
+        IdSubRole = entity.Student!.Id
     };
 
     public static PagingResponse<AccountDto> AccountToAccountDto(PagingResponse<Account> entities) =>

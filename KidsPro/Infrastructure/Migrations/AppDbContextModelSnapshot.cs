@@ -22,7 +22,7 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.Account", b =>
+            modelBuilder.Entity("Domain.Entities.UserName", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1881,7 +1881,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("OrderDetailStudent");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Account", b =>
+            modelBuilder.Entity("Domain.Entities.UserName", b =>
                 {
                     b.HasOne("Domain.Entities.Role", "Role")
                         .WithMany()
@@ -1894,13 +1894,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Admin", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "Account")
+                    b.HasOne("Domain.Entities.UserName", "UserName")
                         .WithOne("Admin")
                         .HasForeignKey("Domain.Entities.Admin", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("UserName");
                 });
 
             modelBuilder.Entity("Domain.Entities.Certificate", b =>
@@ -1930,7 +1930,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Account", "CreatedBy")
+                    b.HasOne("Domain.Entities.UserName", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1962,17 +1962,17 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "ApprovedBy")
+                    b.HasOne("Domain.Entities.UserName", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("ApprovedById");
 
-                    b.HasOne("Domain.Entities.Account", "CreatedBy")
+                    b.HasOne("Domain.Entities.UserName", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Account", "ModifiedBy")
+                    b.HasOne("Domain.Entities.UserName", "ModifiedBy")
                         .WithMany()
                         .HasForeignKey("ModifiedById")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2204,13 +2204,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Parent", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "Account")
+                    b.HasOne("Domain.Entities.UserName", "UserName")
                         .WithOne("Parent")
                         .HasForeignKey("Domain.Entities.Parent", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("UserName");
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
@@ -2237,7 +2237,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Quiz", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "CreatedBy")
+                    b.HasOne("Domain.Entities.UserName", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2271,18 +2271,18 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Staff", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "Account")
+                    b.HasOne("Domain.Entities.UserName", "UserName")
                         .WithOne("Staff")
                         .HasForeignKey("Domain.Entities.Staff", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("UserName");
                 });
 
             modelBuilder.Entity("Domain.Entities.Student", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "Account")
+                    b.HasOne("Domain.Entities.UserName", "UserName")
                         .WithOne("Student")
                         .HasForeignKey("Domain.Entities.Student", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2294,7 +2294,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("UserName");
 
                     b.Navigation("Parent");
                 });
@@ -2404,13 +2404,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Teacher", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "Account")
+                    b.HasOne("Domain.Entities.UserName", "UserName")
                         .WithOne("Teacher")
                         .HasForeignKey("Domain.Entities.Teacher", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("UserName");
                 });
 
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
@@ -2435,7 +2435,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.UserNotification", b =>
                 {
-                    b.HasOne("Domain.Entities.Account", "Account")
+                    b.HasOne("Domain.Entities.UserName", "UserName")
                         .WithMany("UserNotifications")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2447,7 +2447,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("UserName");
 
                     b.Navigation("Notification");
                 });
@@ -2467,7 +2467,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.Account", b =>
+            modelBuilder.Entity("Domain.Entities.UserName", b =>
                 {
                     b.Navigation("Admin");
 
