@@ -11,6 +11,6 @@ namespace Application.Dtos.Response.Game
     public class LevelPositionData
     {
         public int VPosition { get; set; }
-        public string TypeName { get; set; } = null!;
+        public int PositionType { get; set; }
     }
 }

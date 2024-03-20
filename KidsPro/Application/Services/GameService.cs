@@ -309,7 +309,7 @@ public class GameService : IGameService
         var levelInformation = await _unitOfWork.GameLevelDetailRepository
             .GetAsync(o => o.GameLevelId == firstItem.Id, null);
 
-        return new LevelInformationResponse
+        var result = new LevelInformationResponse
         {
             CoinReward = firstItem.CoinReward ?? 0,
             GameReward = firstItem.GemReward ?? 0,
@@ -317,9 +317,11 @@ public class GameService : IGameService
             levelDetail = levelInformation.Select(item => new LevelPositionData
             {
                 VPosition = item.VPosition,
-                TypeName = item.PositionType.TypeName
+                PositionType = item.Id
             }).ToList()
         };
+
+        return result;
     }
 
     public async Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
