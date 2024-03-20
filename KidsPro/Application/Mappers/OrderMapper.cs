@@ -13,7 +13,7 @@ namespace Application.Mappers
             OrderId = order.Id,
         };
 
-        public static List<OrderResponse> ParentShowOrder(List<Order> orders)
+        public static List<OrderResponse> ShowOrder(List<Order> orders)
         {
             var list = new List<OrderResponse>();
             foreach (var x in orders)
@@ -26,7 +26,8 @@ namespace Application.Mappers
                     PictureUrl = x.OrderDetails!.FirstOrDefault()?.Course.PictureUrl,
                     Quantity = x.Quantity,
                     TotalPrice = x.TotalPrice,
-                    OrderStatus = x.Status.ToString()
+                    OrderStatus = x.Status.ToString(),
+                    ParentId = x.ParentId
                 };
                 list.Add(dto);
             }

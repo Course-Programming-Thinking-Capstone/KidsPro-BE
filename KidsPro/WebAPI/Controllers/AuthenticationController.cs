@@ -53,7 +53,7 @@ public class AuthenticationController : ControllerBase
     }
 
     /// <summary>
-    /// Account trên hệ thống đăng nhập bằng email + password
+    /// UserName trên hệ thống đăng nhập bằng email + password
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>

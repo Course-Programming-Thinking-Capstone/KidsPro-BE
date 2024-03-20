@@ -11,4 +11,5 @@ public class OrderResponse
     public int Quantity { get; set; }
     public decimal TotalPrice { get; set; }
     public string? OrderStatus { get; set; }
+    public int ParentId { get; set; }
 }

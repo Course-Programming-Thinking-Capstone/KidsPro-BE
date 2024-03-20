@@ -29,7 +29,7 @@ namespace Application.Mappers
         {
             var student = new StudentDetailResponse()
             {
-                Account = entity.UserName,
+                UserName = entity.UserName,
                 Id = entity.Id,
                 Email = entity.Account.Email,
                 FullName = entity.Account.FullName,

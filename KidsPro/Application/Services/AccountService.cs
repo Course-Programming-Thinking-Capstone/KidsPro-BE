@@ -99,7 +99,7 @@ public class AccountService : IAccountService
     public async Task<LoginAccountDto> LoginByEmailAsync(EmailCredential dto)
     {
         var account = await _unitOfWork.AccountRepository.LoginByEmailAsync(dto.Email)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.PasswordHash))
         {
@@ -115,7 +115,7 @@ public class AccountService : IAccountService
     public async Task<LoginAccountDto> LoginByPhoneNumberAsync(PhoneCredential dto)
     {
         var parent = await _unitOfWork.ParentRepository.LoginByPhoneNumberAsync(dto.PhoneNumber)
-            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("Account not found."));
+            .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         var account = parent.Account;
 

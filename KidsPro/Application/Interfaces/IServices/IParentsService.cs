@@ -18,8 +18,6 @@ namespace Application.Interfaces.IServices;
 
         Task<ParentOrderResponse> GetEmailZalo();
 
-        Task<Parent?> GetInformationParentCurrentAsync();
-
         Task<List<GameVoucher>?> GetListVoucherAsync(VoucherStatus status);
 
     }

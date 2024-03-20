@@ -12,13 +12,14 @@ namespace Application.Services
     public class OrderService : IOrderService
     {
         readonly IUnitOfWork _unitOfWork;
-        private IParentsService _parentsService;
+        private IAccountService _accountService;
 
-        public OrderService(IUnitOfWork unitOfWork, IParentsService parentsService)
+        public OrderService(IUnitOfWork unitOfWork, IAccountService accountService)
         {
             _unitOfWork = unitOfWork;
-            _parentsService = parentsService;
+            _accountService = accountService;
         }
+
 
         public async Task<OrderPaymentResponse> CreateOrderAsync(OrderRequest dto)
         {
@@ -35,12 +36,12 @@ namespace Application.Services
                 if (course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
             } while (getOrderCode == null);
 
-            var parent = await _parentsService.GetInformationParentCurrentAsync();
+            var account = await _accountService.GetCurrentAccountInformationAsync();
 
             //Create Order
             var order = new Order()
             {
-                ParentId = parent?.Id ?? throw new UnauthorizedException("ParentId doesn't exist"),
+                ParentId = account.IdSubRole,
                 VoucherId = voucher != null ? dto.VoucherId : null,
                 PaymentType = (PaymentType)dto.PaymentType,
                 Quantity = dto.Quantity,
@@ -104,47 +105,37 @@ namespace Application.Services
                         order.Status = toStatus;
                         break;
                 }
+
                 _unitOfWork.OrderRepository.Update(order);
                 await _unitOfWork.SaveChangeAsync();
                 return;
             }
+
             throw new NotImplementException($"Update orderID:{orderId} " +
                                             $"to {currentStatus} status from {toStatus} status failed");
         }
 
         public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
         {
-            var parent = await _parentsService.GetInformationParentCurrentAsync();
-            if (parent != null)
-            {
-                var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, parent.Id);
-                return OrderMapper.ParentShowOrder(orders!);
-            }
-
-            throw new UnauthorizedException("ParentId doesn't exist");
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole,account.Role);
+            return OrderMapper.ShowOrder(orders!);
         }
 
         public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
         {
-            var parent = await _parentsService.GetInformationParentCurrentAsync();
-            if (parent != null)
-            {
-                var order = await _unitOfWork.OrderRepository.GetOrderDetail(parent.Id, orderId);
-                if (order != null)
-                    return OrderMapper.ParentShowOrderDetail(order);
-                throw new UnauthorizedException("OrderId doesn't exist");
-            }
-
-            throw new UnauthorizedException("ParentId doesn't exist");
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
+            if (order != null)
+                return OrderMapper.ParentShowOrderDetail(order);
+            throw new UnauthorizedException("OrderId doesn't exist");
         }
 
         public async Task CanCelOrder(OrderCancelRequest dto)
         {
-            var parent = await _parentsService.GetInformationParentCurrentAsync();
-            if (parent != null)
-                await UpdateOrderStatusAsync(dto.OrderId, parent.Id,
-                    OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
-            throw new UnauthorizedException("ParentId doesn't exist");
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
+                OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
         }
     }
 }
