@@ -69,7 +69,6 @@ public class GameService : IGameService
                 new PositionType
                 {
                     Id = 3,
-
                     TypeName = "Rock"
                 },
             };
@@ -259,7 +258,7 @@ public class GameService : IGameService
             {
                 IdMode = group.Key.Id,
                 TypeName = group.Key.TypeName ?? "Null Name",
-                totalLevel = group.Max(h => h.LevelIndex) ?? 0
+                totalLevel = group.Count() 
             })
             .ToListAsync();
 
@@ -317,7 +316,7 @@ public class GameService : IGameService
             levelDetail = levelInformation.Select(item => new LevelPositionData
             {
                 VPosition = item.VPosition,
-                PositionType = item.Id
+                PositionType = item.PositionTypeId
             }).ToList()
         };
 
