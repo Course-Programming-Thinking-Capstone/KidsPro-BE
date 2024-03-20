@@ -28,7 +28,8 @@ namespace Application.Mappers
                     TotalPrice = x.TotalPrice,
                     OrderStatus = x.Status.ToString(),
                     ParentName = x.Parent!.Account!.FullName,
-                    PaymentType = x.PaymentType.ToString()
+                    PaymentType = x.PaymentType.ToString(),
+                    Note = x.Note
                 };
                 list.Add(dto);
             }
@@ -55,7 +56,8 @@ namespace Application.Mappers
                 TotalPrice = order.TotalPrice,
                 Discount = order.Voucher?.DiscountAmount,
                 NumberChildren = order.OrderDetails!.FirstOrDefault()!.Students!.Count,
-                ParentName = order.Parent!.Account.FullName
+                ParentName = order.Parent!.Account.FullName,
+                ParentId = order.Parent!.Account.Id
             };
             foreach (var dto in order.OrderDetails!.FirstOrDefault()!.Students!)
             {

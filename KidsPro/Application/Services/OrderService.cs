@@ -13,11 +13,13 @@ namespace Application.Services
     {
         readonly IUnitOfWork _unitOfWork;
         private IAccountService _accountService;
+        private INotificationService _notify;
 
-        public OrderService(IUnitOfWork unitOfWork, IAccountService accountService)
+        public OrderService(IUnitOfWork unitOfWork, IAccountService accountService, INotificationService notify)
         {
             _unitOfWork = unitOfWork;
             _accountService = accountService;
+            _notify = notify;
         }
 
 
@@ -131,11 +133,23 @@ namespace Application.Services
             throw new UnauthorizedException("OrderId doesn't exist");
         }
 
-        public async Task CanCelOrder(OrderCancelRequest dto)
+        public async Task CanCelOrderAsync(OrderCancelRequest dto)
         {
             var account = await _accountService.GetCurrentAccountInformationAsync();
             await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
                 OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
         }
+        
+        public async Task ApproveOrderCancellationAsync(int orderId, int parentId)
+        {
+            await UpdateOrderStatusAsync(orderId, parentId,
+                OrderStatus.RequestRefund, OrderStatus.Refunded);
+            // Gửi thông báo chấp nhận hủy đơn cho parent
+            var title = "The result of processing order cancellation request";
+            var content = "Order cancellation request accepted, " +
+                          "KidsPro will refund the money to the e-Wallet after 3-5 days";
+            await _notify.SendNotifyToAccountAsync(parentId, title, content);
+        }
+        
     }
 }

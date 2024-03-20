@@ -21,5 +21,5 @@ public class OrderDetailResponse
     public string? ParentZalo { get; set; }
     public List<StudentOrderDetail>? Students { get; set; } = new List<StudentOrderDetail>();
     public string? ParentName { get; set; }
-    
+    public int ParentId { get; set; }
 }

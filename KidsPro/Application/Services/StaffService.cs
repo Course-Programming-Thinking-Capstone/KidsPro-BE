@@ -3,6 +3,7 @@ using Application.Dtos.Request.Account.Student;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Utils;
+using Domain.Enums;
 
 namespace Application.Services;
 
@@ -10,11 +11,13 @@ public class StaffService:IStaffService
 {
     private IUnitOfWork _unitOfWork;
     private IAccountService _accountService;
+    private INotificationService _notify;
 
-    public StaffService(IUnitOfWork unitOfWork, IAccountService accountService)
+    public StaffService(IUnitOfWork unitOfWork, IAccountService accountService, INotificationService notify)
     {
         _unitOfWork = unitOfWork;
         _accountService = accountService;
+        _notify = notify;
     }
 
     public async Task CreateAccountStudentAsync(StudentCreateAccountRequest dto)
@@ -49,7 +52,12 @@ public class StaffService:IStaffService
         }
         throw new UnauthorizedException($"Not a staff role, Please login again!");
     }
-    
-    
+
+    public async Task<string> ViewReasonOrderCancel(int orderId,int parentId)
+    {
+        // Check và lấy order vs requestRefund status
+        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId,OrderStatus.RequestRefund);
+        return order?.Note??throw new BadRequestException($"OrderId: {orderId} not RequestRefund Status");
+    }
     
 }
