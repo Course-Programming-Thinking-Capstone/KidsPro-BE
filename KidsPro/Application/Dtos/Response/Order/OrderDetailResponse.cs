@@ -19,7 +19,7 @@ public class OrderDetailResponse
     public int NumberChildren { get; set; }
     public string? ParentEmail { get; set; }
     public string? ParentZalo { get; set; }
-    public List<StudentOrderDetail>? Students =new List<StudentOrderDetail>();
+    public List<StudentOrderDetail>? Students { get; set; } = new List<StudentOrderDetail>();
     public string? ParentName { get; set; }
     
 }

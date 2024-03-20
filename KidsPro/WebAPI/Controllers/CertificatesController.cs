@@ -9,11 +9,11 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/v1/certificate")]
-    public class CertificateController : ControllerBase
+    public class CertificatesController : ControllerBase
     {
         ICertificateService _service;
 
-        public CertificateController(ICertificateService service)
+        public CertificatesController(ICertificateService service)
         {
             _service = service;
         }
