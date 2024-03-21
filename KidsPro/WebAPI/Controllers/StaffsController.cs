@@ -69,6 +69,9 @@ public class StaffsController : ControllerBase
     public async Task<IActionResult> ViewReasonAsync(int orderId, int parentId)
     {
         var result = await _staff.ViewReasonOrderCancel(orderId, parentId);
-        return Ok(result);
+        return Ok(new
+        {
+            Reason=result
+        });
     }
 }

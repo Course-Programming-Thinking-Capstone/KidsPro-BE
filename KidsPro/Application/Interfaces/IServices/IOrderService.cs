@@ -6,7 +6,7 @@ namespace Application.Interfaces.IServices
 {
     public interface IOrderService
     {
-        Task<OrderPaymentResponse> CreateOrderAsync(OrderRequest dto);
+        Task<int> CreateOrderAsync(OrderRequest dto);
 
         Task UpdateOrderStatusAsync(int orderId, int parentId,
             OrderStatus currentStatus, OrderStatus toStatus, string? reason="");
