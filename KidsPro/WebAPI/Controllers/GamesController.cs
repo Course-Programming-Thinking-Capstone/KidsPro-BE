@@ -27,7 +27,7 @@ public class GamesController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpGet("setup/init-database")]
-    public async Task<ActionResult<StudentGameLoginDto>> InitDatabase()
+    public async Task<ActionResult> InitDatabase()
     {
         await _gameService.InitDatabase();
         return Ok();
