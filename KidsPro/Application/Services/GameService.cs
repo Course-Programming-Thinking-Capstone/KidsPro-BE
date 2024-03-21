@@ -388,7 +388,7 @@ public class GameService : IGameService
                         },
                         new LevelDetailRequest
                         {
-                            VPosition = 31,
+                            VPosition = 30,
                             TypeId = 1
                         },
                         new LevelDetailRequest
