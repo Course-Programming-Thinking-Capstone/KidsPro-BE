@@ -296,7 +296,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            Description = entity.Description,
+            CourseTarget = entity.CourseTarget,
             Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl
@@ -308,7 +308,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            Description = entity.Description,
+            CourseTarget = entity.CourseTarget,
             Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl
@@ -319,7 +319,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            Description = entity.Description,
+            CourseTarget = entity.CourseTarget,
             Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,

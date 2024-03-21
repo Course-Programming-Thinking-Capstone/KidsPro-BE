@@ -33,7 +33,6 @@ public class CoursesController : ControllerBase
     /// <param name="action"></param>
     /// <returns></returns>
     [HttpGet("{id:int}")]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole},{Constant.StaffRole}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CourseDto>> GetByIdAsync([FromRoute] int id, [FromQuery] string? action)
