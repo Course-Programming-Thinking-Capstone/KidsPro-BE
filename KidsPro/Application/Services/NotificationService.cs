@@ -129,4 +129,31 @@ public class NotificationService : INotificationService
             throw new Exception($"Error when execute {nameof(this.GetAccountNotificationAsync)} method");
         }
     }
+    
+    public async Task SendNotifyToAccountAsync(int toId, string title, string content)
+    {
+        var account = await _unitOfWork.AccountRepository.GetByIdAsync(toId)
+                      ?? throw new BadRequestException($"AccountId: {toId} not found");
+
+        var userNotifications = new List<UserNotification>()
+        {
+            new()
+            {
+                AccountId = toId,
+                IsRead = false,
+            }
+        };
+
+        var notify = new Notification()
+        {
+            Title = title,
+            Content = content,
+            Date = DateTime.UtcNow,
+            UserNotifications = userNotifications
+        };
+
+        await _unitOfWork.NotificationRepository.AddAsync(notify);
+        if (await _unitOfWork.SaveChangeAsync() < 0)
+            throw new NotImplementedException("Add Notify Failed");
+    }
 }

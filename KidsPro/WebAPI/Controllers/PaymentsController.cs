@@ -9,33 +9,33 @@ namespace WebAPI.Controllers
 {
     [Route("api/v1/payment")]
     [ApiController]
-    public class PaymentController : ControllerBase
+    public class PaymentsController : ControllerBase
     {
         IPaymentService _payment;
         IMomoConfig _momoConfig;
 
-        public PaymentController(IPaymentService payment, IMomoConfig momoConfig)
+        public PaymentsController(IPaymentService payment, IMomoConfig momoConfig)
         {
             _payment = payment;
             _momoConfig = momoConfig;
         }
 
         /// <summary>
-        /// Tạo mã QR Code để thanh toán momo, lấy link
+        /// Tạo link url payment Momo
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost("momo")]
-        public async Task<ActionResult> CreatePaymentMomoAsync(OrderPaymentResponseDto dto)
+        [HttpPost("momo/{id}")]
+        public async Task<ActionResult> CreatePaymentMomoAsync(int id)
         {
-            var momoRequest = new MomoPaymentRequestDto();
+            var momoRequest = new MomoPaymentRequest();
             //Get order có parent id và order id vs status payment
-            var order = await _payment.GetOrderPaymentAsync(dto);
+            var order = await _payment.GetOrderStatusPaymentAsync(id);
             if (order != null)
             {
                 // Lấy thông tin cho payment
-                momoRequest.requestId = HashingUtils.GenerateRandomString(4) + "-" + dto.ParentId.ToString();
-                momoRequest.orderId = HashingUtils.GenerateRandomString(4) + "-" + dto.OrderId.ToString();
+                momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + order.ParentId;
+                momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + order.Id;
                 momoRequest.amount =(long) order.TotalPrice;
                 //_momoRequest.extraData = DateTime.UtcNow.AddDays(1).ToString();
                 momoRequest.redirectUrl = _momoConfig.ReturnUrl;
@@ -61,11 +61,12 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("momo-return")]
-        public async Task<IActionResult> MomoReturnAsync([FromQuery] MomoResultRequestDto dto)
+        public async Task<IActionResult> MomoReturnAsync([FromQuery] MomoResultRequest dto)
         {
             await _payment.CreateTransactionAsync(dto);
             return Ok(new
             {
+                OrderId=dto.orderId,
                 result = dto.resultCode,
                 Message = dto.message,
                 PayType=dto.payType

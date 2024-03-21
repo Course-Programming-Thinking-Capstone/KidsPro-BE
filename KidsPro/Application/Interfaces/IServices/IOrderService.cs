@@ -6,10 +6,16 @@ namespace Application.Interfaces.IServices
 {
     public interface IOrderService
     {
-        Task<OrderPaymentResponseDto> CreateOrderAsync(OrderRequestDto dto);
+        Task<int> CreateOrderAsync(OrderRequest dto);
 
-        Task<bool> StatusToPendingAsync(int orderId, int parentId);
+        Task UpdateOrderStatusAsync(int orderId, int parentId,
+            OrderStatus currentStatus, OrderStatus toStatus, string? reason="");
 
-        Task<List<OrderResponseDto>> GetListOrderAsync(OrderStatus status);
+        Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status);
+
+        Task<OrderDetailResponse> GetOrderDetail(int orderId);
+
+        Task CanCelOrderAsync(OrderCancelRequest dto);
+        Task ApproveOrderCancellationAsync(int orderId, int parentId);
     }
 }

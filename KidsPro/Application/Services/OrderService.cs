@@ -9,17 +9,21 @@ using Domain.Enums;
 
 namespace Application.Services
 {
-    public class OrderService:IOrderService
+    public class OrderService : IOrderService
     {
         readonly IUnitOfWork _unitOfWork;
-        private IParentsService _parentsService;
-        public OrderService(IUnitOfWork unitOfWork, IParentsService parentsService)
+        private IAccountService _accountService;
+        private INotificationService _notify;
+
+        public OrderService(IUnitOfWork unitOfWork, IAccountService accountService, INotificationService notify)
         {
             _unitOfWork = unitOfWork;
-            _parentsService = parentsService;
+            _accountService = accountService;
+            _notify = notify;
         }
 
-        public async Task<OrderPaymentResponseDto> CreateOrderAsync(OrderRequestDto dto)
+
+        public async Task<int> CreateOrderAsync(OrderRequest dto)
         {
             var voucher = await _unitOfWork.VoucherRepository.GetVoucher(dto.VoucherId);
             //Kiểm tra lấy order code, nếu đã tồn tại phải tạo ordercode mới
@@ -27,27 +31,27 @@ namespace Application.Services
             Course? course;
             do
             {
-                var checkOrderCode = await _unitOfWork.OrderRepository.GetByOrderCode(HashingUtils.GenerateRandomString, false);
+                var checkOrderCode =
+                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomString, false);
                 getOrderCode = checkOrderCode.Item1 != null ? null : checkOrderCode.Item2;
-                course= await _unitOfWork.CourseRepository.CheckCourseExist(dto.CourseId);
+                course = await _unitOfWork.CourseRepository.CheckCourseExist(dto.CourseId);
                 if (course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
-
             } while (getOrderCode == null);
 
-            var parent = await _parentsService.GetInformationParentCurrentAsync();
+            var account = await _accountService.GetCurrentAccountInformationAsync();
 
             //Create Order
             var order = new Order()
             {
-                ParentId = parent?.Id ?? throw new UnauthorizedException("ParentId doesn't exist"),
+                ParentId = account.IdSubRole,
                 VoucherId = voucher != null ? dto.VoucherId : null,
                 PaymentType = (PaymentType)dto.PaymentType,
                 Quantity = dto.Quantity,
                 TotalPrice = (course.Price * dto.Quantity) - (voucher?.DiscountAmount ?? 0),
                 Date = DateTime.UtcNow,
                 Status = OrderStatus.Payment,
-                OrderCode =getOrderCode,
-                Note="course: "+course.Name
+                OrderCode = getOrderCode,
+                Note = "course: " + course.Name
             };
 
             //Create OrderDetail
@@ -55,12 +59,12 @@ namespace Application.Services
             {
                 Price = course.Price,
                 CourseId = dto.CourseId,
-                Quantity=dto.Quantity,
+                Quantity = dto.Quantity,
                 Order = order
             };
 
             //Create OrderDetail Student
-            foreach(var x in dto.StudentId)
+            foreach (var x in dto.StudentId)
             {
                 var student = await _unitOfWork.StudentRepository.GetByIdAsync(x);
                 if (student != null)
@@ -76,36 +80,75 @@ namespace Application.Services
 
             //Add data to database
             await _unitOfWork.OrderDetailRepository.AddAsync(orderDetail);
-            var result=await _unitOfWork.SaveChangeAsync();
-            if (result < 0) 
+            var result = await _unitOfWork.SaveChangeAsync();
+            if (result < 0)
                 throw new NotImplementException("Create Order Failed");
             //Mapper
-            return OrderMapper.OrderToOrderPaymentResponse(order);
+            return order.Id;
         }
 
-        public async Task<bool> StatusToPendingAsync(int orderId, int parentId)
+        public async Task UpdateOrderStatusAsync(int orderId, int parentId,
+            OrderStatus currentStatus, OrderStatus toStatus, string? reason = "")
         {
-            var order = await _unitOfWork.OrderRepository.GetOrderPaymentAsync(parentId, orderId);
+            var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId, currentStatus);
             if (order != null)
             {
-                order.Status = OrderStatus.Pending;
+                switch (currentStatus)
+                {
+                    case OrderStatus.Payment:
+                        order.Status = toStatus;
+                        break;
+                    case OrderStatus.Pending:
+                        if (toStatus == OrderStatus.RequestRefund)
+                            order.Note = reason;
+                        order.Status = toStatus;
+                        break;
+                    case OrderStatus.RequestRefund:
+                        order.Status = toStatus;
+                        break;
+                }
+
                 _unitOfWork.OrderRepository.Update(order);
                 await _unitOfWork.SaveChangeAsync();
-                return true;
+                return;
             }
-            throw new NotImplementException($"Update orderID {orderId} to status pending failed");
+
+            throw new NotImplementException($"Update orderID:{orderId} " +
+                                            $"to {currentStatus} status from {toStatus} status failed");
         }
 
-        public async Task<List<OrderResponseDto>> GetListOrderAsync(OrderStatus status)
+        public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
         {
-            var parent = await _parentsService.GetInformationParentCurrentAsync();
-            if (parent != null)
-            {
-                var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, parent.Id);
-                return OrderMapper.ParentShowOrder(orders!);
-            }
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole,account.Role);
+            return OrderMapper.ShowOrder(orders!);
+        }
 
-            throw new UnauthorizedException("ParentId doesn't exist");
+        public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
+        {
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
+            if (order != null)
+                return OrderMapper.ShowOrderDetail(order);
+            throw new UnauthorizedException("OrderId doesn't exist");
+        }
+
+        public async Task CanCelOrderAsync(OrderCancelRequest dto)
+        {
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
+                OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
+        }
+        
+        public async Task ApproveOrderCancellationAsync(int orderId, int parentId)
+        {
+            await UpdateOrderStatusAsync(orderId, parentId,
+                OrderStatus.RequestRefund, OrderStatus.Refunded);
+            // Gửi thông báo chấp nhận hủy đơn cho parent
+            var title = "The result of processing order cancellation request";
+            var content = "Order cancellation request accepted, " +
+                          "KidsPro will refund the money to the e-Wallet after 3-5 days";
+            await _notify.SendNotifyToAccountAsync(parentId, title, content);
         }
         
     }

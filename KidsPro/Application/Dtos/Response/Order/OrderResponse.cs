@@ -2,7 +2,7 @@
 
 namespace Application.Dtos.Response.Order;
 
-public class OrderResponseDto
+public class OrderResponse
 {
     public int OrderId { get; set; }
     public string? OrderCode { get; set; }
@@ -11,4 +11,8 @@ public class OrderResponseDto
     public int Quantity { get; set; }
     public decimal TotalPrice { get; set; }
     public string? OrderStatus { get; set; }
+   // public int ParentId { get; set; }
+    public string? ParentName { get; set; }
+    public string? PaymentType { get; set; }
+    public string? Note { get; set; }
 }

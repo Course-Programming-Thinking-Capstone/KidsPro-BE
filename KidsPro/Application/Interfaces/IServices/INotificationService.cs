@@ -10,4 +10,5 @@ public interface INotificationService
     Task<NotificationDto> MarkNotificationAsReadAsync(int notificationId);
 
     Task<PagingResponse<NotificationDto>> MarkAllNotificationAsReadAsync(int? page, int? size);
+    Task SendNotifyToAccountAsync(int toId, string title, string content);
 }

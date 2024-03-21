@@ -19,4 +19,6 @@ public class AccountDto
     public string CreatedDate { get; set; } = null!;
 
     public string Role { get; set; } = null!;
+    
+    public int IdSubRole { get; set; }
 }

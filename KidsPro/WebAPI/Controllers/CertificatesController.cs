@@ -9,11 +9,11 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/v1/certificate")]
-    public class CertificateController : ControllerBase
+    public class CertificatesController : ControllerBase
     {
         ICertificateService _service;
 
-        public CertificateController(ICertificateService service)
+        public CertificatesController(ICertificateService service)
         {
             _service = service;
         }
@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-        public async Task<IActionResult> AddCertificateAsync(CertificatesRequestDto dto)
+        public async Task<IActionResult> AddCertificateAsync(CertificatesRequest dto)
         {
             await _service.AddCertificateAsync(dto);
             return Ok();
