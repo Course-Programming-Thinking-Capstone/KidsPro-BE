@@ -349,7 +349,7 @@ public class GameService : IGameService
                         new LevelDetailRequest
                         {
                             VPosition = 28,
-                            TypeId = 2
+                            TypeId = 1
                         },
                         new LevelDetailRequest
                         {
@@ -362,19 +362,19 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
-                    VStartPosition = 26,
+                    VStartPosition = 25,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
                     {
                         new LevelDetailRequest
                         {
-                            VPosition = 27,
+                            VPosition = 26,
                             TypeId = 1
                         },
                         new LevelDetailRequest
                         {
-                            VPosition = 19,
-                            TypeId = 2
+                            VPosition = 27,
+                            TypeId = 1
                         },
                         new LevelDetailRequest
                         {
@@ -384,16 +384,6 @@ public class GameService : IGameService
                         new LevelDetailRequest
                         {
                             VPosition = 29,
-                            TypeId = 1
-                        },
-                        new LevelDetailRequest
-                        {
-                            VPosition = 21,
-                            TypeId = 2
-                        },
-                        new LevelDetailRequest
-                        {
-                            VPosition = 30,
                             TypeId = 1
                         },
                         new LevelDetailRequest
@@ -403,7 +393,7 @@ public class GameService : IGameService
                         },
                         new LevelDetailRequest
                         {
-                            VPosition = 23,
+                            VPosition = 31,
                             TypeId = 2
                         },
                     }
@@ -412,13 +402,18 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
-                    VStartPosition = 26,
+                    VStartPosition = 43,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
                     {
                         new LevelDetailRequest
                         {
-                            VPosition = 18,
+                            VPosition = 35,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 27,
                             TypeId = 1
                         },
                         new LevelDetailRequest
@@ -428,28 +423,28 @@ public class GameService : IGameService
                         },
                         new LevelDetailRequest
                         {
-                            VPosition = 20,
+                            VPosition = 11,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 12,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 13,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 14,
+                            TypeId = 1
+                        },
+                        new LevelDetailRequest
+                        {
+                            VPosition = 15,
                             TypeId = 2
-                        },
-                        new LevelDetailRequest
-                        {
-                            VPosition = 28,
-                            TypeId = 1
-                        },
-                        new LevelDetailRequest
-                        {
-                            VPosition = 29,
-                            TypeId = 1
-                        },
-                        new LevelDetailRequest
-                        {
-                            VPosition = 30,
-                            TypeId = 2
-                        },
-                        new LevelDetailRequest
-                        {
-                            VPosition = 22,
-                            TypeId = 1
                         },
                     }
                 },
