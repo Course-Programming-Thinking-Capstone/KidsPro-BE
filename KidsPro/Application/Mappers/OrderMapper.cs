@@ -7,11 +7,7 @@ namespace Application.Mappers
 {
     public class OrderMapper
     {
-        public static OrderPaymentResponse OrderToOrderPaymentResponse(Order order) => new OrderPaymentResponse()
-        {
-            ParentId = order.ParentId,
-            OrderId = order.Id,
-        };
+        
 
         public static List<OrderResponse> ShowOrder(List<Order> orders)
         {

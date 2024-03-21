@@ -23,7 +23,7 @@ namespace Application.Services
         }
 
 
-        public async Task<OrderPaymentResponse> CreateOrderAsync(OrderRequest dto)
+        public async Task<int> CreateOrderAsync(OrderRequest dto)
         {
             var voucher = await _unitOfWork.VoucherRepository.GetVoucher(dto.VoucherId);
             //Kiểm tra lấy order code, nếu đã tồn tại phải tạo ordercode mới
@@ -84,7 +84,7 @@ namespace Application.Services
             if (result < 0)
                 throw new NotImplementException("Create Order Failed");
             //Mapper
-            return OrderMapper.OrderToOrderPaymentResponse(order);
+            return order.Id;
         }
 
         public async Task UpdateOrderStatusAsync(int orderId, int parentId,

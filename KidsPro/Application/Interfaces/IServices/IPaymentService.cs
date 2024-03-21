@@ -11,7 +11,7 @@ namespace Application.Interfaces.IServices
 {
     public interface IPaymentService
     {
-        Task<Order?> GetOrderStatusPaymentAsync(OrderPaymentResponse dto);
+        Task<Order?> GetOrderStatusPaymentAsync(int orderId);
         string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo);
         (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest);
         Task CreateTransactionAsync(MomoResultRequest dto);

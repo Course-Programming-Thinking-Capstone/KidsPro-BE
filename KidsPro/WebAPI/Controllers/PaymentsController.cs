@@ -21,21 +21,21 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Tạo mã QR Code để thanh toán momo, lấy link
+        /// Tạo link url payment Momo
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost("momo")]
-        public async Task<ActionResult> CreatePaymentMomoAsync(OrderPaymentResponse dto)
+        [HttpPost("momo/{id}")]
+        public async Task<ActionResult> CreatePaymentMomoAsync(int id)
         {
             var momoRequest = new MomoPaymentRequest();
             //Get order có parent id và order id vs status payment
-            var order = await _payment.GetOrderStatusPaymentAsync(dto);
+            var order = await _payment.GetOrderStatusPaymentAsync(id);
             if (order != null)
             {
                 // Lấy thông tin cho payment
-                momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + dto.ParentId.ToString();
-                momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + dto.OrderId.ToString();
+                momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + order.ParentId;
+                momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + order.Id;
                 momoRequest.amount =(long) order.TotalPrice;
                 //_momoRequest.extraData = DateTime.UtcNow.AddDays(1).ToString();
                 momoRequest.redirectUrl = _momoConfig.ReturnUrl;
@@ -66,6 +66,7 @@ namespace WebAPI.Controllers
             await _payment.CreateTransactionAsync(dto);
             return Ok(new
             {
+                OrderId=dto.orderId,
                 result = dto.resultCode,
                 Message = dto.message,
                 PayType=dto.payType

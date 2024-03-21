@@ -17,20 +17,24 @@ public class PaymentService : IPaymentService
 {
     readonly IUnitOfWork _unitOfWork;
     readonly IOrderService _orderService;
+    private IAccountService _accountService;
 
-    public PaymentService(IUnitOfWork unitOfWork, IOrderService orderService)
+    public PaymentService(IUnitOfWork unitOfWork, IOrderService orderService, IAccountService accountService)
     {
         _unitOfWork = unitOfWork;
         _orderService = orderService;
+        _accountService = accountService;
     }
 
-    public async Task<Order?> GetOrderStatusPaymentAsync(OrderPaymentResponse dto)
+    public async Task<Order?> GetOrderStatusPaymentAsync(int orderId)
     {
-        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(dto.ParentId, dto.OrderId,
+        var account = await _accountService.GetCurrentAccountInformationAsync();
+        
+        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
             OrderStatus.Payment);
         if (order != null)
             return order;
-        throw new NotFoundException($"OrderId {dto.OrderId} of ParentId {dto.ParentId} doesn't payment status");
+        throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
     }
 
     public string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo)

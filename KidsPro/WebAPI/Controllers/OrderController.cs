@@ -28,10 +28,13 @@ namespace WebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status501NotImplemented, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<OrderPaymentResponse>> CreateOrderAsync(OrderRequest dto)
+        public async Task<IActionResult> CreateOrderAsync(OrderRequest dto)
         {
             var result=await _order.CreateOrderAsync(dto);
-            return Ok(result);
+            return Ok(new
+            {
+                OrderId=result
+            });
         }
         
         /// <summary>
