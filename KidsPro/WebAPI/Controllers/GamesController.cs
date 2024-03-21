@@ -54,7 +54,7 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <param name="id">User Id</param>
     /// <returns></returns>
-    [HttpGet("userProcess/{id}")]
+    [HttpGet("user-process/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrentLevelData))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<CurrentLevelData>> GetCurrentLevelByUserId([FromRoute] int id)
@@ -67,7 +67,7 @@ public class GamesController : ControllerBase
     /// Get all mode that have in game
     /// </summary>
     /// <returns></returns>
-    [HttpGet("gameMode")]
+    [HttpGet("game-mode")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModeType))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ModeType>> GetAllGameMode()
@@ -77,15 +77,15 @@ public class GamesController : ControllerBase
     }
 
     /// <summary>
-    ///  Get information of a level
+    /// Get information of a level
     /// </summary>
     /// <param name="id">game mode id</param>
     /// <param name="index">level index</param>
     /// <returns></returns>
-    [HttpGet("leveldata/{id}/{index}")]
+    [HttpGet("level-data/")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelInformationResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<LevelInformationResponse>> GetLevelData([FromRoute] int id, [FromRoute] int index)
+    public async Task<ActionResult<LevelInformationResponse>> GetLevelData([FromQuery] int id, [FromQuery] int index)
     {
         var result = await _gameService.GetLevelInformation(id, index);
         return Ok(result);
@@ -94,7 +94,7 @@ public class GamesController : ControllerBase
     /// <summary>
     /// User finish a level game, return new user coin if first time clear level
     /// </summary>
-    [HttpPost("finishLevel")]
+    [HttpPost("finish-level")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<LevelInformationResponse>> FinishLevelGame(
@@ -112,7 +112,7 @@ public class GamesController : ControllerBase
     /// Get Level information by id
     /// </summary>
     /// <returns></returns>
-    [HttpGet("admin/getLevelById/{id}")]
+    [HttpGet("game-level/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<LevelDataResponse>> GetLevelById([FromRoute] int id)
@@ -125,7 +125,7 @@ public class GamesController : ControllerBase
     /// Get Level information by id
     /// </summary>
     /// <returns></returns>
-    [HttpGet("admin/getLevelsByMode/{modeId}")]
+    [HttpGet("game-mode/{modeId}/game-level")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<LevelDataResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId)
@@ -138,7 +138,7 @@ public class GamesController : ControllerBase
     /// Admin add a new game level to game
     /// </summary>
     /// <returns></returns>
-    [HttpPost("admin/addNewLevel")]
+    [HttpPost("game-level")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult> AddNewLevels(
@@ -152,7 +152,7 @@ public class GamesController : ControllerBase
     /// Admin add a new game level to game
     /// </summary>
     /// <returns></returns>
-    [HttpPut("admin/updateLevel")]
+    [HttpPut("game-level")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult> UpdateLevel(

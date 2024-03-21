@@ -88,6 +88,7 @@ public class GameService : IGameService
             await _unitOfWork.CommitAsync();
         }
 
+        // Add basic an sequence
         if (!_unitOfWork.GameLevelRepository.GetAll().Any())
         {
             await _unitOfWork.BeginTransactionAsync();
