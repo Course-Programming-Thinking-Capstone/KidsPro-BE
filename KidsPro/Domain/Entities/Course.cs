@@ -64,6 +64,9 @@ public class Course : BaseEntity
     public virtual Account? ApprovedBy { get; set; }
     public int? ApprovedById { get; set; }
 
+    public virtual Syllabus? Syllabus { get; set; }
+    public int? SyllabusId { get; set; }
+
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 
     public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();

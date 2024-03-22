@@ -13,6 +13,7 @@ public class Section : BaseEntity
     public int Order { get; set; }
 
     [MaxLength(250)] public string Name { get; set; } = null!;
+    public int SectionTime { get; set; }
 
     public virtual Course Course { get; set; } = null!;
 
