@@ -55,15 +55,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Get order detail
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [Authorize(Roles = $"{Constant.ParentRole},{Constant.StaffRole},{Constant.AdminRole},")]
-        [HttpGet("detail")]
+        [HttpGet("detail/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<OrderDetailResponse>> GetOrdersAsync(int orderId)
+        public async Task<ActionResult<OrderDetailResponse>> GetOrdersAsync(int id)
         {
-            var result=await _order.GetOrderDetail(orderId);
+            var result=await _order.GetOrderDetail(id);
             return Ok(result);
         }
         

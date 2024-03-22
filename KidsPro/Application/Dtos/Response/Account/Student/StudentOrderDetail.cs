@@ -2,7 +2,7 @@
 
 public class StudentOrderDetail
 {
-    public int AcountId { get; set; }
+    public int StudentId { get; set; }
     public string? StudentName { get; set; }
     public string?  DateOfBirth { get; set; }
 }
