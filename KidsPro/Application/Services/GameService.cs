@@ -948,13 +948,17 @@ public class GameService : IGameService
 
         if (gameLevel[0].GameLevelTypeId != gameLevel[1].GameLevelTypeId)
         {
-            throw new NotFoundException("Game mode does not match");
+            throw new BadRequestException("Game mode does not match");
         }
 
         try
         {
             await _unitOfWork.BeginTransactionAsync();
-            (gameLevel[0].LevelIndex, gameLevel[1].LevelIndex) = (gameLevel[0].LevelIndex, gameLevel[1].LevelIndex);
+            // ReSharper disable once SwapViaDeconstruction
+            var temp = gameLevel[0].LevelIndex;
+            gameLevel[0].LevelIndex = gameLevel[1].LevelIndex;
+            gameLevel[1].LevelIndex = temp;
+            
             _unitOfWork.GameLevelRepository.Update(gameLevel[0]);
             _unitOfWork.GameLevelRepository.Update(gameLevel[1]);
             await _unitOfWork.SaveChangeAsync();
