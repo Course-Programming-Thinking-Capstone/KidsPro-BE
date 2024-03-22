@@ -109,7 +109,7 @@ public class GamesController : ControllerBase
     #region Admin API
 
     /// <summary>
-    /// Get Level information by id
+    /// Admin Get Level detail by level id
     /// </summary>
     /// <returns></returns>
     [HttpGet("game-level/{id}")]
@@ -122,7 +122,7 @@ public class GamesController : ControllerBase
     }
 
     /// <summary>
-    /// Get Level information by id
+    /// Admin Get Levels details by game mode id
     /// </summary>
     /// <returns></returns>
     [HttpGet("game-mode/{modeId}/game-level")]
@@ -149,7 +149,7 @@ public class GamesController : ControllerBase
     }
 
     /// <summary>
-    /// Admin add a new game level to game
+    /// Admin update an level
     /// </summary>
     /// <returns></returns>
     [HttpPut("game-level")]
@@ -161,6 +161,19 @@ public class GamesController : ControllerBase
         await _gameService.UpdateLevel(modifiedLevelData);
         return Ok();
     }
-
+        
+    /// <summary>
+    /// Admin update index of level
+    /// </summary>
+    /// <returns></returns>
+    [HttpPut("game-level-index")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult> UpdateLevelIndex(
+        [FromBody] ModifiedLevelIndex modifiedLevelData)
+    {
+        await _gameService.UpdateLevelIndex(modifiedLevelData);
+        return Ok();
+    }
     #endregion
 }
