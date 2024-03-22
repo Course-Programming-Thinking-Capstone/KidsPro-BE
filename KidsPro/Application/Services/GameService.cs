@@ -799,6 +799,10 @@ public class GameService : IGameService
                 details
             );
             await _unitOfWork.SaveChangeAsync();
+            if (onTransaction)
+            {
+                await _unitOfWork.CommitAsync();
+            }
         }
         catch (Exception e)
         {
