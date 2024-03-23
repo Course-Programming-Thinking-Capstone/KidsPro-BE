@@ -716,19 +716,20 @@ public class GameService : IGameService
     public async Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData)
     {
         // check Existed
-        var checkExisted =
-            await GetLevelDataById(modifiedLevelData.Id);
-        if (checkExisted == null)
-        {
-            throw new BadRequestException("Game level not found");
-        }
 
+        await _unitOfWork.BeginTransactionAsync();
         var query =
             await _unitOfWork.GameLevelRepository.GetAsync(o
                     => o.GameLevelTypeId == modifiedLevelData.GameLevelTypeId && o.LevelIndex != -1
                 , null);
         var currentLevels = query.ToList();
         var currentMaxLevel = currentLevels.Max(o => o.LevelIndex) ?? -1;
+        var checkExisted =
+            currentLevels.FirstOrDefault(o => o.Id == modifiedLevelData.Id);
+        if (checkExisted == null)
+        {
+            throw new BadRequestException("Game level not found");
+        }
 
         if (modifiedLevelData.LevelIndex < 0)
         {
@@ -791,7 +792,7 @@ public class GameService : IGameService
         }
 
         // REMOVE CURRENT DETAILS
-        await _unitOfWork.BeginTransactionAsync();
+
         try
         {
             var currentList = await
@@ -822,20 +823,20 @@ public class GameService : IGameService
         try
         {
             // Update current game level
-            _unitOfWork.GameLevelRepository.Update(new GameLevel
-            {
-                Id = checkExisted.Id,
-                LevelIndex = modifiedLevelData.LevelIndex,
-                CoinReward = modifiedLevelData.CoinReward,
-                GemReward = modifiedLevelData.GemReward,
-                VStartPosition = modifiedLevelData.VStartPosition,
-                GameLevelTypeId = modifiedLevelData.GameLevelTypeId,
-            });
+
+            checkExisted.Id = checkExisted.Id;
+            checkExisted.LevelIndex = modifiedLevelData.LevelIndex;
+            checkExisted.CoinReward = modifiedLevelData.CoinReward;
+            checkExisted.GemReward = modifiedLevelData.GemReward;
+            checkExisted.VStartPosition = modifiedLevelData.VStartPosition;
+            checkExisted.GameLevelTypeId = modifiedLevelData.GameLevelTypeId;
+            _unitOfWork.GameLevelRepository.Update(checkExisted);
             // Add details
             await _unitOfWork.GameLevelDetailRepository.AddRangeAsync(
                 details
             );
             await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
         }
         catch (Exception e)
         {
@@ -876,7 +877,8 @@ public class GameService : IGameService
 
     public async Task<List<LevelDataResponse>> GetLevelsByMode(int modeId)
     {
-        var query = await _unitOfWork.GameLevelRepository.GetAsync(o => o.GameLevelTypeId == modeId, null);
+        var query = await _unitOfWork.GameLevelRepository.GetAsync(
+            o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null);
         if (!query.Any())
         {
             throw new NotFoundException("Not found any level");
