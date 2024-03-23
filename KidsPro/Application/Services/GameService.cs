@@ -21,6 +21,28 @@ public class GameService : IGameService
 
     public async Task InitDatabase()
     {
+        // CHECK FOR SAMPLE ACCOUNT
+        // if (await _unitOfWork.StudentRepository.GameStudentLoginAsync(SampleEmail)
+        //         .ContinueWith(t => t.Result) == null)
+        // {
+        //     await _unitOfWork.StudentRepository.AddAsync(new Student
+        //     {
+        //         Account = new Account
+        //         {
+        //             Email = SampleEmail,
+        //             PasswordHash = null,
+        //         },
+        //         UserName = "Denk",
+        //         GameUserProfile = new GameUserProfile
+        //         {
+        //             DisplayName = "Denkhotieu",
+        //             Coin = 0,
+        //             Gem = 0,
+        //         },
+        //     });
+        //     await _unitOfWork.SaveChangeAsync();
+        // }
+
         if (!_unitOfWork.LevelTypeRepository.GetAll().Any())
         {
             await _unitOfWork.BeginTransactionAsync();
@@ -777,6 +799,10 @@ public class GameService : IGameService
                 details
             );
             await _unitOfWork.SaveChangeAsync();
+            if (onTransaction)
+            {
+                await _unitOfWork.CommitAsync();
+            }
         }
         catch (Exception e)
         {
@@ -791,6 +817,7 @@ public class GameService : IGameService
 
     public async Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData)
     {
+        // check Existed
         var checkExisted =
             await GetLevelDataById(modifiedLevelData.Id);
         if (checkExisted == null)
@@ -896,7 +923,7 @@ public class GameService : IGameService
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
             LevelDetail = new List<LevelDetail>()
-        }).ToList();
+        }).OrderBy(o => o.LevelIndex).ToList();
 
         foreach (var resultItem in result)
         {
@@ -911,6 +938,41 @@ public class GameService : IGameService
         }
 
         return result;
+    }
+
+    public async Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData)
+    {
+        var query = await _unitOfWork.GameLevelRepository.GetAsync(
+            o => o.Id == modifiedLevelData.IdA || o.Id == modifiedLevelData.IdB, null);
+        var gameLevel = query.ToList();
+        if (gameLevel.Count != 2)
+        {
+            throw new NotFoundException("Game level not found");
+        }
+
+        if (gameLevel[0].GameLevelTypeId != gameLevel[1].GameLevelTypeId)
+        {
+            throw new BadRequestException("Game mode does not match");
+        }
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync();
+            // ReSharper disable once SwapViaDeconstruction
+            var temp = gameLevel[0].LevelIndex;
+            gameLevel[0].LevelIndex = gameLevel[1].LevelIndex;
+            gameLevel[1].LevelIndex = temp;
+            
+            _unitOfWork.GameLevelRepository.Update(gameLevel[0]);
+            _unitOfWork.GameLevelRepository.Update(gameLevel[1]);
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 
     #endregion

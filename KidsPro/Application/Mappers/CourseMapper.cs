@@ -39,7 +39,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            CourseTarget = entity.CourseTarget,
+            Description = entity.Description,
             Price = entity.Price,
             CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.CreatedDate),
             PictureUrl = entity.PictureUrl,
@@ -64,7 +64,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            CourseTarget = entity.CourseTarget,
+            Description = entity.Description,
             Price = entity.Price,
             PictureUrl = entity.PictureUrl,
             DiscountPrice = entity.DiscountPrice,
@@ -296,7 +296,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            CourseTarget = entity.CourseTarget,
+            Description = entity.Description,
             Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl
@@ -308,7 +308,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            CourseTarget = entity.CourseTarget,
+            Description = entity.Description,
             Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl
@@ -319,7 +319,7 @@ public static class CourseMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            CourseTarget = entity.CourseTarget,
+            Description = entity.Description,
             Price = entity.Price,
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,

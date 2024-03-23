@@ -36,6 +36,8 @@ public class Quiz : BaseEntity
     public virtual Section Section { get; set; } = null!;
     public int SectionId { get; set; }
 
+    public virtual PassCondition? PassCondition { get; set; } = null!;
+    public int? PassConditionId { get; set; }
 
     public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }

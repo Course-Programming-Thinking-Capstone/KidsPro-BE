@@ -70,7 +70,6 @@ public class CourseService : ICourseService
         }
 
         entity.Name = dto.Name;
-        entity.CourseTarget = dto.CourseTarget;
         entity.CreatedDate = DateTime.UtcNow;
         entity.ModifiedDate = DateTime.UtcNow;
         entity.CreatedBy = currentAccount;
@@ -190,8 +189,8 @@ public class CourseService : ICourseService
         }
 
         // update course 
-        if (!string.IsNullOrEmpty(dto.Description))
-            courseEntity.Description = dto.Description;
+        // if (!string.IsNullOrEmpty(dto.Description))
+        //     courseEntity.Description = dto.Description;
 
         if (dto.Sections != null)
         {

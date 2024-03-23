@@ -1,8 +1,6 @@
 ﻿using Application.Configurations;
 using Domain.Entities;
 using Domain.Enums;
-using Firebase.Auth;
-using FirebaseAdmin.Auth.Hash;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -104,7 +102,7 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Student>()
-            .HasMany<OrderDetail>(s => s.OrderDetails)
+            .HasMany(s => s.OrderDetails)
             .WithMany(o => o.Students);
 
         //data seeding
@@ -184,6 +182,14 @@ public class AppDbContext : DbContext
                 Id = 1,
                 AccountId = 5
             }
+        );
+
+        modelBuilder.Entity<PassCondition>().HasData(
+            new PassCondition() { Id = 1, PassRatio = 60 },
+            new PassCondition() { Id = 2, PassRatio = 70 },
+            new PassCondition() { Id = 3, PassRatio = 80 },
+            new PassCondition() { Id = 4, PassRatio = 90 },
+            new PassCondition() { Id = 5, PassRatio = 100 }
         );
     }
 }

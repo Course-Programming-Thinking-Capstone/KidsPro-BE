@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240316093458_DatabaseV3")]
-    partial class DatabaseV3
+    [Migration("20240323012736_DatabaseV2")]
+    partial class DatabaseV2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,55 +91,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 3, 16, 9, 34, 56, 533, DateTimeKind.Utc).AddTicks(9351),
+                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 35, 698, DateTimeKind.Utc).AddTicks(4034),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$U31v77rmpRptEsTvEvG0yO.0dthzmsG.COhsQn0FISrxKTKeaVWsa",
+                            PasswordHash = "$2a$11$mDjLuP2tsX/H8Evc488KzuZaQJ99GTt8w2GnI3oOI0j5bZSbUadS2",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 3, 16, 9, 34, 56, 773, DateTimeKind.Utc).AddTicks(6476),
+                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 35, 913, DateTimeKind.Utc).AddTicks(6276),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$LlynMoIR6PuLcurFQ16Rtet4Zg/0tclPaL.KruenauxGYE7F./eVq",
+                            PasswordHash = "$2a$11$t5p/lGSC6eN14zwBhvm.Ue5rsZ2gdDRExn0v.hFVLUzx8AV8eFJ1e",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 3, 16, 9, 34, 57, 9, DateTimeKind.Utc).AddTicks(3665),
+                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 36, 135, DateTimeKind.Utc).AddTicks(8496),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$1iqLhaEU4WM.35tK.WjpAuPAjBpEVIRldklGUhL.m9tMbl4Ap0dgy",
+                            PasswordHash = "$2a$11$NOvoLf88r8.3Ln98ZTonyOhAO7TfM3tE3UjqmuRcpWOPo8DfKqoz.",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 3, 16, 9, 34, 57, 260, DateTimeKind.Utc).AddTicks(124),
+                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 36, 350, DateTimeKind.Utc).AddTicks(638),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$9r9kpOFihqMXOK6uGM1LDedxqmLkgRrS5hzkKqe7xE9kZE5g9/eAa",
+                            PasswordHash = "$2a$11$MKdqp/GM/vEDGQfNBv1FmOghtGdX8T5umcIEeL/vk5O/gs0zmdNJu",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 3, 16, 9, 34, 57, 503, DateTimeKind.Utc).AddTicks(7435),
+                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 36, 574, DateTimeKind.Utc).AddTicks(928),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$hTkv1U.ahgEeNgHJY67Y.eeleRPTKWmoQ4V2TAMOLEuk1NyxWnV8e",
+                            PasswordHash = "$2a$11$tXzQ6libSyzfjf56Qjk2keesb/pzdFrXCR59gVJX/zHOIiEZcvgr.",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -330,10 +330,6 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("ApprovedById")
                         .HasColumnType("int");
 
-                    b.Property<string>("CourseTarget")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
-
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
@@ -389,6 +385,9 @@ namespace Infrastructure.Migrations
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
+                    b.Property<int?>("SyllabusId")
+                        .HasColumnType("int");
+
                     b.Property<short?>("TotalLesson")
                         .HasColumnType("smallint");
 
@@ -405,6 +404,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModifiedById");
+
+                    b.HasIndex("SyllabusId")
+                        .IsUnique()
+                        .HasFilter("[SyllabusId] IS NOT NULL");
 
                     b.ToTable("Courses");
                 });
@@ -1122,6 +1125,55 @@ namespace Infrastructure.Migrations
                     b.ToTable("Parents");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PassCondition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PassRatio")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PassCondition");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PassRatio = 60
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PassRatio = 70
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PassRatio = 80
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PassRatio = 90
+                        },
+                        new
+                        {
+                            Id = 5,
+                            PassRatio = 100
+                        });
+                });
+
             modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -1257,6 +1309,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PassConditionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
@@ -1283,6 +1338,8 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("LessonId");
+
+                    b.HasIndex("PassConditionId");
 
                     b.HasIndex("SectionId");
 
@@ -1364,6 +1421,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<byte>("Order")
                         .HasColumnType("tinyint");
+
+                    b.Property<int>("SectionTime")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
@@ -1698,6 +1758,43 @@ namespace Infrastructure.Migrations
                     b.ToTable("StudentQuizzes");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Syllabus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseSlot")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PassConditionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotTime")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Target")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PassConditionId");
+
+                    b.ToTable("Syllabus");
+                });
+
             modelBuilder.Entity("Domain.Entities.Teacher", b =>
                 {
                     b.Property<int>("Id")
@@ -1980,11 +2077,17 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ModifiedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.Syllabus", "Syllabus")
+                        .WithOne("Course")
+                        .HasForeignKey("Domain.Entities.Course", "SyllabusId");
+
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ModifiedBy");
+
+                    b.Navigation("Syllabus");
                 });
 
             modelBuilder.Entity("Domain.Entities.CourseResource", b =>
@@ -2250,6 +2353,10 @@ namespace Infrastructure.Migrations
                         .WithMany("Quizzes")
                         .HasForeignKey("LessonId");
 
+                    b.HasOne("Domain.Entities.PassCondition", "PassCondition")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("PassConditionId");
+
                     b.HasOne("Domain.Entities.Section", "Section")
                         .WithMany("Quizzes")
                         .HasForeignKey("SectionId")
@@ -2257,6 +2364,8 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("PassCondition");
 
                     b.Navigation("Section");
                 });
@@ -2405,6 +2514,15 @@ namespace Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Syllabus", b =>
+                {
+                    b.HasOne("Domain.Entities.PassCondition", "PassCondition")
+                        .WithMany("Syllabuses")
+                        .HasForeignKey("PassConditionId");
+
+                    b.Navigation("PassCondition");
+                });
+
             modelBuilder.Entity("Domain.Entities.Teacher", b =>
                 {
                     b.HasOne("Domain.Entities.Account", "Account")
@@ -2523,6 +2641,13 @@ namespace Infrastructure.Migrations
                     b.Navigation("Vouchers");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PassCondition", b =>
+                {
+                    b.Navigation("Quizzes");
+
+                    b.Navigation("Syllabuses");
+                });
+
             modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
                     b.Navigation("Options");
@@ -2555,6 +2680,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>
                 {
                     b.Navigation("StudentAnswers");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Syllabus", b =>
+                {
+                    b.Navigation("Course");
                 });
 #pragma warning restore 612, 618
         }

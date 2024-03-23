@@ -14,4 +14,5 @@ public interface IGameService
     public Task<List<LevelDataResponse>> GetLevelsByMode(int modeId);
     public Task<LevelDataResponse> GetLevelDataById(int id);
     public Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData);
+    public Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData);
 }
