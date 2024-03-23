@@ -1,5 +1,7 @@
-﻿using Application.Configurations;
+﻿using System.Linq.Expressions;
+using Application.Configurations;
 using Application.Dtos.Request.Syllabus;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.Syllabus;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -136,5 +138,83 @@ public class SyllabusService : ISyllabusService
 
         await _unitOfWork.SaveChangeAsync();
         return SyllabusMapper.SyllabusToSyllabusDetailDto(entity);
+    }
+
+    public async Task<PagingResponse<FilterSyllabusDto>> FilterSyllabusAsync(
+        string? name,
+        SyllabusStatus? status,
+        string? sortName,
+        string? sortCreatedDate,
+        int? page,
+        int? size)
+    {
+        //need to check role
+        var parameter = Expression.Parameter(typeof(Syllabus));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Syllabus.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            if (status.HasValue)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Syllabus.Status)),
+                        Expression.Constant(status.Value)));
+            }
+
+            //Default sort by modified date desc
+            Func<IQueryable<Syllabus>, IOrderedQueryable<Syllabus>> orderBy = q =>
+                q.OrderByDescending(c => c.Course.CreatedDate);
+
+            if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Name);
+            }
+            else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Course.CreatedDate);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Course.CreatedDate);
+            }
+
+            var entities = await _unitOfWork.SyllabusRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Syllabus, bool>>(filter, parameter),
+                orderBy: orderBy,
+                includeProperties: $"{nameof(Syllabus.Course)}",
+                page: page,
+                size: size
+            );
+            var result = SyllabusMapper.SyllabusToFilterSyllabusDto(entities);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.FilterSyllabusAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterSyllabusAsync)} method");
+        }
     }
 }

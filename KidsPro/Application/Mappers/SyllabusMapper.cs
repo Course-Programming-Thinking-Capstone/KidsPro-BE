@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Syllabus;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.Syllabus;
 using Application.Utils;
 using Domain.Entities;
@@ -34,6 +35,14 @@ public static class SyllabusMapper
             Name = entity.Name,
             Status = entity.Status,
             CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.Course.CreatedDate)
+        };
+
+    public static PagingResponse<FilterSyllabusDto> SyllabusToFilterSyllabusDto(PagingResponse<Syllabus> entities)
+        => new PagingResponse<FilterSyllabusDto>()
+        {
+            TotalPages = entities.TotalPages,
+            TotalRecords = entities.TotalRecords,
+            Results = entities.Results.Select(SyllabusToFilterSyllabusDto).ToList()
         };
 
     public static Section CreateSectionDtoToSection(CreateSyllabusSectionDto dto)
