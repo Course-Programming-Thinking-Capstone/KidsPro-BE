@@ -89,10 +89,10 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> CreateCourseAsync([FromBody] CreateCourseDto dto)
+    public async Task<ActionResult<CourseDto>> CreateCourseAsync([FromBody] CreateSyllabusDto dto)
     {
         var result = await _courseService.CreateCourseAsync(dto);
-        return Created(nameof(CreateCourseDto), result);
+        return Created(nameof(CreateSyllabusDto), result);
     }
 
     /// <summary>

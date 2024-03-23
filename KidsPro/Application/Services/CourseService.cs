@@ -50,7 +50,7 @@ public class CourseService : ICourseService
     /// <exception cref="UnauthorizedException"></exception>
     /// <exception cref="NotFoundException"></exception>
     /// <exception cref="BadRequestException"></exception>
-    public async Task<CourseDto> CreateCourseAsync(CreateCourseDto dto)
+    public async Task<CourseDto> CreateCourseAsync(CreateSyllabusDto dto)
     {
         var entity = new Course();
 
@@ -673,7 +673,7 @@ public class CourseService : ICourseService
                     Expression.Constant(CourseStatus.Active)));
 
             //Default sort by modified date desc
-            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.ModifiedDate);
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.CreatedDate);
 
             if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
             {
@@ -761,7 +761,7 @@ public class CourseService : ICourseService
                         Expression.Constant(status)));
             }
 
-            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(c => c.Id);
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.CreatedDate);
 
             if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
             {
