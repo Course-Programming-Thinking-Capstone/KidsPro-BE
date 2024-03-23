@@ -723,6 +723,73 @@ public class GameService : IGameService
             throw new BadRequestException("Game level not found");
         }
 
+        var query =
+            await _unitOfWork.GameLevelRepository.GetAsync(o
+                    => o.GameLevelTypeId == modifiedLevelData.GameLevelTypeId && o.LevelIndex != -1
+                , null);
+        var currentLevels = query.ToList();
+        var currentMaxLevel = currentLevels.Max(o => o.LevelIndex) ?? -1;
+
+        if (modifiedLevelData.LevelIndex < 0)
+        {
+            throw new BadRequestException("LevelIndex not valid");
+        }
+
+        // Move updated level out
+        if (checkExisted.LevelIndex != modifiedLevelData.LevelIndex)
+        {
+            if (modifiedLevelData.LevelIndex < checkExisted.LevelIndex)
+            {
+                try
+                {
+                    foreach (var itemLevel in currentLevels)
+                    {
+                        if (itemLevel.LevelIndex >= modifiedLevelData.LevelIndex
+                            && itemLevel.LevelIndex < checkExisted.LevelIndex
+                           )
+                        {
+                            itemLevel.LevelIndex++;
+                        }
+
+                        _unitOfWork.GameLevelRepository.Update(itemLevel);
+                    }
+                }
+                catch (Exception e)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+
+            if (modifiedLevelData.LevelIndex > checkExisted.LevelIndex)
+            {
+                try
+                {
+                    foreach (var itemLevel in currentLevels)
+                    {
+                        if (itemLevel.LevelIndex > checkExisted.LevelIndex
+                            && itemLevel.LevelIndex <= modifiedLevelData.LevelIndex
+                           )
+                        {
+                            itemLevel.LevelIndex--;
+                        }
+
+                        _unitOfWork.GameLevelRepository.Update(itemLevel);
+                    }
+                }
+                catch (Exception e)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+        }
+
+        if (modifiedLevelData.LevelIndex > currentMaxLevel) // update to last index
+        {
+            modifiedLevelData.LevelIndex = currentMaxLevel;
+        }
+
         // REMOVE CURRENT DETAILS
         await _unitOfWork.BeginTransactionAsync();
         try
