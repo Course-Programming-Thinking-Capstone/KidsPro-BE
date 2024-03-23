@@ -59,4 +59,16 @@ public class SyllabusesController : ControllerBase
         var result = await _syllabusService.FilterSyllabusAsync(name, status, sortName, sortCreatedDate, page, size);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Get syllabus by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SyllabusDetailDto))]
+    public async Task<ActionResult<SyllabusDetailDto>> GetByIsAsync([FromRoute] int id)
+    {
+        return await _syllabusService.GetByIdAsync(id);
+    }
 }

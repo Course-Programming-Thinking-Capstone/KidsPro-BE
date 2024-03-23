@@ -140,6 +140,14 @@ public class SyllabusService : ISyllabusService
         return SyllabusMapper.SyllabusToSyllabusDetailDto(entity);
     }
 
+    public async Task<SyllabusDetailDto> GetByIdAsync(int id)
+    {
+        return await _unitOfWork.SyllabusRepository.GetByIdAsync(id, disableTracking: true)
+            .ContinueWith(t => t.Result == null
+                ? new SyllabusDetailDto()
+                : SyllabusMapper.SyllabusToSyllabusDetailDto(t.Result));
+    }
+
     public async Task<PagingResponse<FilterSyllabusDto>> FilterSyllabusAsync(
         string? name,
         SyllabusStatus? status,
