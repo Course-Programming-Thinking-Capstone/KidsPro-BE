@@ -720,12 +720,13 @@ public class GameService : IGameService
         await _unitOfWork.BeginTransactionAsync();
         var query =
             await _unitOfWork.GameLevelRepository.GetAsync(o
-                    => o.GameLevelTypeId == modifiedLevelData.GameLevelTypeId && o.LevelIndex != -1
-                , null);
-        var currentLevels = query.ToList();
-        var currentMaxLevel = currentLevels.Max(o => o.LevelIndex) ?? -1;
+                    => o.GameLevelTypeId == modifiedLevelData.GameLevelTypeId
+                , null).ContinueWith(o => o.Result.ToList());
+
         var checkExisted =
-            currentLevels.FirstOrDefault(o => o.Id == modifiedLevelData.Id);
+            query.FirstOrDefault(o => o.Id == modifiedLevelData.Id);
+        var currentLevels = query.Where(o => o.LevelIndex != -1).ToList();
+        var currentMaxLevel = currentLevels.Max(o => o.LevelIndex) ?? -1;
         if (checkExisted == null)
         {
             throw new BadRequestException("Game level not found");
