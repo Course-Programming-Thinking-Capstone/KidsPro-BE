@@ -962,7 +962,7 @@ public class GameService : IGameService
             var temp = gameLevel[0].LevelIndex;
             gameLevel[0].LevelIndex = gameLevel[1].LevelIndex;
             gameLevel[1].LevelIndex = temp;
-            
+
             _unitOfWork.GameLevelRepository.Update(gameLevel[0]);
             _unitOfWork.GameLevelRepository.Update(gameLevel[1]);
             await _unitOfWork.SaveChangeAsync();
@@ -975,6 +975,10 @@ public class GameService : IGameService
         }
     }
 
+    public async Task SoftDeleteLevelGame(int id)
+    {
+        
+    }
     #endregion
 
     #region Helper

@@ -15,4 +15,5 @@ public interface IGameService
     public Task<LevelDataResponse> GetLevelDataById(int id);
     public Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData);
+    public Task SoftDeleteLevelGame(int id);
 }

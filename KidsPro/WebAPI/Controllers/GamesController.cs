@@ -109,19 +109,6 @@ public class GamesController : ControllerBase
     #region Admin API
 
     /// <summary>
-    /// Admin Get Level detail by level id
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("game-level/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelDataResponse))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<LevelDataResponse>> GetLevelById([FromRoute] int id)
-    {
-        var result = await _gameService.GetLevelDataById(id);
-        return Ok(result);
-    }
-
-    /// <summary>
     /// Admin Get Levels details by game mode id
     /// </summary>
     /// <returns></returns>
@@ -131,6 +118,19 @@ public class GamesController : ControllerBase
     public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId)
     {
         var result = await _gameService.GetLevelsByMode(modeId);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Admin Get Level detail by level id
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("game-level/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelDataResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<LevelDataResponse>> GetLevelById([FromRoute] int id)
+    {
+        var result = await _gameService.GetLevelDataById(id);
         return Ok(result);
     }
 
@@ -161,7 +161,21 @@ public class GamesController : ControllerBase
         await _gameService.UpdateLevel(modifiedLevelData);
         return Ok();
     }
-        
+
+    /// <summary>
+    /// Admin remove an level
+    /// </summary>
+    /// <returns></returns>
+    [HttpDelete("game-level/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult> DeleteLevel(
+        [FromRoute] int id)
+    {
+        await _gameService.SoftDeleteLevelGame(id);
+        return Ok();
+    }
+
     /// <summary>
     /// Admin update index of level
     /// </summary>
@@ -175,5 +189,6 @@ public class GamesController : ControllerBase
         await _gameService.UpdateLevelIndex(modifiedLevelData);
         return Ok();
     }
+
     #endregion
 }
