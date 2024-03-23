@@ -15,10 +15,12 @@ namespace WebAPI.Controllers;
 public class ParentsController : ControllerBase
 {
     IParentsService _parent;
+    private IAuthenticationService _authentication;
 
-    public ParentsController(IParentsService parent)
+    public ParentsController(IParentsService parent, IAuthenticationService authentication)
     {
         _parent = parent;
+        _authentication = authentication;
     }
 
     /// <summary>
@@ -32,6 +34,7 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<LoginAccountDto>> AddStudent(StudentAddRequest request)
     {
+        
         var result = await _parent.AddStudentAsync(request);
         return Ok(result);
     }
@@ -46,6 +49,13 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ParentOrderResponse>> GetEmailZalo()
     {
+        var status = _authentication.GetCurrentAccountStatus();
+        if (status == UserStatus.NotActivated.ToString())
+            return BadRequest(new
+            {
+                Message = "The Account has not been activated"
+            });
+        
         var result=await _parent.GetEmailZalo();
         return Ok(result);
     }

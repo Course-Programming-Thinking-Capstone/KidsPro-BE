@@ -9,4 +9,5 @@ public class LoginAccountDto
     public string Role { get; set; } = null!;
     public string? AccessToken { get; set; }
     public string? RefreshToken { get; set; }
+    public string? Status { get; set; }
 }
