@@ -40,6 +40,9 @@ public class AccountService : IAccountService
         var parentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.ParentRole)
             .ContinueWith(t => t.Result ?? throw new Exception("Role parent name is incorrect."));
 
+        if (String.Compare(dto.Password, dto.RePassword, StringComparison.Ordinal) != 0)
+            throw new BadRequestException("Password and re-password are not the same");
+        
         var accountEntity = new Account()
         {
             Email = dto.Email,
@@ -49,7 +52,8 @@ public class AccountService : IAccountService
             CreatedDate = DateTime.UtcNow,
             Status = UserStatus.Active
         };
-
+        
+        
         var parentEntity = new Parent()
         {
             Account = accountEntity
@@ -78,7 +82,7 @@ public class AccountService : IAccountService
             FullName = StringUtils.FormatName(dto.FullName),
             Role = parentRole,
             CreatedDate = DateTime.UtcNow,
-            Status = UserStatus.Active
+            Status = UserStatus.Confirm
         };
 
         var parentEntity = new Parent()
@@ -91,8 +95,8 @@ public class AccountService : IAccountService
         await _unitOfWork.SaveChangeAsync();
 
         var result = AccountMapper.EntityToLoginAccountDto(accountEntity);
-        result.AccessToken = _authenticationService.CreateAccessToken(accountEntity);
-        result.RefreshToken = _authenticationService.CreateRefreshToken(accountEntity);
+        //result.AccessToken = _authenticationService.CreateAccessToken(accountEntity);
+        //result.RefreshToken = _authenticationService.CreateRefreshToken(accountEntity);
         return result;
     }
 
