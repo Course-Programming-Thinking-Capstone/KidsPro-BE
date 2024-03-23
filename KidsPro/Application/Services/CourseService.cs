@@ -70,7 +70,6 @@ public class CourseService : ICourseService
         }
 
         entity.Name = dto.Name;
-        entity.CourseTarget = dto.CourseTarget;
         entity.CreatedDate = DateTime.UtcNow;
         entity.ModifiedDate = DateTime.UtcNow;
         entity.CreatedBy = currentAccount;
