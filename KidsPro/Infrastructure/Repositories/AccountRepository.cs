@@ -14,10 +14,9 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
     {
     }
 
-    public async Task<bool> ExistByEmailAsync(string email)
+    public async Task<Account?> ExistByEmailAsync(string email)
     {
-        return await _dbSet.FirstOrDefaultAsync(a => a.Email == email)
-            .ContinueWith(t => t.Result != null);
+        return await _dbSet.FirstOrDefaultAsync(a => a.Email == email);
     }
 
     public async Task<Account?> LoginByEmailAsync(string email)

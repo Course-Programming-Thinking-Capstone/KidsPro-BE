@@ -96,11 +96,11 @@ public class AuthenticationController : ControllerBase
     /// </summary>
     /// <param name="code"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.ParentRole},{Constant.StudentRole},{Constant.StaffRole},{Constant.TeacherRole},")]
+    //[Authorize(Roles = $"{Constant.ParentRole},{Constant.StudentRole},{Constant.StaffRole},{Constant.TeacherRole},")]
     [HttpPatch("confirm/check/{code}")]
     public async Task<IActionResult> CheckConfirmation(string code)
     {
-        await _accountService.CheckConfirmationStatus(ConfirmationStatus.CheckConfirmation,code);
+        await _accountService.CheckConfirmation(code);
         return Ok("The account has been successfully activated");
     }
    
@@ -112,7 +112,7 @@ public class AuthenticationController : ControllerBase
     [HttpGet("confirm/send")]
     public async Task<IActionResult> SendConfirmation()
     {
-        await _accountService.CheckConfirmationStatus(ConfirmationStatus.SendConfirmation);
+        await _accountService.SendConfirmation();
         return Ok("Sent confirmation code successful");
     }
 }
