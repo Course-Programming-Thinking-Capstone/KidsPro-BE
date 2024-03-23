@@ -750,9 +750,8 @@ public class GameService : IGameService
                            )
                         {
                             itemLevel.LevelIndex++;
+                            _unitOfWork.GameLevelRepository.Update(itemLevel);
                         }
-
-                        _unitOfWork.GameLevelRepository.Update(itemLevel);
                     }
                 }
                 catch (Exception e)
@@ -773,9 +772,8 @@ public class GameService : IGameService
                            )
                         {
                             itemLevel.LevelIndex--;
+                            _unitOfWork.GameLevelRepository.Update(itemLevel);
                         }
-
-                        _unitOfWork.GameLevelRepository.Update(itemLevel);
                     }
                 }
                 catch (Exception e)
@@ -951,6 +949,48 @@ public class GameService : IGameService
 
     public async Task SoftDeleteLevelGame(int id)
     {
+        await _unitOfWork.BeginTransactionAsync();
+        var checkExisted =
+            await _unitOfWork.GameLevelRepository.GetAsync(o
+                    => o.GameLevelTypeId == id
+                , null).ContinueWith(o => o.Result.FirstOrDefault());
+        if (checkExisted == null)
+        {
+            throw new BadRequestException("Game level not found");
+        }
+
+        // check Existed
+        var currentLevels =
+            await _unitOfWork.GameLevelRepository.GetAsync(o
+                    => o.GameLevelTypeId == checkExisted.GameLevelTypeId && o.LevelIndex != -1
+                , null).ContinueWith(o => o.Result.ToList());
+        if (checkExisted == null)
+        {
+            throw new BadRequestException("Game level not found");
+        }
+
+        foreach (var itemLevel in currentLevels)
+        {
+            if (itemLevel.LevelIndex > checkExisted.LevelIndex)
+            {
+                itemLevel.LevelIndex--;
+                _unitOfWork.GameLevelRepository.Update(itemLevel);
+            }
+        }
+
+        checkExisted.LevelIndex = -1;
+        try
+        {
+            // Update current game level
+            _unitOfWork.GameLevelRepository.Update(checkExisted);
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 
     #endregion
