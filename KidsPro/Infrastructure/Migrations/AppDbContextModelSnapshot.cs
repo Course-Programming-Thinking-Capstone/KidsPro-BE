@@ -92,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 124, DateTimeKind.Utc).AddTicks(9398),
+                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 47, 564, DateTimeKind.Utc).AddTicks(1526),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$axVF32nXT7GmyXy0fSqlOezAnhCd3EaQgNRnU2ICr5qpL6M60/H/q",
+                            PasswordHash = "$2a$11$ZCqGCOYP/EV5rsb8yVof/.5o8vwpw30VIqaHfO5b2y7BdnKXGuStO",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 330, DateTimeKind.Utc).AddTicks(3987),
+                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 47, 797, DateTimeKind.Utc).AddTicks(8390),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$MUY7nWhZkky4OCQuVQ9PleLm1IKjCDXCTrwRP1XKoJWXllsNh6fDO",
+                            PasswordHash = "$2a$11$kD6ejb2DhMzH8nIkFVYKJeIslNVQbARgDx7/sWEF729TEdc8.sW22",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 510, DateTimeKind.Utc).AddTicks(2293),
+                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 48, 26, DateTimeKind.Utc).AddTicks(7490),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$LMpCuFbPw2WzpxLYrW/XK.55bV5JJQ.V5oPI5Z3EVZWrdPRH2/g7u",
+                            PasswordHash = "$2a$11$LnKg/Cjve7f.rfIkRyefy.xMTAPU32Syx9SC.HPmp/vBnt/YVjf5W",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 701, DateTimeKind.Utc).AddTicks(5657),
+                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 48, 261, DateTimeKind.Utc).AddTicks(2618),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$AjY2.QofWS0SDNnhcMG9Cewv5b0BpzgeLSEKRacdCeoBbQv5X9LXq",
+                            PasswordHash = "$2a$11$N6R8v/zTnC6EDcg13/gzwer1qgYIDnb7.v1.5jnC7Mz/D4pcrCD7S",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 952, DateTimeKind.Utc).AddTicks(93),
+                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 48, 490, DateTimeKind.Utc).AddTicks(3024),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$GW.6.1g.8YO/ZllAIaibTunrdhjhbiRbUBJ.kxIyEUJLfoEmPMFNK",
+                            PasswordHash = "$2a$11$4UeUnDi5zexx9raS.mb1H.c3T1RS5NrXL882LZYkwKuwzmDjIKD2a",
                             RoleId = 2,
                             Status = (byte)1
                         });
