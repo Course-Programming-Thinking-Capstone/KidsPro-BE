@@ -50,7 +50,7 @@ public class CourseService : ICourseService
     /// <exception cref="UnauthorizedException"></exception>
     /// <exception cref="NotFoundException"></exception>
     /// <exception cref="BadRequestException"></exception>
-    public async Task<CourseDto> CreateCourseAsync(CreateSyllabusDto dto)
+    public async Task<CourseDto> CreateCourseAsync(CreateCourseDto dto)
     {
         var entity = new Course();
 

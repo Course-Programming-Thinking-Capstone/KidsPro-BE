@@ -1,6 +1,6 @@
 ﻿namespace Application.Dtos.Response.Syllabus;
 
-public class SectionDto
+public class SyllabusSectionDto
 {
     public int Id { get; set; }
 

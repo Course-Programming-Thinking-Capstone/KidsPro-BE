@@ -92,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 47, 564, DateTimeKind.Utc).AddTicks(1526),
+                            CreatedDate = new DateTime(2024, 3, 23, 15, 14, 25, 284, DateTimeKind.Utc).AddTicks(5728),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$ZCqGCOYP/EV5rsb8yVof/.5o8vwpw30VIqaHfO5b2y7BdnKXGuStO",
+                            PasswordHash = "$2a$11$pgVAdft7yPxz5kZeXHFMJO.bi5wuaPp9n47ePKBA8kSBXQ4HkUgrG",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 47, 797, DateTimeKind.Utc).AddTicks(8390),
+                            CreatedDate = new DateTime(2024, 3, 23, 15, 14, 25, 519, DateTimeKind.Utc).AddTicks(6229),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$kD6ejb2DhMzH8nIkFVYKJeIslNVQbARgDx7/sWEF729TEdc8.sW22",
+                            PasswordHash = "$2a$11$yTR8lrtlUrqBoWxqKfjpNur79zC8jM3o1XIUArPuFdNmouCWK9qOe",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 48, 26, DateTimeKind.Utc).AddTicks(7490),
+                            CreatedDate = new DateTime(2024, 3, 23, 15, 14, 25, 748, DateTimeKind.Utc).AddTicks(698),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$LnKg/Cjve7f.rfIkRyefy.xMTAPU32Syx9SC.HPmp/vBnt/YVjf5W",
+                            PasswordHash = "$2a$11$SXpjG7x/b/lKmTtX3Cb0aOCUtMLImzSzvCB2zn9qtIWbwC4OkxmDK",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 48, 261, DateTimeKind.Utc).AddTicks(2618),
+                            CreatedDate = new DateTime(2024, 3, 23, 15, 14, 25, 982, DateTimeKind.Utc).AddTicks(7169),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$N6R8v/zTnC6EDcg13/gzwer1qgYIDnb7.v1.5jnC7Mz/D4pcrCD7S",
+                            PasswordHash = "$2a$11$afyyZP0qviysonUcAeEdgOntF1T4SwYMH7fa6uLog14n3XHKYqtY.",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 3, 23, 9, 2, 48, 490, DateTimeKind.Utc).AddTicks(3024),
+                            CreatedDate = new DateTime(2024, 3, 23, 15, 14, 26, 210, DateTimeKind.Utc).AddTicks(3526),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$4UeUnDi5zexx9raS.mb1H.c3T1RS5NrXL882LZYkwKuwzmDjIKD2a",
+                            PasswordHash = "$2a$11$rN78sP.Xoy4hp6p.gOc/LO//8GZ/gtEmUwpaYtHK9elJjI5wErTdm",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -2690,7 +2690,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Syllabus", b =>
                 {
-                    b.Navigation("Course");
+                    b.Navigation("Course")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

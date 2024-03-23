@@ -25,6 +25,7 @@ public class SyllabusesController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Authorize(Roles = $"{Constant.AdminRole}")]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SyllabusDetailDto))]
     public async Task<ActionResult<SyllabusDetailDto>> CreateAsync([FromBody] CreateSyllabusDto dto)
     {
         var result = await _syllabusService.CreateAsync(dto);

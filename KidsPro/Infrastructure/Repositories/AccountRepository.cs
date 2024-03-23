@@ -71,6 +71,6 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
         }
 
         return await query.Include(a => a.Role)
-            .FirstOrDefaultAsync(a => a.Id == id && !a.IsDelete && a.Status != UserStatus.Active);
+            .FirstOrDefaultAsync(a => a.Id == id && !a.IsDelete && a.Status != UserStatus.Inactive);
     }
 }

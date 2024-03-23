@@ -20,8 +20,8 @@ public static class SyllabusMapper
             Sections = entity.Course.Sections.Select(SectionToSectionDto).ToList()
         };
 
-    public static SectionDto SectionToSectionDto(Section entity)
-        => new SectionDto()
+    public static SyllabusSectionDto SectionToSectionDto(Section entity)
+        => new SyllabusSectionDto()
         {
             Id = entity.Id,
             Name = entity.Name
@@ -36,7 +36,7 @@ public static class SyllabusMapper
             CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.Course.CreatedDate)
         };
 
-    public static Section CreateSectionDtoToSection(CreateSectionDto dto)
+    public static Section CreateSectionDtoToSection(CreateSyllabusSectionDto dto)
         => new Section()
         {
             Name = dto.Name

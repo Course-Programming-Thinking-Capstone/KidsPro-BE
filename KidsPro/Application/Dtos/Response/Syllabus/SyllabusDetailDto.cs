@@ -14,7 +14,7 @@ public class SyllabusDetailDto
 
     public int? MinQuizScoreRatio { get; init; }
 
-    public List<SectionDto>? Sections { get; init; }
+    public List<SyllabusSectionDto>? Sections { get; init; }
 
     public int? TeacherId { get; init; }
 }

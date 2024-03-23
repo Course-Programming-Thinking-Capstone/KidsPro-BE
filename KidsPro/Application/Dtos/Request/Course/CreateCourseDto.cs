@@ -3,7 +3,7 @@ using Application.Dtos.Request.Course.Section;
 
 namespace Application.Dtos.Request.Course;
 
-public record CreateSyllabusDto
+public record CreateCourseDto
 {
     [StringLength(250, ErrorMessage = "Class name can not exceed 250 character")]
     [Required(ErrorMessage = "Class name is required.")]

@@ -21,7 +21,7 @@ public class CreateSyllabusDto
     [Range(0, 100, ErrorMessage = "Out of range 0 to 100")]
     public int? MinQuizScoreRatio { get; init; }
 
-    public List<CreateSectionDto>? Sections { get; init; }
+    public List<CreateSyllabusSectionDto>? Sections { get; init; }
 
     public int TeacherId { get; init; }
 }
