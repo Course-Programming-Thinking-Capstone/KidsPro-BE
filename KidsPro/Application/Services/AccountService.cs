@@ -36,7 +36,7 @@ public class AccountService : IAccountService
 
     public async Task<LoginAccountDto> RegisterByEmailAsync(EmailRegisterDto dto)
     {
-        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email))
+        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email)!=null)
             throw new ConflictException($"Email {dto.Email} has been existed.");
 
         var parentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.ParentRole)
@@ -142,7 +142,7 @@ public class AccountService : IAccountService
 
     public async Task ChangePasswordAsync(ChangePasswordDto dto)
     {
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        var accountId= _authenticationService.GetCurrentUserId();
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
@@ -160,7 +160,7 @@ public class AccountService : IAccountService
 
     public async Task<string> UpdatePictureAsync(IFormFile file)
     {
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        var accountId= _authenticationService.GetCurrentUserId();
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
@@ -305,7 +305,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> CreateAccountAsync(CreateAccountDto dto)
     {
-        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email))
+        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email)!=null)
             throw new ConflictException($"Email {dto.Email} has been existed.");
 
         var account = new Account()
@@ -319,10 +319,10 @@ public class AccountService : IAccountService
             IsDelete = false,
             CreatedDate = DateTime.UtcNow
         };
-        
+
         account.ConfirmAccount = GenerateConfirmationCode
             (account.FullName, dto.Role, account.PasswordHash);
-        
+
         AccountDto result;
 
         switch (dto.Role)
@@ -370,7 +370,7 @@ public class AccountService : IAccountService
         }
 
         SendConfirmationCode(account);
-        
+
         return result;
     }
 
@@ -502,41 +502,53 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task CheckConfirmationStatus(ConfirmationStatus status, string? confirmInput = "")
+    public async Task CheckConfirmation(string input)
     {
-        var id = _authenticationService.GetCurrentUserId();
-        var account = await _unitOfWork.AccountRepository.GetByIdAsync(id);
+        string[] parts = input.Split('&');
+
+        string emailPart = parts[0];
+        string tokenPart = parts[1];
+
+        string email = emailPart.Split('=')[1];
+        string token = tokenPart.Split('=')[1];
+
+        var account = await _unitOfWork.AccountRepository.ExistByEmailAsync(email);
 
         if (account != null && account.Status == UserStatus.NotActivated)
         {
-            switch (status)
+            if (account.ConfirmAccount!.Equals(token))
             {
-                case ConfirmationStatus.CheckConfirmation:
-                    if (account.ConfirmAccount!.Equals(confirmInput))
-                    {
-                        account.Status = UserStatus.Active;
-                        _unitOfWork.AccountRepository.Update(account);
-                        await _unitOfWork.SaveChangeAsync();
-                        return;
-                    }
-
-                    throw new BadRequestException("Verification code is wrong");
-                case ConfirmationStatus.SendConfirmation:
-                    SendConfirmationCode(account);
-                    return;
+                account.Status = UserStatus.Active;
+                _unitOfWork.AccountRepository.Update(account);
+                await _unitOfWork.SaveChangeAsync();
+                return;
             }
         }
 
-        throw new BadRequestException("Account has been actived");
+        throw new BadRequestException("Account has been activated");
+    }
+
+    public async Task SendConfirmation()
+    {
+        var id = _authenticationService.GetCurrentUserId();
+        var account = await _unitOfWork.AccountRepository.GetByIdAsync(id);
+        if (account != null && account.Status == UserStatus.NotActivated)
+        {
+            SendConfirmationCode(account);
+            return;
+        }
+
+        throw new BadRequestException("Account has been Activated");
     }
 
     private void SendConfirmationCode(Account account)
     {
+        var link = "Email=" + account.Email + "&Token=" + account.ConfirmAccount;
         var title = "Successful account registration";
         var content = "Welcome " + account.FullName + "<br>" + "<br>" +
                       "Your account has been successfully registered at KidsPro" + "<br>" + "<br>" +
-                      "To complete your registration, please activate your account via the following link:"
-                      + "<br>" + "<br>" +
+                      "To complete your registration, please activate your account via the following link:"+ "<br>"
+                      +link+ "<br>" + "<br>" +
                       "Thanks you!" + "<br>" + "<br>" + "KidsPro Team";
         EmailUtils.SendEmail(account.Email!, title, content);
     }
