@@ -17,5 +17,7 @@ namespace Application.Utils
                 return hex;
             }
         }
+        
+        
     }
 }

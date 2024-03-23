@@ -38,5 +38,6 @@ public interface IAccountService
         int? page, int? size
     );
 
-    
+    Task CheckConfirmationStatus(ConfirmationStatus status,string? confirmInput="");
+
 }

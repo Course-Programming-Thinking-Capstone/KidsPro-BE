@@ -30,6 +30,10 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ConfirmAccount")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
@@ -88,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 35, 698, DateTimeKind.Utc).AddTicks(4034),
+                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 124, DateTimeKind.Utc).AddTicks(9398),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$mDjLuP2tsX/H8Evc488KzuZaQJ99GTt8w2GnI3oOI0j5bZSbUadS2",
+                            PasswordHash = "$2a$11$axVF32nXT7GmyXy0fSqlOezAnhCd3EaQgNRnU2ICr5qpL6M60/H/q",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 35, 913, DateTimeKind.Utc).AddTicks(6276),
+                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 330, DateTimeKind.Utc).AddTicks(3987),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$t5p/lGSC6eN14zwBhvm.Ue5rsZ2gdDRExn0v.hFVLUzx8AV8eFJ1e",
+                            PasswordHash = "$2a$11$MUY7nWhZkky4OCQuVQ9PleLm1IKjCDXCTrwRP1XKoJWXllsNh6fDO",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 36, 135, DateTimeKind.Utc).AddTicks(8496),
+                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 510, DateTimeKind.Utc).AddTicks(2293),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$NOvoLf88r8.3Ln98ZTonyOhAO7TfM3tE3UjqmuRcpWOPo8DfKqoz.",
+                            PasswordHash = "$2a$11$LMpCuFbPw2WzpxLYrW/XK.55bV5JJQ.V5oPI5Z3EVZWrdPRH2/g7u",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 36, 350, DateTimeKind.Utc).AddTicks(638),
+                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 701, DateTimeKind.Utc).AddTicks(5657),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$MKdqp/GM/vEDGQfNBv1FmOghtGdX8T5umcIEeL/vk5O/gs0zmdNJu",
+                            PasswordHash = "$2a$11$AjY2.QofWS0SDNnhcMG9Cewv5b0BpzgeLSEKRacdCeoBbQv5X9LXq",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 3, 23, 1, 27, 36, 574, DateTimeKind.Utc).AddTicks(928),
+                            CreatedDate = new DateTime(2024, 3, 23, 5, 16, 55, 952, DateTimeKind.Utc).AddTicks(93),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$tXzQ6libSyzfjf56Qjk2keesb/pzdFrXCR59gVJX/zHOIiEZcvgr.",
+                            PasswordHash = "$2a$11$GW.6.1g.8YO/ZllAIaibTunrdhjhbiRbUBJ.kxIyEUJLfoEmPMFNK",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -335,8 +339,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2(2)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<decimal?>("DiscountPrice")
                         .HasPrecision(11, 2)
@@ -1763,8 +1767,10 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseSlot")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("PassConditionId")
                         .HasColumnType("int");
@@ -1776,8 +1782,11 @@ namespace Infrastructure.Migrations
                         .HasColumnType("tinyint");
 
                     b.Property<string>("Target")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("TotalSlot")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()

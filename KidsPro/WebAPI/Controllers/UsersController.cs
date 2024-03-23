@@ -86,7 +86,7 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    //[Authorize(Roles = $"{Constant.AdminRole}")]
+    [Authorize(Roles = $"{Constant.AdminRole}")]
     [HttpPost("admin/account")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AccountDto))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDetail))]

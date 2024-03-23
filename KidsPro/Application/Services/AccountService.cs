@@ -1,4 +1,6 @@
 ﻿using System.Linq.Expressions;
+using System.Security.Cryptography;
+using System.Text;
 using Application.Dtos.Request.Account;
 using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.Account;
@@ -42,7 +44,7 @@ public class AccountService : IAccountService
 
         if (String.Compare(dto.Password, dto.RePassword, StringComparison.Ordinal) != 0)
             throw new BadRequestException("Password and re-password are not the same");
-        
+
         var accountEntity = new Account()
         {
             Email = dto.Email,
@@ -50,10 +52,12 @@ public class AccountService : IAccountService
             FullName = StringUtils.FormatName(dto.FullName),
             Role = parentRole,
             CreatedDate = DateTime.UtcNow,
-            Status = UserStatus.Active
+            Status = UserStatus.NotActivated
         };
-        
-        
+
+        accountEntity.ConfirmAccount = GenerateConfirmationCode
+            (accountEntity.FullName, parentRole.ToString(), accountEntity.PasswordHash);
+
         var parentEntity = new Parent()
         {
             Account = accountEntity
@@ -61,6 +65,8 @@ public class AccountService : IAccountService
 
         await _unitOfWork.ParentRepository.AddAsync(parentEntity);
         await _unitOfWork.SaveChangeAsync();
+
+        SendConfirmationCode(accountEntity);
 
         var result = AccountMapper.EntityToLoginAccountDto(accountEntity);
         result.AccessToken = _authenticationService.CreateAccessToken(accountEntity);
@@ -82,7 +88,7 @@ public class AccountService : IAccountService
             FullName = StringUtils.FormatName(dto.FullName),
             Role = parentRole,
             CreatedDate = DateTime.UtcNow,
-            Status = UserStatus.Confirm
+            Status = UserStatus.Active,
         };
 
         var parentEntity = new Parent()
@@ -95,8 +101,8 @@ public class AccountService : IAccountService
         await _unitOfWork.SaveChangeAsync();
 
         var result = AccountMapper.EntityToLoginAccountDto(accountEntity);
-        //result.AccessToken = _authenticationService.CreateAccessToken(accountEntity);
-        //result.RefreshToken = _authenticationService.CreateRefreshToken(accountEntity);
+        result.AccessToken = _authenticationService.CreateAccessToken(accountEntity);
+        result.RefreshToken = _authenticationService.CreateRefreshToken(accountEntity);
         return result;
     }
 
@@ -309,11 +315,14 @@ public class AccountService : IAccountService
             DateOfBirth = dto.DateOfBirth,
             Gender = dto.Gender,
             PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
-            Status = UserStatus.Active,
+            Status = UserStatus.NotActivated,
             IsDelete = false,
             CreatedDate = DateTime.UtcNow
         };
-
+        
+        account.ConfirmAccount = GenerateConfirmationCode
+            (account.FullName, dto.Role, account.PasswordHash);
+        
         AccountDto result;
 
         switch (dto.Role)
@@ -360,6 +369,8 @@ public class AccountService : IAccountService
                 throw new UnauthorizedException($"Only accept role {Constant.StaffRole} and {Constant.TeacherRole}");
         }
 
+        SendConfirmationCode(account);
+        
         return result;
     }
 
@@ -473,5 +484,60 @@ public class AccountService : IAccountService
                 nameof(this.FilterAccountAsync), e.Message);
             throw new Exception($"Error when execute {nameof(this.FilterAccountAsync)} method");
         }
+    }
+
+    private string GenerateConfirmationCode(string name, string? role, string password)
+    {
+        var salt = StringUtils.GenerateRandomString(8);
+
+        var rawConfirm = $"Name={name}Role={role}Password={password}{salt}";
+
+        using (var sha256 = SHA256.Create())
+        {
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawConfirm));
+
+            var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+
+            return hash;
+        }
+    }
+
+    public async Task CheckConfirmationStatus(ConfirmationStatus status, string? confirmInput = "")
+    {
+        var id = _authenticationService.GetCurrentUserId();
+        var account = await _unitOfWork.AccountRepository.GetByIdAsync(id);
+
+        if (account != null && account.Status == UserStatus.NotActivated)
+        {
+            switch (status)
+            {
+                case ConfirmationStatus.CheckConfirmation:
+                    if (account.ConfirmAccount!.Equals(confirmInput))
+                    {
+                        account.Status = UserStatus.Active;
+                        _unitOfWork.AccountRepository.Update(account);
+                        await _unitOfWork.SaveChangeAsync();
+                        return;
+                    }
+
+                    throw new BadRequestException("Verification code is wrong");
+                case ConfirmationStatus.SendConfirmation:
+                    SendConfirmationCode(account);
+                    return;
+            }
+        }
+
+        throw new BadRequestException("Account has been actived");
+    }
+
+    private void SendConfirmationCode(Account account)
+    {
+        var title = "Successful account registration";
+        var content = "Welcome " + account.FullName + "<br>" + "<br>" +
+                      "Your account has been successfully registered at KidsPro" + "<br>" + "<br>" +
+                      "To complete your registration, please activate your account via the following link:"
+                      + "<br>" + "<br>" +
+                      "Thanks you!" + "<br>" + "<br>" + "KidsPro Team";
+        EmailUtils.SendEmail(account.Email!, title, content);
     }
 }
