@@ -18,7 +18,8 @@ public static class AccountMapper
             Email = entity.Email,
             FullName = entity.FullName,
             PictureUrl = entity.PictureUrl,
-            Role = entity.Role.Name
+            Role = entity.Role.Name,
+            Status = entity.Status.ToString()
         };
 
 

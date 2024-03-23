@@ -9,7 +9,7 @@ public record CreateCourseDto
     [Required(ErrorMessage = "Class name is required.")]
     public string Name { get; init; } = null!;
 
-    [StringLength(3000, ErrorMessage = "CourseTarget can not exceed 3000 character")]
+    [StringLength(1000, ErrorMessage = "CourseTarget can not exceed 1000 character")]
     public string? CourseTarget { get; init; }
     
     public int CourseSlot { get; init; }

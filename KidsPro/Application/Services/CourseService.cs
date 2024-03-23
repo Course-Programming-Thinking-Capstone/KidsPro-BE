@@ -189,8 +189,8 @@ public class CourseService : ICourseService
         }
 
         // update course 
-        // if (!string.IsNullOrEmpty(dto.Description))
-        //     courseEntity.Description = dto.Description;
+        if (!string.IsNullOrEmpty(dto.Description))
+            courseEntity.Description = dto.Description;
 
         if (dto.Sections != null)
         {
@@ -673,7 +673,7 @@ public class CourseService : ICourseService
                     Expression.Constant(CourseStatus.Active)));
 
             //Default sort by modified date desc
-            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.ModifiedDate);
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.CreatedDate);
 
             if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
             {
@@ -761,7 +761,7 @@ public class CourseService : ICourseService
                         Expression.Constant(status)));
             }
 
-            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderBy(c => c.Id);
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.CreatedDate);
 
             if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
             {

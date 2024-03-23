@@ -11,4 +11,5 @@ public record EmailRegisterDto
     [Required] public string FullName { get; set; } = null!;
 
     [Required] public string Password { get; set; } = null!;
+    [Required] public string RePassword { get; set; } = null!;
 }

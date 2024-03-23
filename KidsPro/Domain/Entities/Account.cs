@@ -31,7 +31,7 @@ public class Account : BaseEntity
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     [Precision(2)]
     public DateTime CreatedDate { get; set; }
-
+    [MaxLength(150)] public string? ConfirmAccount { get; set; }
     public int RoleId { get; set; }
     public Role Role { get; set; } = null!;
 

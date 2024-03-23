@@ -27,7 +27,7 @@ public class StudentsController : Controller
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentResponse>> GetStudentsByRoleId()
+    public async Task<ActionResult<StudentResponse>> GetStudents()
     {
         var result = await _studentService.GetStudentsAsync();
         return Ok(result);

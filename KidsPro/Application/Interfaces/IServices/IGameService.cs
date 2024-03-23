@@ -10,9 +10,10 @@ public interface IGameService
     public Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId);
     public Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex);
     public Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
-    public Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData, bool onTransaction = true);
+    public Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task<List<LevelDataResponse>> GetLevelsByMode(int modeId);
     public Task<LevelDataResponse> GetLevelDataById(int id);
     public Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData);
+    public Task SoftDeleteLevelGame(int id);
 }

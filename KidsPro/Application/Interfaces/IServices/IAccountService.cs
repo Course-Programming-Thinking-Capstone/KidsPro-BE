@@ -38,5 +38,7 @@ public interface IAccountService
         int? page, int? size
     );
 
-    
+    Task CheckConfirmation(string input);
+    Task SendConfirmation();
+
 }

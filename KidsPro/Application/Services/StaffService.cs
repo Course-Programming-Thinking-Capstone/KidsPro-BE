@@ -34,7 +34,7 @@ public class StaffService:IStaffService
                 _unitOfWork.StudentRepository.Update(student);
                 var result= await _unitOfWork.SaveChangeAsync();
                 if (result > 0 &&
-                    await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.ParentEmail!))
+                    await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.ParentEmail!)!=null)
                 {
                     //Send Email
                     var toSubject = "KidsPro Send Student Account";

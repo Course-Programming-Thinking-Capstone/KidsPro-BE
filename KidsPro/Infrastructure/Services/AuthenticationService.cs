@@ -45,7 +45,8 @@ public class AuthenticationService : IAuthenticationService
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
-                new Claim(ClaimTypes.Role, account.Role.Name ?? throw new Exception("Role is empty"))
+                new Claim(ClaimTypes.Role, account.Role.Name ?? throw new Exception("Role is empty")),
+                new Claim("AccountStatus", account.Status.ToString())
             };
             var token = new JwtSecurityToken(
                 issuer: _appConfiguration.Issuer,
@@ -151,6 +152,29 @@ public class AuthenticationService : IAuthenticationService
         throw new UnauthorizedException("Invalid token.");
     }
 
+    public string GetCurrentAccountStatus()
+    {
+        var httpContextAccessor = _serviceProvider.GetService<IHttpContextAccessor>();
+
+        if (httpContextAccessor != null)
+        {
+            if (httpContextAccessor.HttpContext?.User.Identity is ClaimsIdentity claimsIdentity &&
+                claimsIdentity.Claims.Any())
+            {
+                // Retrieve the role claim
+                var statusClaim = claimsIdentity.Claims.FirstOrDefault(c => c.Type == "AccountStatus");
+
+                if (statusClaim == null)
+                {
+                    throw new Exception("Status claim not found");
+                }
+
+                return statusClaim.Value;
+            }
+        }
+
+        throw new NotFoundException("Invalid token");
+    }
     // public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)
     // {
     //     _tokenValidation = new TokenValidationParameters
