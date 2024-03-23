@@ -9,7 +9,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Constant = Application.Configurations.Constant;
-using CourseDto = Application.Dtos.Response.Old.Course.CourseDto;
+using CourseDto = Application.Dtos.Response.Course.CourseDto;
 using UpdateCourseDto = Application.Dtos.Request.Course.Update.Course.UpdateCourseDto;
 
 namespace WebAPI.Controllers;

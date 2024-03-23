@@ -190,8 +190,8 @@ public class CourseService : ICourseService
         }
 
         // update course 
-        if (!string.IsNullOrEmpty(dto.Description))
-            courseEntity.Description = dto.Description;
+        // if (!string.IsNullOrEmpty(dto.Description))
+        //     courseEntity.Description = dto.Description;
 
         if (dto.Sections != null)
         {
