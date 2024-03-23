@@ -49,6 +49,8 @@ public class UnitOfWork : IUnitOfWork
     public IOrderDetailRepository OrderDetailRepository { get; set; }
 
     public ITransactionRepository TransactionRepository { get; set; }
+    public ISyllabusRepository SyllabusRepository { get; }
+    public IPassConditionRepository PassConditionRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
@@ -61,7 +63,7 @@ public class UnitOfWork : IUnitOfWork
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
         , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
-        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository)
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository)
     {
         _context = context;
         _logger = logger;
@@ -96,7 +98,8 @@ public class UnitOfWork : IUnitOfWork
         UserNotificationRepository = userNotificationRepository;
         NotificationRepository = notificationRepository;
         TransactionRepository = transactionRepository;
-
+        SyllabusRepository = syllabusRepository;
+        PassConditionRepository = passConditionRepository;
     }
 
     public async Task<int> SaveChangeAsync()

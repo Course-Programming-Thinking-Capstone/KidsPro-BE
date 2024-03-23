@@ -40,4 +40,6 @@ public interface IUnitOfWork : IDisposable
     public IVoucherRepository VoucherRepository { get; }
     public IOrderDetailRepository OrderDetailRepository { get; }
     public ITransactionRepository TransactionRepository { get; }
+    public ISyllabusRepository SyllabusRepository { get; }
+    public IPassConditionRepository PassConditionRepository { get; }
 }
