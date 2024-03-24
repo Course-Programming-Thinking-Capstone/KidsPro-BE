@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Account.Student;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,13 @@ public class StaffsController : ControllerBase
 {
     private IStaffService _staff;
     private INotificationService _notify;
-
-    public StaffsController(IStaffService staff, INotificationService notify)
+    private IAuthenticationService _authentication;
+    
+    public StaffsController(IStaffService staff, INotificationService notify, IAuthenticationService authentication)
     {
         _staff = staff;
         _notify = notify;
+        _authentication = authentication;
     }
 
     /// <summary>
@@ -32,6 +35,9 @@ public class StaffsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> CreateAccountAsync(StudentCreateAccountRequest dto)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         await _staff.CreateAccountStudentAsync(dto);
         return Ok("Create student account successfully");
     }
@@ -49,6 +55,9 @@ public class StaffsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> RequestEmailAsync(int parentId, string studentName)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var title = "Request Create Email For Student";
         var content = "Please create an email for student " + studentName +
                       ", An email used to access to the website, study online and login to the game";
@@ -68,6 +77,9 @@ public class StaffsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> ViewReasonAsync(int orderId, int parentId)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var result = await _staff.ViewReasonOrderCancel(orderId, parentId);
         return Ok(new
         {

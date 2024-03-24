@@ -13,11 +13,14 @@ namespace WebAPI.Controllers
     {
         IPaymentService _payment;
         IMomoConfig _momoConfig;
+        private IAuthenticationService _authentication;
 
-        public PaymentsController(IPaymentService payment, IMomoConfig momoConfig)
+        public PaymentsController(IPaymentService payment, IMomoConfig momoConfig,
+            IAuthenticationService authentication)
         {
             _payment = payment;
             _momoConfig = momoConfig;
+            _authentication = authentication;
         }
 
         /// <summary>
@@ -28,29 +31,31 @@ namespace WebAPI.Controllers
         [HttpPost("momo/{id}")]
         public async Task<ActionResult> CreatePaymentMomoAsync(int id)
         {
+            //Check if the account is activated or not or inactive
+            _authentication.CheckAccountStatus();
+
             var momoRequest = new MomoPaymentRequest();
             //Get order có parent id và order id vs status payment
             var order = await _payment.GetOrderStatusPaymentAsync(id);
-            if (order != null)
-            {
-                // Lấy thông tin cho payment
-                momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + order.ParentId;
-                momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + order.Id;
-                momoRequest.amount =(long) order.TotalPrice;
-                //_momoRequest.extraData = DateTime.UtcNow.AddDays(1).ToString();
-                momoRequest.redirectUrl = _momoConfig.ReturnUrl;
-                momoRequest.ipnUrl = _momoConfig.IpnUrl;
-                momoRequest.partnerCode = _momoConfig.PartnerCode;
-                momoRequest.orderInfo = " 'KidsPro Service' - You are payment for " + order.Note;
-                momoRequest.signature = _payment.MakeSignatureMomoPayment
+            if (order == null) return BadRequest($"OrderID:{id} doesn't not exist");
+            
+            // Lấy thông tin cho payment
+            momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + order.ParentId;
+            momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + order.Id;
+            momoRequest.amount = (long)order.TotalPrice;
+            momoRequest.redirectUrl = _momoConfig.ReturnUrl;
+            momoRequest.ipnUrl = _momoConfig.IpnUrl;
+            momoRequest.partnerCode = _momoConfig.PartnerCode;
+            momoRequest.orderInfo = " 'KidsPro Service' - You are payment for " + order.Note;
+            momoRequest.signature = _payment.MakeSignatureMomoPayment
                 (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
-            }
+            
             // lấy link QR momo
             var result = _payment.GetLinkGatewayMomo(_momoConfig.PaymentUrl, momoRequest);
             return Ok(new
             {
-                payUrl= result.Item1,
-                qrCode= result.Item2,
+                payUrl = result.Item1,
+                qrCode = result.Item2,
             });
         }
 
@@ -66,12 +71,11 @@ namespace WebAPI.Controllers
             await _payment.CreateTransactionAsync(dto);
             return Ok(new
             {
-                OrderId=dto.orderId,
+                OrderId = dto.orderId,
                 result = dto.resultCode,
                 Message = dto.message,
-                PayType=dto.payType
+                PayType = dto.payType
             });
         }
-
     }
 }

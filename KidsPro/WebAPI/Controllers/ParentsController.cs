@@ -34,6 +34,8 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<LoginAccountDto>> AddStudent(StudentAddRequest request)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
         
         var result = await _parent.AddStudentAsync(request);
         return Ok(result);
@@ -49,12 +51,8 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ParentOrderResponse>> GetEmailZalo()
     {
-        var status = _authentication.GetCurrentAccountStatus();
-        if (status == UserStatus.NotActivated.ToString())
-            return BadRequest(new
-            {
-                Message = "The Account has not been activated"
-            });
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
         
         var result=await _parent.GetEmailZalo();
         return Ok(result);
@@ -71,6 +69,9 @@ public class ParentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ParentOrderResponse>> GetListVoucherAsync(VoucherStatus status)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var result=await _parent.GetListVoucherAsync(status);
         return Ok(result);
     }

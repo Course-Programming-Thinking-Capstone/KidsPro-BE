@@ -120,7 +120,7 @@ namespace Application.Services
         public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
         {
             var account = await _accountService.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole,account.Role);
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.ShowOrder(orders!);
         }
 
@@ -139,17 +139,31 @@ namespace Application.Services
             await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
                 OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
         }
-        
-        public async Task ApproveOrderCancellationAsync(int orderId, int parentId)
+
+        public async Task HandleRefundRequest(OrderRefundRequest dto, ModerationStatus status)
         {
-            await UpdateOrderStatusAsync(orderId, parentId,
-                OrderStatus.RequestRefund, OrderStatus.Refunded);
-            // Gửi thông báo chấp nhận hủy đơn cho parent
-            var title = "The result of processing order cancellation request";
-            var content = "Order cancellation request accepted, " +
-                          "KidsPro will refund the money to the e-Wallet after 3-5 days";
-            await _notify.SendNotifyToAccountAsync(parentId, title, content);
+            string title = "";
+            string content = "";
+            switch (status)
+            {
+                case ModerationStatus.Approve:
+                    await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,
+                        OrderStatus.RequestRefund, OrderStatus.Refunded);
+                    // Send a notice of acceptance of order cancellation to parent
+                    title = "The result of processing order cancellation request";
+                    content = "Order cancellation request accepted, " +
+                              "KidsPro will refund the money to the e-Wallet after 3-5 days";
+                    break;
+                case ModerationStatus.Refuse:
+                    await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,
+                        OrderStatus.RequestRefund, OrderStatus.Pending);
+                    // Send a notice of refusal of order cancellation to parent
+                    title = "The result of processing order cancellation request";
+                    content = "Order cancellation request refused because  " + dto.ReasonRefuse;
+                    break;
+            }
+
+            await _notify.SendNotifyToAccountAsync(dto.ParentId, title, content);
         }
-        
     }
 }
