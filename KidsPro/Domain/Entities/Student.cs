@@ -24,4 +24,5 @@ public class Student : BaseEntity
     public virtual ICollection<Certificate>? Certificates { get; set; }
 
     public virtual ICollection<StudentProgress>? StudentProgresses { get; set; }
+    public virtual ICollection<StudentClass>? StudentsClasses { get; set; }
 }

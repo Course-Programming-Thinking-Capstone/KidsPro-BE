@@ -26,6 +26,10 @@ public class Class : BaseEntity
     [Precision(2)]
     public DateTime? OpenDate { get; set; }
 
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+    [Precision(2)]
+    public DateTime? CloseDate { get; set; }
     public virtual Teacher Teacher { get; set; } = null!;
     public int TeacherId { get; set; }
 
@@ -34,4 +38,6 @@ public class Class : BaseEntity
 
     public virtual Course Course { get; set; } = null!;
     public int CourseId { get; set; }
+    
+    public virtual ICollection<StudentClass>? StudentsClasses { get; set; }
 }
