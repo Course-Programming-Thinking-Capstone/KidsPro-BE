@@ -94,7 +94,7 @@ public class GamesController : ControllerBase
     /// <summary>
     /// User finish a level game, return new user coin if first time clear level
     /// </summary>
-    [HttpPost("finish-level")]
+    [HttpPost("game-play-history")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<UserDataResponse>> FinishLevelGame(

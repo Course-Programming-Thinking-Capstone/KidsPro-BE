@@ -590,10 +590,11 @@ public class GameService : IGameService
             , null
         ).ContinueWith(o => o.Result.FirstOrDefault());
 
-        var userData = await _unitOfWork.GameUserProfileRepository.GetByIdAsync(userFinishLevelRequest.UserID);
+        var userData = await _unitOfWork.GameUserProfileRepository.GetAsync(
+            o => o.StudentId == userFinishLevelRequest.UserID, null).ContinueWith(o => o.Result.FirstOrDefault());
         var result = new UserDataResponse
         {
-            UserId = userData.Id,
+            UserId = userData.StudentId,
             DisplayName = userData.DisplayName,
             OldGem = (int)userData.Gem,
             OldCoin = (int)userData.Coin,
