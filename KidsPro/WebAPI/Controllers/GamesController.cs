@@ -95,9 +95,9 @@ public class GamesController : ControllerBase
     /// User finish a level game, return new user coin if first time clear level
     /// </summary>
     [HttpPost("finish-level")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<LevelInformationResponse>> FinishLevelGame(
+    public async Task<ActionResult<UserDataResponse>> FinishLevelGame(
         [FromBody] UserFinishLevelRequest userFinishLevelRequest)
     {
         var result = await _gameService.UserFinishLevel(userFinishLevelRequest);
