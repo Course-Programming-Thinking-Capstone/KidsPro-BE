@@ -16,10 +16,12 @@ namespace WebAPI.Controllers;
 public class UsersController : ControllerBase
 {
     private IAccountService _accountService;
+    private IAuthenticationService _authentication;
 
-    public UsersController(IAccountService accountService)
+    public UsersController(IAccountService accountService, IAuthenticationService authentication)
     {
         _accountService = accountService;
+        _authentication = authentication;
     }
 
     /// <summary>
@@ -34,6 +36,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
     public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto request)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         await _accountService.ChangePasswordAsync(request);
         return Ok();
     }
@@ -47,6 +52,9 @@ public class UsersController : ControllerBase
     [HttpPatch("account/avatar")]
     public async Task<ActionResult<string>> UpdateAvatarAsync([FromForm] IFormFile file)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var result = await _accountService.UpdatePictureAsync(file);
         return Ok(result);
     }
@@ -75,6 +83,9 @@ public class UsersController : ControllerBase
     [HttpGet("account/{id}")]
     public async Task<ActionResult<AccountDto>> GetByIdAsync([FromRoute] int id, [FromQuery] [Required] string role)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var result = await _accountService.GetAccountByIdAsync(id, role);
         return Ok(result);
     }
@@ -92,6 +103,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<AccountDto>> CreateAccountAsync([FromBody] CreateAccountDto dto)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var result = await _accountService.CreateAccountAsync(dto);
         return Created(nameof(CreateAccountAsync), result);
     }

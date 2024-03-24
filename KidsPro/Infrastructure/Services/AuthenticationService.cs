@@ -6,6 +6,7 @@ using Application.Configurations;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -152,7 +153,7 @@ public class AuthenticationService : IAuthenticationService
         throw new UnauthorizedException("Invalid token.");
     }
 
-    public string GetCurrentAccountStatus()
+    private string GetCurrentAccountStatus()
     {
         var httpContextAccessor = _serviceProvider.GetService<IHttpContextAccessor>();
 
@@ -175,6 +176,15 @@ public class AuthenticationService : IAuthenticationService
 
         throw new NotFoundException("Invalid token");
     }
+    
+    //Check if the account is activated or not
+    public void CheckAccountStatus()
+    {
+        var checkStatus = GetCurrentAccountStatus();
+        if (checkStatus != UserStatus.Active.ToString())
+            throw new BadRequestException("The account has not been activated or is inactive");
+    }
+   
     // public async Task<(bool, string, string?)> ReissueToken(string accessToken, string refeshToken, int id)
     // {
     //     _tokenValidation = new TokenValidationParameters
