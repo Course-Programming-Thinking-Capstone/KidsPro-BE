@@ -24,7 +24,6 @@ public class AccountService : IAccountService
     private IImageService _imageService;
     private ILogger<AccountService> _logger;
 
-
     public AccountService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
         IImageService imageService, ILogger<AccountService> logger)
     {
@@ -36,7 +35,7 @@ public class AccountService : IAccountService
 
     public async Task<LoginAccountDto> RegisterByEmailAsync(EmailRegisterDto dto)
     {
-        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email)!=null)
+        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email) != null)
             throw new ConflictException($"Email {dto.Email} has been existed.");
 
         var parentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.ParentRole)
@@ -142,7 +141,7 @@ public class AccountService : IAccountService
 
     public async Task ChangePasswordAsync(ChangePasswordDto dto)
     {
-        var accountId= _authenticationService.GetCurrentUserId();
+        var accountId = _authenticationService.GetCurrentUserId();
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
@@ -160,7 +159,7 @@ public class AccountService : IAccountService
 
     public async Task<string> UpdatePictureAsync(IFormFile file)
     {
-        var accountId= _authenticationService.GetCurrentUserId();
+        var accountId = _authenticationService.GetCurrentUserId();
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
@@ -187,6 +186,20 @@ public class AccountService : IAccountService
         if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.PasswordHash))
         {
             throw new UnauthorizedException("Incorrect password.");
+        }
+
+        if (student.GameUserProfile == null)
+        {
+            var newGameProfile = new GameUserProfile
+            {
+                DisplayName = student.UserName,
+                Coin = 0,
+                Gem = 0,
+                StudentId = student.Id
+            };
+            student.GameUserProfile = newGameProfile;
+            await _unitOfWork.GameUserProfileRepository.AddAsync(newGameProfile);
+            await _unitOfWork.SaveChangeAsync();
         }
 
         var result = AccountMapper.StudentToStudentGameLoginDto(student);
@@ -305,7 +318,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> CreateAccountAsync(CreateAccountDto dto)
     {
-        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email)!=null)
+        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email) != null)
             throw new ConflictException($"Email {dto.Email} has been existed.");
 
         var account = new Account()
@@ -547,8 +560,8 @@ public class AccountService : IAccountService
         var title = "Successful account registration";
         var content = "Welcome " + account.FullName + "<br>" + "<br>" +
                       "Your account has been successfully registered at KidsPro" + "<br>" + "<br>" +
-                      "To complete your registration, please activate your account via the following link:"+ "<br>"
-                      +link+ "<br>" + "<br>" +
+                      "To complete your registration, please activate your account via the following link:" + "<br>"
+                      + link + "<br>" + "<br>" +
                       "Thanks you!" + "<br>" + "<br>" + "KidsPro Team";
         EmailUtils.SendEmail(account.Email!, title, content);
     }

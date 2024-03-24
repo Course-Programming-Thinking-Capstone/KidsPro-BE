@@ -574,7 +574,7 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
+    public async Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
         var winLevel =
             await GetGameLevelByTypeAndIndex(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
@@ -583,20 +583,32 @@ public class GameService : IGameService
             throw new BadRequestException("Level not found");
         }
 
-        var isPlayedHistory = await _unitOfWork.GamePlayHistoryRepository.GetAsync(
+        var oldData = await _unitOfWork.GamePlayHistoryRepository.GetAsync(
             o => o.StudentId == userFinishLevelRequest.UserID
                  && o.GameLevelTypeId == userFinishLevelRequest.ModeId
                  && o.LevelIndex == userFinishLevelRequest.LevelIndex
             , null
-        );
-        var userCoin = -1;
-        var oldData = isPlayedHistory.FirstOrDefault();
-        if (oldData == null) // already play -> no coin
+        ).ContinueWith(o => o.Result.FirstOrDefault());
+
+        var userData = await _unitOfWork.GameUserProfileRepository.GetByIdAsync(userFinishLevelRequest.UserID);
+        var result = new UserDataResponse
         {
-            var userData = await _unitOfWork.GameUserProfileRepository.GetByIdAsync(userFinishLevelRequest.UserID);
-            var coinWin = winLevel.CoinReward ?? 0;
-            userData.Coin += coinWin;
-            userCoin = userData.Coin;
+            UserId = userData.Id,
+            DisplayName = userData.DisplayName,
+            OldGem = (int)userData.Gem,
+            OldCoin = (int)userData.Coin,
+            UserCoin = userData.Gem,
+            UserGem = userData.Coin
+        };
+        // COIN ADD
+        await _unitOfWork.BeginTransactionAsync();
+        if (oldData == null) // first play -> add  coin
+        {
+            userData.Coin += winLevel.CoinReward ?? 0;
+            userData.Gem += winLevel.GemReward ?? 0;
+
+            result.UserGem = userData.Gem;
+            result.UserCoin = userData.Coin;
             _unitOfWork.GameUserProfileRepository.Update(userData);
         }
 
@@ -604,13 +616,25 @@ public class GameService : IGameService
         {
             LevelIndex = userFinishLevelRequest.LevelIndex,
             PlayTime = userFinishLevelRequest.StartTime,
-            FinishTime = userFinishLevelRequest.EndTime,
+
+            FinishTime = DateTime.Now,
             GameLevelTypeId = userFinishLevelRequest.ModeId,
-            Duration = (userFinishLevelRequest.EndTime - userFinishLevelRequest.StartTime).Minutes,
+            Duration = (DateTime.Now - userFinishLevelRequest.StartTime).Minutes,
             StudentId = userFinishLevelRequest.UserID
         });
 
-        return userCoin;
+        try
+        {
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        return result;
     }
 
     #endregion
