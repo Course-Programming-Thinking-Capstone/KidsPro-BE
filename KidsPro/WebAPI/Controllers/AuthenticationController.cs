@@ -97,7 +97,7 @@ public class AuthenticationController : ControllerBase
     /// <param name="code"></param>
     /// <returns></returns>
     //[Authorize(Roles = $"{Constant.ParentRole},{Constant.StudentRole},{Constant.StaffRole},{Constant.TeacherRole},")]
-    [HttpPatch("confirm/check/{code}")]
+    [HttpGet("confirm/check/{code}")]
     public async Task<IActionResult> CheckConfirmation(string code)
     {
         await _accountService.CheckConfirmation(code);
