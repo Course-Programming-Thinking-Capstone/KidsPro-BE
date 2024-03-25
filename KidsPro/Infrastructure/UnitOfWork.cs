@@ -51,6 +51,8 @@ public class UnitOfWork : IUnitOfWork
     public ITransactionRepository TransactionRepository { get; set; }
     public ISyllabusRepository SyllabusRepository { get; }
     public IPassConditionRepository PassConditionRepository { get; }
+    public IScheduleReposisoty ScheduleReposisoty { get; }
+    public IClassRepository ClassRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
@@ -63,7 +65,7 @@ public class UnitOfWork : IUnitOfWork
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
         , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
-        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository)
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository, IScheduleReposisoty scheduleReposisoty, IClassRepository classRepository)
     {
         _context = context;
         _logger = logger;
@@ -100,6 +102,8 @@ public class UnitOfWork : IUnitOfWork
         TransactionRepository = transactionRepository;
         SyllabusRepository = syllabusRepository;
         PassConditionRepository = passConditionRepository;
+        ScheduleReposisoty = scheduleReposisoty;
+        ClassRepository = classRepository;
     }
 
     public async Task<int> SaveChangeAsync()

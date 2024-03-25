@@ -5,5 +5,5 @@ namespace Application.Interfaces.IRepositories;
 
 public interface IClassRepository:IBaseRepository<Class>
 {
-    
+    Task<bool> ExistByClassCode(string code);
 }

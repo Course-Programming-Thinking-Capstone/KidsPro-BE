@@ -13,13 +13,13 @@ public class Class : BaseEntity
 
     [Column(TypeName = "tinyint")]
     [Range(0, 250)]
-    public int? Duration { get; set; }
+    public int Duration { get; set; }
 
     public ClassStatus Status { get; set; } = ClassStatus.Active;
 
-    public int TotalSlot { get; set; }
+    public int? TotalSlot { get; set; }
 
-    public int TotalStudent { get; set; }
+    public int? TotalStudent { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
@@ -30,8 +30,8 @@ public class Class : BaseEntity
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     [Precision(2)]
     public DateTime? CloseDate { get; set; }
-    public virtual Teacher Teacher { get; set; } = null!;
-    public int TeacherId { get; set; }
+    public virtual Teacher? Teacher { get; set; } 
+    public int? TeacherId { get; set; }
 
     public virtual Account CreatedBy { get; set; } = null!;
     public int CreatedById { get; set; }

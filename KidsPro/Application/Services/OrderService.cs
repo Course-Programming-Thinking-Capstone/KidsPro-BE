@@ -12,13 +12,13 @@ namespace Application.Services
     public class OrderService : IOrderService
     {
         readonly IUnitOfWork _unitOfWork;
-        private IAccountService _accountService;
+        private IAccountService _account;
         private INotificationService _notify;
 
-        public OrderService(IUnitOfWork unitOfWork, IAccountService accountService, INotificationService notify)
+        public OrderService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify)
         {
             _unitOfWork = unitOfWork;
-            _accountService = accountService;
+            _account = account;
             _notify = notify;
         }
 
@@ -38,7 +38,7 @@ namespace Application.Services
                 if (course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
             } while (getOrderCode == null);
 
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
 
             //Create Order
             var order = new Order()
@@ -119,14 +119,14 @@ namespace Application.Services
 
         public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
         {
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
             var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.ShowOrder(orders!);
         }
 
         public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
         {
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
             var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
             if (order != null)
                 return OrderMapper.ShowOrderDetail(order);
@@ -135,7 +135,7 @@ namespace Application.Services
 
         public async Task CanCelOrderAsync(OrderCancelRequest dto)
         {
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
             await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
                 OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
         }
