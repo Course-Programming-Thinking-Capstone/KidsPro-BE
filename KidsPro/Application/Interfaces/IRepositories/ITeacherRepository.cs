@@ -5,5 +5,5 @@ namespace Application.Interfaces.IRepositories;
 
 public interface ITeacherRepository:IBaseRepository<Teacher>
 {
-    
+    Task<List<Teacher>> GetTeacherToClass();
 }

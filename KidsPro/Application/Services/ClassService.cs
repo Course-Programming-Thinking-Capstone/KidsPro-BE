@@ -5,6 +5,7 @@ using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
+using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -49,7 +50,8 @@ public class ClassService:IClassService
             Status = ClassStatus.Active,
             CourseId = dto.CourseId,
             CreatedById = account.Id,
-            Duration = dto.CloseDay.Month-dto.OpenDay.Month
+            Duration = dto.CloseDay.Month-dto.OpenDay.Month,
+            TotalSlot = course.Syllabus?.TotalSlot??0
         };
 
         await _unitOfWork.ClassRepository.AddAsync(classEntity);
@@ -58,19 +60,39 @@ public class ClassService:IClassService
         return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name,course.Syllabus?.SlotTime??0);
     }
 
-    // public async Task<ScheduleCreateResponse> CreateScheduleAsync(ScheduleCreateRequest dto)
-    // {
-    //     await CheckPermission();
-    //
-    //     var schedule = dto.Days.Select(day => new ClassSchedule
-    //     {
-    //         RoomUrl = dto.Link,
-    //         ClassId = dto.ClassId,
-    //         Slot = dto.Slot,
-    //         StudyDay = day,
-    //         
-    //     }).ToList();
-    //
-    // }
+    public async Task<ScheduleCreateResponse> CreateScheduleAsync(ScheduleCreateRequest dto)
+    {
+        await CheckPermission();
+
+        var time = TimeUtils.GetTimeFromSlot(dto.Slot, dto.SlotTime);
+        
+        var schedule = dto.Days.Select(day => new ClassSchedule
+        {
+            RoomUrl = dto.Link,
+            ClassId = dto.ClassId,
+            Slot = dto.Slot,
+            StudyDay = (DayStatus)day,
+            StartTime = time.Item1,
+            EndTime = time.Item2
+        }).ToList();
+
+        await _unitOfWork.ScheduleReposisoty.AddRangeAsync(schedule);
+        await _unitOfWork.SaveChangeAsync();
+
+        return ClassMapper.ScheduleToScheuldeCreateResponse(schedule.First(), dto.Days);
+    }
+
+    public async Task AddTeacherToClassAsync(int teacherId)
+    {
+        await CheckPermission();
+        
+        
+    }
     
+    public async Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync()
+    {
+        await CheckPermission();
+        var teachers = await _unitOfWork.TeacherRepository.GetTeacherToClass();
+        return ClassMapper.TeacherToTeacherScheduleResponse(teachers);
+    }
 }

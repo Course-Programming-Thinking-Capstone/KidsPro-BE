@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
 using Domain.Enums;
@@ -30,7 +31,7 @@ public class Class : BaseEntity
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     [Precision(2)]
     public DateTime? CloseDate { get; set; }
-    public virtual Teacher? Teacher { get; set; } 
+    public virtual Teacher? Teacher { get; set; }
     public int? TeacherId { get; set; }
 
     public virtual Account CreatedBy { get; set; } = null!;
@@ -40,4 +41,5 @@ public class Class : BaseEntity
     public int CourseId { get; set; }
     
     public virtual ICollection<StudentClass>? StudentsClasses { get; set; }
+    public virtual ICollection<ClassSchedule>? Schedules { get; set; }
 }

@@ -56,6 +56,11 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // modelBuilder.Entity<Class>()
+        //     .HasOne(c => c.Teacher)
+        //     .WithMany(t => t.Classes)
+        // .HasForeignKey(c => c.TeacherId).IsRequired(false);
+
         modelBuilder.Entity<Student>()
             .HasOne<Parent>(s => s.Parent)
             .WithMany()

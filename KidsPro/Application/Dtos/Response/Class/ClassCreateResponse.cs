@@ -12,4 +12,5 @@ public class ClassCreateResponse
     public string? CloseDay { get; set; }
     public int Duration { get; set; }
     public int SlotTime { get; set; }
+    public int? TotalSlot { get; set; }
 }

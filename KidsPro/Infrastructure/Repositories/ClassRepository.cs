@@ -19,4 +19,5 @@ public class ClassRepository:BaseRepository<Class>, IClassRepository
             .ContinueWith(task => task.Result != null);
     }
 
+    
 }

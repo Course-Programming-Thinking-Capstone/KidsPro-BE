@@ -163,10 +163,11 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CourseSlot = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    TotalSlot = table.Column<int>(type: "int", nullable: false),
                     SlotTime = table.Column<int>(type: "int", nullable: false),
-                    Target = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    status = table.Column<byte>(type: "tinyint", nullable: false),
+                    Target = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
                     PassConditionId = table.Column<int>(type: "int", nullable: true),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
@@ -195,6 +196,7 @@ namespace Infrastructure.Migrations
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
+                    ConfirmAccount = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
@@ -292,8 +294,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
-                    CourseTarget = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     PictureUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     StartSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
                     EndSaleDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
@@ -564,14 +565,16 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Duration = table.Column<byte>(type: "tinyint", nullable: true),
+                    Duration = table.Column<byte>(type: "tinyint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    TotalSlot = table.Column<int>(type: "int", nullable: false),
-                    TotalStudent = table.Column<int>(type: "int", nullable: false),
+                    TotalSlot = table.Column<int>(type: "int", nullable: true),
+                    TotalStudent = table.Column<int>(type: "int", nullable: true),
                     OpenDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
-                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    CloseDate = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: true),
+                    TeacherId = table.Column<int>(type: "int", nullable: true),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
+                    TeacherId1 = table.Column<int>(type: "int", nullable: true),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
@@ -595,6 +598,11 @@ namespace Infrastructure.Migrations
                         principalTable: "Teachers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Classes_Teachers_TeacherId1",
+                        column: x => x.TeacherId1,
+                        principalTable: "Teachers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -902,8 +910,10 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    StartTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2(2)", precision: 2, nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Slot = table.Column<int>(type: "int", nullable: false),
+                    StudyDay = table.Column<int>(type: "int", nullable: false),
                     ClassId = table.Column<int>(type: "int", nullable: false),
                     Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
@@ -914,6 +924,33 @@ namespace Infrastructure.Migrations
                         name: "FK_ClassSchedules_Classes_ClassId",
                         column: x => x.ClassId,
                         principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentClass",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClassId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentClass", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudentClass_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentClass_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1143,13 +1180,13 @@ namespace Infrastructure.Migrations
                         column: x => x.OrderDetailsId,
                         principalTable: "OrderDetails",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderDetailStudent_Students_StudentsId",
                         column: x => x.StudentsId,
                         principalTable: "Students",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1208,6 +1245,18 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "PassCondition",
+                columns: new[] { "Id", "PassRatio" },
+                values: new object[,]
+                {
+                    { 1, 60 },
+                    { 2, 70 },
+                    { 3, 80 },
+                    { 4, 90 },
+                    { 5, 100 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
@@ -1232,14 +1281,14 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Accounts",
-                columns: new[] { "Id", "CreatedDate", "DateOfBirth", "Email", "FullName", "Gender", "IsDelete", "PasswordHash", "PictureUrl", "RoleId", "Status" },
+                columns: new[] { "Id", "ConfirmAccount", "CreatedDate", "DateOfBirth", "Email", "FullName", "Gender", "IsDelete", "PasswordHash", "PictureUrl", "RoleId", "Status" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 3, 22, 14, 16, 59, 119, DateTimeKind.Utc).AddTicks(5667), null, "admin@gmail.com", "Admin", null, false, "$2a$11$2PayLXtOg3PVcryKYeZivOwQTLS/WXswbPKl4QIE60IPCficU5RSi", null, 1, (byte)1 },
-                    { 2, new DateTime(2024, 3, 22, 14, 16, 59, 365, DateTimeKind.Utc).AddTicks(7887), null, "subadmin@gmail.com", "Sub Admin", null, false, "$2a$11$iz3dN59ymsl9ai6KyQvQPeD1ONxRoACXT3BmSK7.O8URSzugbwWB.", null, 1, (byte)1 },
-                    { 3, new DateTime(2024, 3, 22, 14, 16, 59, 639, DateTimeKind.Utc).AddTicks(3816), null, "teacher@gmail.com", "Teacher", null, false, "$2a$11$r3YcIw0awx2Z5NVeGTKUS.Alp23zBldxOYGhOIgp4EH7JaZYKhLTi", null, 3, (byte)1 },
-                    { 4, new DateTime(2024, 3, 22, 14, 16, 59, 847, DateTimeKind.Utc).AddTicks(2784), null, "teacher2@gmail.com", "Teacher 2", null, false, "$2a$11$zOhD8PFSq0FPzLJBGyctveUK3LP9x7pj813qopu1QMxF.UN8/cVzy", null, 3, (byte)1 },
-                    { 5, new DateTime(2024, 3, 22, 14, 17, 0, 61, DateTimeKind.Utc).AddTicks(7829), null, "staff@gmail.com", "Staff", null, false, "$2a$11$o6FFpFsrdMsUhJr61JMw/.Hay.pwmmN02K9oUbpbWs5lVlvD2vmmG", null, 2, (byte)1 }
+                    { 1, null, new DateTime(2024, 3, 25, 16, 9, 8, 754, DateTimeKind.Utc).AddTicks(3632), null, "admin@gmail.com", "Admin", null, false, "$2a$11$2JqnQFSjJV99O1RmRPCEcuYwh2UzYlNhHkU4Y0uHYDMvK4fDYmXsy", null, 1, (byte)1 },
+                    { 2, null, new DateTime(2024, 3, 25, 16, 9, 8, 943, DateTimeKind.Utc).AddTicks(4315), null, "subadmin@gmail.com", "Sub Admin", null, false, "$2a$11$HTjUkhjz/Q52hX9AAigF/uvx6gor8J2wGQfSIvxBYTGpJEJa4WsrC", null, 1, (byte)1 },
+                    { 3, null, new DateTime(2024, 3, 25, 16, 9, 9, 177, DateTimeKind.Utc).AddTicks(7252), null, "teacher@gmail.com", "Teacher", null, false, "$2a$11$ehLP14NRns.K/6NHA7qkveMvpnciRmvp203KL6vs.z5e6NmTmIq/i", null, 3, (byte)1 },
+                    { 4, null, new DateTime(2024, 3, 25, 16, 9, 9, 357, DateTimeKind.Utc).AddTicks(3824), null, "teacher2@gmail.com", "Teacher 2", null, false, "$2a$11$6hydLLOOwIHIIO/tUFjBJO7k7H0UFYqVElHCg7w0K.1eISb4LqKpy", null, 3, (byte)1 },
+                    { 5, null, new DateTime(2024, 3, 25, 16, 9, 9, 564, DateTimeKind.Utc).AddTicks(7058), null, "staff@gmail.com", "Staff", null, false, "$2a$11$cKjtUFouvEFG2DvLnT8SFeoIneT/Q4o3t4EguC3qNc7nXcHEGBAWK", null, 2, (byte)1 }
                 });
 
             migrationBuilder.InsertData(
@@ -1314,6 +1363,11 @@ namespace Infrastructure.Migrations
                 name: "IX_Classes_TeacherId",
                 table: "Classes",
                 column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classes_TeacherId1",
+                table: "Classes",
+                column: "TeacherId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClassSchedules_ClassId",
@@ -1556,6 +1610,16 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudentClass_ClassId",
+                table: "StudentClass",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentClass_StudentId",
+                table: "StudentClass",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudentLessons_LessonId",
                 table: "StudentLessons",
                 column: "LessonId");
@@ -1703,6 +1767,9 @@ namespace Infrastructure.Migrations
                 name: "Staves");
 
             migrationBuilder.DropTable(
+                name: "StudentClass");
+
+            migrationBuilder.DropTable(
                 name: "StudentLessons");
 
             migrationBuilder.DropTable(
@@ -1724,9 +1791,6 @@ namespace Infrastructure.Migrations
                 name: "UserNotification");
 
             migrationBuilder.DropTable(
-                name: "Classes");
-
-            migrationBuilder.DropTable(
                 name: "PositionTypes");
 
             migrationBuilder.DropTable(
@@ -1737,6 +1801,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");
+
+            migrationBuilder.DropTable(
+                name: "Classes");
 
             migrationBuilder.DropTable(
                 name: "MiniGames");

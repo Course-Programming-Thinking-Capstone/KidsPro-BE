@@ -556,7 +556,9 @@ public class AccountService : IAccountService
 
     private void SendConfirmationCode(Account account)
     {
-        var link ="https://www.kidpro-production.somee.com/api/v1/authentication/confirm/check/Email=" + account.Email + "&Token=" + account.ConfirmAccount;
+        var link ="http://localhost:3000/Email="
+           // "https://www.kidpro-production.somee.com/api/v1/authentication/confirm/check/Email=" 
+                + account.Email + "&Token=" + account.ConfirmAccount;
         var title = "Successful account registration";
         var content = "Welcome " + account.FullName + "<br>" + "<br>" +
                       "Your account has been successfully registered at KidsPro" + "<br>" + "<br>" +
