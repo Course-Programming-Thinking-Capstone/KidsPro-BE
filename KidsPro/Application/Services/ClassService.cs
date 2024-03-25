@@ -1,6 +1,7 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
+using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -22,12 +23,17 @@ public class ClassService:IClassService
         _notify = notify;
     }
 
-    public async Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto)
+    private async Task<AccountDto> CheckPermission()
     {
         var account =await _account.GetCurrentAccountInformationAsync();
-    
+        
         if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole)
             throw new UnauthorizedException("Not the staff role, please login by staff account");
+        return account;
+    }
+    public async Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto)
+    {
+        var account=await CheckPermission();
     
         if (await _unitOfWork.ClassRepository.ExistByClassCode(dto.ClassCode))
             throw new BadRequestException("Class Code has been existed");
@@ -49,7 +55,22 @@ public class ClassService:IClassService
         await _unitOfWork.ClassRepository.AddAsync(classEntity);
         await _unitOfWork.SaveChangeAsync();
 
-        return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name);
+        return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name,course.Syllabus?.SlotTime??0);
     }
+
+    // public async Task<ScheduleCreateResponse> CreateScheduleAsync(ScheduleCreateRequest dto)
+    // {
+    //     await CheckPermission();
+    //
+    //     var schedule = dto.Days.Select(day => new ClassSchedule
+    //     {
+    //         RoomUrl = dto.Link,
+    //         ClassId = dto.ClassId,
+    //         Slot = dto.Slot,
+    //         StudyDay = day,
+    //         
+    //     }).ToList();
+    //
+    // }
     
 }

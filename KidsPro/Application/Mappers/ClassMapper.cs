@@ -6,7 +6,7 @@ namespace Application.Mappers;
 
 public static class ClassMapper
 {
-    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName) =>
+    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, int slotTime) =>
         new ClassCreateResponse()
         {
             ClassId = dto.Id,
@@ -15,6 +15,7 @@ public static class ClassMapper
             CourseName = courseName,
             OpenDay = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
             CloseDay = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
-            Duration = dto.Duration
+            Duration = dto.Duration,
+            SlotTime = slotTime
         };
 }
