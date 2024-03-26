@@ -105,10 +105,12 @@ public class ClassService:IClassService
         return ClassMapper.TeacherToTeacherScheduleResponse(teachers);
     }
 
-    // public async Task<ClassResponse> GetClassByIdAsync(int classId)
-    // {
-    //     await CheckPermission();
-    //     var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
-    //     entityClass?return C
-    // }
+    public async Task<ClassResponse> GetClassByIdAsync(int classId)
+    {
+        await CheckPermission();
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
+        
+        return entityClass!=null? ClassMapper.ClassToClassResponse(entityClass)
+            :throw new BadRequestException($"ClassId: {classId} doesn't exist");
+    }
 }

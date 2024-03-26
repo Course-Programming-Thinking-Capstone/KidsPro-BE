@@ -1,6 +1,8 @@
 ﻿using Application.Dtos.Response;
+using Application.Dtos.Response.StudentSchedule;
 using Application.Utils;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Mappers;
 
@@ -66,15 +68,32 @@ public static class ClassMapper
         return teacherScheduleList;
     }
 
-    // public static ClassResponse ClassToClassResponse(Class dto)
-    // {
-    //     var entityClass= new ClassResponse()
-    //     {
-    //         ClassId = dto.Id,
-    //         ClassCode = dto.Code,
-    //         CourseName = dto.Course.Name,
-    //         TeacherName = dto.Teacher?.Account.FullName??"The class doesn't have a teacher yet",
-    //         
-    //     }
-    // }
+    public static ClassResponse ClassToClassResponse(Class dto) => new ClassResponse()
+    {
+        ClassId = dto.Id,
+        ClassCode = dto.Code,
+        CourseName = dto.Course.Name,
+        TeacherId = dto.Teacher?.Id,
+        TeacherName = dto.Teacher?.Account.FullName,
+                      //?? "The class doesn't have a teacher yet",
+        OpenClass = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
+        CloseClass = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
+        Duration = dto.Duration,
+        SlotTime = dto.Course.Syllabus?.SlotTime ?? 0,
+        TotalSlot = dto.TotalSlot,
+        RoomUrl = dto.Schedules?.First().RoomUrl,
+        //?? "The Class doesn't have a schedule yet"
+        SlotNumber = dto.Schedules?.First().Slot ?? 0,
+        StartSlot = dto.Schedules?.First().StartTime ?? TimeSpan.Zero,
+        EndSlot = dto.Schedules?.First().EndTime ?? TimeSpan.Zero,
+        StudyDay = dto.Schedules?.Select(x => x.StudyDay) ?? new List<DayStatus>(),
+        Students = dto.Students.Select(x => new StudentClassResponse
+        {
+            Image = x.Account.PictureUrl,
+            StudentName = x.Account.FullName,
+            Age = Math.Max(0, DateTime.Now.Year - (x.Account.DateOfBirth?.Year ?? 0)),
+            Gender = x.Account.Gender
+        }).ToList(),
+        TotalStudent = dto.Students.Count()
+    };
 }

@@ -24,7 +24,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
         IQueryable<Class> query = _dbSet.AsNoTracking();
         return query.Include(x => x.Schedules)
             .Include(x => x.Teacher).ThenInclude(x => x.Account)
-            .Include(x => x.Course)
+            .Include(x => x.Course).ThenInclude(x=> x.Syllabus)
             .Include(x => x.Students).FirstOrDefaultAsync(x => x.Id == id);
     }
 }

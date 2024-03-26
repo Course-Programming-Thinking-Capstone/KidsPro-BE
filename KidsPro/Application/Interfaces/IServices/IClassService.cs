@@ -10,4 +10,5 @@ public interface IClassService
      Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync();
 
      Task<string> AddTeacherToClassAsync(int teacherId, int classId);
+     Task<ClassResponse> GetClassByIdAsync(int classId);
 }
