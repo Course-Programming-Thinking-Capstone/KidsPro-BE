@@ -1,12 +1,9 @@
-﻿using Domain.Entities.Generic;
+﻿namespace Domain.Entities;
 
-namespace Domain.Entities;
-
-public class StudentClass:BaseEntity
+public class StudentClass
 {
-    public virtual Class Class { get; set; } = null!;
-    public int ClassId { get; set; }
-
     public virtual Student Student { get; set; } = null!;
     public int StudentId { get; set; }
+    public virtual Class Class { get; set; } = null!;
+    public int ClassId { get; set; }
 }

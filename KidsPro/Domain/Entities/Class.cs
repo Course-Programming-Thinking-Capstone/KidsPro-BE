@@ -31,6 +31,7 @@ public class Class : BaseEntity
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     [Precision(2)]
     public DateTime? CloseDate { get; set; }
+
     public virtual Teacher? Teacher { get; set; }
     public int? TeacherId { get; set; }
 
@@ -39,7 +40,7 @@ public class Class : BaseEntity
 
     public virtual Course Course { get; set; } = null!;
     public int CourseId { get; set; }
-    
-    public virtual ICollection<StudentClass>? StudentsClasses { get; set; }
+
+    public virtual IEnumerable<Student> Students { get; } = new List<Student>();
     public virtual ICollection<ClassSchedule>? Schedules { get; set; }
 }

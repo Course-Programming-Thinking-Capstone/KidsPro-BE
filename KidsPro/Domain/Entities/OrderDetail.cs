@@ -12,7 +12,7 @@ public class OrderDetail : BaseEntity
     public virtual Order Order { get; set; } = null!;
     public int OrderId { get; set; }
 
-    public virtual List<Student>? Students { get; set; } 
+    public ICollection<Student> Students { get; set; } = new List<Student>();
 
     public virtual Course Course { get; set; } = null!;
     public int CourseId { get; set; }
