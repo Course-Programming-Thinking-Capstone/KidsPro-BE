@@ -82,11 +82,20 @@ public class ClassService:IClassService
         return ClassMapper.ScheduleToScheuldeCreateResponse(schedule.First(), dto.Days);
     }
 
-    public async Task AddTeacherToClassAsync(int teacherId)
+    public async Task<string> AddTeacherToClassAsync(int teacherId, int classId)
     {
         await CheckPermission();
+
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
+                          ??throw new NotFoundException($"ClassId: {classId} doesn't exist");
+
+        entityClass.TeacherId = teacherId;
         
-        
+        _unitOfWork.ClassRepository.Update(entityClass);
+        await _unitOfWork.SaveChangeAsync();
+
+        var teacher = await _unitOfWork.TeacherRepository.GetByIdAsync(teacherId);
+        return teacher?.Account.FullName ?? "";
     }
     
     public async Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync()
@@ -95,4 +104,11 @@ public class ClassService:IClassService
         var teachers = await _unitOfWork.TeacherRepository.GetTeacherToClass();
         return ClassMapper.TeacherToTeacherScheduleResponse(teachers);
     }
+
+    // public async Task<ClassResponse> GetClassByIdAsync(int classId)
+    // {
+    //     await CheckPermission();
+    //     var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
+    //     entityClass?return C
+    // }
 }

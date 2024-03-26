@@ -43,27 +43,38 @@ public static class ClassMapper
                 TeacherName = dto.Account.FullName,
             };
             //Nêú teacher có class, sẽ add schedule vào
-            // if (dto.Classes != null)
-            // {
-            //     foreach (var c in dto.Classes)
-            //     {
-            //         var x = new TeacherCouse()
-            //         {
-            //             CourseId = c.CourseId,
-            //             CourseName = c.Course.Name,
-            //             Open = c.Schedules!.First().StartTime,
-            //             Close = c.Schedules!.First().EndTime,
-            //             Slot = c.Schedules!.First().Slot,
-            //             StudyDays = c.Schedules!.Select(x => x.StudyDay),
-            //         };
-            //         teacher.Schedules?.Add(x);
-            //     }
-            // }
+            if (dto.Classes != null)
+            {
+                foreach (var c in dto.Classes)
+                {
+                    var x = new TeacherCouse()
+                    {
+                        CourseId = c.CourseId,
+                        CourseName = c.Course.Name,
+                        Open = c.Schedules!.First().StartTime,
+                        Close = c.Schedules!.First().EndTime,
+                        Slot = c.Schedules!.First().Slot,
+                        StudyDays = c.Schedules!.Select(x => x.StudyDay),
+                    };
+                    teacher.Schedules?.Add(x);
+                }
+            }
 
             teacherScheduleList.Add(teacher);
         }
 
         return teacherScheduleList;
     }
-    
+
+    // public static ClassResponse ClassToClassResponse(Class dto)
+    // {
+    //     var entityClass= new ClassResponse()
+    //     {
+    //         ClassId = dto.Id,
+    //         ClassCode = dto.Code,
+    //         CourseName = dto.Course.Name,
+    //         TeacherName = dto.Teacher?.Account.FullName??"The class doesn't have a teacher yet",
+    //         
+    //     }
+    // }
 }

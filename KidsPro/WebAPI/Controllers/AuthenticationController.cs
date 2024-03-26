@@ -3,6 +3,7 @@ using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -114,5 +115,17 @@ public class AuthenticationController : ControllerBase
     {
         await _accountService.SendConfirmation();
         return Ok("Sent confirmation code successful");
+    }
+
+    /// <summary>
+    /// Update status account to not activated status
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    [HttpPatch("account/status/{email}")]
+    public async Task<ActionResult<Account>> UpdateToNotActivatedStatusAsync(string email)
+    {
+        await _accountService.UpdateToNotActivatedStatus(email);
+        return Ok("Update to Not Activated Status successfully");
     }
 }

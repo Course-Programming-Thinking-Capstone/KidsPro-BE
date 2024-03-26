@@ -43,4 +43,5 @@ public class Class : BaseEntity
 
     public virtual IEnumerable<Student> Students { get; } = new List<Student>();
     public virtual ICollection<ClassSchedule>? Schedules { get; set; }
+    //public virtual IEnumerable<StudentClass> StudentClasses { get; } = new List<StudentClass>();
 }

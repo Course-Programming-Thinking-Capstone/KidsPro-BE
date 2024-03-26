@@ -8,4 +8,6 @@ public interface IClassService
      Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto);
      Task<ScheduleCreateResponse> CreateScheduleAsync(ScheduleCreateRequest dto);
      Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync();
+
+     Task<string> AddTeacherToClassAsync(int teacherId, int classId);
 }

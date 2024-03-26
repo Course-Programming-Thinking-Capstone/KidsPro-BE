@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Paging;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
@@ -40,5 +41,6 @@ public interface IAccountService
 
     Task CheckConfirmation(string input);
     Task SendConfirmation();
+    Task UpdateToNotActivatedStatus(string email);
 
 }

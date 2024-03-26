@@ -41,7 +41,7 @@ public class ClassController : ControllerBase
     }
     
     /// <summary>
-    /// Add Schedule
+    /// Create Schedules
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -60,7 +60,7 @@ public class ClassController : ControllerBase
     }
     
     /// <summary>
-    /// 
+    /// Get all teacher with activate status in the system, including their schedule
     /// </summary>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
@@ -73,6 +73,25 @@ public class ClassController : ControllerBase
         _authentication.CheckAccountStatus();
 
         var result = await _class.GetTeacherToClassAsync();
+        return Ok(result);
+    }
+    
+    /// <summary>
+    /// Add Teacher to class
+    /// </summary>
+    /// <param name="classId"></param>
+    /// <param name="teacherId"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [HttpPost("teacher/add-to-class")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<string>> AddTeacherAsync(int classId, int teacherId)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        var result = await _class.AddTeacherToClassAsync(teacherId,classId);
         return Ok(result);
     }
 }

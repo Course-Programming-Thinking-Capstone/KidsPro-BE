@@ -19,6 +19,6 @@ public class Teacher : BaseEntity
     public int AccountId { get; set; }
     public Account Account { get; set; } = null!;
 
-    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
+    public virtual ICollection<Class>? Classes { get; set; } = new List<Class>();
     public virtual ICollection<TeacherProfile> TeacherProfiles { get; set; } = new List<TeacherProfile>();
 }

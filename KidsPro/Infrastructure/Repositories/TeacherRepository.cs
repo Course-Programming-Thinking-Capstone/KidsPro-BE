@@ -19,11 +19,15 @@ public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
         IQueryable<Teacher> query = _dbSet.AsNoTracking();
 
         return await query.Include(x=> x.Account)
-            //.Include(x => x.Classes).ThenInclude(x => x.Schedules)
-            //.Include(x => x.Classes).ThenInclude(x => x.Course)
+            .Include(x => x.Classes).ThenInclude(x => x.Schedules)
+            .Include(x => x.Classes).ThenInclude(x => x.Course)
             .ToListAsync();
     }
     #nullable restore
-    
-    
+
+    public override Task<Teacher?> GetByIdAsync(int id, bool disableTracking = false)
+    {
+        return _dbSet.Include(x => x.Account)
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
 }

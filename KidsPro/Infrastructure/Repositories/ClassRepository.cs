@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
-public class ClassRepository:BaseRepository<Class>, IClassRepository
+public class ClassRepository : BaseRepository<Class>, IClassRepository
 {
     public ClassRepository(AppDbContext context, ILogger<BaseRepository<Class>> logger) : base(context, logger)
     {
@@ -19,5 +19,12 @@ public class ClassRepository:BaseRepository<Class>, IClassRepository
             .ContinueWith(task => task.Result != null);
     }
 
-    
+    public override Task<Class?> GetByIdAsync(int id, bool disableTracking = false)
+    {
+        IQueryable<Class> query = _dbSet.AsNoTracking();
+        return query.Include(x => x.Schedules)
+            .Include(x => x.Teacher).ThenInclude(x => x.Account)
+            .Include(x => x.Course)
+            .Include(x => x.Students).FirstOrDefaultAsync(x => x.Id == id);
+    }
 }
