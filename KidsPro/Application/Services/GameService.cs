@@ -100,6 +100,7 @@ public class GameService : IGameService
                     CoinReward = 100,
                     GemReward = 100,
                     VStartPosition = 26,
+                    LevelIndex = 0,
                     GameLevelTypeId = 1,
                     LevelDetail = new List<LevelDetailRequest>()
                     {
@@ -119,6 +120,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 1,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -144,6 +146,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 2,
                     VStartPosition = 26,
                     GameLevelTypeId = 1,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -189,6 +192,7 @@ public class GameService : IGameService
                     GemReward = 100,
                     VStartPosition = 26,
                     GameLevelTypeId = 2,
+                    LevelIndex = 0,
                     LevelDetail = new List<LevelDetailRequest>()
                     {
                         new LevelDetailRequest
@@ -203,6 +207,7 @@ public class GameService : IGameService
                     CoinReward = 100,
                     GemReward = 100,
                     VStartPosition = 26,
+                    LevelIndex = 1,
                     GameLevelTypeId = 2,
                     LevelDetail = new List<LevelDetailRequest>()
                     {
@@ -223,6 +228,7 @@ public class GameService : IGameService
                     CoinReward = 100,
                     GemReward = 100,
                     VStartPosition = 9,
+                    LevelIndex = 2,
                     GameLevelTypeId = 2,
                     LevelDetail = new List<LevelDetailRequest>()
                     {
@@ -250,6 +256,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 0,
                     VStartPosition = 26,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -280,6 +287,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 1,
                     VStartPosition = 25,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -320,6 +328,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 2,
                     VStartPosition = 43,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -383,6 +392,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 0,
                     VStartPosition = 26,
                     GameLevelTypeId = 4,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -413,6 +423,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 1,
                     VStartPosition = 35,
                     GameLevelTypeId = 4,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -448,6 +459,7 @@ public class GameService : IGameService
                 {
                     CoinReward = 100,
                     GemReward = 100,
+                    LevelIndex = 2,
                     VStartPosition = 25,
                     GameLevelTypeId = 4,
                     LevelDetail = new List<LevelDetailRequest>()
