@@ -15,7 +15,7 @@ public class ClassResponse
     public string? CloseClass { get; set; }
     public int Duration { get; set; }
     public int SlotTime { get; set; }
-    public IEnumerable<DayStatus> StudyDay  { get; set; }= new List<DayStatus>();
+    public IEnumerable<DayStatus>? StudyDay  { get; set; }= new List<DayStatus>();
     public int? SlotNumber { get; set; }
     public TimeSpan? StartSlot { get; set; }
     public TimeSpan? EndSlot { get; set; }

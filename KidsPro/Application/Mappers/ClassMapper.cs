@@ -96,4 +96,15 @@ public static class ClassMapper
         }).ToList(),
         TotalStudent = dto.Students.Count()
     };
+
+    public static ScheduleResponse ScheduleToScheduleResponse(List<ClassSchedule> dto)
+        => new ScheduleResponse()
+        {
+            SlotTime = dto.First().Class.Course.Syllabus?.SlotTime,
+            StartSlot = dto.First().StartTime,
+            EndSlot = dto.First().EndTime,
+            SlotNumber = dto.First().Slot,
+            RoomUrl = dto.First().RoomUrl,
+            StudyDay = dto.Select(x => x.StudyDay)
+        };
 }

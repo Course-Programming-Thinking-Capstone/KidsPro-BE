@@ -113,4 +113,14 @@ public class ClassService:IClassService
         return entityClass!=null? ClassMapper.ClassToClassResponse(entityClass)
             :throw new BadRequestException($"ClassId: {classId} doesn't exist");
     }
+
+    public async Task<ScheduleResponse> GetScheduleByClassIdAsync(int classId)
+    {
+        await CheckPermission();
+
+        var schedule = await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(classId);
+        
+        return schedule.Any()? ClassMapper.ScheduleToScheduleResponse(schedule)
+            :throw new BadRequestException($"ClassId: {classId} doesn't exist");
+    }
 }

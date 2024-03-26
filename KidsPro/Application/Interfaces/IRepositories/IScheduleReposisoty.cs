@@ -5,5 +5,5 @@ namespace Application.Interfaces.IRepositories;
 
 public interface IScheduleReposisoty:IBaseRepository<ClassSchedule>
 {
-    
+    Task<List<ClassSchedule>> GetScheduleByClassIdAsync(int classId);
 }
