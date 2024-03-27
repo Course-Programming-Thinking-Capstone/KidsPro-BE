@@ -50,6 +50,11 @@ public class GameService : IGameService
                 {
                     Id = 5,
                     TypeName = "Condition"
+                },
+                new LevelType
+                {
+                    Id = 6,
+                    TypeName = "Custom"
                 }
             };
 
@@ -502,7 +507,7 @@ public class GameService : IGameService
 
     public async Task<List<ModeType>> GetAllGameMode()
     {
-        var result2 = await _unitOfWork.GameLevelRepository
+        var result = await _unitOfWork.GameLevelRepository
             .GetAll()
             .GroupBy(h => h.GameLevelType)
             .Select(group => new ModeType
@@ -513,12 +518,31 @@ public class GameService : IGameService
             })
             .ToListAsync();
 
-        if (result2.Count == 0)
+        var allMode = _unitOfWork.LevelTypeRepository.GetAll();
+
+        foreach (var mode in allMode)
+        {
+            if (result.Any(o => o.IdMode == mode.Id))
+            {
+                continue;
+            }
+            else
+            {
+                result.Add(new ModeType()
+                {
+                    IdMode = mode.Id,
+                    TypeName = mode.TypeName ?? "Null Name",
+                    totalLevel = 0
+                });
+            }
+        }
+
+        if (result.Count == 0)
         {
             var result3 = await _unitOfWork.LevelTypeRepository.GetAll().ToListAsync();
             foreach (var item in result3)
             {
-                result2.Add(new ModeType
+                result.Add(new ModeType
                 {
                     IdMode = item.Id,
                     TypeName = item.TypeName ?? "Null Name",
@@ -527,7 +551,7 @@ public class GameService : IGameService
             }
         }
 
-        return result2;
+        return result;
     }
 
     public async Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId)
