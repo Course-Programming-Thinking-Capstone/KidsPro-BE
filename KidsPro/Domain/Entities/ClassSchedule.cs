@@ -20,4 +20,6 @@ public class ClassSchedule : BaseEntity
 
     public virtual Class Class { get; set; } = null!;
     public int ClassId { get; set; }
+    
+    public ScheduleStatus Status { get; set; } = ScheduleStatus.Active;
 }
