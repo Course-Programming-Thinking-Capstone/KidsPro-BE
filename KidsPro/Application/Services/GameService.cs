@@ -926,7 +926,8 @@ public class GameService : IGameService
     public async Task<List<LevelDataResponse>> GetLevelsByMode(int modeId)
     {
         var query = await _unitOfWork.GameLevelRepository.GetAsync(
-            o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null);
+            o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
+            , includeProperties: $"{nameof(GameLevel.GameLevelType)}");
         if (!query.Any())
         {
             throw new NotFoundException("Not found any level");
@@ -940,6 +941,7 @@ public class GameService : IGameService
             GemReward = gameLevel.GemReward ?? 0,
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
+            GameLevelTypeName = gameLevel.GameLevelType.TypeName,
             LevelDetail = new List<LevelDetail>()
         }).OrderBy(o => o.LevelIndex).ToList();
 
