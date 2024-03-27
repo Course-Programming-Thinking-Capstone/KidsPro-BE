@@ -581,4 +581,21 @@ public class AccountService : IAccountService
         _unitOfWork.AccountRepository.Update(account);
         await _unitOfWork.SaveChangeAsync();
     }
+
+    public async Task<LoginAccountDto> StudentLoginToWeb(StudentLoginRequest dto)
+    {
+        var account = await _unitOfWork.StudentRepository.WebStudentLoginAsync(dto.Account)
+                      ?? throw new BadRequestException("Account doesn't exist");
+            
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.Account.PasswordHash))
+        {
+            throw new UnauthorizedException("Incorrect password.");
+        }
+
+        var result = AccountMapper.EntityToLoginAccountDto(account.Account);
+        result.AccessToken = _authenticationService.CreateAccessToken(account.Account);
+        result.RefreshToken = _authenticationService.CreateRefreshToken(account.Account);
+        return result;
+    }
 }

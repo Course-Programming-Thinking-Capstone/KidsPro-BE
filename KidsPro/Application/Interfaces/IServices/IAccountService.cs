@@ -42,5 +42,6 @@ public interface IAccountService
     Task CheckConfirmation(string input);
     Task SendConfirmation();
     Task UpdateToNotActivatedStatus(string email);
+    Task<LoginAccountDto> StudentLoginToWeb(StudentLoginRequest dto);
 
 }

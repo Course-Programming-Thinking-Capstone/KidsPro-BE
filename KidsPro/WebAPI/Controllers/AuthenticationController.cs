@@ -128,4 +128,27 @@ public class AuthenticationController : ControllerBase
         await _accountService.UpdateToNotActivatedStatus(email);
         return Ok("Update to Not Activated Status successfully");
     }
+    
+    /// <summary>
+    /// Student Login To Web By Account & Password
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("login/email")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginAccountDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<LoginAccountDto>> StudentLoginToWebAsync(StudentLoginRequest request)
+    {
+        var result = await _accountService.StudentLoginToWeb(request);
+        // if (result.Status == UserStatus.NotActivated.ToString())
+        //     return BadRequest(new
+        //     {
+        //         AccountStatus=result.Status,
+        //         Token=result.AccessToken,
+        //         Meesage="The Account has not been activated, " +
+        //                 "please click on the link sent in the email to activate the account"
+        //     });
+        return Ok(result);
+    }
 }

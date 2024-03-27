@@ -49,7 +49,7 @@ namespace Application.Services
                 Quantity = dto.Quantity,
                 TotalPrice = (course.Price * dto.Quantity) - (voucher?.DiscountAmount ?? 0),
                 Date = DateTime.UtcNow,
-                Status = OrderStatus.Payment,
+                Status = OrderStatus.Process,
                 OrderCode = getOrderCode,
                 Note = "course: " + course.Name
             };
@@ -95,7 +95,7 @@ namespace Application.Services
             {
                 switch (currentStatus)
                 {
-                    case OrderStatus.Payment:
+                    case OrderStatus.Process:
                         order.Status = toStatus;
                         break;
                     case OrderStatus.Pending:
