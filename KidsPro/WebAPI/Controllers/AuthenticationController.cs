@@ -134,7 +134,7 @@ public class AuthenticationController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("login/email")]
+    [HttpPost("login/account")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginAccountDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
