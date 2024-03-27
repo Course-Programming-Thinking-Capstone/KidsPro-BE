@@ -50,4 +50,10 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
             .Include(x=> x.Parent).ThenInclude(x=> x.Account)
             .FirstOrDefaultAsync();
     }
+    
+    public async Task<Student?> WebStudentLoginAsync(string account)
+    {
+        return await _dbSet.Include(x => x.Account)
+            .FirstOrDefaultAsync(x => x.UserName == account);
+    }
 }

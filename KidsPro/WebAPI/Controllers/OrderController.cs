@@ -25,7 +25,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Create order
         /// </summary>
-        /// <param name="dto">Payment Type: 1.ZaloPay, 2.Momo</param>
+        /// <param name="dto">Process Type: 1.ZaloPay, 2.Momo</param>
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]

@@ -31,7 +31,7 @@ public class PaymentService : IPaymentService
         var account = await _accountService.GetCurrentAccountInformationAsync();
         
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
-            OrderStatus.Payment);
+            OrderStatus.Process);
         if (order != null)
             return order;
         throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
@@ -84,7 +84,7 @@ public class PaymentService : IPaymentService
         var orderId = GetIdMomoResponse(dto.orderId);
         var parentId = GetIdMomoResponse(dto.requestId);
 
-        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Payment, OrderStatus.Pending);
+        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Process, OrderStatus.Pending);
         var transaction = new Transaction()
         {
             OrderId = orderId,
