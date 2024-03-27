@@ -22,7 +22,7 @@ public static class ClassMapper
             TotalSlot = dto.TotalSlot
         };
 
-    public static ScheduleCreateResponse ScheduleToScheuldeCreateResponse(ClassSchedule dto, List<int> dayList)
+    public static ScheduleCreateResponse ScheduleToScheuldeCreateResponse(ClassSchedule dto, List<DayStatus> dayList)
         => new ScheduleCreateResponse()
         {
             ClassId = dto.ClassId,
@@ -86,7 +86,8 @@ public static class ClassMapper
         SlotNumber = dto.Schedules?.First().Slot ?? 0,
         StartSlot = dto.Schedules?.First().StartTime ?? TimeSpan.Zero,
         EndSlot = dto.Schedules?.First().EndTime ?? TimeSpan.Zero,
-        StudyDay = dto.Schedules?.Select(x => x.StudyDay) ?? new List<DayStatus>(),
+        StudyDay = dto.Schedules?.Where(x=> x.Status==ScheduleStatus.Active)
+            .Select(x => x.StudyDay) ?? new List<DayStatus>(),
         Students = dto.Students.Select(x => new StudentClassResponse
         {
             Image = x.Account.PictureUrl,
@@ -100,11 +101,12 @@ public static class ClassMapper
     public static ScheduleResponse ScheduleToScheduleResponse(List<ClassSchedule> dto)
         => new ScheduleResponse()
         {
+            ClassId = dto.First().ClassId,
             SlotTime = dto.First().Class.Course.Syllabus?.SlotTime,
             StartSlot = dto.First().StartTime,
             EndSlot = dto.First().EndTime,
             SlotNumber = dto.First().Slot,
             RoomUrl = dto.First().RoomUrl,
-            StudyDay = dto.Select(x => x.StudyDay)
+            StudyDay = dto.Select(x => x.StudyDay),
         };
 }

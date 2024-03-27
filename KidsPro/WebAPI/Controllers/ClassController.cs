@@ -133,4 +133,22 @@ public class ClassController : ControllerBase
         var result = await _class.GetScheduleByClassIdAsync(classId);
         return Ok(result);
     }
+    
+    
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [HttpPut("schedules")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<ClassResponse>> UpdateScheduleAsync(ScheduleUpdateRequest dto)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        await _class.UpdateScheduleAsync(dto);
+        return Ok(new
+        {
+            Message="Update Schedules Successfully"
+        } );
+    }
 }
