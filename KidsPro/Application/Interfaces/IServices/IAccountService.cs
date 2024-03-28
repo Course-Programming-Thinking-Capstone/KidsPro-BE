@@ -21,7 +21,7 @@ public interface IAccountService
     Task ChangePasswordAsync(ChangePasswordDto dto);
     Task<string> UpdatePictureAsync(IFormFile file);
 
-    Task<StudentGameLoginDto> StudentGameLoginAsync(EmailCredential dto);
+    Task<StudentGameLoginDto> StudentGameLoginAsync(StudentLoginRequest dto);
 
     Task<AccountDto> GetCurrentAccountInformationAsync();
 

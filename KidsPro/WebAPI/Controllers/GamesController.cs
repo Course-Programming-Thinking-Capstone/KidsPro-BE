@@ -43,7 +43,7 @@ public class GamesController : ControllerBase
     [HttpPost("authentication/login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGameLoginDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody] EmailCredential request)
+    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody]StudentLoginRequest  request)
     {
         var result = await _accountService.StudentGameLoginAsync(request);
         return Ok(result);

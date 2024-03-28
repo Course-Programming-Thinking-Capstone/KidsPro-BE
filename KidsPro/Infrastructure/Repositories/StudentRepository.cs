@@ -14,12 +14,12 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
     {
     }
 
-    public async Task<Student?> GameStudentLoginAsync(string email)
+    public async Task<Student?> GameStudentLoginAsync(string account)
     {
         return await _dbSet.Include(s => s.Account)
             .ThenInclude(a => a.Role)
             .Include(s => s.GameUserProfile)
-            .FirstOrDefaultAsync(s => s.Account.Email == email);
+            .FirstOrDefaultAsync(x => x.UserName == account);
     }
 
     public async Task<List<Student>> GetStudents(int parentId,string role)

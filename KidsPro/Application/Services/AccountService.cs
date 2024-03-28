@@ -176,9 +176,9 @@ public class AccountService : IAccountService
         return account.PictureUrl;
     }
 
-    public async Task<StudentGameLoginDto> StudentGameLoginAsync(EmailCredential dto)
+    public async Task<StudentGameLoginDto> StudentGameLoginAsync(StudentLoginRequest dto)
     {
-        var student = await _unitOfWork.StudentRepository.GameStudentLoginAsync(dto.Email)
+        var student = await _unitOfWork.StudentRepository.GameStudentLoginAsync(dto.Account)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find student account."));
 
         var account = student.Account;
