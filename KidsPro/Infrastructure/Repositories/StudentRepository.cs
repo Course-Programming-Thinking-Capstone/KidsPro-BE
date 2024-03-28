@@ -53,7 +53,7 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
     
     public async Task<Student?> WebStudentLoginAsync(string account)
     {
-        return await _dbSet.Include(x => x.Account)
+        return await _dbSet.Include(x => x.Account).ThenInclude(x=> x.Role)
             .FirstOrDefaultAsync(x => x.UserName == account);
     }
 }
