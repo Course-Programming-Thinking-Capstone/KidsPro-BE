@@ -79,7 +79,7 @@ public class PaymentService : IPaymentService
         if (macth.Success) return Int32.Parse(macth.Groups[1].Value);
         return 0;
     }
-    public async Task CreateTransactionAsync(MomoResultRequest dto)
+    public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
     {
         var orderId = GetIdMomoResponse(dto.orderId);
         var parentId = GetIdMomoResponse(dto.requestId);
@@ -96,5 +96,6 @@ public class PaymentService : IPaymentService
         await _unitOfWork.TransactionRepository.AddAsync(transaction);
         var result = await _unitOfWork.SaveChangeAsync();
         if (result < 0) throw new NotImplementException("Add transaction failed");
+        return orderId;
     }
 }

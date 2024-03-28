@@ -68,8 +68,8 @@ namespace WebAPI.Controllers
         [Route("momo-return")]
         public async Task<IActionResult> MomoReturnAsync([FromQuery] MomoResultRequest dto)
         {
-            await _payment.CreateTransactionAsync(dto);
-            return Redirect($"https://capstone-one-rose.vercel.app/payment-success/{dto.orderId}");
+            var orderId=await _payment.CreateTransactionAsync(dto);
+            return Redirect($"https://capstone-one-rose.vercel.app/payment-success/{orderId}");
         }
     }
 }
