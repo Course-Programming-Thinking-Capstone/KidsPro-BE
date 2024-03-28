@@ -6,5 +6,6 @@ public enum OrderStatus
     Pending = 1,
     Success = 2,
     RequestRefund=3,
-    Refunded = 4
+    Refunded = 4,
+    AllStatus=5,
 }
