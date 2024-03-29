@@ -501,7 +501,7 @@ public class AccountService : IAccountService
 
     private string GenerateConfirmationCode(string name, string? role, string password)
     {
-        var salt = StringUtils.GenerateRandomString(8);
+        var salt = StringUtils.GenerateRandomNumber(8);
 
         var rawConfirm = $"Name={name}Role={role}Password={password}{salt}";
 

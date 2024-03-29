@@ -32,9 +32,9 @@ public class StringUtils
         return formattedName.ToString();
     }
     
-    public static string GenerateRandomString(int length)
+    public static string GenerateRandomNumber(int length)
     {
-        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        const string chars = "0123456789";
         Random random = new Random();
         StringBuilder stringBuilder = new StringBuilder(length);
 

@@ -40,8 +40,8 @@ namespace WebAPI.Controllers
             if (order == null) return BadRequest($"OrderID:{id} doesn't not exist");
             
             // Lấy thông tin cho payment
-            momoRequest.requestId = StringUtils.GenerateRandomString(4) + "-" + order.ParentId;
-            momoRequest.orderId = StringUtils.GenerateRandomString(4) + "-" + order.Id;
+            momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + order.ParentId;
+            momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + order.Id;
             momoRequest.amount = (long)order.TotalPrice;
             momoRequest.redirectUrl = _momoConfig.ReturnUrl;
             momoRequest.ipnUrl = _momoConfig.IpnUrl;

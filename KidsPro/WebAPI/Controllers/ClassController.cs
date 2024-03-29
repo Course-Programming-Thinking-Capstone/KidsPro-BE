@@ -3,6 +3,7 @@ using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -93,7 +94,11 @@ public class ClassController : ControllerBase
         _authentication.CheckAccountStatus();
 
         var result = await _class.AddTeacherToClassAsync(teacherId,classId);
-        return Ok(result);
+        return Ok(new
+        {
+            Message=Ok(),
+            TeacherName= result
+        });
     }
     
     /// <summary>
@@ -134,7 +139,11 @@ public class ClassController : ControllerBase
         return Ok(result);
     }
     
-    
+    /// <summary>
+    /// Update schedule
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
     [HttpPut("schedules")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -151,4 +160,5 @@ public class ClassController : ControllerBase
             Message="Update Schedules Successfully"
         } );
     }
+    
 }

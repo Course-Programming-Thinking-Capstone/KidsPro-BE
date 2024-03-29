@@ -45,14 +45,14 @@ public static class ClassMapper
                 TeacherName = dto.Account.FullName,
             };
             //Nêú teacher có class, sẽ add schedule vào
-            if (dto.Classes != null)
+            if (dto.Classes!.Count > 0)
             {
                 foreach (var c in dto.Classes)
                 {
-                    var x = new TeacherCouse()
+                    var x = new TeacherClass()
                     {
-                        CourseId = c.CourseId,
-                        CourseName = c.Course.Name,
+                        ClassId = c.Id,
+                        ClassName = c.Code,
                         Open = c.Schedules!.First().StartTime,
                         Close = c.Schedules!.First().EndTime,
                         Slot = c.Schedules!.First().Slot,
@@ -75,7 +75,7 @@ public static class ClassMapper
         CourseName = dto.Course.Name,
         TeacherId = dto.Teacher?.Id,
         TeacherName = dto.Teacher?.Account.FullName,
-                      //?? "The class doesn't have a teacher yet",
+        //?? "The class doesn't have a teacher yet",
         OpenClass = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
         CloseClass = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
         Duration = dto.Duration,
@@ -86,7 +86,7 @@ public static class ClassMapper
         SlotNumber = dto.Schedules?.First().Slot ?? 0,
         StartSlot = dto.Schedules?.First().StartTime ?? TimeSpan.Zero,
         EndSlot = dto.Schedules?.First().EndTime ?? TimeSpan.Zero,
-        StudyDay = dto.Schedules?.Where(x=> x.Status==ScheduleStatus.Active)
+        StudyDay = dto.Schedules?.Where(x => x.Status == ScheduleStatus.Active)
             .Select(x => x.StudyDay) ?? new List<DayStatus>(),
         Students = dto.Students.Select(x => new StudentClassResponse
         {

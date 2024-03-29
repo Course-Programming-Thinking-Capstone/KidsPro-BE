@@ -13,17 +13,26 @@ public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
     {
     }
 
-    #nullable disable
-    public async Task<List<Teacher>> GetTeacherToClass()
+#nullable disable
+    public async Task<List<Teacher>> GetTeacherSchedules()
     {
         IQueryable<Teacher> query = _dbSet.AsNoTracking();
 
-        return await query.Include(x=> x.Account)
+        return await query.Include(x => x.Account)
             .Include(x => x.Classes).ThenInclude(x => x.Schedules)
             .Include(x => x.Classes).ThenInclude(x => x.Course)
             .ToListAsync();
     }
-    #nullable restore
+
+    public async Task<Teacher> GetTeacherSchedulesById(int teacherId)
+    {
+        IQueryable<Teacher> query = _dbSet.AsNoTracking();
+
+        return await query.Include(x => x.Account)
+            .Include(x => x.Classes).ThenInclude(x => x.Schedules)
+            .FirstOrDefaultAsync(x => x.Id == teacherId);
+    }
+#nullable restore
 
     public override Task<Teacher?> GetByIdAsync(int id, bool disableTracking = false)
     {

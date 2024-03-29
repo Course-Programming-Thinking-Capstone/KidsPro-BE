@@ -90,19 +90,29 @@ public class ClassService : IClassService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
+        var teacher = await _unitOfWork.TeacherRepository.GetTeacherSchedulesById(teacherId)
+                      ?? throw new NotFoundException($"TeacherId: {teacherId} doesn't exist");
+
+
+        bool hasOverlap = entityClass.Schedules!
+            .Any(c => teacher.Classes!
+                .Any(t => t.Schedules!
+                    .Any(s => s.Slot == c.Slot && s.StudyDay == c.StudyDay)));
+
+        if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
+
         entityClass.TeacherId = teacherId;
 
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();
 
-        var teacher = await _unitOfWork.TeacherRepository.GetByIdAsync(teacherId);
-        return teacher?.Account.FullName ?? "";
+        return teacher.Account.FullName ?? "";
     }
 
     public async Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync()
     {
         await CheckPermission();
-        var teachers = await _unitOfWork.TeacherRepository.GetTeacherToClass();
+        var teachers = await _unitOfWork.TeacherRepository.GetTeacherSchedules();
         return ClassMapper.TeacherToTeacherScheduleResponse(teachers);
     }
 
@@ -120,7 +130,7 @@ public class ClassService : IClassService
     {
         await CheckPermission();
 
-        var schedule = await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(classId,ScheduleStatus.Active);
+        var schedule = await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(classId, ScheduleStatus.Active);
 
         return schedule.Any()
             ? ClassMapper.ScheduleToScheduleResponse(schedule)
@@ -131,7 +141,8 @@ public class ClassService : IClassService
     {
         await CheckPermission();
 
-        var schedules = await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(dto.ClassId,ScheduleStatus.AllStatus);
+        var schedules =
+            await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(dto.ClassId, ScheduleStatus.AllStatus);
 
         if (schedules.Any())
         {

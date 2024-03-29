@@ -32,7 +32,7 @@ namespace Application.Services
             do
             {
                 var checkOrderCode =
-                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomString, false);
+                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomNumber, false);
                 getOrderCode = checkOrderCode.Item1 != null ? null : checkOrderCode.Item2;
                 course = await _unitOfWork.CourseRepository.CheckCourseExist(dto.CourseId);
                 if (course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
