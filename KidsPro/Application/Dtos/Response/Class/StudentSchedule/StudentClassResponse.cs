@@ -6,6 +6,6 @@ public class StudentClassResponse
 {
     public string? Image { get; set; }
     public string? StudentName { get; set; }
-    public int Age { get; set; }
+    public string? DateOfBirth { get; set; }
     public Gender? Gender { get; set; }
 }

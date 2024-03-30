@@ -21,9 +21,9 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
 
     public override Task<Class?> GetByIdAsync(int id, bool disableTracking = false)
     {
-        IQueryable<Class> query = _dbSet.AsNoTracking();
+        IQueryable<Class> query = _dbSet;
         return query.Include(x => x.Schedules)
-            .Include(x => x.Teacher).ThenInclude(x => x.Account)
+            .Include(x => x.Teacher).ThenInclude(x => x!.Account)
             .Include(x => x.Course).ThenInclude(x=> x.Syllabus)
             .Include(x => x.Students).FirstOrDefaultAsync(x => x.Id == id);
     }

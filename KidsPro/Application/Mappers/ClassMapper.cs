@@ -92,7 +92,7 @@ public static class ClassMapper
         {
             Image = x.Account.PictureUrl,
             StudentName = x.Account.FullName,
-            Age = Math.Max(0, DateTime.Now.Year - (x.Account.DateOfBirth?.Year ?? 0)),
+            DateOfBirth =DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
             Gender = x.Account.Gender
         }).ToList(),
         TotalStudent = dto.Students.Count()
@@ -109,4 +109,16 @@ public static class ClassMapper
             RoomUrl = dto.First().RoomUrl,
             StudyDay = dto.Select(x => x.StudyDay),
         };
+
+    public static List<StudentClassResponse> StudentToStudentClassResponse(List<Student> dto)
+    {
+        return dto.Select(student => new StudentClassResponse
+        {
+            Image = student.Account.PictureUrl,
+            StudentName = student.Account.FullName,
+            DateOfBirth = DateUtils.FormatDateTimeToDateV1(student.Account.DateOfBirth),
+            Gender = student.Account.Gender
+        }).ToList();
+    }
+        
 }

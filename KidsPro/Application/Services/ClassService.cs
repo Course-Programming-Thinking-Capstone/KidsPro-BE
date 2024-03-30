@@ -2,6 +2,8 @@
 using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -33,6 +35,8 @@ public class ClassService : IClassService
         return account;
     }
 
+    #region Class
+
     public async Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto)
     {
         var account = await CheckPermission();
@@ -61,6 +65,20 @@ public class ClassService : IClassService
         return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name, course.Syllabus?.SlotTime ?? 0);
     }
 
+    public async Task<ClassResponse> GetClassByIdAsync(int classId)
+    {
+        await CheckPermission();
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
+
+        return entityClass != null
+            ? ClassMapper.ClassToClassResponse(entityClass)
+            : throw new BadRequestException($"ClassId: {classId} doesn't exist");
+    }
+
+    #endregion
+
+    #region Schdule
+
     public async Task<ScheduleCreateResponse> CreateScheduleAsync(ScheduleCreateRequest dto)
     {
         await CheckPermission();
@@ -81,49 +99,6 @@ public class ClassService : IClassService
         await _unitOfWork.SaveChangeAsync();
 
         return ClassMapper.ScheduleToScheuldeCreateResponse(schedule.First(), dto.Days);
-    }
-
-    public async Task<string> AddTeacherToClassAsync(int teacherId, int classId)
-    {
-        await CheckPermission();
-
-        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
-                          ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
-
-        var teacher = await _unitOfWork.TeacherRepository.GetTeacherSchedulesById(teacherId)
-                      ?? throw new NotFoundException($"TeacherId: {teacherId} doesn't exist");
-
-
-        bool hasOverlap = entityClass.Schedules!
-            .Any(c => teacher.Classes!
-                .Any(t => t.Schedules!
-                    .Any(s => s.Slot == c.Slot && s.StudyDay == c.StudyDay)));
-
-        if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
-
-        entityClass.TeacherId = teacherId;
-
-        _unitOfWork.ClassRepository.Update(entityClass);
-        await _unitOfWork.SaveChangeAsync();
-
-        return teacher.Account.FullName ?? "";
-    }
-
-    public async Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync()
-    {
-        await CheckPermission();
-        var teachers = await _unitOfWork.TeacherRepository.GetTeacherSchedules();
-        return ClassMapper.TeacherToTeacherScheduleResponse(teachers);
-    }
-
-    public async Task<ClassResponse> GetClassByIdAsync(int classId)
-    {
-        await CheckPermission();
-        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
-
-        return entityClass != null
-            ? ClassMapper.ClassToClassResponse(entityClass)
-            : throw new BadRequestException($"ClassId: {classId} doesn't exist");
     }
 
     public async Task<ScheduleResponse> GetScheduleByClassIdAsync(int classId)
@@ -193,4 +168,116 @@ public class ClassService : IClassService
             }
         }
     }
+
+    #endregion
+
+    #region Teacher
+
+    public async Task<string> AddTeacherToClassAsync(int teacherId, int classId)
+    {
+        await CheckPermission();
+
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
+                          ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
+
+        var teacher = await _unitOfWork.TeacherRepository.GetTeacherSchedulesById(teacherId)
+                      ?? throw new NotFoundException($"TeacherId: {teacherId} doesn't exist");
+
+
+        bool hasOverlap = entityClass.Schedules!
+            .Any(c => teacher.Classes!
+                .Any(t => t.Schedules!
+                    .Any(s => s.Slot == c.Slot && s.StudyDay == c.StudyDay)));
+
+        if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
+
+        entityClass.TeacherId = teacherId;
+
+        _unitOfWork.ClassRepository.Update(entityClass);
+        await _unitOfWork.SaveChangeAsync();
+
+        return teacher.Account.FullName;
+    }
+
+    public async Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync()
+    {
+        await CheckPermission();
+        var teachers = await _unitOfWork.TeacherRepository.GetTeacherSchedules();
+        return ClassMapper.TeacherToTeacherScheduleResponse(teachers);
+    }
+
+    #endregion
+
+    #region Student
+
+    public async Task<List<StudentClassResponse>> SearchStudentScheduleAsync(string input, int classId)
+    {
+        await CheckPermission();
+
+        var students = await _unitOfWork.StudentRepository.SearchStudent(input, SearchType.ClassStudent);
+
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
+                          ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
+
+        var studentsResponse = new List<Student>();
+
+        foreach (var std in students)
+        {
+            //nếu k có class nào thì break lun
+            if (!std.Classes.Any()) break;
+
+            var hasOverlap = entityClass.Schedules!
+                .Any(entitySchedule => std.Classes.Any(studentClass => studentClass.Schedules!
+                    .Any(studentSchedule => studentSchedule.StudyDay == entitySchedule.StudyDay
+                                            && studentSchedule.Slot == entitySchedule.Slot)));
+
+            //nếu student trùng schedule thì k cần show ra
+            if (hasOverlap) break;
+
+            studentsResponse.Add(std);
+        }
+
+        return ClassMapper.StudentToStudentClassResponse(studentsResponse);
+    }
+
+    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto, ClassStudentType type)
+    {
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
+                          ?? throw new NotFoundException($"ClassId: {dto.ClassId} doesn't exist");
+
+        var students = await _unitOfWork.StudentRepository.GetStudentsByIds(dto.StudentIds);
+
+        if (students.Count < dto.StudentIds.Count)
+            throw new BadRequestException("StudentId doesn't exist");
+
+        // lấy những StudentId mà class có, list truyền vào không có để removed
+        var removeStudents = entityClass.Students.
+            Where(e => students.All(s => s.Id != e.Id)).ToList();
+            //entityClass.Students.Except(students).ToList();
+        //entityClass.Students.Select(x => x.Id).Except(dto.StudentIds).ToList();
+
+        switch (type)
+        {
+            case ClassStudentType.AddToClass:
+
+                if (entityClass.Students.Count == 0)
+                    entityClass.Students = new List<Student>();
+
+                foreach (var x in students)
+                    entityClass.Students.Add(x);
+                break;
+
+            case ClassStudentType.RemoveFromClass:
+                foreach (var x in removeStudents)
+                    entityClass.Students.Remove(x);
+                break;
+        }
+
+        _unitOfWork.ClassRepository.Update(entityClass);
+        await _unitOfWork.SaveChangeAsync();
+
+        return ClassMapper.StudentToStudentClassResponse(entityClass.Students.ToList());
+    }
+
+    #endregion
 }

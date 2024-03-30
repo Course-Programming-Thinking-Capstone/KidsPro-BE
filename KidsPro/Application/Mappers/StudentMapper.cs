@@ -20,6 +20,7 @@ public static class StudentMapper
             student.Gender = x.Account.Gender?.ToString();
             student.ParentId = x.ParentId;
             student.ParentName = x.Parent.Account.FullName;
+            student.DateOfBirth =DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth);
             list.Add(student);
         }
 
