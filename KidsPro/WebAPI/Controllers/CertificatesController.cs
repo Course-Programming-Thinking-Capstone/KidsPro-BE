@@ -12,10 +12,11 @@ namespace WebAPI.Controllers
     public class CertificatesController : ControllerBase
     {
         ICertificateService _service;
-
-        public CertificatesController(ICertificateService service)
+        private IAuthenticationService _authentication;
+        public CertificatesController(ICertificateService service, IAuthenticationService authentication)
         {
             _service = service;
+            _authentication = authentication;
         }
 
         /// <summary>
@@ -28,6 +29,9 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
         public async Task<IActionResult> AddCertificateAsync(CertificatesRequest dto)
         {
+            //Check if the account is activated or not or inactive
+            _authentication.CheckAccountStatus();
+            
             await _service.AddCertificateAsync(dto);
             return Ok();
         }

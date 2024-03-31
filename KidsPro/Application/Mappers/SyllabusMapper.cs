@@ -18,7 +18,8 @@ public static class SyllabusMapper
             SlotTime = entity.SlotTime,
             TeacherId = entity.Course.ModifiedById,
             MinQuizScoreRatio = entity.PassCondition?.PassRatio,
-            Sections = entity.Course.Sections.Select(SectionToSectionDto).ToList()
+            Sections = entity.Course.Sections.Select(SectionToSectionDto).ToList(),
+            CourseId = entity.Course.Id
         };
 
     public static SyllabusSectionDto SectionToSectionDto(Section entity)

@@ -3,6 +3,7 @@ using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.Account;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -97,7 +98,7 @@ public class AuthenticationController : ControllerBase
     /// <param name="code"></param>
     /// <returns></returns>
     //[Authorize(Roles = $"{Constant.ParentRole},{Constant.StudentRole},{Constant.StaffRole},{Constant.TeacherRole},")]
-    [HttpPatch("confirm/check/{code}")]
+    [HttpGet("confirm/check/{code}")]
     public async Task<IActionResult> CheckConfirmation(string code)
     {
         await _accountService.CheckConfirmation(code);
@@ -114,5 +115,40 @@ public class AuthenticationController : ControllerBase
     {
         await _accountService.SendConfirmation();
         return Ok("Sent confirmation code successful");
+    }
+
+    /// <summary>
+    /// Update status account to not activated status
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    [HttpPatch("account/status/{email}")]
+    public async Task<ActionResult<Account>> UpdateToNotActivatedStatusAsync(string email)
+    {
+        await _accountService.UpdateToNotActivatedStatus(email);
+        return Ok("Update to Not Activated Status successfully");
+    }
+    
+    /// <summary>
+    /// Student Login To Web By Account & Password
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("login/account")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginAccountDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<LoginAccountDto>> StudentLoginToWebAsync(StudentLoginRequest request)
+    {
+        var result = await _accountService.StudentLoginToWeb(request);
+        // if (result.Status == UserStatus.NotActivated.ToString())
+        //     return BadRequest(new
+        //     {
+        //         AccountStatus=result.Status,
+        //         Token=result.AccessToken,
+        //         Meesage="The Account has not been activated, " +
+        //                 "please click on the link sent in the email to activate the account"
+        //     });
+        return Ok(result);
     }
 }

@@ -47,11 +47,11 @@ namespace Application.Mappers
                 OrderCode = order.OrderCode,
                 PaymentType = order.PaymentType.ToString(),
                 TransactionCode = order.Transaction?.TransactionCode,
-                ParentEmail = order.Parent!.PhoneNumber,
-                ParentZalo = order.Parent!.Account.Email,
+                ParentEmail = order.Parent!.Account.Email,
+                ParentZalo = order.Parent!.PhoneNumber,
                 TotalPrice = order.TotalPrice,
                 Discount = order.Voucher?.DiscountAmount,
-                NumberChildren = order.OrderDetails!.FirstOrDefault()!.Students!.Count,
+                NumberChildren = order.OrderDetails!.FirstOrDefault()!.Students.Count,
                 ParentName = order.Parent!.Account.FullName,
                 ParentId = order.Parent!.Account.Id
             };

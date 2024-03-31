@@ -63,12 +63,12 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<TeacherProfile>()
             .HasOne<Teacher>(s => s.Teacher)
-            .WithMany()
+            .WithMany(t => t.TeacherProfiles)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Class>()
             .HasOne<Teacher>(s => s.Teacher)
-            .WithMany()
+            .WithMany(t => t.Classes)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<StudentMiniGame>()
@@ -83,7 +83,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<StudentQuiz>()
             .HasOne<Student>(s => s.Student)
-            .WithMany()
+            .WithMany(s => s.StudentQuizzes)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Course>()
@@ -104,6 +104,26 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Student>()
             .HasMany(s => s.OrderDetails)
             .WithMany(o => o.Students);
+
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.Classes)
+            .WithMany(c => c.Students)
+            .UsingEntity<StudentClass>(
+                r => r.HasOne(x => x.Class).WithMany().HasForeignKey(x => x.ClassId)
+                    .OnDelete(DeleteBehavior.Restrict),
+                l => l.HasOne(x => x.Student).WithMany().HasForeignKey(x => x.StudentId)
+                    .OnDelete(DeleteBehavior.Restrict)
+            );
+
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.OrderDetails)
+            .WithMany(o => o.Students)
+            .UsingEntity<OrderDetailStudent>(
+                r => r.HasOne(x => x.OrderDetail).WithMany().HasForeignKey(x => x.OrderDetailId)
+                    .OnDelete(DeleteBehavior.Restrict),
+                l => l.HasOne(x => x.Student).WithMany().HasForeignKey(x => x.StudentId)
+                    .OnDelete(DeleteBehavior.Restrict)
+            );
 
         //data seeding
         modelBuilder.Entity<Role>().HasData(

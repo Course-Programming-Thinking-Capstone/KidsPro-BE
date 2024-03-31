@@ -31,7 +31,7 @@ public class PaymentService : IPaymentService
         var account = await _accountService.GetCurrentAccountInformationAsync();
         
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
-            OrderStatus.Payment);
+            OrderStatus.Process);
         if (order != null)
             return order;
         throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
@@ -79,12 +79,12 @@ public class PaymentService : IPaymentService
         if (macth.Success) return Int32.Parse(macth.Groups[1].Value);
         return 0;
     }
-    public async Task CreateTransactionAsync(MomoResultRequest dto)
+    public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
     {
         var orderId = GetIdMomoResponse(dto.orderId);
         var parentId = GetIdMomoResponse(dto.requestId);
 
-        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Payment, OrderStatus.Pending);
+        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Process, OrderStatus.Pending);
         var transaction = new Transaction()
         {
             OrderId = orderId,
@@ -96,5 +96,6 @@ public class PaymentService : IPaymentService
         await _unitOfWork.TransactionRepository.AddAsync(transaction);
         var result = await _unitOfWork.SaveChangeAsync();
         if (result < 0) throw new NotImplementException("Add transaction failed");
+        return orderId;
     }
 }

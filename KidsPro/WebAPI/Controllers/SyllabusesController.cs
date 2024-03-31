@@ -45,7 +45,6 @@ public class SyllabusesController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Roles = $"{Constant.AdminRole}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<FilterSyllabusDto>))]
     public async Task<ActionResult<PagingResponse<FilterSyllabusDto>>> FilterSyllabusAsync(
         [FromQuery] string? name,

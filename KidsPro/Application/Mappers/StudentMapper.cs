@@ -16,11 +16,11 @@ public static class StudentMapper
             var student = new StudentResponse();
             student.Id = x.Id;
             student.FullName = x.Account.FullName;
-            student.Age = DateTime.Now.Year -
-                          (x.Account.DateOfBirth != null ? x.Account.DateOfBirth.Value.Year : 0);
+            student.Age = Math.Max(0, DateTime.Now.Year - (x.Account.DateOfBirth?.Year ?? 0));
             student.Gender = x.Account.Gender?.ToString();
             student.ParentId = x.ParentId;
             student.ParentName = x.Parent.Account.FullName;
+            student.DateOfBirth =DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth);
             list.Add(student);
         }
 
@@ -41,8 +41,7 @@ public static class StudentMapper
             Status = entity.Account.Status.ToString(),
             CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.Account.CreatedDate),
             Role = entity.Account.Role.Name,
-            Age = DateTime.Now.Year -
-                  (entity.Account.DateOfBirth != null ? entity.Account.DateOfBirth.Value.Year : 0),
+            Age = Math.Max(0, DateTime.Now.Year - (entity.Account.DateOfBirth?.Year ?? 0)),
             ParentId = entity.ParentId,
             ParentName = entity.Parent.Account.FullName
         };

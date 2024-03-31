@@ -11,6 +11,5 @@ public class StudentCreateAccountRequest
     [Required]
     public string? Password { get; set; }
     [Required]
-    [EmailAddress]
-    public string? ParentEmail { get; set; }
+    public int OrderId { get; set; }
 }

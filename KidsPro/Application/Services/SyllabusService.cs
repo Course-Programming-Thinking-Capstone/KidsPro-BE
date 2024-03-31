@@ -144,7 +144,7 @@ public class SyllabusService : ISyllabusService
     {
         return await _unitOfWork.SyllabusRepository.GetByIdAsync(id, disableTracking: true)
             .ContinueWith(t => t.Result == null
-                ? new SyllabusDetailDto()
+                ? throw new NotFoundException($"Syllabus {id} not found.")
                 : SyllabusMapper.SyllabusToSyllabusDetailDto(t.Result));
     }
 

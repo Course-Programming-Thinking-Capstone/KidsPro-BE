@@ -12,13 +12,13 @@ namespace Application.Services
     public class OrderService : IOrderService
     {
         readonly IUnitOfWork _unitOfWork;
-        private IAccountService _accountService;
+        private IAccountService _account;
         private INotificationService _notify;
 
-        public OrderService(IUnitOfWork unitOfWork, IAccountService accountService, INotificationService notify)
+        public OrderService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify)
         {
             _unitOfWork = unitOfWork;
-            _accountService = accountService;
+            _account = account;
             _notify = notify;
         }
 
@@ -32,13 +32,13 @@ namespace Application.Services
             do
             {
                 var checkOrderCode =
-                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomString, false);
+                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomNumber, false);
                 getOrderCode = checkOrderCode.Item1 != null ? null : checkOrderCode.Item2;
                 course = await _unitOfWork.CourseRepository.CheckCourseExist(dto.CourseId);
                 if (course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
             } while (getOrderCode == null);
 
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
 
             //Create Order
             var order = new Order()
@@ -49,7 +49,7 @@ namespace Application.Services
                 Quantity = dto.Quantity,
                 TotalPrice = (course.Price * dto.Quantity) - (voucher?.DiscountAmount ?? 0),
                 Date = DateTime.UtcNow,
-                Status = OrderStatus.Payment,
+                Status = OrderStatus.Process,
                 OrderCode = getOrderCode,
                 Note = "course: " + course.Name
             };
@@ -95,7 +95,7 @@ namespace Application.Services
             {
                 switch (currentStatus)
                 {
-                    case OrderStatus.Payment:
+                    case OrderStatus.Process:
                         order.Status = toStatus;
                         break;
                     case OrderStatus.Pending:
@@ -119,14 +119,14 @@ namespace Application.Services
 
         public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
         {
-            var account = await _accountService.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole,account.Role);
+            var account = await _account.GetCurrentAccountInformationAsync();
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.ShowOrder(orders!);
         }
 
         public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
         {
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
             var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
             if (order != null)
                 return OrderMapper.ShowOrderDetail(order);
@@ -135,21 +135,37 @@ namespace Application.Services
 
         public async Task CanCelOrderAsync(OrderCancelRequest dto)
         {
-            var account = await _accountService.GetCurrentAccountInformationAsync();
+            var account = await _account.GetCurrentAccountInformationAsync();
             await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
                 OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
         }
-        
-        public async Task ApproveOrderCancellationAsync(int orderId, int parentId)
+
+        public async Task HandleRefundRequest(OrderRefundRequest dto, ModerationStatus status)
         {
-            await UpdateOrderStatusAsync(orderId, parentId,
-                OrderStatus.RequestRefund, OrderStatus.Refunded);
-            // Gửi thông báo chấp nhận hủy đơn cho parent
-            var title = "The result of processing order cancellation request";
-            var content = "Order cancellation request accepted, " +
-                          "KidsPro will refund the money to the e-Wallet after 3-5 days";
-            await _notify.SendNotifyToAccountAsync(parentId, title, content);
+            string title = "";
+            string content = "";
+            switch (status)
+            {
+                case ModerationStatus.Approve:
+                    await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,
+                        OrderStatus.RequestRefund, OrderStatus.Refunded);
+                    // Send a notice of acceptance of order cancellation to parent
+                    title = "The result of processing order cancellation request";
+                    content = "Order cancellation request accepted, " +
+                              "KidsPro will refund the money to the e-Wallet after 3-5 days";
+                    break;
+                case ModerationStatus.Refuse:
+                    await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,
+                        OrderStatus.RequestRefund, OrderStatus.Pending);
+                    // Send a notice of refusal of order cancellation to parent
+                    title = "The result of processing order cancellation request";
+                    content = "Order cancellation request refused because  " + dto.ReasonRefuse;
+                    break;
+            }
+
+            await _notify.SendNotifyToAccountAsync(dto.ParentId, title, content);
         }
+        
         
     }
 }

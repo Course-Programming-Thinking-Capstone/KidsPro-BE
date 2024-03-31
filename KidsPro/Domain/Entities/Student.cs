@@ -19,9 +19,11 @@ public class Student : BaseEntity
 
     public virtual GameUserProfile GameUserProfile { get; set; } = null!;
 
-    public virtual List<OrderDetail>? OrderDetails { get; set; }
+    public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual ICollection<Certificate>? Certificates { get; set; }
 
     public virtual ICollection<StudentProgress>? StudentProgresses { get; set; }
+    public virtual IEnumerable<Class> Classes { get; } = new List<Class>();
+    public virtual ICollection<StudentQuiz> StudentQuizzes { get; set; } = new List<StudentQuiz>();
 }

@@ -7,15 +7,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
+
 [ApiController]
 [Route("api/v1/students")]
 public class StudentsController : Controller
 {
     private IStudentService _studentService;
+    private IAuthenticationService _authentication;
 
-    public StudentsController(IStudentService studentService)
+    public StudentsController(IStudentService studentService, IAuthenticationService authentication)
     {
         _studentService = studentService;
+        _authentication = authentication;
     }
 
 
@@ -29,6 +32,9 @@ public class StudentsController : Controller
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<StudentResponse>> GetStudents()
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
         var result = await _studentService.GetStudentsAsync();
         return Ok(result);
     }
@@ -44,9 +50,13 @@ public class StudentsController : Controller
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<StudentDetailResponse>> GetStudentDetail(int id)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         var result = await _studentService.GetDetailStudentAsync(id);
         return Ok(result);
     }
+
     /// <summary>
     /// 
     /// </summary>
@@ -58,8 +68,10 @@ public class StudentsController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> UpdateStudentInformation(StudentUpdateRequest dto)
     {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+        
         await _studentService.UpdateStudentAsync(dto);
         return Ok("Update Student Information Success!");
     }
-
 }

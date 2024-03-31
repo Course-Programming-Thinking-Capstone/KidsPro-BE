@@ -164,29 +164,12 @@ public class CourseService : ICourseService
         }
 
         //Get Section component number of each type in section
-        var sectionVideoNumber =
-            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Video);
-        if (sectionVideoNumber == null)
-        {
-            _logger.LogError("Section component type {} can not found.", SectionComponentType.Video);
-            throw new Exception($"Section component type {SectionComponentType.Video} can not found.");
-        }
 
-        var sectionDocumentNumber =
-            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Document);
-        if (sectionDocumentNumber == null)
-        {
-            _logger.LogError("Section component type {} can not found.", SectionComponentType.Document);
-            throw new Exception($"Section component type {SectionComponentType.Document} can not found.");
-        }
+        var sectionVideoNumber = await GetSectionComponentNumberAsync(SectionComponentType.Video);
 
-        var sectionQuizNumber =
-            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(SectionComponentType.Quiz);
-        if (sectionQuizNumber == null)
-        {
-            _logger.LogError("Section component type {} can not found.", SectionComponentType.Quiz);
-            throw new Exception($"Section component type {SectionComponentType.Quiz} can not found.");
-        }
+        var sectionDocumentNumber = await GetSectionComponentNumberAsync(SectionComponentType.Document);
+
+        var sectionQuizNumber = await GetSectionComponentNumberAsync(SectionComponentType.Quiz);
 
         // update course 
         if (!string.IsNullOrEmpty(dto.Description))
@@ -357,6 +340,18 @@ public class CourseService : ICourseService
                                 quiz.TotalScore = totalScore;
                                 quiz.TotalQuestion = questionOrder - 1;
                                 quiz.Questions = questions;
+
+                                //update number os question
+                                if (quiz.NumberOfQuestion == 0 || quiz.NumberOfQuestion > quiz.TotalQuestion)
+                                {
+                                    quiz.NumberOfQuestion = quiz.TotalQuestion;
+                                }
+
+                                //Add pass condition to quiz
+                                if (courseEntity.Syllabus?.PassConditionId.HasValue ?? false)
+                                {
+                                    quiz.PassConditionId = courseEntity.Syllabus.PassConditionId;
+                                }
                             }
 
                             quiz.Order = quizOrder;
@@ -839,5 +834,14 @@ public class CourseService : ICourseService
         if (result != null)
             return CourseMapper.ShowCoursePayment(result);
         throw new NotFoundException("courseId doesn't exist");
+    }
+
+    private async Task<SectionComponentNumber> GetSectionComponentNumberAsync(SectionComponentType type)
+    {
+        var sectionComponentNumber =
+            await _unitOfWork.SectionComponentNumberRepository.GetByTypeAsync(type);
+        if (sectionComponentNumber != null) return sectionComponentNumber;
+        _logger.LogError("Section component type {} can not found.", type.ToString());
+        throw new Exception($"Section component type {type.ToString()} can not found.");
     }
 }

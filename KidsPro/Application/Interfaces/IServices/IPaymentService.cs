@@ -14,6 +14,6 @@ namespace Application.Interfaces.IServices
         Task<Order?> GetOrderStatusPaymentAsync(int orderId);
         string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo);
         (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest);
-        Task CreateTransactionAsync(MomoResultRequest dto);
+        Task<int> CreateTransactionAsync(MomoResultRequest dto);
     }
 }

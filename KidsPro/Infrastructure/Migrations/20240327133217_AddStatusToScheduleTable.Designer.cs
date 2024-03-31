@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240322141700_AddDbInit")]
-    partial class AddDbInit
+    [Migration("20240327133217_AddStatusToScheduleTable")]
+    partial class AddStatusToScheduleTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConfirmAccount")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasPrecision(2)
@@ -91,55 +95,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 3, 22, 14, 16, 59, 119, DateTimeKind.Utc).AddTicks(5667),
+                            CreatedDate = new DateTime(2024, 3, 27, 13, 32, 14, 851, DateTimeKind.Utc).AddTicks(6001),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$2PayLXtOg3PVcryKYeZivOwQTLS/WXswbPKl4QIE60IPCficU5RSi",
+                            PasswordHash = "$2a$11$qby27PEU.7yu7iIIa6XCcO42luMteAZiT0PldGXgBIjOgwv19U.3a",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 3, 22, 14, 16, 59, 365, DateTimeKind.Utc).AddTicks(7887),
+                            CreatedDate = new DateTime(2024, 3, 27, 13, 32, 15, 101, DateTimeKind.Utc).AddTicks(2110),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$iz3dN59ymsl9ai6KyQvQPeD1ONxRoACXT3BmSK7.O8URSzugbwWB.",
+                            PasswordHash = "$2a$11$GnX5Ym58Su2u8Rx00Z3iNOyTge1wNcDVHrDLKvptCm.3gYK2M0XgC",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 3, 22, 14, 16, 59, 639, DateTimeKind.Utc).AddTicks(3816),
+                            CreatedDate = new DateTime(2024, 3, 27, 13, 32, 15, 511, DateTimeKind.Utc).AddTicks(9825),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$r3YcIw0awx2Z5NVeGTKUS.Alp23zBldxOYGhOIgp4EH7JaZYKhLTi",
+                            PasswordHash = "$2a$11$RK4hLrgv0Ibkns8vVoJO1.W31wf9OeK2vot2Xi.jPAL1LdZRZQSh6",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 3, 22, 14, 16, 59, 847, DateTimeKind.Utc).AddTicks(2784),
+                            CreatedDate = new DateTime(2024, 3, 27, 13, 32, 15, 808, DateTimeKind.Utc).AddTicks(8594),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$zOhD8PFSq0FPzLJBGyctveUK3LP9x7pj813qopu1QMxF.UN8/cVzy",
+                            PasswordHash = "$2a$11$N3eM9vJko3z.V7pbKNI8/enOO35xUJv0ZCjA0QDjKbzdMn8iQoXLK",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 3, 22, 14, 17, 0, 61, DateTimeKind.Utc).AddTicks(7829),
+                            CreatedDate = new DateTime(2024, 3, 27, 13, 32, 16, 91, DateTimeKind.Utc).AddTicks(8042),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$o6FFpFsrdMsUhJr61JMw/.Hay.pwmmN02K9oUbpbWs5lVlvD2vmmG",
+                            PasswordHash = "$2a$11$lPXgWoZTUk1kDjAHBooXf.qQXPr5a5k0NKFg2he.o1x/HMf6JMzAW",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -233,6 +237,10 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CloseDate")
+                        .HasPrecision(2)
+                        .HasColumnType("datetime2(2)");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -244,7 +252,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<byte?>("Duration")
+                    b.Property<byte>("Duration")
                         .HasColumnType("tinyint");
 
                     b.Property<DateTime?>("OpenDate")
@@ -254,13 +262,13 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("TeacherId")
+                    b.Property<int?>("TeacherId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalSlot")
+                    b.Property<int?>("TotalSlot")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalStudent")
+                    b.Property<int?>("TotalStudent")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("Version")
@@ -294,17 +302,24 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
 
                     b.Property<string>("RoomUrl")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
+                    b.Property<int>("Slot")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudyDay")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
@@ -330,10 +345,6 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("ApprovedById")
                         .HasColumnType("int");
 
-                    b.Property<string>("CourseTarget")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
-
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
@@ -342,8 +353,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2(2)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<decimal?>("DiscountPrice")
                         .HasPrecision(11, 2)
@@ -1149,6 +1160,33 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PassCondition");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PassRatio = 60
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PassRatio = 70
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PassRatio = 80
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PassRatio = 90
+                        },
+                        new
+                        {
+                            Id = 5,
+                            PassRatio = 100
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
@@ -1551,6 +1589,21 @@ namespace Infrastructure.Migrations
                     b.ToTable("Students");
                 });
 
+            modelBuilder.Entity("Domain.Entities.StudentClass", b =>
+                {
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ClassId", "StudentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentClass");
+                });
+
             modelBuilder.Entity("Domain.Entities.StudentLesson", b =>
                 {
                     b.Property<int>("StudentId")
@@ -1743,8 +1796,10 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseSlot")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("PassConditionId")
                         .HasColumnType("int");
@@ -1752,18 +1807,21 @@ namespace Infrastructure.Migrations
                     b.Property<int>("SlotTime")
                         .HasColumnType("int");
 
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
                     b.Property<string>("Target")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("TotalSlot")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
-
-                    b.Property<byte>("status")
-                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
@@ -1943,17 +2001,17 @@ namespace Infrastructure.Migrations
                     b.ToTable("UserNotification");
                 });
 
-            modelBuilder.Entity("OrderDetailStudent", b =>
+            modelBuilder.Entity("Domain.Enums.OrderDetailStudent", b =>
                 {
-                    b.Property<int>("OrderDetailsId")
+                    b.Property<int>("OrderDetailId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentsId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderDetailsId", "StudentsId");
+                    b.HasKey("OrderDetailId", "StudentId");
 
-                    b.HasIndex("StudentsId");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("OrderDetailStudent");
                 });
@@ -2014,10 +2072,9 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithMany()
+                        .WithMany("Classes")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Course");
 
@@ -2029,7 +2086,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ClassSchedule", b =>
                 {
                     b.HasOne("Domain.Entities.Class", "Class")
-                        .WithMany()
+                        .WithMany("Schedules")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2331,7 +2388,7 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("LessonId");
 
                     b.HasOne("Domain.Entities.PassCondition", "PassCondition")
-                        .WithMany("Quizs")
+                        .WithMany("Quizzes")
                         .HasForeignKey("PassConditionId");
 
                     b.HasOne("Domain.Entities.Section", "Section")
@@ -2386,6 +2443,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("Domain.Entities.StudentClass", b =>
+                {
+                    b.HasOne("Domain.Entities.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentLesson", b =>
@@ -2481,7 +2557,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Student", "Student")
-                        .WithMany()
+                        .WithMany("StudentQuizzes")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2494,7 +2570,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Syllabus", b =>
                 {
                     b.HasOne("Domain.Entities.PassCondition", "PassCondition")
-                        .WithMany("Syllabi")
+                        .WithMany("Syllabuses")
                         .HasForeignKey("PassConditionId");
 
                     b.Navigation("PassCondition");
@@ -2514,7 +2590,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.TeacherProfile", b =>
                 {
                     b.HasOne("Domain.Entities.Teacher", "Teacher")
-                        .WithMany()
+                        .WithMany("TeacherProfiles")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2550,19 +2626,23 @@ namespace Infrastructure.Migrations
                     b.Navigation("Notification");
                 });
 
-            modelBuilder.Entity("OrderDetailStudent", b =>
+            modelBuilder.Entity("Domain.Enums.OrderDetailStudent", b =>
                 {
-                    b.HasOne("Domain.Entities.OrderDetail", null)
+                    b.HasOne("Domain.Entities.OrderDetail", "OrderDetail")
                         .WithMany()
-                        .HasForeignKey("OrderDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrderDetailId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Student", null)
+                    b.HasOne("Domain.Entities.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("StudentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OrderDetail");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Domain.Entities.Account", b =>
@@ -2578,6 +2658,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Teacher");
 
                     b.Navigation("UserNotifications");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Class", b =>
+                {
+                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
@@ -2620,9 +2705,9 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.PassCondition", b =>
                 {
-                    b.Navigation("Quizs");
+                    b.Navigation("Quizzes");
 
-                    b.Navigation("Syllabi");
+                    b.Navigation("Syllabuses");
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
@@ -2652,6 +2737,8 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("StudentProgresses");
+
+                    b.Navigation("StudentQuizzes");
                 });
 
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>
@@ -2661,7 +2748,15 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Syllabus", b =>
                 {
-                    b.Navigation("Course");
+                    b.Navigation("Course")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Teacher", b =>
+                {
+                    b.Navigation("Classes");
+
+                    b.Navigation("TeacherProfiles");
                 });
 #pragma warning restore 612, 618
         }

@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Authentication;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Paging;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
@@ -20,7 +21,7 @@ public interface IAccountService
     Task ChangePasswordAsync(ChangePasswordDto dto);
     Task<string> UpdatePictureAsync(IFormFile file);
 
-    Task<StudentGameLoginDto> StudentGameLoginAsync(EmailCredential dto);
+    Task<StudentGameLoginDto> StudentGameLoginAsync(StudentLoginRequest dto);
 
     Task<AccountDto> GetCurrentAccountInformationAsync();
 
@@ -40,5 +41,7 @@ public interface IAccountService
 
     Task CheckConfirmation(string input);
     Task SendConfirmation();
+    Task UpdateToNotActivatedStatus(string email);
+    Task<LoginAccountDto> StudentLoginToWeb(StudentLoginRequest dto);
 
 }

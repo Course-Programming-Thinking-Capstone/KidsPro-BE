@@ -32,6 +32,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .ThenInclude(q => q.Options.OrderBy(o => o.Order))
             .Include(c => c.Sections.OrderBy(s => s.Order))
             .ThenInclude(s => s.Games)
+            .Include(x=> x.Syllabus)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
 

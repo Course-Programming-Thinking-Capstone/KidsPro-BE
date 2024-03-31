@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
 using Domain.Enums;
@@ -13,25 +14,34 @@ public class Class : BaseEntity
 
     [Column(TypeName = "tinyint")]
     [Range(0, 250)]
-    public int? Duration { get; set; }
+    public int Duration { get; set; }
 
     public ClassStatus Status { get; set; } = ClassStatus.Active;
 
-    public int TotalSlot { get; set; }
+    public int? TotalSlot { get; set; }
 
-    public int TotalStudent { get; set; }
+    public int? TotalStudent { get; set; }
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     [Precision(2)]
     public DateTime? OpenDate { get; set; }
 
-    public virtual Teacher Teacher { get; set; } = null!;
-    public int TeacherId { get; set; }
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+    [Precision(2)]
+    public DateTime? CloseDate { get; set; }
+
+    public virtual Teacher? Teacher { get; set; }
+    public int? TeacherId { get; set; }
 
     public virtual Account CreatedBy { get; set; } = null!;
     public int CreatedById { get; set; }
 
     public virtual Course Course { get; set; } = null!;
     public int CourseId { get; set; }
+
+    public virtual ICollection<Student> Students { get; set; } = new List<Student>();
+    public virtual ICollection<ClassSchedule>? Schedules { get; set; }
+    //public virtual IEnumerable<StudentClass> StudentClasses { get; } = new List<StudentClass>();
 }

@@ -50,6 +50,11 @@ public class GameService : IGameService
                 {
                     Id = 5,
                     TypeName = "Condition"
+                },
+                new LevelType
+                {
+                    Id = 6,
+                    TypeName = "Custom"
                 }
             };
 
@@ -514,7 +519,7 @@ public class GameService : IGameService
 
     public async Task<List<ModeType>> GetAllGameMode()
     {
-        var result2 = await _unitOfWork.GameLevelRepository
+        var result = await _unitOfWork.GameLevelRepository
             .GetAll()
             .GroupBy(h => h.GameLevelType)
             .Select(group => new ModeType
@@ -525,12 +530,31 @@ public class GameService : IGameService
             })
             .ToListAsync();
 
-        if (result2.Count == 0)
+        var allMode = _unitOfWork.LevelTypeRepository.GetAll();
+
+        foreach (var mode in allMode)
+        {
+            if (result.Any(o => o.IdMode == mode.Id))
+            {
+                continue;
+            }
+            else
+            {
+                result.Add(new ModeType()
+                {
+                    IdMode = mode.Id,
+                    TypeName = mode.TypeName ?? "Null Name",
+                    totalLevel = 0
+                });
+            }
+        }
+
+        if (result.Count == 0)
         {
             var result3 = await _unitOfWork.LevelTypeRepository.GetAll().ToListAsync();
             foreach (var item in result3)
             {
-                result2.Add(new ModeType
+                result.Add(new ModeType
                 {
                     IdMode = item.Id,
                     TypeName = item.TypeName ?? "Null Name",
@@ -539,7 +563,7 @@ public class GameService : IGameService
             }
         }
 
-        return result2;
+        return result;
     }
 
     public async Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId)
@@ -586,7 +610,7 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<int> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
+    public async Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
         var winLevel =
             await GetGameLevelByTypeAndIndex(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
@@ -595,20 +619,33 @@ public class GameService : IGameService
             throw new BadRequestException("Level not found");
         }
 
-        var isPlayedHistory = await _unitOfWork.GamePlayHistoryRepository.GetAsync(
+        var oldData = await _unitOfWork.GamePlayHistoryRepository.GetAsync(
             o => o.StudentId == userFinishLevelRequest.UserID
                  && o.GameLevelTypeId == userFinishLevelRequest.ModeId
                  && o.LevelIndex == userFinishLevelRequest.LevelIndex
             , null
-        );
-        var userCoin = -1;
-        var oldData = isPlayedHistory.FirstOrDefault();
-        if (oldData == null) // already play -> no coin
+        ).ContinueWith(o => o.Result.FirstOrDefault());
+
+        var userData = await _unitOfWork.GameUserProfileRepository.GetAsync(
+            o => o.StudentId == userFinishLevelRequest.UserID, null).ContinueWith(o => o.Result.FirstOrDefault());
+        var result = new UserDataResponse
         {
-            var userData = await _unitOfWork.GameUserProfileRepository.GetByIdAsync(userFinishLevelRequest.UserID);
-            var coinWin = winLevel.CoinReward ?? 0;
-            userData.Coin += coinWin;
-            userCoin = userData.Coin;
+            UserId = userData.StudentId,
+            DisplayName = userData.DisplayName,
+            OldGem = (int)userData.Gem,
+            OldCoin = (int)userData.Coin,
+            UserCoin = userData.Gem,
+            UserGem = userData.Coin
+        };
+        // COIN ADD
+        await _unitOfWork.BeginTransactionAsync();
+        if (oldData == null) // first play -> add  coin
+        {
+            userData.Coin += winLevel.CoinReward ?? 0;
+            userData.Gem += winLevel.GemReward ?? 0;
+
+            result.UserGem = userData.Gem;
+            result.UserCoin = userData.Coin;
             _unitOfWork.GameUserProfileRepository.Update(userData);
         }
 
@@ -616,13 +653,25 @@ public class GameService : IGameService
         {
             LevelIndex = userFinishLevelRequest.LevelIndex,
             PlayTime = userFinishLevelRequest.StartTime,
-            FinishTime = userFinishLevelRequest.EndTime,
+
+            FinishTime = DateTime.Now,
             GameLevelTypeId = userFinishLevelRequest.ModeId,
-            Duration = (userFinishLevelRequest.EndTime - userFinishLevelRequest.StartTime).Minutes,
+            Duration = (DateTime.Now - userFinishLevelRequest.StartTime).Minutes,
             StudentId = userFinishLevelRequest.UserID
         });
 
-        return userCoin;
+        try
+        {
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        return result;
     }
 
     #endregion
@@ -889,7 +938,8 @@ public class GameService : IGameService
     public async Task<List<LevelDataResponse>> GetLevelsByMode(int modeId)
     {
         var query = await _unitOfWork.GameLevelRepository.GetAsync(
-            o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null);
+            o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
+            , includeProperties: $"{nameof(GameLevel.GameLevelType)}");
         if (!query.Any())
         {
             throw new NotFoundException("Not found any level");
@@ -903,6 +953,7 @@ public class GameService : IGameService
             GemReward = gameLevel.GemReward ?? 0,
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
+            GameLevelTypeName = gameLevel.GameLevelType.TypeName,
             LevelDetail = new List<LevelDetail>()
         }).OrderBy(o => o.LevelIndex).ToList();
 

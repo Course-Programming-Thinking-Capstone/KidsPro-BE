@@ -42,4 +42,6 @@ public interface IUnitOfWork : IDisposable
     public ITransactionRepository TransactionRepository { get; }
     public ISyllabusRepository SyllabusRepository { get; }
     public IPassConditionRepository PassConditionRepository { get; }
+    public IScheduleReposisoty ScheduleReposisoty { get; }
+    public IClassRepository ClassRepository { get; }
 }

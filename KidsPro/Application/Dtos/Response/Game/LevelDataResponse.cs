@@ -8,6 +8,7 @@
         public int GemReward { get; set; }
         public int VStartPosition { get; set; }
         public int GameLevelTypeId { get; set; }
+        public string GameLevelTypeName { get; set; }
         public List<LevelDetail> LevelDetail { get; set; } = new();
     }
 

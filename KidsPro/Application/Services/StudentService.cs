@@ -48,7 +48,7 @@ public class StudentService:IStudentService
     public async Task<List<StudentResponse>> GetStudentsAsync()
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
-        var list = await _unitOfWork.StudentRepository.GetStudents(account.IdSubRole,account.Role);
+        var list = await _unitOfWork.StudentRepository.GetStudents(account.Role,account.IdSubRole);
         return StudentMapper.ShowStudentList(list);
     }
     

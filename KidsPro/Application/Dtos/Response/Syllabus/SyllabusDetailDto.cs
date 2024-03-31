@@ -4,17 +4,18 @@ public class SyllabusDetailDto
 {
     public int Id { get; set; }
 
-    public string Name { get; init; } = null!;
+    public string Name { get; set; } = null!;
 
-    public string? Target { get; init; } = null!;
+    public string? Target { get; set; } = null!;
 
-    public int TotalSlot { get; init; }
+    public int TotalSlot { get; set; }
 
-    public int SlotTime { get; init; }
+    public int SlotTime { get; set; }
 
-    public int? MinQuizScoreRatio { get; init; }
+    public int? MinQuizScoreRatio { get; set; }
 
-    public List<SyllabusSectionDto>? Sections { get; init; }
+    public List<SyllabusSectionDto>? Sections { get; set; }
 
-    public int? TeacherId { get; init; }
+    public int? TeacherId { get; set; }
+    public int? CourseId { get; set; }
 }

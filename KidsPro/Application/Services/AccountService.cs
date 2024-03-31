@@ -24,7 +24,6 @@ public class AccountService : IAccountService
     private IImageService _imageService;
     private ILogger<AccountService> _logger;
 
-
     public AccountService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
         IImageService imageService, ILogger<AccountService> logger)
     {
@@ -36,7 +35,7 @@ public class AccountService : IAccountService
 
     public async Task<LoginAccountDto> RegisterByEmailAsync(EmailRegisterDto dto)
     {
-        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email)!=null)
+        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email) != null)
             throw new ConflictException($"Email {dto.Email} has been existed.");
 
         var parentRole = await _unitOfWork.RoleRepository.GetByNameAsync(Constant.ParentRole)
@@ -142,7 +141,7 @@ public class AccountService : IAccountService
 
     public async Task ChangePasswordAsync(ChangePasswordDto dto)
     {
-        var accountId= _authenticationService.GetCurrentUserId();
+        var accountId = _authenticationService.GetCurrentUserId();
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
@@ -160,7 +159,7 @@ public class AccountService : IAccountService
 
     public async Task<string> UpdatePictureAsync(IFormFile file)
     {
-        var accountId= _authenticationService.GetCurrentUserId();
+        var accountId = _authenticationService.GetCurrentUserId();
 
         var account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
@@ -177,9 +176,9 @@ public class AccountService : IAccountService
         return account.PictureUrl;
     }
 
-    public async Task<StudentGameLoginDto> StudentGameLoginAsync(EmailCredential dto)
+    public async Task<StudentGameLoginDto> StudentGameLoginAsync(StudentLoginRequest dto)
     {
-        var student = await _unitOfWork.StudentRepository.GameStudentLoginAsync(dto.Email)
+        var student = await _unitOfWork.StudentRepository.GameStudentLoginAsync(dto.Account)
             .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find student account."));
 
         var account = student.Account;
@@ -187,6 +186,20 @@ public class AccountService : IAccountService
         if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.PasswordHash))
         {
             throw new UnauthorizedException("Incorrect password.");
+        }
+
+        if (student.GameUserProfile == null)
+        {
+            var newGameProfile = new GameUserProfile
+            {
+                DisplayName = student.UserName,
+                Coin = 0,
+                Gem = 0,
+                StudentId = student.Id
+            };
+            student.GameUserProfile = newGameProfile;
+            await _unitOfWork.GameUserProfileRepository.AddAsync(newGameProfile);
+            await _unitOfWork.SaveChangeAsync();
         }
 
         var result = AccountMapper.StudentToStudentGameLoginDto(student);
@@ -305,7 +318,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> CreateAccountAsync(CreateAccountDto dto)
     {
-        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email)!=null)
+        if (await _unitOfWork.AccountRepository.ExistByEmailAsync(dto.Email) != null)
             throw new ConflictException($"Email {dto.Email} has been existed.");
 
         var account = new Account()
@@ -488,7 +501,7 @@ public class AccountService : IAccountService
 
     private string GenerateConfirmationCode(string name, string? role, string password)
     {
-        var salt = StringUtils.GenerateRandomString(8);
+        var salt = StringUtils.GenerateRandomNumber(8);
 
         var rawConfirm = $"Name={name}Role={role}Password={password}{salt}";
 
@@ -543,13 +556,46 @@ public class AccountService : IAccountService
 
     private void SendConfirmationCode(Account account)
     {
-        var link = "Email=" + account.Email + "&Token=" + account.ConfirmAccount;
+        var link =//"http://localhost:3000/Email="
+            "https://www.kidpro-production.somee.com/api/v1/authentication/confirm/check/Email=" 
+                + account.Email + "&Token=" + account.ConfirmAccount;
         var title = "Successful account registration";
         var content = "Welcome " + account.FullName + "<br>" + "<br>" +
                       "Your account has been successfully registered at KidsPro" + "<br>" + "<br>" +
-                      "To complete your registration, please activate your account via the following link:"+ "<br>"
-                      +link+ "<br>" + "<br>" +
+                      "To complete your registration, please activate your account via the following link:" + "<br>"
+                      + link + "<br>" + "<br>" +
                       "Thanks you!" + "<br>" + "<br>" + "KidsPro Team";
         EmailUtils.SendEmail(account.Email!, title, content);
+    }
+
+    public async Task UpdateToNotActivatedStatus(string email)
+    {
+        var account = await _unitOfWork.AccountRepository.ExistByEmailAsync(email)
+            ??throw new BadRequestException("Email doesn't exist");
+
+        if (account.Status == UserStatus.NotActivated)
+            throw new BadRequestException("The account is not activated yet");
+        
+        account.Status = UserStatus.NotActivated;
+        
+        _unitOfWork.AccountRepository.Update(account);
+        await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task<LoginAccountDto> StudentLoginToWeb(StudentLoginRequest dto)
+    {
+        var account = await _unitOfWork.StudentRepository.WebStudentLoginAsync(dto.Account)
+                      ?? throw new BadRequestException("Account doesn't exist");
+            
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.Account.PasswordHash))
+        {
+            throw new UnauthorizedException("Incorrect password.");
+        }
+
+        var result = AccountMapper.EntityToLoginAccountDto(account.Account);
+        result.AccessToken = _authenticationService.CreateAccessToken(account.Account);
+        result.RefreshToken = _authenticationService.CreateRefreshToken(account.Account);
+        return result;
     }
 }

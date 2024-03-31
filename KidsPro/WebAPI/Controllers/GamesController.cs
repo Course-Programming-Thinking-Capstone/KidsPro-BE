@@ -43,7 +43,7 @@ public class GamesController : ControllerBase
     [HttpPost("authentication/login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGameLoginDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody] EmailCredential request)
+    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody]StudentLoginRequest  request)
     {
         var result = await _accountService.StudentGameLoginAsync(request);
         return Ok(result);
@@ -94,10 +94,10 @@ public class GamesController : ControllerBase
     /// <summary>
     /// User finish a level game, return new user coin if first time clear level
     /// </summary>
-    [HttpPost("finish-level")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
+    [HttpPost("game-play-history")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<LevelInformationResponse>> FinishLevelGame(
+    public async Task<ActionResult<UserDataResponse>> FinishLevelGame(
         [FromBody] UserFinishLevelRequest userFinishLevelRequest)
     {
         var result = await _gameService.UserFinishLevel(userFinishLevelRequest);

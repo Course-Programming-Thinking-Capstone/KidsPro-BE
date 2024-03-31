@@ -16,6 +16,6 @@ namespace Application.Interfaces.IServices
         Task<OrderDetailResponse> GetOrderDetail(int orderId);
 
         Task CanCelOrderAsync(OrderCancelRequest dto);
-        Task ApproveOrderCancellationAsync(int orderId, int parentId);
+        Task HandleRefundRequest(OrderRefundRequest dto, ModerationStatus status);
     }
 }
