@@ -75,19 +75,19 @@ public static class ClassMapper
         CourseName = dto.Course.Name,
         TeacherId = dto.Teacher?.Id,
         TeacherName = dto.Teacher?.Account.FullName,
-        //?? "The class doesn't have a teacher yet",
         OpenClass = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
         CloseClass = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
         Duration = dto.Duration,
         SlotTime = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
+        //Schedules
         RoomUrl = dto.Schedules?.First().RoomUrl,
-        //?? "The Class doesn't have a schedule yet"
         SlotNumber = dto.Schedules?.First().Slot ?? 0,
         StartSlot = dto.Schedules?.First().StartTime ?? TimeSpan.Zero,
         EndSlot = dto.Schedules?.First().EndTime ?? TimeSpan.Zero,
         StudyDay = dto.Schedules?.Where(x => x.Status == ScheduleStatus.Active)
             .Select(x => x.StudyDay) ?? new List<DayStatus>(),
+        //Students
         Students = dto.Students.Select(x => new StudentClassResponse
         {
             Image = x.Account.PictureUrl,

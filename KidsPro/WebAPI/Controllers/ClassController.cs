@@ -195,13 +195,13 @@ public class ClassController : ControllerBase
     }
 
     /// <summary>
-    /// Add students to class
+    /// Add students to class or remove student from class
     /// </summary>
     /// <param name="dto"></param>
     /// <param name="type"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
-    [HttpPost("students/add-to-class")]
+    [HttpPost("students/add-or-remove")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]

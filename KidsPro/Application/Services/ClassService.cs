@@ -183,7 +183,6 @@ public class ClassService : IClassService
         var teacher = await _unitOfWork.TeacherRepository.GetTeacherSchedulesById(teacherId)
                       ?? throw new NotFoundException($"TeacherId: {teacherId} doesn't exist");
 
-
         bool hasOverlap = entityClass.Schedules!
             .Any(c => teacher.Classes!
                 .Any(t => t.Schedules!
@@ -192,9 +191,13 @@ public class ClassService : IClassService
         if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
 
         entityClass.TeacherId = teacherId;
-
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();
+
+        //Sent notice to teacher
+        var title = "New class";
+        var content = "Your new class is " + entityClass.Code + ", click on My Classes for more details";
+        await _notify.SendNotifyToAccountAsync(teacherId, title, content);
 
         return teacher.Account.FullName;
     }
@@ -219,28 +222,15 @@ public class ClassService : IClassService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
-        var studentsResponse = new List<Student>();
+        var studentsForClass = students.Where(c => !c.Classes.Any() || c.Classes
+            .Any(s => s.Schedules!.Any(x => entityClass.Schedules!
+                .All(e => e.StudyDay != x.StudyDay && e.Slot != x.Slot)))).ToList();
 
-        foreach (var std in students)
-        {
-            //nếu k có class nào thì break lun
-            if (!std.Classes.Any()) break;
-
-            var hasOverlap = entityClass.Schedules!
-                .Any(entitySchedule => std.Classes.Any(studentClass => studentClass.Schedules!
-                    .Any(studentSchedule => studentSchedule.StudyDay == entitySchedule.StudyDay
-                                            && studentSchedule.Slot == entitySchedule.Slot)));
-
-            //nếu student trùng schedule thì k cần show ra
-            if (hasOverlap) break;
-
-            studentsResponse.Add(std);
-        }
-
-        return ClassMapper.StudentToStudentClassResponse(studentsResponse);
+        return ClassMapper.StudentToStudentClassResponse(studentsForClass);
     }
 
-    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto, ClassStudentType type)
+    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto,
+        ClassStudentType type)
     {
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
                           ?? throw new NotFoundException($"ClassId: {dto.ClassId} doesn't exist");
@@ -250,24 +240,23 @@ public class ClassService : IClassService
         if (students.Count < dto.StudentIds.Count)
             throw new BadRequestException("StudentId doesn't exist");
 
-        // lấy những StudentId mà class có, list truyền vào không có để removed
-        var removeStudents = entityClass.Students.
-            Where(e => students.All(s => s.Id != e.Id)).ToList();
-            //entityClass.Students.Except(students).ToList();
-        //entityClass.Students.Select(x => x.Id).Except(dto.StudentIds).ToList();
-
         switch (type)
         {
             case ClassStudentType.AddToClass:
+                // lấy những StudentId mà list truyền vào có, list không có để add
+                var addStudents = students.Where(e => entityClass.Students.All(s => s.Id != e.Id)).ToList();
 
                 if (entityClass.Students.Count == 0)
                     entityClass.Students = new List<Student>();
 
-                foreach (var x in students)
+                foreach (var x in addStudents)
                     entityClass.Students.Add(x);
                 break;
 
             case ClassStudentType.RemoveFromClass:
+                // lấy những StudentId mà class có, list truyền vào không có để removed
+                var removeStudents = entityClass.Students.Where(e => students.All(s => s.Id != e.Id)).ToList();
+
                 foreach (var x in removeStudents)
                     entityClass.Students.Remove(x);
                 break;
