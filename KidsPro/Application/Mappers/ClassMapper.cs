@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Response;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.Utils;
 using Domain.Entities;
@@ -8,7 +9,7 @@ namespace Application.Mappers;
 
 public static class ClassMapper
 {
-    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, int slotTime) =>
+    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, int slotDuration) =>
         new ClassCreateResponse()
         {
             ClassId = dto.Id,
@@ -18,7 +19,7 @@ public static class ClassMapper
             OpenDay = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
             CloseDay = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
             Duration = dto.Duration,
-            SlotTime = slotTime,
+            SlotDuration = slotDuration,
             TotalSlot = dto.TotalSlot
         };
 
@@ -68,7 +69,7 @@ public static class ClassMapper
         return teacherScheduleList;
     }
 
-    public static ClassResponse ClassToClassResponse(Class dto) => new ClassResponse()
+    public static ClassDetailResponse ClassToClassDetailResponse(Class dto) => new ClassDetailResponse()
     {
         ClassId = dto.Id,
         ClassCode = dto.Code,
@@ -78,7 +79,7 @@ public static class ClassMapper
         OpenClass = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
         CloseClass = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
         Duration = dto.Duration,
-        SlotTime = dto.Course.Syllabus?.SlotTime ?? 0,
+        SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
         //Schedules
         RoomUrl = dto.Schedules?.First().RoomUrl,
@@ -92,7 +93,7 @@ public static class ClassMapper
         {
             Image = x.Account.PictureUrl,
             StudentName = x.Account.FullName,
-            DateOfBirth =DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
+            DateOfBirth = DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
             Gender = x.Account.Gender
         }).ToList(),
         TotalStudent = dto.Students.Count()
@@ -120,5 +121,18 @@ public static class ClassMapper
             Gender = student.Account.Gender
         }).ToList();
     }
-        
+
+    public static PagingClassesResponse ClassToClassesResponse(PagingResponse<Class> dto) => new PagingClassesResponse()
+    {
+        TotalPage = dto.TotalPages,
+        TotalRecord = dto.TotalRecords,
+        Classes = dto.Results.Select(c => new ClassesResponse()
+        {
+            ClassCode = c.Code,
+            Start = DateUtils.FormatDateTimeToDateV1(c.OpenDate),
+            End = DateUtils.FormatDateTimeToDateV1(c.CloseDate),
+            ClassId = c.Id
+        }).ToList()
+    };
+
 }

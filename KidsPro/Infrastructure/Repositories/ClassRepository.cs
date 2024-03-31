@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.IRepositories;
+﻿using System.Linq.Expressions;
+using Application.Interfaces.IRepositories;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
@@ -27,5 +28,10 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
             .Include(x => x.Course).ThenInclude(x=> x.Syllabus)
             .Include(x => x.Students).ThenInclude(x => x!.Account)
             .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public Task<IEnumerable<Class>> GetAsync(Expression<Func<Class, bool>>? filter, Func<IQueryable<Class>, IOrderedQueryable<Class>>? orderBy, string? includeProperties = null, bool disableTracking = false)
+    {
+        throw new NotImplementedException();
     }
 }

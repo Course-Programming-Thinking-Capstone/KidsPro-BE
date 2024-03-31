@@ -3,6 +3,7 @@ using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -65,14 +66,28 @@ public class ClassService : IClassService
         return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name, course.Syllabus?.SlotTime ?? 0);
     }
 
-    public async Task<ClassResponse> GetClassByIdAsync(int classId)
+    public async Task<ClassDetailResponse> GetClassByIdAsync(int classId)
     {
         await CheckPermission();
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
 
         return entityClass != null
-            ? ClassMapper.ClassToClassResponse(entityClass)
+            ? ClassMapper.ClassToClassDetailResponse(entityClass)
             : throw new BadRequestException($"ClassId: {classId} doesn't exist");
+    }
+
+    public async Task<PagingClassesResponse> GetClassesAsync(int? page, int? size)
+    {
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        var classes = await _unitOfWork.ClassRepository.GetPaginateAsync(filter:null,orderBy:null,page:page, size:size);
+
+        return ClassMapper.ClassToClassesResponse(classes);
     }
 
     #endregion

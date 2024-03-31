@@ -1801,7 +1801,7 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("PassConditionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SlotTime")
+                    b.Property<int>("SlotDuration")
                         .HasColumnType("int");
 
                     b.Property<byte>("Status")
