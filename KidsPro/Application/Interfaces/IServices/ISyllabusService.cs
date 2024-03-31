@@ -8,7 +8,7 @@ namespace Application.Interfaces.IServices;
 public interface ISyllabusService
 {
     Task<SyllabusDetailDto> CreateAsync(CreateSyllabusDto dto);
-    Task<SyllabusDetailDto?> GetByIdAsync(int id);
+    Task<SyllabusDetailDto> GetByIdAsync(int id);
 
     Task<PagingResponse<FilterSyllabusDto>> FilterSyllabusAsync(string? name,
         SyllabusStatus? status,
