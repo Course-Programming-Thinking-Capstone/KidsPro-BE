@@ -16,8 +16,8 @@ public static class ClassMapper
             ClassCode = dto.Code,
             CourseId = dto.CourseId,
             CourseName = courseName,
-            OpenDay = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
-            CloseDay = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
+            OpenDay = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
+            CloseDay = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
             Duration = dto.Duration,
             SlotDuration = slotDuration,
             TotalSlot = dto.TotalSlot
@@ -76,8 +76,8 @@ public static class ClassMapper
         CourseName = dto.Course.Name,
         TeacherId = dto.Teacher?.Id,
         TeacherName = dto.Teacher?.Account.FullName,
-        OpenClass = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
-        CloseClass = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
+        OpenClass = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
+        CloseClass = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
         Duration = dto.Duration,
         SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
@@ -129,8 +129,8 @@ public static class ClassMapper
         Classes = dto.Results.Select(c => new ClassesResponse()
         {
             ClassCode = c.Code,
-            Start = DateUtils.FormatDateTimeToDateV1(c.OpenDate),
-            End = DateUtils.FormatDateTimeToDateV1(c.CloseDate),
+            Start = DateUtils.FormatDateTimeToDatetimeV1(c.OpenDate),
+            End = DateUtils.FormatDateTimeToDatetimeV1(c.CloseDate),
             ClassId = c.Id
         }).ToList()
     };

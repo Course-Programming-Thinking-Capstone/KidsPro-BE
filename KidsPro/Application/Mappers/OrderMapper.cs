@@ -61,7 +61,7 @@ namespace Application.Mappers
                 {
                     StudentId = dto.Id,
                     StudentName = dto.Account.FullName,
-                    DateOfBirth = DateUtils.FormatDateTimeToDateV1(dto.Account.DateOfBirth)
+                    DateOfBirth = DateUtils.FormatDateTimeToDatetimeV1(dto.Account.DateOfBirth)
                 };
                 x.Students?.Add(stu);
             }
