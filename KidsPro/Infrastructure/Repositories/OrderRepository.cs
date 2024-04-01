@@ -37,7 +37,8 @@ namespace Infrastructure.Repositories
         {
             var query = _dbSet.AsNoTracking();
 
-            return await query.FirstOrDefaultAsync(x =>
+            return await query.Include(x=>x.Parent).ThenInclude(x=>x!.Account)
+                .FirstOrDefaultAsync(x =>
                 x.Id == orderId && x.ParentId == parentId && x.Status == status);
         }
 

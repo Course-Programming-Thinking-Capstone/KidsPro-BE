@@ -40,7 +40,8 @@ public static class DependencyInjection
         //unit of work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IMomoConfig,MomoConfig>();
-
+        services.AddScoped<IZaloPayConfig,ZaloPayConfig>();
+        
         //Add service
         services.Scan(scan => scan
             .FromAssembliesOf(typeof(IBaseRepository<>), typeof(BaseRepository<>))

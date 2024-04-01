@@ -7,6 +7,7 @@ public static class DateUtils
     public static string FormatDateTimeToDateV1(DateTime? date) => date?.ToString("dd/MM/yyyy") ?? "";
     public static string FormatDateTimeToDateV2(DateTime? date) => date?.ToString("dd/MM/yyyy dddd") ?? "";
     public static string FormatDateTimeToDateV3(DateTime? date) => date?.ToString("yyyy/MM/dd") ?? "";
+    public static string FormatDateTimeToDateV4(DateTime? date) => date?.ToString("yyMMdd") ?? "";
     public static string FormatDateTimeToDatetimeV1(DateTime? date) => date?.ToString("dd/MM/yyyy HH:mm:ss") ?? "";
     public static string FormatDateTimeToDatetimeV2(DateTime? date) => date?.ToString("dd/MM/yyyy HH:mm:ss dddd") ?? "";
     public static string FormatDateTimeToDatetimeV3(DateTime? date) => date?.ToString("yyyy/MM/dd HH:mm:ss") ?? "";

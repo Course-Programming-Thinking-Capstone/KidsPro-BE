@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Application.Dtos.Request.Order.ZaloPay;
+using Application.Dtos.Response.Order.ZaloPay;
 
 namespace Application.Services;
 
@@ -26,16 +28,42 @@ public class PaymentService : IPaymentService
         _accountService = accountService;
     }
 
+    #region Transaction
+
     public async Task<Order?> GetOrderStatusPaymentAsync(int orderId)
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
-        
+
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
             OrderStatus.Process);
         if (order != null)
             return order;
         throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
     }
+
+    public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
+    {
+        var orderId = GetIdMomoResponse(dto.orderId);
+        var parentId = GetIdMomoResponse(dto.requestId);
+
+        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Process, OrderStatus.Pending);
+        var transaction = new Transaction()
+        {
+            OrderId = orderId,
+            CreatedDate = DateTime.UtcNow,
+            TransactionCode = dto.transId,
+            Amount = dto.amount,
+            Status = TransactionStatus.Success
+        };
+        await _unitOfWork.TransactionRepository.AddAsync(transaction);
+        var result = await _unitOfWork.SaveChangeAsync();
+        if (result < 0) throw new NotImplementException("Add transaction failed");
+        return orderId;
+    }
+
+    #endregion
+
+    #region Momo
 
     public string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo)
     {
@@ -68,34 +96,52 @@ public class PaymentService : IPaymentService
                 return (responeseData.payUrl, responeseData.qrCodeUrl);
             throw new NotImplementException($"Error Momo: {responeseData?.message}");
         }
-        else
-            throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
+
+        throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
     }
 
-    private  int GetIdMomoResponse(string id)
+    private int GetIdMomoResponse(string id)
     {
         Regex regex = new Regex("-(\\d+)");
         var macth = regex.Match(id);
         if (macth.Success) return Int32.Parse(macth.Groups[1].Value);
         return 0;
     }
-    public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
-    {
-        var orderId = GetIdMomoResponse(dto.orderId);
-        var parentId = GetIdMomoResponse(dto.requestId);
 
-        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Process, OrderStatus.Pending);
-        var transaction = new Transaction()
+    #endregion
+
+    #region ZaloPay
+
+    public string? GetLinkGatewayZaloPay(string paymentUrl, ZaloPaymentRequest zaloRequest)
+    {
+        using HttpClient client = new HttpClient();
+        var requestData = JsonConvert.SerializeObject(zaloRequest, new JsonSerializerSettings()
         {
-            OrderId = orderId,
-            CreatedDate = DateTime.UtcNow,
-            TransactionCode = dto.transId,
-            Amount = dto.amount,
-            Status = TransactionStatus.Success
-        };
-        await _unitOfWork.TransactionRepository.AddAsync(transaction);
-        var result = await _unitOfWork.SaveChangeAsync();
-        if (result < 0) throw new NotImplementException("Add transaction failed");
-        return orderId;
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            Formatting = Formatting.Indented,
+        });
+        var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
+
+        var createPaymentLink = client.PostAsync(paymentUrl, requestContent).Result;
+        if (createPaymentLink.IsSuccessStatusCode)
+        {
+            var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
+            var responeseData = JsonConvert.DeserializeObject<ZaloPaymentResponse>(responseContent);
+            // return QRcode
+            if (responeseData?.returnCode == 1)
+                return responeseData.orderUrl;
+            throw new NotImplementException($"Error Momo: {responeseData?.returnMessage}");
+        }
+
+        throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
     }
+
+    public string MakeSignatureZaloPayment(string key, ZaloPaymentRequest momo)
+    {
+        var rawHash = momo.AppId + "|" + momo.AppTransId + "|" + momo.AppUser + "|" + momo.Amount + "|" + momo.AppTime +
+                      "|" + "|";
+        return momo.Mac = HashingUtils.HmacSha256(rawHash, key);
+    }
+
+    #endregion
 }

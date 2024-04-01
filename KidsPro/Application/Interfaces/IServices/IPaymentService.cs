@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Dtos.Request.Order.ZaloPay;
 
 namespace Application.Interfaces.IServices
 {
@@ -15,5 +16,7 @@ namespace Application.Interfaces.IServices
         string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo);
         (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest);
         Task<int> CreateTransactionAsync(MomoResultRequest dto);
+        string MakeSignatureZaloPayment(string Key, ZaloPaymentRequest momo);
+        string? GetLinkGatewayZaloPay(string paymentUrl, ZaloPaymentRequest zaloRequest);
     }
 }
