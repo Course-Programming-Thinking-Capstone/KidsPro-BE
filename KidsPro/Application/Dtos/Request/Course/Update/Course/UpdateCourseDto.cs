@@ -5,7 +5,7 @@ namespace Application.Dtos.Request.Course.Update.Course;
 
 public record UpdateCourseDto
 {
-    [StringLength(1000, ErrorMessage = "Description can not exceed 1000 character")]
+    [StringLength(1000, ErrorMessage = "description can not exceed 1000 character")]
     public string? Description { get; set; }
     public ICollection<UpdateSectionDto>? Sections { get; init; }
 }
