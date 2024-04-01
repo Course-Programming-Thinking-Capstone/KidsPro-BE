@@ -101,11 +101,11 @@ namespace WebAPI.Controllers
             zaloRequest.AppUser = order.Parent!.Account.FullName;
             zaloRequest.AppTransId = DateUtils.FormatDateTimeToDateV4(order.Date) + "_" + order.Id;
             zaloRequest.Amount = (long)order.TotalPrice;
-            zaloRequest.BankCode = "zalopayapp";
             zaloRequest.AppTime = TimeUtils.GetOrderTimeSpan(order.Date);
             zaloRequest.AppId = Int32.Parse(_zaloPayConfig.AppId);
-            zaloRequest.Description = " 'KidsPro Service' - You are payment for " + order.Note;
-            zaloRequest.EmbedData = "{\"redirecturl\": \"https://docs.zalopay.vn/result\"}";
+            zaloRequest.Description = "ZaloPayDemo - Thanh toán cho đơn hàng #220817_1660717311101";
+            zaloRequest.BankCode = "zalopayapp";
+           // zaloRequest.embed_data = "{\"redirecturl\": \"https://docs.zalopay.vn/result\"}";
             zaloRequest.Mac = _payment.MakeSignatureZaloPayment(_zaloPayConfig.Key1, zaloRequest);
 
             // lấy link QR momo

@@ -112,20 +112,33 @@ public class PaymentService : IPaymentService
 
     #region ZaloPay
 
+    private Dictionary<string, string> GetContent(ZaloPaymentRequest zaloRequest)
+    {
+        Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+
+        keyValuePairs.Add("app_id", zaloRequest.AppId.ToString());
+        keyValuePairs.Add("app_user", zaloRequest.AppUser);
+        keyValuePairs.Add("app_time", zaloRequest.AppTime.ToString());
+        keyValuePairs.Add("amount", zaloRequest.Amount.ToString());
+        keyValuePairs.Add("app_trans_id", zaloRequest.AppTransId);
+        keyValuePairs.Add("bank_code", "zalopayapp");
+        keyValuePairs.Add("embed_data", "{}");
+        keyValuePairs.Add("item", "[]");
+        keyValuePairs.Add("callback_url", "https://localhost:44317/swagger/index.html");
+        keyValuePairs.Add("description", zaloRequest.Description);
+        keyValuePairs.Add("mac", zaloRequest.Mac);
+
+        return keyValuePairs;
+    }
+
     public string? GetLinkGatewayZaloPay(string paymentUrl, ZaloPaymentRequest zaloRequest)
     {
         using HttpClient client = new HttpClient();
-        var requestData = JsonConvert.SerializeObject(zaloRequest, new JsonSerializerSettings()
+        var content = new FormUrlEncodedContent(GetContent(zaloRequest));
+        var response = client.PostAsync(paymentUrl, content).Result;
+        if (response.IsSuccessStatusCode)
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Formatting = Formatting.Indented,
-        });
-        var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
-
-        var createPaymentLink = client.PostAsync(paymentUrl, requestContent).Result;
-        if (createPaymentLink.IsSuccessStatusCode)
-        {
-            var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
+            var responseContent = response.Content.ReadAsStringAsync().Result;
             var responeseData = JsonConvert.DeserializeObject<ZaloPaymentResponse>(responseContent);
             // return QRcode
             if (responeseData?.returnCode == 1)
@@ -133,14 +146,17 @@ public class PaymentService : IPaymentService
             throw new NotImplementException($"Error Momo: {responeseData?.returnMessage}");
         }
 
-        throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
+        throw new NotImplementException($"Error Momo: {response.ReasonPhrase}");
     }
 
-    public string MakeSignatureZaloPayment(string key, ZaloPaymentRequest momo)
+    public string MakeSignatureZaloPayment(string key, ZaloPaymentRequest zalo)
     {
-        var rawHash = momo.AppId + "|" + momo.AppTransId + "|" + momo.AppUser + "|" + momo.Amount + "|" + momo.AppTime +
-                      "|" + "|";
-        return momo.Mac = HashingUtils.HmacSha256(rawHash, key);
+        var embed_data = new { };
+        var item = new[] { new { } };
+        var data = zalo.AppId + "|" + zalo.AppTransId + "|" + zalo.AppUser + "|" + zalo.Amount + "|" + zalo.AppTime +
+                   "|" + "{}" + "|" + "[]";
+
+        return zalo.Mac = HashingUtils.HmacSha256(data, key);
     }
 
     #endregion

@@ -198,7 +198,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("description")
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
@@ -349,7 +349,7 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
@@ -435,7 +435,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("description")
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
@@ -609,7 +609,7 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
+                    b.Property<string>("description")
                         .IsRequired()
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
@@ -1299,7 +1299,7 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("description")
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
@@ -1896,7 +1896,7 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("description")
                         .HasMaxLength(750)
                         .HasColumnType("nvarchar(750)");
 
@@ -1932,7 +1932,7 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal>("amount")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
