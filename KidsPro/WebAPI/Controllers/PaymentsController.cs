@@ -14,8 +14,8 @@ namespace WebAPI.Controllers
     {
         IPaymentService _payment;
         IMomoConfig _momoConfig;
-        private IZaloPayConfig _zaloPayConfig;
-        private IAuthenticationService _authentication;
+        IAuthenticationService _authentication;
+        IZaloPayConfig _zaloPayConfig;
 
         public PaymentsController(IPaymentService payment, IMomoConfig momoConfig,
             IAuthenticationService authentication, IZaloPayConfig zaloPayConfig)
@@ -75,30 +75,22 @@ namespace WebAPI.Controllers
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
 
-            var momoRequest = new MomoPaymentRequest();
-            //Get order có parent id và order id vs status payment
-            var order = await _payment.GetOrderStatusPaymentAsync(id);
+            var momoRequest = new MomoRefundRequest();
             //Get Transaction by orderId
             var transaction = await _payment.GetTransactionByOrderIdAsync(id);
 
             // Lấy thông tin cho payment
-            momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + order.ParentId;
-            momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + order.Id;
-            momoRequest.amount = (long)order.TotalPrice;
-            momoRequest.redirectUrl = _momoConfig.ReturnUrl;
-            momoRequest.ipnUrl = _momoConfig.IpnUrl;
+            momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + transaction.Order!.ParentId;
+            momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + transaction.OrderId;
+            momoRequest.amount = 1000;
             momoRequest.partnerCode = _momoConfig.PartnerCode;
-            momoRequest.transId =long.Parse(transaction.TransactionCode!);
-            momoRequest.signature = _payment.MakeSignatureMomoPayment
+            momoRequest.transId = long.Parse(transaction.TransactionCode!);
+            momoRequest.signature = _payment.MakeSignatureMomoRefund
                 (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
 
-            // lấy link QR momo
-            var result = _payment.GetLinkGatewayMomo(_momoConfig.RefundUrl, momoRequest);
-            return Ok(new
-            {
-                payUrl = result.Item1,
-                qrCode = result.Item2,
-            });
+            // Request Momo Refund
+            var result = _payment.RequestMomoRefund(_momoConfig.RefundUrl, momoRequest);
+            return Ok(result);
         }
 
         /// <summary>

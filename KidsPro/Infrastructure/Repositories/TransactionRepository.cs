@@ -15,7 +15,7 @@ namespace Infrastructure.Repositories;
 
         public override Task<Transaction?> GetByIdAsync(int id, bool disableTracking = false)
         {
-            return _dbSet.Include(x => x.Order)
+            return _dbSet.Include(x => x.Order).ThenInclude(x=> x!.Parent)
                 .FirstOrDefaultAsync(x => x.OrderId == id && x.Status==TransactionStatus.Success);
         }
     }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Dtos.Request.Order.ZaloPay;
+using Application.Dtos.Response.Order.Momo;
 
 namespace Application.Interfaces.IServices
 {
@@ -19,5 +20,7 @@ namespace Application.Interfaces.IServices
         string MakeSignatureZaloPayment(string Key, ZaloPaymentRequest zalo);
         string? GetLinkGatewayZaloPay(string paymentUrl, ZaloPaymentRequest zaloRequest);
         Task<Transaction> GetTransactionByOrderIdAsync(int orderId);
+        MomoPaymentResponse RequestMomoRefund(string paymentUrl, MomoRefundRequest momoRequest);
+        string MakeSignatureMomoRefund(string accessKey, string secretKey, MomoRefundRequest momo);
     }
 }

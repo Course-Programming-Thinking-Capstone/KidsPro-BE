@@ -21,6 +21,7 @@ public class PaymentService : IPaymentService
     readonly IOrderService _orderService;
     private IAccountService _accountService;
 
+
     public PaymentService(IUnitOfWork unitOfWork, IOrderService orderService, IAccountService accountService)
     {
         _unitOfWork = unitOfWork;
@@ -81,6 +82,15 @@ public class PaymentService : IPaymentService
         return momo.signature = HashingUtils.HmacSha256(rawHash, secretKey);
     }
 
+    public string MakeSignatureMomoRefund(string accessKey, string secretKey, MomoRefundRequest momo)
+    {
+        var rawHash = "accessKey=" + accessKey +
+                      "&amount=" + momo.amount + "&description=" + momo.description +
+                      "&orderId=" + momo.orderId + "&partnerCode=" + momo.partnerCode +
+                      "&requestId=" + momo.requestId + "&transId=" + momo.transId;
+        return momo.signature = HashingUtils.HmacSha256(rawHash, secretKey);
+    }
+
     public (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest)
     {
         using HttpClient client = new HttpClient();
@@ -104,7 +114,30 @@ public class PaymentService : IPaymentService
 
         throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
     }
+    
+    public MomoPaymentResponse RequestMomoRefund(string paymentUrl, MomoRefundRequest momoRequest)
+    {
+        using HttpClient client = new HttpClient();
+        var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            Formatting = Formatting.Indented,
+        });
+        var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
 
+        var createPaymentLink = client.PostAsync(paymentUrl, requestContent).Result;
+        if (createPaymentLink.IsSuccessStatusCode)
+        {
+            var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
+            var responeseData = JsonConvert.DeserializeObject<MomoPaymentResponse>(responseContent);
+            // return QRcode
+            if (responeseData?.resultCode == 0)
+                return responeseData;
+            throw new NotImplementException($"Error Momo: {responeseData?.message}");
+        }
+
+        throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
+    }
     private int GetIdMomoResponse(string id)
     {
         Regex regex = new Regex("-(\\d+)");

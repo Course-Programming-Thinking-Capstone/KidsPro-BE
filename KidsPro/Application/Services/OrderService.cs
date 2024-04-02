@@ -153,6 +153,8 @@ namespace Application.Services
                     title = "The result of processing order cancellation request";
                     content = "Order cancellation request accepted, " +
                               "KidsPro will refund the money to the e-Wallet after 3-5 days";
+                    
+                    
                     break;
                 case ModerationStatus.Refuse:
                     await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,

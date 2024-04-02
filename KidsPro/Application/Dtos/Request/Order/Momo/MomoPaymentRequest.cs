@@ -14,6 +14,5 @@
         public string extraData { get; set; } = "eyJ1c2VybmFtZSI6ICJtb21vIn0=";
         public string signature { get; set; } = string.Empty;
         public string lang { get; set; } = "vi";
-        public long transId { get; set; }
     }
 }
