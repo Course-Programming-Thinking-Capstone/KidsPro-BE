@@ -40,4 +40,5 @@ public class Quiz : BaseEntity
     public int? PassConditionId { get; set; }
 
     public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
+    public virtual ICollection<StudentQuiz> StudentQuizzes  { get; set; } = new List<StudentQuiz>();
 }
