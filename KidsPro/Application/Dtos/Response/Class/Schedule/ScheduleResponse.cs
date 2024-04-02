@@ -4,7 +4,7 @@ namespace Application.Dtos.Response;
 
 public class ScheduleResponse
 {
-    public int ClassId { get; set; }
+    public int? ClassId { get; set; }
     public int? SlotTime { get; set; }
     public IEnumerable<DayStatus>? StudyDay  { get; set; }= new List<DayStatus>();
     public int? SlotNumber { get; set; }

@@ -54,9 +54,9 @@ public static class ClassMapper
                     {
                         ClassId = c.Id,
                         ClassName = c.Code,
-                        Open = c.Schedules!.First().StartTime,
-                        Close = c.Schedules!.First().EndTime,
-                        Slot = c.Schedules!.First().Slot,
+                        Open = c.Schedules?.FirstOrDefault()?.StartTime,
+                        Close = c.Schedules?.FirstOrDefault()?.EndTime,
+                        Slot = c.Schedules?.FirstOrDefault()?.Slot,
                         StudyDays = c.Schedules!.Select(x => x.StudyDay),
                     };
                     teacher.Schedules?.Add(x);
@@ -82,10 +82,10 @@ public static class ClassMapper
         SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
         //Schedules
-        RoomUrl = dto.Schedules?.First().RoomUrl,
-        SlotNumber = dto.Schedules?.First().Slot ?? 0,
-        StartSlot = dto.Schedules?.First().StartTime ?? TimeSpan.Zero,
-        EndSlot = dto.Schedules?.First().EndTime ?? TimeSpan.Zero,
+        RoomUrl = dto.Schedules?.FirstOrDefault()?.RoomUrl,
+        SlotNumber = dto.Schedules?.FirstOrDefault()?.Slot ?? 0,
+        StartSlot = dto.Schedules?.FirstOrDefault()?.StartTime ?? TimeSpan.Zero,
+        EndSlot = dto.Schedules?.FirstOrDefault()?.EndTime ?? TimeSpan.Zero,
         StudyDay = dto.Schedules?.Where(x => x.Status == ScheduleStatus.Active)
             .Select(x => x.StudyDay) ?? new List<DayStatus>(),
         //Students
@@ -102,12 +102,12 @@ public static class ClassMapper
     public static ScheduleResponse ScheduleToScheduleResponse(List<ClassSchedule> dto)
         => new ScheduleResponse()
         {
-            ClassId = dto.First().ClassId,
-            SlotTime = dto.First().Class.Course.Syllabus?.SlotTime,
-            StartSlot = dto.First().StartTime,
-            EndSlot = dto.First().EndTime,
-            SlotNumber = dto.First().Slot,
-            RoomUrl = dto.First().RoomUrl,
+            ClassId = dto.FirstOrDefault()?.ClassId,
+            SlotTime = dto.FirstOrDefault()?.Class.Course.Syllabus?.SlotTime,
+            StartSlot = dto.FirstOrDefault()?.StartTime,
+            EndSlot = dto.FirstOrDefault()?.EndTime,
+            SlotNumber = dto.FirstOrDefault()?.Slot,
+            RoomUrl = dto.FirstOrDefault()?.RoomUrl,
             StudyDay = dto.Select(x => x.StudyDay),
         };
 
