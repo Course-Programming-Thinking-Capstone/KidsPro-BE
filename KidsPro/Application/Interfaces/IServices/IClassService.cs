@@ -19,6 +19,6 @@ public interface IClassService
      Task<ScheduleResponse> GetScheduleByClassIdAsync(int classId);
      Task UpdateScheduleAsync(ScheduleUpdateRequest dto);
      Task<List<StudentClassResponse>> SearchStudentScheduleAsync(string input, int classId);
-     Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto, ClassStudentType type);
+     Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto);
      Task<PagingClassesResponse> GetClassesAsync(int? page, int? size);
 }

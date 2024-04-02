@@ -244,8 +244,7 @@ public class ClassService : IClassService
         return ClassMapper.StudentToStudentClassResponse(studentsForClass);
     }
 
-    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto,
-        ClassStudentType type)
+    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto)
     {
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
                           ?? throw new NotFoundException($"ClassId: {dto.ClassId} doesn't exist");
@@ -254,28 +253,27 @@ public class ClassService : IClassService
 
         if (students.Count < dto.StudentIds.Count)
             throw new BadRequestException("StudentId doesn't exist");
-
-        switch (type)
-        {
-            case ClassStudentType.AddToClass:
-                // lấy những StudentId mà list truyền vào có, list không có để add
-                var addStudents = students.Where(e => entityClass.Students.All(s => s.Id != e.Id)).ToList();
-
-                if (entityClass.Students.Count == 0)
-                    entityClass.Students = new List<Student>();
-
-                foreach (var x in addStudents)
-                    entityClass.Students.Add(x);
-                break;
-
-            case ClassStudentType.RemoveFromClass:
-                // lấy những StudentId mà class có, list truyền vào không có để removed
-                var removeStudents = entityClass.Students.Where(e => students.All(s => s.Id != e.Id)).ToList();
-
-                foreach (var x in removeStudents)
-                    entityClass.Students.Remove(x);
-                break;
-        }
+        
+        if (entityClass.Students.Count == 0)
+            entityClass.Students = new List<Student>();
+        
+        // lấy những StudentId mà list truyền vào có, list không có để add
+        var addStudents = students.Where(e => entityClass.Students.All(s => s.Id != e.Id)).ToList();
+        foreach (var x in addStudents)
+            entityClass.Students.Add(x);
+        
+        // lấy những StudentId mà class có, list truyền vào không có để removed
+        var removeStudents = entityClass.Students.Where(e => students.All(s => s.Id != e.Id)).ToList();
+        foreach (var x in removeStudents)
+            entityClass.Students.Remove(x);
+        
+        // switch (type)
+        // {
+        //     case ClassStudentType.AddToClass:
+        //         break;
+        //     case ClassStudentType.RemoveFromClass:
+        //         break;
+        // }
 
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();

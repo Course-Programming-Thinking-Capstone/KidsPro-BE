@@ -91,7 +91,7 @@ public static class ClassMapper
         //Students
         Students = dto.Students.Select(x => new StudentClassResponse
         {
-            Image = x.Account.PictureUrl,
+            StudentId = x.Id,
             StudentName = x.Account.FullName,
             DateOfBirth = DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
             Gender = x.Account.Gender
@@ -115,6 +115,7 @@ public static class ClassMapper
     {
         return dto.Select(student => new StudentClassResponse
         {
+            StudentId = student.Id,
             Image = student.Account.PictureUrl,
             StudentName = student.Account.FullName,
             DateOfBirth = DateUtils.FormatDateTimeToDateV1(student.Account.DateOfBirth),
