@@ -12,11 +12,12 @@ namespace Application.Interfaces.IServices
 {
     public interface IPaymentService
     {
-        Task<Order?> GetOrderStatusPaymentAsync(int orderId);
+        Task<Order> GetOrderStatusPaymentAsync(int orderId);
         string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo);
         (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest);
         Task<int> CreateTransactionAsync(MomoResultRequest dto);
         string MakeSignatureZaloPayment(string Key, ZaloPaymentRequest zalo);
         string? GetLinkGatewayZaloPay(string paymentUrl, ZaloPaymentRequest zaloRequest);
+        Task<Transaction> GetTransactionByOrderIdAsync(int orderId);
     }
 }

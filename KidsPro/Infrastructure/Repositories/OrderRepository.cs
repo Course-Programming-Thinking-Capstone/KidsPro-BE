@@ -35,7 +35,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Order?> GetOrderByStatusAsync(int parentId, int orderId, OrderStatus status)
         {
-            var query = _dbSet.AsNoTracking();
+            var query = _dbSet;
 
             return await query.Include(x=>x.Parent).ThenInclude(x=>x!.Account)
                 .FirstOrDefaultAsync(x =>

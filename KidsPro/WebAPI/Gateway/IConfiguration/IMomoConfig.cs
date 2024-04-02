@@ -9,4 +9,5 @@ public interface IMomoConfig
     public string AccessKey { get; }
     public string SecretKey { get; }
     public string PaymentUrl { get; }
+    public string RefundUrl { get; }
 }

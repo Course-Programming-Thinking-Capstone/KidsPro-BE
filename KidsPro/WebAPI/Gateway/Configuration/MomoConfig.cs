@@ -13,6 +13,7 @@ namespace WebAPI.Gateway.Configuration
         public string AccessKey => _section[nameof(AccessKey)];
         public string SecretKey => _section[nameof(SecretKey)];
         public string PaymentUrl => _section[nameof(PaymentUrl)];
+        public string RefundUrl => _section[nameof(RefundUrl)];
 
         public MomoConfig(IConfiguration configuration)
         {

@@ -65,6 +65,43 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Staff call this api, momo refund
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPatch("momo/refund/{id}")]
+        public async Task<ActionResult> RefundMomoAsync(int id)
+        {
+            //Check if the account is activated or not or inactive
+            _authentication.CheckAccountStatus();
+
+            var momoRequest = new MomoPaymentRequest();
+            //Get order có parent id và order id vs status payment
+            var order = await _payment.GetOrderStatusPaymentAsync(id);
+            //Get Transaction by orderId
+            var transaction = await _payment.GetTransactionByOrderIdAsync(id);
+
+            // Lấy thông tin cho payment
+            momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + order.ParentId;
+            momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + order.Id;
+            momoRequest.amount = (long)order.TotalPrice;
+            momoRequest.redirectUrl = _momoConfig.ReturnUrl;
+            momoRequest.ipnUrl = _momoConfig.IpnUrl;
+            momoRequest.partnerCode = _momoConfig.PartnerCode;
+            momoRequest.transId =long.Parse(transaction.TransactionCode!);
+            momoRequest.signature = _payment.MakeSignatureMomoPayment
+                (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
+
+            // lấy link QR momo
+            var result = _payment.GetLinkGatewayMomo(_momoConfig.RefundUrl, momoRequest);
+            return Ok(new
+            {
+                payUrl = result.Item1,
+                qrCode = result.Item2,
+            });
+        }
+
+        /// <summary>
         /// Không dùng APi này, sau khi payment success Momo sẽ tự động gọi api return
         /// </summary>
         /// <param name="dto"></param>
@@ -105,7 +142,7 @@ namespace WebAPI.Controllers
             zaloRequest.AppId = Int32.Parse(_zaloPayConfig.AppId);
             zaloRequest.Description = "ZaloPayDemo - Thanh toán cho đơn hàng #220817_1660717311101";
             zaloRequest.BankCode = "zalopayapp";
-           // zaloRequest.embed_data = "{\"redirecturl\": \"https://docs.zalopay.vn/result\"}";
+            // zaloRequest.embed_data = "{\"redirecturl\": \"https://docs.zalopay.vn/result\"}";
             zaloRequest.Mac = _payment.MakeSignatureZaloPayment(_zaloPayConfig.Key1, zaloRequest);
 
             // lấy link QR momo

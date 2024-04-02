@@ -30,15 +30,14 @@ public class PaymentService : IPaymentService
 
     #region Transaction
 
-    public async Task<Order?> GetOrderStatusPaymentAsync(int orderId)
+    public async Task<Order> GetOrderStatusPaymentAsync(int orderId)
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
 
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
             OrderStatus.Process);
-        if (order != null)
-            return order;
-        throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
+        return order ??
+               throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
     }
 
     public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
@@ -50,7 +49,7 @@ public class PaymentService : IPaymentService
         var transaction = new Transaction()
         {
             OrderId = orderId,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = DateTime.Now,
             TransactionCode = dto.transId,
             Amount = dto.amount,
             Status = TransactionStatus.Success
@@ -59,6 +58,12 @@ public class PaymentService : IPaymentService
         var result = await _unitOfWork.SaveChangeAsync();
         if (result < 0) throw new NotImplementException("Add transaction failed");
         return orderId;
+    }
+
+    public async Task<Transaction> GetTransactionByOrderIdAsync(int orderId)
+    {
+        var transaction = await _unitOfWork.TransactionRepository.GetByIdAsync(orderId);
+        return transaction ?? throw new NotFoundException($"OrderId: {orderId} not found in transaction");
     }
 
     #endregion
@@ -92,7 +97,7 @@ public class PaymentService : IPaymentService
             var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
             var responeseData = JsonConvert.DeserializeObject<MomoPaymentResponse>(responseContent);
             // return QRcode
-            if (responeseData?.resultCode == "0")
+            if (responeseData?.resultCode == 0)
                 return (responeseData.payUrl, responeseData.qrCodeUrl);
             throw new NotImplementException($"Error Momo: {responeseData?.message}");
         }

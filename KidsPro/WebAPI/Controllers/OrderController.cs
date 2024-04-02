@@ -69,7 +69,7 @@ namespace WebAPI.Controllers
         [HttpGet("detail/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<OrderDetailResponse>> GetOrdersAsync(int id)
+        public async Task<ActionResult<OrderDetailResponse>> GetOrdersDetailAsync(int id)
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
