@@ -81,4 +81,17 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
         return await query.Where(x=> ids.Contains(x.Id)) .Include(x => x.Account)
             .Include(x=> x.Parent).ThenInclude(x=> x.Account).ToListAsync();
     }
+
+    public async Task<Student?> GetStudentProgress(int id)
+    {
+        var query = _dbSet.AsNoTracking();
+        return await query.Include(x => x.StudentProgresses).ThenInclude(x=> x.Course)
+            .Include(x => x.StudentProgresses).ThenInclude(x => x.Section)
+            .ThenInclude(x => x.Lessons).ThenInclude(x => x.StudentLessons)
+            .Include(x => x.StudentProgresses).ThenInclude(x => x.Section)
+            .ThenInclude(x => x.Quizzes).ThenInclude(x => x.StudentQuizzes)
+            .Include(x=>x.Account)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+    }
 }

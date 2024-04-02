@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.IRepositories;
+using Application.Interfaces.IServices;
 
 namespace Application;
 
@@ -44,4 +45,5 @@ public interface IUnitOfWork : IDisposable
     public IPassConditionRepository PassConditionRepository { get; }
     public IScheduleReposisoty ScheduleReposisoty { get; }
     public IClassRepository ClassRepository { get; }
+    public IStudentProgressRepository StudentProgressRepository { get; }
 }
