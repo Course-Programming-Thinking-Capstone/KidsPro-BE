@@ -29,7 +29,7 @@ namespace Application.Services
         public async Task<int> CreateOrderAsync(OrderRequest dto)
         {
             var voucher = await _unitOfWork.VoucherRepository.GetVoucher(dto.VoucherId);
-            //Kiểm tra lấy order code, nếu đã tồn tại phải tạo ordercode mới
+            //Check lấy order code, nếu đã tồn tại phải tạo ordercode mới
             string? getOrderCode;
             Course? course;
             do
@@ -174,11 +174,12 @@ namespace Application.Services
 
         public async Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status)
         {
-            var account = await _account.GetCurrentAccountInformationAsync();
+            //var account = await _account.GetCurrentAccountInformationAsync();
 
             var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId, status);
             return order ??
                    throw new NotFoundException($"OrderId {orderId} not exist process status");
         }
+        
     }
 }

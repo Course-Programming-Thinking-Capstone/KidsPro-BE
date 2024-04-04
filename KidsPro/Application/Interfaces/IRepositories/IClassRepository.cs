@@ -6,4 +6,5 @@ namespace Application.Interfaces.IRepositories;
 public interface IClassRepository:IBaseRepository<Class>
 {
     Task<bool> ExistByClassCode(string code);
+    Task<List<Class>> GetClassByRole(int id, string role);
 }

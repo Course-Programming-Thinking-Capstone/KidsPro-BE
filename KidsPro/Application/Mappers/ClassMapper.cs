@@ -23,7 +23,7 @@ public static class ClassMapper
             TotalSlot = dto.TotalSlot
         };
 
-    public static ScheduleCreateResponse ScheduleToScheuldeCreateResponse(ClassSchedule dto, List<DayStatus> dayList)
+    public static ScheduleCreateResponse ScheduleToScheduleCreateResponse(ClassSchedule dto, List<DayStatus> dayList)
         => new ScheduleCreateResponse()
         {
             ClassId = dto.ClassId,
@@ -123,7 +123,7 @@ public static class ClassMapper
         }).ToList();
     }
 
-    public static PagingClassesResponse ClassToClassesResponse(PagingResponse<Class> dto) => new PagingClassesResponse()
+    public static PagingClassesResponse ClassToClassesPagingResponse(PagingResponse<Class> dto) => new PagingClassesResponse()
     {
         TotalPage = dto.TotalPages,
         TotalRecord = dto.TotalRecords,
@@ -136,4 +136,15 @@ public static class ClassMapper
         }).ToList()
     };
 
+    public static List<ClassesResponse> ClassToClassesResponse(List<Class> dto)
+    {
+        return dto.Select(x => new ClassesResponse()
+        {
+            ClassId = x.Id,
+            ClassCode = x.Code,
+            Start = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
+            End = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
+            Days = x.Schedules?.Select(s=> s.StudyDay).ToList()
+        }).ToList();
+    }
 }

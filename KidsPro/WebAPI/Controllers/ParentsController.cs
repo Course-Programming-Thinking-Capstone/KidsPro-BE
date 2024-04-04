@@ -54,7 +54,7 @@ public class ParentsController : ControllerBase
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
         
-        var result=await _parent.GetEmailZalo();
+        var result=await _parent.GetParentEmail();
         return Ok(result);
     }
     

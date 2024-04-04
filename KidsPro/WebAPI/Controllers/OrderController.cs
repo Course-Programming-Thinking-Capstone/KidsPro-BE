@@ -114,5 +114,22 @@ namespace WebAPI.Controllers
             await _order.HandleRefundRequest(dto, status);
             return Ok("Handling the request successfully");
         }
+        /// <summary>
+        /// Staff click on confirm button, order update from pending status to success status
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Roles = $"{Constant.StaffRole}")]
+        [HttpPatch("confirm/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+        public async Task<IActionResult> ConfirmOrderAsync(int id)
+        {
+            //Check if the account is activated or not or inactive
+            _authentication.CheckAccountStatus();
+
+            await _order.UpdateOrderStatusAsync(orderId:id, OrderStatus.Pending, OrderStatus.Success);
+            return Ok("Successfully update to success status");
+        }
     }
 }

@@ -53,7 +53,7 @@ public class ParentsService : IParentsService
         return result;
     }
 
-    public async Task<ParentOrderResponse> GetEmailZalo()
+    public async Task<ParentOrderResponse> GetParentEmail()
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
         var result = _unitOfWork.ParentRepository.GetEmailZalo(account.IdSubRole);

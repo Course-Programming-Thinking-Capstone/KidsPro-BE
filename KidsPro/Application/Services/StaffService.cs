@@ -43,9 +43,6 @@ public class StaffService : IStaffService
         student!.UserName = dto.UserName;
         student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
         _unitOfWork.StudentRepository.Update(student);
-        //Update order status to Success
-        order.Status = OrderStatus.Success;
-        _unitOfWork.OrderRepository.Update(order);
         await _unitOfWork.SaveChangeAsync();
 
         return EmailMapper.ShowEmailContentResponse(student, dto.Password!, order);

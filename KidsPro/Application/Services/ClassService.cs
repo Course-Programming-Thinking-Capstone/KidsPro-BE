@@ -32,7 +32,7 @@ public class ClassService : IClassService
         var account = await _account.GetCurrentAccountInformationAsync();
 
         if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole)
-            throw new UnauthorizedException("Not the staff role, please login by staff account");
+            throw new UnauthorizedException("Not the staff or admin role, please login by manager account");
         return account;
     }
 
@@ -85,7 +85,18 @@ public class ClassService : IClassService
             size = 10;
         }
 
-        var classes = await _unitOfWork.ClassRepository.GetPaginateAsync(filter:null,orderBy:null,page:page, size:size);
+        var classes =
+            await _unitOfWork.ClassRepository.GetPaginateAsync(filter: null, orderBy: null, page: page, size: size);
+
+        return ClassMapper.ClassToClassesPagingResponse(classes);
+    }
+
+    public async Task<List<ClassesResponse>> GetClassByRoleAsync(int id)
+    {
+        var account = await _account.GetCurrentAccountInformationAsync();
+
+        var classes = await _unitOfWork.ClassRepository.GetClassByRole(id, account.Role);
+        if (classes.Count == 0) throw new BadRequestException($"Teacher or student {id} not found");
 
         return ClassMapper.ClassToClassesResponse(classes);
     }
@@ -113,7 +124,7 @@ public class ClassService : IClassService
         await _unitOfWork.ScheduleReposisoty.AddRangeAsync(schedule);
         await _unitOfWork.SaveChangeAsync();
 
-        return ClassMapper.ScheduleToScheuldeCreateResponse(schedule.First(), dto.Days);
+        return ClassMapper.ScheduleToScheduleCreateResponse(schedule.First(), dto.Days);
     }
 
     public async Task<ScheduleResponse> GetScheduleByClassIdAsync(int classId)
@@ -253,20 +264,20 @@ public class ClassService : IClassService
 
         if (students.Count < dto.StudentIds.Count)
             throw new BadRequestException("StudentId doesn't exist");
-        
+
         if (entityClass.Students.Count == 0)
             entityClass.Students = new List<Student>();
-        
+
         // lấy những StudentId mà list truyền vào có, list không có để add
         var addStudents = students.Where(e => entityClass.Students.All(s => s.Id != e.Id)).ToList();
         foreach (var x in addStudents)
             entityClass.Students.Add(x);
-        
+
         // lấy những StudentId mà class có, list truyền vào không có để removed
         var removeStudents = entityClass.Students.Where(e => students.All(s => s.Id != e.Id)).ToList();
         foreach (var x in removeStudents)
             entityClass.Students.Remove(x);
-        
+
         // switch (type)
         // {
         //     case ClassStudentType.AddToClass:

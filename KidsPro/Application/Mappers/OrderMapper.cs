@@ -23,7 +23,7 @@ namespace Application.Mappers
                     Quantity = x.Quantity,
                     TotalPrice = x.TotalPrice,
                     OrderStatus = x.Status.ToString(),
-                    ParentName = x.Parent!.Account!.FullName,
+                    ParentName = x.Parent!.Account.FullName,
                     PaymentType = x.PaymentType.ToString(),
                     Note = x.Note
                 };
@@ -55,13 +55,14 @@ namespace Application.Mappers
                 ParentName = order.Parent!.Account.FullName,
                 ParentId = order.Parent!.Account.Id
             };
-            foreach (var dto in order.OrderDetails!.FirstOrDefault()!.Students!)
+            foreach (var dto in order.OrderDetails!.FirstOrDefault()!.Students)
             {
                 var stu = new StudentOrderDetail()
                 {
                     StudentId = dto.Id,
                     StudentName = dto.Account.FullName,
-                    DateOfBirth = DateUtils.FormatDateTimeToDatetimeV1(dto.Account.DateOfBirth)
+                    DateOfBirth = DateUtils.FormatDateTimeToDatetimeV1(dto.Account.DateOfBirth),
+                    UserName = dto.UserName
                 };
                 x.Students?.Add(stu);
             }

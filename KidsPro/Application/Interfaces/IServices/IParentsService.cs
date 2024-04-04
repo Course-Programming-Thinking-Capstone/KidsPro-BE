@@ -13,7 +13,7 @@ namespace Application.Interfaces.IServices;
 
        
 
-        Task<ParentOrderResponse> GetEmailZalo();
+        Task<ParentOrderResponse> GetParentEmail();
 
         Task<List<GameVoucher>?> GetListVoucherAsync(VoucherStatus status);
 

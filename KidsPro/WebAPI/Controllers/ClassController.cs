@@ -30,6 +30,25 @@ public class ClassController : ControllerBase
     #region Class
 
     /// <summary>
+    /// Get classes by teacher or student Id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.StudentRole}")]
+    [HttpGet("teacher-or-student/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<ClassesResponse>> GetClassesByRoleAsync(int id)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        var result = await _class.GetClassByRoleAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get Classes, enter page and size
     /// </summary>
     /// <param name="page"></param>
