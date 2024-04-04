@@ -18,7 +18,7 @@ namespace Infrastructure.Repositories
 
         public async Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision)
         {
-            string orderCode = generateOrderCode(13);
+            string orderCode = generateOrderCode(7);
 
             switch (decision)
             {

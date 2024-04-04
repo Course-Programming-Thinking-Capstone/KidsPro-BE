@@ -12,41 +12,36 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Application.Dtos.Request.Order.ZaloPay;
 using Application.Dtos.Response.Order.ZaloPay;
+using WebAPI.Gateway.IConfig;
 
 namespace Application.Services;
 
 public class PaymentService : IPaymentService
 {
     readonly IUnitOfWork _unitOfWork;
-    readonly IOrderService _orderService;
     private IAccountService _accountService;
+    IMomoConfig _momoConfig;
 
-
-    public PaymentService(IUnitOfWork unitOfWork, IOrderService orderService, IAccountService accountService)
+    public PaymentService(IUnitOfWork unitOfWork,IAccountService accountService, IMomoConfig momoConfig)
     {
         _unitOfWork = unitOfWork;
-        _orderService = orderService;
         _accountService = accountService;
+        _momoConfig = momoConfig;
     }
 
     #region Transaction
-
-    public async Task<Order> GetOrderStatusPaymentAsync(int orderId)
-    {
-        var account = await _accountService.GetCurrentAccountInformationAsync();
-
-        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
-            OrderStatus.Process);
-        return order ??
-               throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} doesn't payment status");
-    }
 
     public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
     {
         var orderId = GetIdMomoResponse(dto.orderId);
         var parentId = GetIdMomoResponse(dto.requestId);
 
-        await _orderService.UpdateOrderStatusAsync(orderId, parentId, OrderStatus.Process, OrderStatus.Pending);
+        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId, OrderStatus.Process)
+            ??throw new  BadRequestException($"OrderId {orderId} not found, can't update to pending status");
+
+        order.Status = OrderStatus.Pending;
+        _unitOfWork.OrderRepository.Update(order);
+        
         var transaction = new Transaction()
         {
             OrderId = orderId,
@@ -65,6 +60,17 @@ public class PaymentService : IPaymentService
     {
         var transaction = await _unitOfWork.TransactionRepository.GetByIdAsync(orderId);
         return transaction ?? throw new NotFoundException($"OrderId: {orderId} not found in transaction");
+    }
+
+    public async Task UpdateTransStatusToRefunded(string momoOrderId)
+    {
+        var orderId = GetIdMomoResponse(momoOrderId);
+
+        var transaction = await GetTransactionByOrderIdAsync(orderId);
+        transaction.Status = TransactionStatus.Refunded;
+        
+        _unitOfWork.TransactionRepository.Update(transaction);
+        await _unitOfWork.SaveChangeAsync();
     }
 
     #endregion
@@ -91,7 +97,7 @@ public class PaymentService : IPaymentService
         return momo.signature = HashingUtils.HmacSha256(rawHash, secretKey);
     }
 
-    public (string?, string?) GetLinkGatewayMomo(string paymentUrl, MomoPaymentRequest momoRequest)
+    public (string?, string?) GetLinkMomoGateway(string paymentUrl, MomoPaymentRequest momoRequest)
     {
         using HttpClient client = new HttpClient();
         var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
@@ -115,7 +121,7 @@ public class PaymentService : IPaymentService
         throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
     }
     
-    public MomoPaymentResponse RequestMomoRefund(string paymentUrl, MomoRefundRequest momoRequest)
+    public MomoPaymentResponse SentRequestMomoRefund(string paymentUrl, MomoRefundRequest momoRequest)
     {
         using HttpClient client = new HttpClient();
         var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
@@ -138,12 +144,32 @@ public class PaymentService : IPaymentService
 
         throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
     }
+    
     private int GetIdMomoResponse(string id)
     {
         Regex regex = new Regex("-(\\d+)");
         var macth = regex.Match(id);
         if (macth.Success) return Int32.Parse(macth.Groups[1].Value);
         return 0;
+    }
+    
+    public async Task<MomoPaymentResponse> RequestMomoRefundAsync(int orderId)
+    {
+        var momoRequest = new MomoRefundRequest();
+        //Get Transaction by momoOrderId
+        var transaction = await GetTransactionByOrderIdAsync(orderId);
+
+        // Lấy thông tin cho payment
+        momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + transaction.Order!.ParentId;
+        momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + transaction.OrderId;
+        momoRequest.amount = (long)transaction.Amount;
+        momoRequest.partnerCode = _momoConfig.PartnerCode;
+        momoRequest.transId = long.Parse(transaction.TransactionCode!);
+        momoRequest.signature = MakeSignatureMomoRefund
+            (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
+
+        // Request Momo Refund
+        return SentRequestMomoRefund(_momoConfig.RefundUrl, momoRequest);
     }
 
     #endregion

@@ -3,6 +3,7 @@ using Application.Dtos.Request.Order.ZaloPay;
 using Application.Dtos.Response.Order;
 using Application.Interfaces.IServices;
 using Application.Utils;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Gateway.IConfig;
 
@@ -16,14 +17,16 @@ namespace WebAPI.Controllers
         IMomoConfig _momoConfig;
         IAuthenticationService _authentication;
         IZaloPayConfig _zaloPayConfig;
+        private IOrderService _order;
 
         public PaymentsController(IPaymentService payment, IMomoConfig momoConfig,
-            IAuthenticationService authentication, IZaloPayConfig zaloPayConfig)
+            IAuthenticationService authentication, IZaloPayConfig zaloPayConfig, IOrderService order)
         {
             _payment = payment;
             _momoConfig = momoConfig;
             _authentication = authentication;
             _zaloPayConfig = zaloPayConfig;
+            _order = order;
         }
 
         #region Momo
@@ -41,12 +44,11 @@ namespace WebAPI.Controllers
 
             var momoRequest = new MomoPaymentRequest();
             //Get order có parent id và order id vs status payment
-            var order = await _payment.GetOrderStatusPaymentAsync(id);
-            if (order == null) return BadRequest($"OrderID:{id} doesn't not exist");
+            var order = await _order.GetOrderByStatusAsync(id, OrderStatus.Process);
 
             // Lấy thông tin cho payment
-            momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + order.ParentId;
-            momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + order.Id;
+            momoRequest.requestId = StringUtils.GenerateRandomNumberString(4) + "-" + order!.ParentId;
+            momoRequest.orderId = StringUtils.GenerateRandomNumberString(4) + "-" + order.Id;
             momoRequest.amount = (long)order.TotalPrice;
             momoRequest.redirectUrl = _momoConfig.ReturnUrl;
             momoRequest.ipnUrl = _momoConfig.IpnUrl;
@@ -56,41 +58,12 @@ namespace WebAPI.Controllers
                 (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
 
             // lấy link QR momo
-            var result = _payment.GetLinkGatewayMomo(_momoConfig.PaymentUrl, momoRequest);
+            var result = _payment.GetLinkMomoGateway(_momoConfig.PaymentUrl, momoRequest);
             return Ok(new
             {
                 payUrl = result.Item1,
                 qrCode = result.Item2,
             });
-        }
-
-        /// <summary>
-        /// Staff call this api, momo refund
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpPatch("momo/refund/{id}")]
-        public async Task<ActionResult> RefundMomoAsync(int id)
-        {
-            //Check if the account is activated or not or inactive
-            _authentication.CheckAccountStatus();
-
-            var momoRequest = new MomoRefundRequest();
-            //Get Transaction by orderId
-            var transaction = await _payment.GetTransactionByOrderIdAsync(id);
-
-            // Lấy thông tin cho payment
-            momoRequest.requestId = StringUtils.GenerateRandomNumber(4) + "-" + transaction.Order!.ParentId;
-            momoRequest.orderId = StringUtils.GenerateRandomNumber(4) + "-" + transaction.OrderId;
-            momoRequest.amount = 1000;
-            momoRequest.partnerCode = _momoConfig.PartnerCode;
-            momoRequest.transId = long.Parse(transaction.TransactionCode!);
-            momoRequest.signature = _payment.MakeSignatureMomoRefund
-                (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
-
-            // Request Momo Refund
-            var result = _payment.RequestMomoRefund(_momoConfig.RefundUrl, momoRequest);
-            return Ok(result);
         }
 
         /// <summary>
@@ -123,7 +96,7 @@ namespace WebAPI.Controllers
 
             var zaloRequest = new ZaloPaymentRequest();
             //Get order có parent id và order id vs status payment
-            var order = await _payment.GetOrderStatusPaymentAsync(id);
+            var order = await _order.GetOrderByStatusAsync(id, OrderStatus.Process);
 
             // Lấy thông tin cho payment
             zaloRequest.AppUser = order.Parent!.Account.FullName;

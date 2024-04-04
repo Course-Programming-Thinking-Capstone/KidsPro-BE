@@ -1,4 +1,5 @@
-﻿using WebAPI.Gateway.IConfig;
+﻿using Microsoft.Extensions.Configuration;
+using WebAPI.Gateway.IConfig;
 
 namespace WebAPI.Gateway.Configuration
 {

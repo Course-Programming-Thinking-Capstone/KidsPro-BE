@@ -92,7 +92,7 @@ namespace WebAPI.Controllers
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
             
-            await _order.CanCelOrderAsync(dto);
+            await _order.ParentCanCelOrderAsync(dto);
             return Ok("Order cancellation request sent successfully");
         }
 

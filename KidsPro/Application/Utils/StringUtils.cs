@@ -35,7 +35,7 @@ public class StringUtils
     public static string GenerateRandomNumber(int length)
     {
         //const string chars = "0123456789";
-        const string chars = "qwertyuioplkjhgfdsazxzcvbnm0123456789";
+        const string chars = "0123456789";
         Random random = new Random();
         StringBuilder stringBuilder = new StringBuilder(length);
 
@@ -47,4 +47,18 @@ public class StringUtils
         return stringBuilder.ToString();
     }
    
+    public static string GenerateRandomNumberString(int length)
+    {
+        //const string chars = "0123456789";
+        const string chars = "qwertyuiioplkjhgfdsazxcvbnm0123456789";
+        Random random = new Random();
+        StringBuilder stringBuilder = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++)
+        {
+            stringBuilder.Append(chars[random.Next(chars.Length)]);
+        }
+
+        return stringBuilder.ToString();
+    }
 }
