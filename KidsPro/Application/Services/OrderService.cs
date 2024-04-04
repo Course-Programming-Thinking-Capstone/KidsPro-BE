@@ -91,9 +91,10 @@ namespace Application.Services
             return order.Id;
         }
 
-        public async Task UpdateOrderStatusAsync(int orderId,OrderStatus currentStatus, OrderStatus toStatus, string? reason = "")
+        public async Task UpdateOrderStatusAsync(int orderId, OrderStatus currentStatus, OrderStatus toStatus,
+            string? reason = "")
         {
-            var order = await GetOrderByStatusAsync(orderId,currentStatus);
+            var order = await GetOrderByStatusAsync(orderId, currentStatus);
             if (order != null)
             {
                 switch (currentStatus)
@@ -130,10 +131,9 @@ namespace Application.Services
         public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
-            var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
-            if (order != null)
-                return OrderMapper.ShowOrderDetail(order);
-            throw new UnauthorizedException("OrderId doesn't exist");
+            var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId, account.Role)
+                        ?? throw new UnauthorizedException("OrderId doesn't exist");
+            return OrderMapper.ShowOrderDetail(order);
         }
 
         public async Task ParentCanCelOrderAsync(OrderCancelRequest dto)
@@ -171,7 +171,8 @@ namespace Application.Services
 
             await _notify.SendNotifyToAccountAsync(dto.ParentId, title, content);
         }
-        public async Task<Order?> GetOrderByStatusAsync(int orderId,OrderStatus status)
+
+        public async Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
 
