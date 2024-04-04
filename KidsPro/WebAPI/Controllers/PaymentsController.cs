@@ -124,7 +124,6 @@ namespace WebAPI.Controllers
             var zaloRequest = new ZaloPaymentRequest();
             //Get order có parent id và order id vs status payment
             var order = await _payment.GetOrderStatusPaymentAsync(id);
-            if (order == null) return BadRequest($"OrderID:{id} doesn't not exist");
 
             // Lấy thông tin cho payment
             zaloRequest.AppUser = order.Parent!.Account.FullName;

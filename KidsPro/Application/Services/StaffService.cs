@@ -1,7 +1,9 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Account.Student;
+using Application.Dtos.Request.Email;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Application.Mappers;
 using Application.Utils;
 using Domain.Enums;
 
@@ -20,7 +22,7 @@ public class StaffService : IStaffService
         _notify = notify;
     }
 
-    public async Task CreateAccountStudentAsync(StudentCreateAccountRequest dto)
+    public async Task<EmailContentRequest> CreateAccountStudentAsync(StudentCreateAccountRequest dto)
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
 
@@ -45,19 +47,8 @@ public class StaffService : IStaffService
         order.Status = OrderStatus.Success;
         _unitOfWork.OrderRepository.Update(order);
         await _unitOfWork.SaveChangeAsync();
-        
-        //Send Email
-        var toSubject = "KidsPro Send Student Account";
-        var toContent = "Student Name: " + student.Account.FullName + "<br>" +
-                        "Birthday: " + student.Account.DateOfBirth + "<br>" +
-                        "Account: <span style='color:red;'><strong>" + dto.UserName + "</strong></span><br>" +
-                        "Password: <span style='color:red;'><strong>" + dto.Password + "</strong></span>";
-        EmailUtils.SendEmail(parent.Email!, toSubject, toContent);
-        
-        //Send Notify
-        var title = "The order "+order.OrderCode+" has been successfully confirmed";
-        var content = "Student account of "+student.Account.FullName+" send to email "+parent.Email;
-        await _notify.SendNotifyToAccountAsync(order.ParentId, title, content);
+
+        return EmailMapper.ShowEmailContentResponse(student, dto.Password!, order);
     }
 
     public async Task<string> ViewReasonOrderCancel(int orderId, int parentId)
@@ -66,5 +57,22 @@ public class StaffService : IStaffService
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId,
             OrderStatus.RequestRefund);
         return order?.Note ?? throw new BadRequestException($"OrderId: {orderId} not RequestRefund Status");
+    }
+
+    public async Task SendEmailParentAsync(EmailContentRequest student)
+    {
+        //Send Email
+        var toSubject = "KidsPro Send Student Account";
+        var toContent = "Student Name: " + student.StudentName + "<br>" +
+                        "Birthday: " + student.Birthday + "<br>" +
+                        "Account: <span style='color:red;'><strong>" + student.Account + "</strong></span><br>" +
+                        "Password: <span style='color:red;'><strong>" + student.Password + "</strong></span><br>" +
+                        "Note: " + student.Note;
+        EmailUtils.SendEmail(student.Email!, toSubject, toContent);
+        
+        //Send Notify
+        var title = "The order has been successfully confirmed";
+        var content = "Student account of "+student.StudentName+" send to email "+student.Email;
+        await _notify.SendNotifyToAccountAsync(student.ParentId, title, content);
     }
 }

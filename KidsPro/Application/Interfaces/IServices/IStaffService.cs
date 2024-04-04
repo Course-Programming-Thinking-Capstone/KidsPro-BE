@@ -1,9 +1,11 @@
 ﻿using Application.Dtos.Request.Account.Student;
+using Application.Dtos.Request.Email;
 
 namespace Application.Interfaces.IServices;
 
 public interface IStaffService
 {
-    Task CreateAccountStudentAsync(StudentCreateAccountRequest dto);
+    Task<EmailContentRequest> CreateAccountStudentAsync(StudentCreateAccountRequest dto);
     Task<string> ViewReasonOrderCancel(int orderId, int parentId);
+    Task SendEmailParentAsync(EmailContentRequest student);
 }

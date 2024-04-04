@@ -189,8 +189,6 @@ public class PaymentService : IPaymentService
 
     public string MakeSignatureZaloPayment(string key, ZaloPaymentRequest zalo)
     {
-        var embed_data = new { };
-        var item = new[] { new { } };
         var data = zalo.AppId + "|" + zalo.AppTransId + "|" + zalo.AppUser + "|" + zalo.Amount + "|" + zalo.AppTime +
                    "|" + "{}" + "|" + "[]";
 

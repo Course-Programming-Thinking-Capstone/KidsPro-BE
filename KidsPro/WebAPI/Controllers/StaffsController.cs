@@ -1,5 +1,6 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Account.Student;
+using Application.Dtos.Request.Email;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Enums;
@@ -33,13 +34,13 @@ public class StaffsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<IActionResult> CreateAccountAsync(StudentCreateAccountRequest dto)
+    public async Task<ActionResult<EmailContentRequest>> CreateAccountAsync(StudentCreateAccountRequest dto)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
         
-        await _staff.CreateAccountStudentAsync(dto);
-        return Ok("Create student account successfully");
+        var result=await _staff.CreateAccountStudentAsync(dto);
+        return Ok(result);
     }
 
     /// <summary>
@@ -64,7 +65,27 @@ public class StaffsController : ControllerBase
         await _notify.SendNotifyToAccountAsync(parentId, title, content);
         return Ok("Send request to parent successfully");
     }
+    
+    /// <summary>
+    /// After create student account successful, staff sent an account to parent's email
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole}")]
+    [HttpPost("parent/send-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> SendEmailAsync(EmailContentRequest request)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
 
+        await _staff.SendEmailParentAsync(request);
+
+        return Ok();
+    }
+    
     /// <summary>
     /// View reason for cancellation
     /// </summary>
