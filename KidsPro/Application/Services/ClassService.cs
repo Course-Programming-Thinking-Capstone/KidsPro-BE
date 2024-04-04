@@ -68,7 +68,8 @@ public class ClassService : IClassService
 
     public async Task<ClassDetailResponse> GetClassByIdAsync(int classId)
     {
-        await CheckPermission();
+        var account = await _account.GetCurrentAccountInformationAsync();
+        
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
 
         return entityClass != null
@@ -249,7 +250,7 @@ public class ClassService : IClassService
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
         var studentsForClass = students.Where(c => !c.Classes.Any() || c.Classes
-            .Any(s => s.Schedules!.Any(x => entityClass.Schedules!
+            .All(s => s.Schedules!.All(x => entityClass.Schedules!
                 .All(e => e.StudyDay != x.StudyDay && e.Slot != x.Slot)))).ToList();
 
         return ClassMapper.StudentToStudentClassResponse(studentsForClass);

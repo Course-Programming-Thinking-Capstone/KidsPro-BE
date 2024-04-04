@@ -76,6 +76,8 @@ public static class ClassMapper
         CourseName = dto.Course.Name,
         TeacherId = dto.Teacher?.Id,
         TeacherName = dto.Teacher?.Account.FullName,
+        TeachPhoneNumber = dto.Teacher?.PhoneNumber,
+        TeachEmail = dto.Teacher?.Account.Email,
         OpenClass = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
         CloseClass = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
         Duration = dto.Duration,
