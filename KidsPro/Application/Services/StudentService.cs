@@ -12,11 +12,13 @@ public class StudentService:IStudentService
 {
     private IUnitOfWork _unitOfWork;
     private IAccountService _accountService;
+    private IClassService _classService;
 
-    public StudentService(IUnitOfWork unitOfWork, IAccountService accountService)
+    public StudentService(IUnitOfWork unitOfWork, IAccountService accountService, IClassService classService)
     {
         _unitOfWork = unitOfWork;
         _accountService = accountService;
+        _classService = classService;
     }
 
     public async Task UpdateStudentAsync(StudentUpdateRequest dto)
@@ -45,11 +47,20 @@ public class StudentService:IStudentService
         throw new NotFoundException("studentId doesn't exist");
     }
     
-    public async Task<List<StudentResponse>> GetStudentsAsync()
+    public async Task<List<StudentResponse>> GetStudentsAsync(int classId=0)
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
-        var list = await _unitOfWork.StudentRepository.GetStudents(account.Role,account.IdSubRole);
-        return StudentMapper.ShowStudentList(list);
+        var students = await _unitOfWork.StudentRepository.GetStudents(account.Role,account.IdSubRole);
+
+        if (classId==0)
+            return StudentMapper.ShowStudentList(students);
+        
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
+                          ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
+
+        var studentsCanAddToClass = _classService.GetStudentsCanAddToClass(students, entityClass);
+
+        return StudentMapper.ShowStudentList(studentsCanAddToClass);
     }
     
     

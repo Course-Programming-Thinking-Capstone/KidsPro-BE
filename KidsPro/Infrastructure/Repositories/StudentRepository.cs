@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
-public class StudentRepository:BaseRepository<Student>, IStudentRepository
+public class StudentRepository : BaseRepository<Student>, IStudentRepository
 {
     public StudentRepository(AppDbContext context, ILogger<BaseRepository<Student>> logger) : base(context, logger)
     {
@@ -23,22 +23,24 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
             .FirstOrDefaultAsync(x => x.UserName == account);
     }
 
-    public async Task<List<Student>> GetStudents(string role,int parentId=0)
+    public async Task<List<Student>> GetStudents(string role, int parentId = 0)
     {
         var query = _dbSet.AsNoTracking();
         if (role == Constant.ParentRole)
         {
-            query =query.Where(x => x.ParentId == parentId);
+            query = query.Include(x=> x.Classes).ThenInclude(x=> x.Schedules)
+                .Where(x => x.ParentId == parentId);
         }
+
         return await query.Include(x => x.Account)
-            .Include(x=> x.Parent).ThenInclude(x=> x.Account).ToListAsync();
+            .Include(x => x.Parent).ThenInclude(x => x.Account).ToListAsync();
     }
 
     public override async Task<Student?> GetByIdAsync(int id, bool disableTracking = false)
     {
         return await _dbSet.Where(x => x.Id == id)
             .Include(x => x.Account).ThenInclude(x => x.Role)
-            .Include(x=> x.Parent).ThenInclude(x=> x.Account)
+            .Include(x => x.Parent).ThenInclude(x => x.Account)
             .FirstOrDefaultAsync();
     }
 
@@ -48,13 +50,13 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
             .Include(x => x.Account).ThenInclude(x => x.Role)
             .Include(x => x.Certificates)
             .Include(x => x.StudentProgresses)!.ThenInclude(x => x.Course)
-            .Include(x=> x.Parent).ThenInclude(x=> x.Account)
+            .Include(x => x.Parent).ThenInclude(x => x.Account)
             .FirstOrDefaultAsync();
     }
-    
+
     public async Task<Student?> WebStudentLoginAsync(string account)
     {
-        return await _dbSet.Include(x => x.Account).ThenInclude(x=> x.Role)
+        return await _dbSet.Include(x => x.Account).ThenInclude(x => x.Role)
             .FirstOrDefaultAsync(x => x.UserName == account);
     }
 
@@ -78,20 +80,19 @@ public class StudentRepository:BaseRepository<Student>, IStudentRepository
     {
         IQueryable<Student> query = _dbSet;
 
-        return await query.Where(x=> ids.Contains(x.Id)) .Include(x => x.Account)
-            .Include(x=> x.Parent).ThenInclude(x=> x.Account).ToListAsync();
+        return await query.Where(x => ids.Contains(x.Id)).Include(x => x.Account)
+            .Include(x => x.Parent).ThenInclude(x => x.Account).ToListAsync();
     }
 
     public async Task<Student?> GetStudentProgress(int id)
     {
         var query = _dbSet.AsNoTracking();
-        return await query.Include(x => x.StudentProgresses).ThenInclude(x=> x.Course)
+        return await query.Include(x => x.StudentProgresses).ThenInclude(x => x.Course)
             .Include(x => x.StudentProgresses).ThenInclude(x => x.Section)
             .ThenInclude(x => x.Lessons).ThenInclude(x => x.StudentLessons)
             .Include(x => x.StudentProgresses).ThenInclude(x => x.Section)
             .ThenInclude(x => x.Quizzes).ThenInclude(x => x.StudentQuizzes)
-            .Include(x=>x.Account)
+            .Include(x => x.Account)
             .FirstOrDefaultAsync(x => x.Id == id);
-
     }
 }

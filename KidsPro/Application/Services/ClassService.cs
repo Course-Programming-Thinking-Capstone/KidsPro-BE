@@ -69,7 +69,7 @@ public class ClassService : IClassService
     public async Task<ClassDetailResponse> GetClassByIdAsync(int classId)
     {
         var account = await _account.GetCurrentAccountInformationAsync();
-        
+
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
 
         return entityClass != null
@@ -249,11 +249,16 @@ public class ClassService : IClassService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
-        var studentsForClass = students.Where(c => !c.Classes.Any() || c.Classes
-            .All(s => s.Schedules!.All(x => entityClass.Schedules!
-                .All(e => e.StudyDay != x.StudyDay && e.Slot != x.Slot)))).ToList();
+        var studentsForClass = GetStudentsCanAddToClass(students, entityClass);
 
         return ClassMapper.StudentToStudentClassResponse(studentsForClass);
+    }
+
+    public List<Student> GetStudentsCanAddToClass(List<Student> students, Class entityClass)
+    {
+        return students.Where(c => !c.Classes.Any() || c.Classes
+            .All(s => s.Schedules!.All(x => entityClass.Schedules!
+                .All(e => e.StudyDay != x.StudyDay && e.Slot != x.Slot)))).ToList();
     }
 
     public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto)

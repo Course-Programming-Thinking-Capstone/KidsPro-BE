@@ -30,13 +30,13 @@ public class StudentsController : Controller
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentResponse>> GetStudents()
+    public async Task<ActionResult<StudentResponse>> GetStudents(int classId=0)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-
-        var result = await _studentService.GetStudentsAsync();
-        return Ok(result);
+        if (classId > 0)
+            return Ok(await _studentService.GetStudentsAsync(classId));
+        return Ok(await _studentService.GetStudentsAsync());
     }
 
     /// <summary>
