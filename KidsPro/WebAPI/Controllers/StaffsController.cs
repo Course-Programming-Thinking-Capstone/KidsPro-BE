@@ -90,18 +90,17 @@ public class StaffsController : ControllerBase
     /// View reason for cancellation
     /// </summary>
     /// <param name="orderId"></param>
-    /// <param name="parentId"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StaffRole}")]
-    [HttpGet("order/view-reason")]
+    [HttpGet("order/view-reason/{orderId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-    public async Task<IActionResult> ViewReasonAsync(int orderId, int parentId)
+    public async Task<IActionResult> ViewReasonAsync(int orderId)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
         
-        var result = await _staff.ViewReasonOrderCancel(orderId, parentId);
+        var result = await _staff.ViewReasonOrderCancel(orderId);
         return Ok(new
         {
             Reason=result

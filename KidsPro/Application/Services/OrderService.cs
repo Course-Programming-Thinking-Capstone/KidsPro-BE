@@ -176,10 +176,9 @@ namespace Application.Services
         {
             var account = await _account.GetCurrentAccountInformationAsync();
 
-            var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(account.IdSubRole, orderId,
-                status);
+            var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId, status);
             return order ??
-                   throw new NotFoundException($"OrderId {orderId} of ParentId {account.IdSubRole} not found");
+                   throw new NotFoundException($"OrderId {orderId} not exist process status");
         }
     }
 }

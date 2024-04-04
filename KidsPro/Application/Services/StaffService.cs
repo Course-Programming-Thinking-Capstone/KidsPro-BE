@@ -51,12 +51,12 @@ public class StaffService : IStaffService
         return EmailMapper.ShowEmailContentResponse(student, dto.Password!, order);
     }
 
-    public async Task<string> ViewReasonOrderCancel(int orderId, int parentId)
+    public async Task<string> ViewReasonOrderCancel(int orderId)
     {
         // Check và lấy order vs requestRefund status
-        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId,
+        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId,
             OrderStatus.RequestRefund);
-        return order?.Note ?? throw new BadRequestException($"OrderId: {orderId} not RequestRefund Status");
+        return order?.Note ?? throw new BadRequestException($"OrderId: {orderId} not found");
     }
 
     public async Task SendEmailParentAsync(EmailContentRequest student)

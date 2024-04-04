@@ -9,6 +9,6 @@ public class MomoRefundRequest
     public long amount { get; set; } = 0;
     public long transId { get; set; }
     public string lang { get; set; } = "vi";
-    public string description { get; set; } = "I want refund this order";
+    public string description { get; set; } = string.Empty;
     public string signature { get; set; } = string.Empty;
 }

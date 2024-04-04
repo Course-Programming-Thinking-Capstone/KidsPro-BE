@@ -34,9 +34,9 @@ public class PaymentService : IPaymentService
     public async Task<int> CreateTransactionAsync(MomoResultRequest dto)
     {
         var orderId = GetIdMomoResponse(dto.orderId);
-        var parentId = GetIdMomoResponse(dto.requestId);
+        //var parentId = GetIdMomoResponse(dto.requestId);
 
-        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId, OrderStatus.Process)
+        var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId, OrderStatus.Process)
             ??throw new  BadRequestException($"OrderId {orderId} not found, can't update to pending status");
 
         order.Status = OrderStatus.Pending;
@@ -165,6 +165,7 @@ public class PaymentService : IPaymentService
         momoRequest.amount = (long)transaction.Amount;
         momoRequest.partnerCode = _momoConfig.PartnerCode;
         momoRequest.transId = long.Parse(transaction.TransactionCode!);
+        momoRequest.description = "KidsPro refunds for order with OrderCode '" +transaction.Order!.OrderCode+ "'";
         momoRequest.signature = MakeSignatureMomoRefund
             (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
 

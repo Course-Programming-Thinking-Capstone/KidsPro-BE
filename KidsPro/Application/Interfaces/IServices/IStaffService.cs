@@ -6,6 +6,6 @@ namespace Application.Interfaces.IServices;
 public interface IStaffService
 {
     Task<EmailContentRequest> CreateAccountStudentAsync(StudentCreateAccountRequest dto);
-    Task<string> ViewReasonOrderCancel(int orderId, int parentId);
+    Task<string> ViewReasonOrderCancel(int orderId);
     Task SendEmailParentAsync(EmailContentRequest student);
 }
