@@ -3,6 +3,7 @@ using Application.Dtos.Response.Game;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -501,6 +502,13 @@ public class GameService : IGameService
                 await AddNewLevel(func);
             }
         }
+
+        // Game ShopItem
+        var baseItem = _unitOfWork.GameItemRepository.GetAll();
+        if (!baseItem.Any(o => o.ItemType == ItemType.ShopItem))
+        {
+            
+        }
     }
 
     #region GAME CLIENT
@@ -665,6 +673,33 @@ public class GameService : IGameService
     #endregion
 
     #region ADMIN SERVICES
+
+    public async Task AddNewGameItem(NewItemRequest newItemRequest)
+    {
+        await _unitOfWork.BeginTransactionAsync();
+        var gameItem = new GameItem
+        {
+            Id = 0,
+            GameId = 0,
+            ItemName = newItemRequest.ItemName,
+            Details = newItemRequest.Details,
+            SpritesUrl = newItemRequest.SpritesUrl,
+            ItemRateType = (ItemRateType)newItemRequest.ItemRateType,
+            ItemType = (ItemType)newItemRequest.ItemRateType,
+            Price = newItemRequest.Price
+        };
+
+        try
+        {
+            await _unitOfWork.GameItemRepository.AddAsync(gameItem);
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+    }
 
     public async Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData)
     {
