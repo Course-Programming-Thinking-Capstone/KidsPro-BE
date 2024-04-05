@@ -328,7 +328,7 @@ public class AccountService : IAccountService
             DateOfBirth = dto.DateOfBirth,
             Gender = dto.Gender,
             PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
-            Status = UserStatus.NotActivated,
+            Status = UserStatus.Active,
             IsDelete = false,
             CreatedDate = DateTime.UtcNow
         };
