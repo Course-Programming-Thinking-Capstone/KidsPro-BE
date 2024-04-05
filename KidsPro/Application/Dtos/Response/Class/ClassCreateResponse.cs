@@ -11,6 +11,6 @@ public class ClassCreateResponse
     public string? OpenDay { get; set; }
     public string? CloseDay { get; set; }
     public int Duration { get; set; }
-    public int SlotTime { get; set; }
+    public int SlotDuration { get; set; }
     public int? TotalSlot { get; set; }
 }

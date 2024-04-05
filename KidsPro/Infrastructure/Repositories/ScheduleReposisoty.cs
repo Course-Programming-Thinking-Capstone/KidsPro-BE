@@ -26,4 +26,6 @@ public class ScheduleReposisoty : BaseRepository<ClassSchedule>, IScheduleReposi
             .Include(x => x.Class)
             .ThenInclude(x => x.Course).ThenInclude(x => x.Syllabus).ToListAsync();
     }
+
+    
 }

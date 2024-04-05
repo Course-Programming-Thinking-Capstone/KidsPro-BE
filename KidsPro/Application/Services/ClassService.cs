@@ -3,6 +3,7 @@ using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -31,7 +32,7 @@ public class ClassService : IClassService
         var account = await _account.GetCurrentAccountInformationAsync();
 
         if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole)
-            throw new UnauthorizedException("Not the staff role, please login by staff account");
+            throw new UnauthorizedException("Not the staff or admin role, please login by manager account");
         return account;
     }
 
@@ -65,14 +66,40 @@ public class ClassService : IClassService
         return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name, course.Syllabus?.SlotTime ?? 0);
     }
 
-    public async Task<ClassResponse> GetClassByIdAsync(int classId)
+    public async Task<ClassDetailResponse> GetClassByIdAsync(int classId)
     {
-        await CheckPermission();
+        var account = await _account.GetCurrentAccountInformationAsync();
+
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
 
         return entityClass != null
-            ? ClassMapper.ClassToClassResponse(entityClass)
+            ? ClassMapper.ClassToClassDetailResponse(entityClass)
             : throw new BadRequestException($"ClassId: {classId} doesn't exist");
+    }
+
+    public async Task<PagingClassesResponse> GetClassesAsync(int? page, int? size)
+    {
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        var classes =
+            await _unitOfWork.ClassRepository.GetPaginateAsync(filter: null, orderBy: null, page: page, size: size);
+
+        return ClassMapper.ClassToClassesPagingResponse(classes);
+    }
+
+    public async Task<List<ClassesResponse>> GetClassByRoleAsync(int id)
+    {
+        var account = await _account.GetCurrentAccountInformationAsync();
+
+        var classes = await _unitOfWork.ClassRepository.GetClassByRole(id, account.Role);
+        if (classes.Count == 0) throw new BadRequestException($"Teacher or student {id} not found");
+
+        return ClassMapper.ClassToClassesResponse(classes);
     }
 
     #endregion
@@ -98,7 +125,7 @@ public class ClassService : IClassService
         await _unitOfWork.ScheduleReposisoty.AddRangeAsync(schedule);
         await _unitOfWork.SaveChangeAsync();
 
-        return ClassMapper.ScheduleToScheuldeCreateResponse(schedule.First(), dto.Days);
+        return ClassMapper.ScheduleToScheduleCreateResponse(schedule.First(), dto.Days);
     }
 
     public async Task<ScheduleResponse> GetScheduleByClassIdAsync(int classId)
@@ -183,7 +210,6 @@ public class ClassService : IClassService
         var teacher = await _unitOfWork.TeacherRepository.GetTeacherSchedulesById(teacherId)
                       ?? throw new NotFoundException($"TeacherId: {teacherId} doesn't exist");
 
-
         bool hasOverlap = entityClass.Schedules!
             .Any(c => teacher.Classes!
                 .Any(t => t.Schedules!
@@ -192,9 +218,13 @@ public class ClassService : IClassService
         if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
 
         entityClass.TeacherId = teacherId;
-
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();
+
+        //Sent notice to teacher
+        var title = "New class";
+        var content = "Your new class is " + entityClass.Code + ", click on My Classes for more details";
+        await _notify.SendNotifyToAccountAsync(teacherId, title, content);
 
         return teacher.Account.FullName;
     }
@@ -219,28 +249,19 @@ public class ClassService : IClassService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
-        var studentsResponse = new List<Student>();
+        var studentsForClass = GetStudentsCanAddToClass(students, entityClass);
 
-        foreach (var std in students)
-        {
-            //nếu k có class nào thì break lun
-            if (!std.Classes.Any()) break;
-
-            var hasOverlap = entityClass.Schedules!
-                .Any(entitySchedule => std.Classes.Any(studentClass => studentClass.Schedules!
-                    .Any(studentSchedule => studentSchedule.StudyDay == entitySchedule.StudyDay
-                                            && studentSchedule.Slot == entitySchedule.Slot)));
-
-            //nếu student trùng schedule thì k cần show ra
-            if (hasOverlap) break;
-
-            studentsResponse.Add(std);
-        }
-
-        return ClassMapper.StudentToStudentClassResponse(studentsResponse);
+        return ClassMapper.StudentToStudentClassResponse(studentsForClass);
     }
 
-    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto, ClassStudentType type)
+    public List<Student> GetStudentsCanAddToClass(List<Student> students, Class entityClass)
+    {
+        return students.Where(c => !c.Classes.Any() || c.Classes
+            .All(s => s.Schedules!.All(x => entityClass.Schedules!
+                .All(e => e.StudyDay != x.StudyDay && e.Slot != x.Slot)))).ToList();
+    }
+
+    public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto)
     {
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
                           ?? throw new NotFoundException($"ClassId: {dto.ClassId} doesn't exist");
@@ -250,28 +271,26 @@ public class ClassService : IClassService
         if (students.Count < dto.StudentIds.Count)
             throw new BadRequestException("StudentId doesn't exist");
 
+        if (entityClass.Students.Count == 0)
+            entityClass.Students = new List<Student>();
+
+        // lấy những StudentId mà list truyền vào có, list không có để add
+        var addStudents = students.Where(e => entityClass.Students.All(s => s.Id != e.Id)).ToList();
+        foreach (var x in addStudents)
+            entityClass.Students.Add(x);
+
         // lấy những StudentId mà class có, list truyền vào không có để removed
-        var removeStudents = entityClass.Students.
-            Where(e => students.All(s => s.Id != e.Id)).ToList();
-            //entityClass.Students.Except(students).ToList();
-        //entityClass.Students.Select(x => x.Id).Except(dto.StudentIds).ToList();
+        var removeStudents = entityClass.Students.Where(e => students.All(s => s.Id != e.Id)).ToList();
+        foreach (var x in removeStudents)
+            entityClass.Students.Remove(x);
 
-        switch (type)
-        {
-            case ClassStudentType.AddToClass:
-
-                if (entityClass.Students.Count == 0)
-                    entityClass.Students = new List<Student>();
-
-                foreach (var x in students)
-                    entityClass.Students.Add(x);
-                break;
-
-            case ClassStudentType.RemoveFromClass:
-                foreach (var x in removeStudents)
-                    entityClass.Students.Remove(x);
-                break;
-        }
+        // switch (type)
+        // {
+        //     case ClassStudentType.AddToClass:
+        //         break;
+        //     case ClassStudentType.RemoveFromClass:
+        //         break;
+        // }
 
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();

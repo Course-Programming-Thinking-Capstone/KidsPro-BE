@@ -42,4 +42,20 @@ public static class TimeUtils
 
         return (open, close);
     }
+    
+    public static long GetOrderTimeSpan(DateTime date)
+    {
+        var unixTimestamp = (long)(date.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+
+        // Thời điểm thanh toán
+        var paymentTime = unixTimestamp - 15 * 60 * 1000; // 15 phút trước, tính bằng mili giây
+
+        if (unixTimestamp >= paymentTime && unixTimestamp <= paymentTime + 15 * 60 * 1000)
+        {
+            return unixTimestamp;
+        }
+            throw new Exception("Thời gian tạo đơn hàng phải nằm trong khoảng 15 phút so với thời điểm thanh toán.");
+    }
+    
+
 }

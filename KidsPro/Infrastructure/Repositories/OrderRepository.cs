@@ -18,7 +18,7 @@ namespace Infrastructure.Repositories
 
         public async Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision)
         {
-            string orderCode = generateOrderCode(13);
+            string orderCode = generateOrderCode(7);
 
             switch (decision)
             {
@@ -33,12 +33,12 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<Order?> GetOrderByStatusAsync(int parentId, int orderId, OrderStatus status)
+        public async Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status)
         {
-            var query = _dbSet.AsNoTracking();
+            var query = _dbSet;
 
-            return await query.FirstOrDefaultAsync(x =>
-                x.Id == orderId && x.ParentId == parentId && x.Status == status);
+            return await query.Include(x=>x.Parent).ThenInclude(x=>x!.Account)
+                .FirstOrDefaultAsync(x =>x.Id == orderId && x.Status == status);
         }
 
         public async Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId, string role)
@@ -56,14 +56,19 @@ namespace Infrastructure.Repositories
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course).ToListAsync();
         }
 
-        public async Task<Order?> GetOrderDetail(int parentId, int orderId)
+        public async Task<Order?> GetOrderDetail(int parentId, int orderId, string role)
         {
-            return (await _dbSet.AsNoTracking().Include(x => x.OrderDetails)!
-                .ThenInclude(x => x.Students)!.ThenInclude(x => x.Account)
+            var query = _dbSet.AsNoTracking();
+            if (role == Constant.ParentRole)
+            {
+                query = query.Where(x => x.ParentId == parentId);
+            }
+            return await query.Include(x => x.OrderDetails)!
+                .ThenInclude(x => x.Students).ThenInclude(x => x.Account)
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
                 .Include(x => x.Transaction).Include(x => x.Voucher)
                 .Include(x => x.Parent).ThenInclude(x => x!.Account)
-                .FirstOrDefaultAsync(x => x.Id == orderId && x.ParentId == parentId));
+                .FirstOrDefaultAsync(x => x.Id == orderId);
         }
 
         public override Task<Order?> GetByIdAsync(int id, bool disableTracking = false)

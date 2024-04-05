@@ -10,5 +10,6 @@ namespace Application.Interfaces.IRepositories
 {
     public interface IStudentProgressRepository:IBaseRepository<StudentProgress>
     {
+        Task<List<StudentProgress>> GetSectionProgress(int studentId, int courseId);
     }
 }

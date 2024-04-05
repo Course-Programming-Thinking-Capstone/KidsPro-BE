@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Response;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.Utils;
 using Domain.Entities;
@@ -8,21 +9,21 @@ namespace Application.Mappers;
 
 public static class ClassMapper
 {
-    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, int slotTime) =>
+    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, int slotDuration) =>
         new ClassCreateResponse()
         {
             ClassId = dto.Id,
             ClassCode = dto.Code,
             CourseId = dto.CourseId,
             CourseName = courseName,
-            OpenDay = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
-            CloseDay = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
+            OpenDay = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
+            CloseDay = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
             Duration = dto.Duration,
-            SlotTime = slotTime,
+            SlotDuration = slotDuration,
             TotalSlot = dto.TotalSlot
         };
 
-    public static ScheduleCreateResponse ScheduleToScheuldeCreateResponse(ClassSchedule dto, List<DayStatus> dayList)
+    public static ScheduleCreateResponse ScheduleToScheduleCreateResponse(ClassSchedule dto, List<DayStatus> dayList)
         => new ScheduleCreateResponse()
         {
             ClassId = dto.ClassId,
@@ -53,9 +54,9 @@ public static class ClassMapper
                     {
                         ClassId = c.Id,
                         ClassName = c.Code,
-                        Open = c.Schedules!.First().StartTime,
-                        Close = c.Schedules!.First().EndTime,
-                        Slot = c.Schedules!.First().Slot,
+                        Open = c.Schedules?.FirstOrDefault()?.StartTime,
+                        Close = c.Schedules?.FirstOrDefault()?.EndTime,
+                        Slot = c.Schedules?.FirstOrDefault()?.Slot,
                         StudyDays = c.Schedules!.Select(x => x.StudyDay),
                     };
                     teacher.Schedules?.Add(x);
@@ -68,31 +69,33 @@ public static class ClassMapper
         return teacherScheduleList;
     }
 
-    public static ClassResponse ClassToClassResponse(Class dto) => new ClassResponse()
+    public static ClassDetailResponse ClassToClassDetailResponse(Class dto) => new ClassDetailResponse()
     {
         ClassId = dto.Id,
         ClassCode = dto.Code,
         CourseName = dto.Course.Name,
         TeacherId = dto.Teacher?.Id,
         TeacherName = dto.Teacher?.Account.FullName,
-        //?? "The class doesn't have a teacher yet",
-        OpenClass = DateUtils.FormatDateTimeToDateV1(dto.OpenDate),
-        CloseClass = DateUtils.FormatDateTimeToDateV1(dto.CloseDate),
+        TeachPhoneNumber = dto.Teacher?.PhoneNumber,
+        TeachEmail = dto.Teacher?.Account.Email,
+        OpenClass = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
+        CloseClass = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
         Duration = dto.Duration,
-        SlotTime = dto.Course.Syllabus?.SlotTime ?? 0,
+        SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
-        RoomUrl = dto.Schedules?.First().RoomUrl,
-        //?? "The Class doesn't have a schedule yet"
-        SlotNumber = dto.Schedules?.First().Slot ?? 0,
-        StartSlot = dto.Schedules?.First().StartTime ?? TimeSpan.Zero,
-        EndSlot = dto.Schedules?.First().EndTime ?? TimeSpan.Zero,
+        //Schedules
+        RoomUrl = dto.Schedules?.FirstOrDefault()?.RoomUrl,
+        SlotNumber = dto.Schedules?.FirstOrDefault()?.Slot ?? 0,
+        StartSlot = dto.Schedules?.FirstOrDefault()?.StartTime ?? TimeSpan.Zero,
+        EndSlot = dto.Schedules?.FirstOrDefault()?.EndTime ?? TimeSpan.Zero,
         StudyDay = dto.Schedules?.Where(x => x.Status == ScheduleStatus.Active)
             .Select(x => x.StudyDay) ?? new List<DayStatus>(),
+        //Students
         Students = dto.Students.Select(x => new StudentClassResponse
         {
-            Image = x.Account.PictureUrl,
+            StudentId = x.Id,
             StudentName = x.Account.FullName,
-            DateOfBirth =DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
+            DateOfBirth = DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
             Gender = x.Account.Gender
         }).ToList(),
         TotalStudent = dto.Students.Count()
@@ -101,12 +104,12 @@ public static class ClassMapper
     public static ScheduleResponse ScheduleToScheduleResponse(List<ClassSchedule> dto)
         => new ScheduleResponse()
         {
-            ClassId = dto.First().ClassId,
-            SlotTime = dto.First().Class.Course.Syllabus?.SlotTime,
-            StartSlot = dto.First().StartTime,
-            EndSlot = dto.First().EndTime,
-            SlotNumber = dto.First().Slot,
-            RoomUrl = dto.First().RoomUrl,
+            ClassId = dto.FirstOrDefault()?.ClassId,
+            SlotTime = dto.FirstOrDefault()?.Class.Course.Syllabus?.SlotTime,
+            StartSlot = dto.FirstOrDefault()?.StartTime,
+            EndSlot = dto.FirstOrDefault()?.EndTime,
+            SlotNumber = dto.FirstOrDefault()?.Slot,
+            RoomUrl = dto.FirstOrDefault()?.RoomUrl,
             StudyDay = dto.Select(x => x.StudyDay),
         };
 
@@ -114,11 +117,38 @@ public static class ClassMapper
     {
         return dto.Select(student => new StudentClassResponse
         {
+            StudentId = student.Id,
             Image = student.Account.PictureUrl,
             StudentName = student.Account.FullName,
             DateOfBirth = DateUtils.FormatDateTimeToDateV1(student.Account.DateOfBirth),
             Gender = student.Account.Gender
         }).ToList();
     }
-        
+
+    public static PagingClassesResponse ClassToClassesPagingResponse(PagingResponse<Class> dto) => new PagingClassesResponse()
+    {
+        TotalPage = dto.TotalPages,
+        TotalRecord = dto.TotalRecords,
+        Classes = dto.Results.Select(c => new ClassesResponse()
+        {
+            ClassCode = c.Code,
+            DayStart = DateUtils.FormatDateTimeToDatetimeV1(c.OpenDate),
+            DayEnd = DateUtils.FormatDateTimeToDatetimeV1(c.CloseDate),
+            ClassId = c.Id
+        }).ToList()
+    };
+
+    public static List<ClassesResponse> ClassToClassesResponse(List<Class> dto)
+    {
+        return dto.Select(x => new ClassesResponse()
+        {
+            ClassId = x.Id,
+            ClassCode = x.Code,
+            SlotStart = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
+            SlotEnd = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
+            DayStart = DateUtils.FormatDateTimeToDateV1(x.OpenDate),
+            DayEnd = DateUtils.FormatDateTimeToDateV1(x.CloseDate),
+            Days = x.Schedules?.Select(s=> s.StudyDay).ToList()
+        }).ToList();
+    }
 }

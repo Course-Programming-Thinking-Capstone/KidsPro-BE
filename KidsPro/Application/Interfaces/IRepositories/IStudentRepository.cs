@@ -12,4 +12,5 @@ public interface IStudentRepository:IBaseRepository<Student>
     Task<Student?> WebStudentLoginAsync(string account);
     Task<List<Student>> SearchStudent(string input, SearchType type);
     Task<List<Student>> GetStudentsByIds(List<int> ids);
+    Task<Student?> GetStudentProgress(int id);
 }

@@ -2,9 +2,11 @@
 using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Entities;
 using Domain.Enums;
 using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebAPI.Controllers;
 
 [ApiController]
-[Route("api/v1/classes")]
+[Route("api/v1/Classes")]
 public class ClassController : ControllerBase
 {
     private IClassService _class;
@@ -26,6 +28,64 @@ public class ClassController : ControllerBase
     }
 
     #region Class
+
+    /// <summary>
+    /// Get classes by teacher or student Id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.StudentRole}")]
+    [HttpGet("teacher-or-student/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<ClassesResponse>> GetClassesByRoleAsync(int id)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        var result = await _class.GetClassByRoleAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get Classes, enter page and size
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [HttpGet()]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingClassesResponse>> GetClassesAsync(int? page, int? size)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        var result = await _class.GetClassesAsync(page, size);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get class detail 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole},{Constant.TeacherRole},{Constant.StudentRole}")]
+    [HttpGet("detail/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<ClassDetailResponse>> GetClassDetailAsync(int id)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        var result = await _class.GetClassByIdAsync(id);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Create Class
@@ -43,25 +103,6 @@ public class ClassController : ControllerBase
         _authentication.CheckAccountStatus();
 
         var result = await _class.CreateClassAsync(dto);
-        return Ok(result);
-    }
-    
-    /// <summary>
-    /// Get class detail 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
-    [HttpGet("detail/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<ClassResponse>> GetClassDetailAsync(int id)
-    {
-        //Check if the account is activated or not or inactive
-        _authentication.CheckAccountStatus();
-
-        var result = await _class.GetClassByIdAsync(id);
         return Ok(result);
     }
 
@@ -98,7 +139,7 @@ public class ClassController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<ClassResponse>> GetScheduleByClassIdAsync(int classId)
+    public async Task<ActionResult<ClassDetailResponse>> GetScheduleByClassIdAsync(int classId)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
@@ -117,7 +158,7 @@ public class ClassController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<ClassResponse>> UpdateScheduleAsync(ScheduleUpdateRequest dto)
+    public async Task<ActionResult<ClassDetailResponse>> UpdateScheduleAsync(ScheduleUpdateRequest dto)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
@@ -128,9 +169,11 @@ public class ClassController : ControllerBase
             Message = "Update Schedules Successfully"
         });
     }
+
     #endregion
 
     #region Teacher
+
     /// <summary>
     /// Get all teacher with activate status in the system, including their schedule
     /// </summary>
@@ -147,7 +190,7 @@ public class ClassController : ControllerBase
         var result = await _class.GetTeacherToClassAsync();
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Add Teacher to class
     /// </summary>
@@ -171,9 +214,11 @@ public class ClassController : ControllerBase
             TeacherName = result
         });
     }
+
     #endregion
 
     #region Student
+
     /// <summary>
     /// Search students name, BE checked and dropped students with overlap schedules before return the list
     /// </summary>
@@ -195,34 +240,23 @@ public class ClassController : ControllerBase
     }
 
     /// <summary>
-    /// Add students to class
+    /// Add students to class or remove student from class
     /// </summary>
     /// <param name="dto"></param>
-    /// <param name="type"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
-    [HttpPost("students/add-to-class")]
+    [HttpPost("students/add-or-remove")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentClassResponse>> AddStudentsToClassAsync(StudentsAddRequest dto,
-        ClassStudentType type)
+    public async Task<ActionResult<StudentClassResponse>> AddStudentsToClassAsync(StudentsAddRequest dto)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
 
-        var result = await _class.UpdateStudentsToClassAsync(dto, type);
+        var result = await _class.UpdateStudentsToClassAsync(dto);
         return Ok(result);
     }
+
     #endregion
-
-    
-
-    
-
-  
-
-   
-
-    
 }

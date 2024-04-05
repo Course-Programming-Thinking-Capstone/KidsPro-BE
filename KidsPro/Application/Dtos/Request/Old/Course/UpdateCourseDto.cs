@@ -9,7 +9,7 @@ public class UpdateCourseDto
     [StringLength(250, ErrorMessage = "Class name can not exceed 3000 character")]
     public string? Name { get; set; } 
 
-    [StringLength(3000, ErrorMessage = "Description can not exceed 3000 character")]
+    [StringLength(3000, ErrorMessage = "description can not exceed 3000 character")]
     public string? Description { get; set; }
 
     [StringLength(3000, ErrorMessage = "Prerequisite can not exceed 3000 character")]

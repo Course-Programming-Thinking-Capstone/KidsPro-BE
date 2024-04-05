@@ -41,11 +41,11 @@ public static class CourseMapper
             Name = entity.Name,
             Description = entity.Description,
             Price = entity.Price,
-            CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.CreatedDate),
+            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString(),
             DiscountPrice = entity.DiscountPrice,
-            ModifiedDate = DateUtils.FormatDateTimeToDateV1(entity.ModifiedDate),
+            ModifiedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
             TotalLesson = entity.TotalLesson,
             CreatedById = entity.CreatedById,
             CreatedByName = entity.CreatedBy.FullName,
@@ -324,7 +324,7 @@ public static class CourseMapper
             IsFree = entity.IsFree,
             PictureUrl = entity.PictureUrl,
             Status = entity.Status.ToString(),
-            CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.CreatedDate)
+            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate)
         };
 
     public static PagingResponse<FilterCourseDto> CourseToFilterCourseDto(PagingResponse<Course> entities)

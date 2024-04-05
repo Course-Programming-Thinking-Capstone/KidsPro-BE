@@ -35,7 +35,7 @@ public static class SyllabusMapper
             Id = entity.Id,
             Name = entity.Name,
             Status = entity.Status,
-            CreatedDate = DateUtils.FormatDateTimeToDateV1(entity.Course.CreatedDate)
+            CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.Course.CreatedDate)
         };
 
     public static PagingResponse<FilterSyllabusDto> SyllabusToFilterSyllabusDto(PagingResponse<Syllabus> entities)

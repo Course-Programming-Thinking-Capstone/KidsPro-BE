@@ -26,4 +26,6 @@ public class Student : BaseEntity
     public virtual ICollection<StudentProgress>? StudentProgresses { get; set; }
     public virtual IEnumerable<Class> Classes { get; } = new List<Class>();
     public virtual ICollection<StudentQuiz> StudentQuizzes { get; set; } = new List<StudentQuiz>();
+    
+    
 }

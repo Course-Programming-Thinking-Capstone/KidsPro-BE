@@ -8,7 +8,7 @@ public record CreateQuizDto
     [StringLength(250, ErrorMessage = "Title can not exceed 250 characters")]
     public string Title { get; init; } = null!;
 
-    [StringLength(750, ErrorMessage = "Description can not exceed 750 characters.")]
+    [StringLength(750, ErrorMessage = "description can not exceed 750 characters.")]
     public string? Description { get; init; }
 
     public int? Duration { get; init; }

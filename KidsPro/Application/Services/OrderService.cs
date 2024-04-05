@@ -14,23 +14,27 @@ namespace Application.Services
         readonly IUnitOfWork _unitOfWork;
         private IAccountService _account;
         private INotificationService _notify;
+        private IPaymentService _payment;
 
-        public OrderService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify)
+        public OrderService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
+            IPaymentService payment)
         {
             _unitOfWork = unitOfWork;
             _account = account;
             _notify = notify;
+            _payment = payment;
         }
 
 
         public async Task<int> CreateOrderAsync(OrderRequest dto)
         {
             var voucher = await _unitOfWork.VoucherRepository.GetVoucher(dto.VoucherId);
-            //Kiểm tra lấy order code, nếu đã tồn tại phải tạo ordercode mới
+            //Check lấy order code, nếu đã tồn tại phải tạo ordercode mới
             string? getOrderCode;
             Course? course;
             do
             {
+                //Create and check exist order code
                 var checkOrderCode =
                     await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomNumber, false);
                 getOrderCode = checkOrderCode.Item1 != null ? null : checkOrderCode.Item2;
@@ -48,7 +52,7 @@ namespace Application.Services
                 PaymentType = (PaymentType)dto.PaymentType,
                 Quantity = dto.Quantity,
                 TotalPrice = (course.Price * dto.Quantity) - (voucher?.DiscountAmount ?? 0),
-                Date = DateTime.UtcNow,
+                Date = DateTime.Now,
                 Status = OrderStatus.Process,
                 OrderCode = getOrderCode,
                 Note = "course: " + course.Name
@@ -87,10 +91,10 @@ namespace Application.Services
             return order.Id;
         }
 
-        public async Task UpdateOrderStatusAsync(int orderId, int parentId,
-            OrderStatus currentStatus, OrderStatus toStatus, string? reason = "")
+        public async Task UpdateOrderStatusAsync(int orderId, OrderStatus currentStatus, OrderStatus toStatus,
+            string? reason = "")
         {
-            var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(parentId, orderId, currentStatus);
+            var order = await GetOrderByStatusAsync(orderId, currentStatus);
             if (order != null)
             {
                 switch (currentStatus)
@@ -127,17 +131,14 @@ namespace Application.Services
         public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
-            var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId);
-            if (order != null)
-                return OrderMapper.ShowOrderDetail(order);
-            throw new UnauthorizedException("OrderId doesn't exist");
+            var order = await _unitOfWork.OrderRepository.GetOrderDetail(account.IdSubRole, orderId, account.Role)
+                        ?? throw new UnauthorizedException("OrderId doesn't exist");
+            return OrderMapper.ShowOrderDetail(order);
         }
 
-        public async Task CanCelOrderAsync(OrderCancelRequest dto)
+        public async Task ParentCanCelOrderAsync(OrderCancelRequest dto)
         {
-            var account = await _account.GetCurrentAccountInformationAsync();
-            await UpdateOrderStatusAsync(dto.OrderId, account.IdSubRole,
-                OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
+            await UpdateOrderStatusAsync(dto.OrderId, OrderStatus.Pending, OrderStatus.RequestRefund, dto.Reason);
         }
 
         public async Task HandleRefundRequest(OrderRefundRequest dto, ModerationStatus status)
@@ -147,16 +148,21 @@ namespace Application.Services
             switch (status)
             {
                 case ModerationStatus.Approve:
-                    await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,
-                        OrderStatus.RequestRefund, OrderStatus.Refunded);
+                    var responseMomo = await _payment.RequestMomoRefundAsync(dto.OrderId);
+                    // Nếu result code != 0 => Refund failed
+                    if (responseMomo.resultCode > 0)
+                        throw new BadRequestException("Momo refuse request refund, Please debug");
+                    // Update order status
+                    await UpdateOrderStatusAsync(dto.OrderId, OrderStatus.RequestRefund, OrderStatus.Refunded);
+                    // Update transaction status
+                    await _payment.UpdateTransStatusToRefunded(responseMomo.orderId);
                     // Send a notice of acceptance of order cancellation to parent
                     title = "The result of processing order cancellation request";
                     content = "Order cancellation request accepted, " +
-                              "KidsPro will refund the money to the e-Wallet after 3-5 days";
+                              "KidsPro has successfully refunded money to Momo e-Wallet ";
                     break;
                 case ModerationStatus.Refuse:
-                    await UpdateOrderStatusAsync(dto.OrderId, dto.ParentId,
-                        OrderStatus.RequestRefund, OrderStatus.Pending);
+                    await UpdateOrderStatusAsync(dto.OrderId, OrderStatus.RequestRefund, OrderStatus.Pending);
                     // Send a notice of refusal of order cancellation to parent
                     title = "The result of processing order cancellation request";
                     content = "Order cancellation request refused because  " + dto.ReasonRefuse;
@@ -165,7 +171,15 @@ namespace Application.Services
 
             await _notify.SendNotifyToAccountAsync(dto.ParentId, title, content);
         }
-        
+
+        public async Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status)
+        {
+            //var account = await _account.GetCurrentAccountInformationAsync();
+
+            var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId, status);
+            return order ??
+                   throw new NotFoundException($"OrderId {orderId} not exist process status");
+        }
         
     }
 }
