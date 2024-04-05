@@ -132,8 +132,8 @@ public static class ClassMapper
         Classes = dto.Results.Select(c => new ClassesResponse()
         {
             ClassCode = c.Code,
-            Start = DateUtils.FormatDateTimeToDatetimeV1(c.OpenDate),
-            End = DateUtils.FormatDateTimeToDatetimeV1(c.CloseDate),
+            DayStart = DateUtils.FormatDateTimeToDatetimeV1(c.OpenDate),
+            DayEnd = DateUtils.FormatDateTimeToDatetimeV1(c.CloseDate),
             ClassId = c.Id
         }).ToList()
     };
@@ -144,8 +144,10 @@ public static class ClassMapper
         {
             ClassId = x.Id,
             ClassCode = x.Code,
-            Start = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
-            End = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
+            SlotStart = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
+            SlotEnd = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
+            DayStart = DateUtils.FormatDateTimeToDateV1(x.OpenDate),
+            DayEnd = DateUtils.FormatDateTimeToDateV1(x.CloseDate),
             Days = x.Schedules?.Select(s=> s.StudyDay).ToList()
         }).ToList();
     }
