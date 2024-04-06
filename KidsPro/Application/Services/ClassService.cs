@@ -139,12 +139,12 @@ public class ClassService : IClassService
         return ClassMapper.ClassToClassesPagingResponse(classes);
     }
 
-    public async Task<List<ClassesResponse>> GetClassByRoleAsync(int id)
+    public async Task<List<ClassesResponse>> GetClassByRoleAsync()
     {
         var account = await _account.GetCurrentAccountInformationAsync();
 
-        var classes = await _unitOfWork.ClassRepository.GetClassByRole(id, account.Role);
-        if (classes.Count == 0) throw new BadRequestException($"Teacher or student {id} not found");
+        var classes = await _unitOfWork.ClassRepository.GetClassByRole(account.IdSubRole, account.Role);
+        if (classes.Count == 0) throw new BadRequestException($"Teacher or student {account.IdSubRole} not found");
 
         return ClassMapper.ClassToClassesResponse(classes);
     }
