@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Game;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Entities;
@@ -695,11 +696,37 @@ public class GameService : IGameService
                     throw;
                 }
             }
+
             await _unitOfWork.CommitAsync();
         }
     }
 
-    #region GAME CLIENT
+    #region SHOPPING
+
+    public async Task<List<GameShopItem>> GetAllShopItem()
+    {
+        var result = await _unitOfWork.GameItemRepository
+            .GetAsync(o => o.ItemType == ItemType.ShopItem, null);
+
+        return result.Select(Mappers.GameMapper.GameItemToGameShopItem).ToList();
+    }
+
+    public async Task<PagingResponse<GameShopItem>> GetAllShopItem(int? page, int? size)
+    {
+        var result = await _unitOfWork.GameItemRepository
+            .GetPaginateAsync(o => o.ItemType == ItemType.ShopItem, null, page, size);
+
+        return new PagingResponse<GameShopItem>
+        {
+            TotalPages = result.TotalPages,
+            TotalRecords = result.TotalRecords,
+            Results = result.Results.Select(Mappers.GameMapper.GameItemToGameShopItem)
+        };
+    }
+
+    #endregion
+
+    #region GAME LEVEL
 
     public async Task<List<ModeType>> GetAllGameMode()
     {
