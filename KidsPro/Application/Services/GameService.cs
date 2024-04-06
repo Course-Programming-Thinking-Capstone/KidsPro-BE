@@ -28,32 +28,32 @@ public class GameService : IGameService
             await _unitOfWork.BeginTransactionAsync();
             var gameMode = new List<LevelType>()
             {
-                new LevelType
+                new()
                 {
                     Id = 1,
                     TypeName = "Basic"
                 },
-                new LevelType
+                new()
                 {
                     Id = 2,
                     TypeName = "Sequence"
                 },
-                new LevelType
+                new()
                 {
                     Id = 3,
                     TypeName = "Loop"
                 },
-                new LevelType
+                new()
                 {
                     Id = 4,
                     TypeName = "Function"
                 },
-                new LevelType
+                new()
                 {
                     Id = 5,
                     TypeName = "Condition"
                 },
-                new LevelType
+                new()
                 {
                     Id = 6,
                     TypeName = "Custom"
@@ -62,18 +62,18 @@ public class GameService : IGameService
 
             var positionTypes = new List<PositionType>()
             {
-                new PositionType
+                new()
                 {
                     Id = 1,
                     TypeName = "Board"
                 },
-                new PositionType
+                new()
                 {
                     Id = 2,
 
                     TypeName = "Target"
                 },
-                new PositionType
+                new()
                 {
                     Id = 3,
                     TypeName = "Rock"
@@ -86,7 +86,7 @@ public class GameService : IGameService
                 await _unitOfWork.PositionTypeRepository.ForceAddRangeAsync(positionTypes);
                 await _unitOfWork.SaveChangeAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await _unitOfWork.RollbackAsync();
                 throw;
@@ -680,7 +680,7 @@ public class GameService : IGameService
                     await _unitOfWork.GameItemRepository.AddAsync(gameItem);
                     await _unitOfWork.SaveChangeAsync();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     await _unitOfWork.RollbackAsync();
                     throw;
@@ -743,15 +743,13 @@ public class GameService : IGameService
             {
                 continue;
             }
-            else
+
+            result.Add(new ModeType()
             {
-                result.Add(new ModeType()
-                {
-                    IdMode = mode.Id,
-                    TypeName = mode.TypeName ?? "Null Name",
-                    totalLevel = 0
-                });
-            }
+                IdMode = mode.Id,
+                TypeName = mode.TypeName ?? "Null Name",
+                totalLevel = 0
+            });
         }
 
         if (result.Count == 0)
@@ -835,10 +833,10 @@ public class GameService : IGameService
             o => o.StudentId == userFinishLevelRequest.UserID, null).ContinueWith(o => o.Result.FirstOrDefault());
         var result = new UserDataResponse
         {
-            UserId = userData.StudentId,
+            UserId = userData!.StudentId,
             DisplayName = userData.DisplayName,
-            OldGem = (int)userData.Gem,
-            OldCoin = (int)userData.Coin,
+            OldGem = userData.Gem,
+            OldCoin = userData.Coin,
             UserCoin = userData.Gem,
             UserGem = userData.Coin
         };
@@ -870,7 +868,7 @@ public class GameService : IGameService
             await _unitOfWork.SaveChangeAsync();
             await _unitOfWork.CommitAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
@@ -903,7 +901,7 @@ public class GameService : IGameService
             await _unitOfWork.GameItemRepository.AddAsync(gameItem);
             await _unitOfWork.CommitAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
@@ -944,14 +942,14 @@ public class GameService : IGameService
                     _unitOfWork.GameLevelRepository.Update(currentLevel);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await _unitOfWork.RollbackAsync();
                 throw;
             }
         }
 
-        var gameLevelId = 0;
+        int gameLevelId;
         var newData = new GameLevel
         {
             LevelIndex = modifiedLevelData.LevelIndex,
@@ -970,7 +968,7 @@ public class GameService : IGameService
             var result = await GetGameLevelByTypeAndIndex(newData.GameLevelTypeId, (int)newData.LevelIndex);
             gameLevelId = result!.Id;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
 
@@ -998,7 +996,7 @@ public class GameService : IGameService
 
             await _unitOfWork.CommitAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
 
@@ -1048,7 +1046,7 @@ public class GameService : IGameService
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     await _unitOfWork.RollbackAsync();
                     throw;
@@ -1070,7 +1068,7 @@ public class GameService : IGameService
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     await _unitOfWork.RollbackAsync();
                     throw;
@@ -1094,7 +1092,7 @@ public class GameService : IGameService
                 currentList
             );
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
@@ -1130,7 +1128,7 @@ public class GameService : IGameService
             await _unitOfWork.SaveChangeAsync();
             await _unitOfWork.CommitAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
@@ -1171,7 +1169,7 @@ public class GameService : IGameService
     {
         var query = await _unitOfWork.GameLevelRepository.GetAsync(
             o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
-            , includeProperties: $"{nameof(GameLevel.GameLevelType)}");
+            , includeProperties: $"{nameof(GameLevel.GameLevelType)}").ContinueWith(o => o.Result.ToList());
 
         if (!query.Any())
         {
@@ -1186,7 +1184,7 @@ public class GameService : IGameService
             GemReward = gameLevel.GemReward ?? 0,
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
-            GameLevelTypeName = gameLevel.GameLevelType.TypeName,
+            GameLevelTypeName = gameLevel.GameLevelType.TypeName ?? "Not Found",
             LevelDetail = new List<LevelDetail>()
         }).OrderBy(o => o.LevelIndex).ToList();
 
@@ -1224,7 +1222,7 @@ public class GameService : IGameService
             GemReward = gameLevel.GemReward ?? 0,
             VStartPosition = gameLevel.VStartPosition,
             GameLevelTypeId = gameLevel.GameLevelTypeId,
-            GameLevelTypeName = gameLevel.GameLevelType.TypeName,
+            GameLevelTypeName = gameLevel.GameLevelType.TypeName ?? "Not Found",
             LevelDetail = new List<LevelDetail>()
         }).OrderBy(o => o.LevelIndex).ToList();
 
@@ -1275,7 +1273,7 @@ public class GameService : IGameService
             await _unitOfWork.SaveChangeAsync();
             await _unitOfWork.CommitAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
@@ -1321,7 +1319,7 @@ public class GameService : IGameService
             await _unitOfWork.SaveChangeAsync();
             await _unitOfWork.CommitAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
