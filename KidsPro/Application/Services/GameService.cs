@@ -693,6 +693,77 @@ public class GameService : IGameService
 
     #region SHOPPING
 
+    public async Task<List<int>> BuyItemFromShop(int idItem, int userId)
+    {
+        var boughtItem = await _unitOfWork.GameItemRepository.GetAsync(o => o.Id == idItem, null)
+            .ContinueWith(o => o.Result.FirstOrDefault());
+
+        if (boughtItem == null)
+        {
+            throw new BadRequestException("Item not found");
+        }
+
+        if (boughtItem.ItemType != ItemType.ShopItem)
+        {
+            throw new BadRequestException("Item bought not valid, must be a shop item");
+        }
+        if (boughtItem.ItemRateType == ItemRateType.Default)
+        {
+            throw new BadRequestException("Default Item, cannot buy");
+        }
+        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.Id == userId, null)
+            .ContinueWith(o => o.Result.FirstOrDefault());
+        if (user == null)
+        {
+            throw new BadRequestException("User not found");
+        }
+
+        if (user.Coin < boughtItem.Price)
+        {
+            throw new BadRequestException("Not enough coin to buy this item");
+        }
+
+        var checkExisted = _unitOfWork.ItemOwnedRepository.GetAsync(
+                o => o.StudentId == user.StudentId && o.GameItemId == boughtItem.Id
+                , null)
+            .ContinueWith(o => o.Result.FirstOrDefault());
+
+        if (checkExisted != null)
+        {
+            throw new BadRequestException("This item is already bought");
+        }
+
+        var newOwnedItem = new ItemOwned
+        {
+            Id = 0,
+            DisplayName = boughtItem.ItemName,
+            Quantity = 1,
+            StudentId = user.StudentId,
+            GameItemId = boughtItem.Id,
+        };
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            user.Coin -= boughtItem.Price;
+            await _unitOfWork.ItemOwnedRepository.AddAsync(newOwnedItem);
+            _unitOfWork.GameUserProfileRepository.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        return _unitOfWork.ItemOwnedRepository
+            .GetAsync(o => o.StudentId == user.StudentId
+                , null, includeProperties: nameof(GameItem))
+            .ContinueWith(o => o.Result.Where(o => o.GameItem.ItemType == ItemType.ShopItem)).Result
+            .Select(o => o.GameItemId).ToList();
+    }
+
     public async Task<List<GameShopItem>> GetAllShopItem()
     {
         var result = await _unitOfWork.GameItemRepository

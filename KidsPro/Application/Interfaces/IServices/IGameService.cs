@@ -21,4 +21,5 @@ public interface IGameService
     public Task SoftDeleteLevelGame(int id);
     public Task<List<GameShopItem>> GetAllShopItem();
     public Task<PagingResponse<GameShopItem>> GetAllShopItem(int? page, int? size);
+    public  Task<List<int>> BuyItemFromShop(int idItem, int userId);
 }
