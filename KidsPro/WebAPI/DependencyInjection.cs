@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IMomoConfig,MomoConfig>();
         services.AddScoped<IZaloPayConfig,ZaloPayConfig>();
+        services.AddScoped<IDiscordConfig,DiscordConfig>();
         
         //Add service
         services.Scan(scan => scan

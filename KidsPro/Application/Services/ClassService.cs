@@ -2,15 +2,16 @@
 using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account;
-using Application.Dtos.Response.Account.Student;
-using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
 using Application.Utils;
+using Discord;
+using Discord.WebSocket;
 using Domain.Entities;
 using Domain.Enums;
+using WebAPI.Gateway.IConfig;
 
 namespace Application.Services;
 
@@ -19,12 +20,18 @@ public class ClassService : IClassService
     private IUnitOfWork _unitOfWork;
     private IAccountService _account;
     private INotificationService _notify;
+    private IDiscordConfig _discord;
 
-    public ClassService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify)
+    //Discord
+    private static DiscordSocketClient _client;
+
+    public ClassService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
+        IDiscordConfig discord)
     {
         _unitOfWork = unitOfWork;
         _account = account;
         _notify = notify;
+        _discord = discord;
     }
 
     private async Task<AccountDto> CheckPermission()
@@ -35,6 +42,46 @@ public class ClassService : IClassService
             throw new UnauthorizedException("Not the staff or admin role, please login by manager account");
         return account;
     }
+
+    #region Discord
+
+    // private async Task OnReadyAsync(string classCode)
+    // {
+    //     // Gọi hàm tạo channel khi bot sẵn sàng
+    //     await CreateVoiceChannelAsync("Class: " + classCode);
+    // }
+    private async Task InitializeDiscordConnection()
+    {
+        try
+        {
+            _client = new DiscordSocketClient();
+            //_client.Ready += () => OnReadyAsync(classCode);
+            await _client.LoginAsync(TokenType.Bot, _discord.BotToken);
+            await _client.StartAsync();
+            // Kiểm tra xem bot đã kết nối thành công
+            if (_client.ConnectionState == ConnectionState.Connected) return;
+            // Đợi bot kết nối và sẵn sàng hoạt động, Chờ 10 giây
+            await Task.Delay(10000);
+        }
+        catch (Exception ex)
+        {
+            throw new BadRequestException("Unable connect to Discord Bot, error " + ex);
+        }
+    }
+
+    private async Task<string> CreateVoiceChannelAsync(string voiceChannelName)
+    {
+        //Connect to discord
+        await InitializeDiscordConnection();
+
+        var guild = _client.GetGuild(ulong.Parse(_discord.ServerId))
+                    ?? throw new NotFoundException("Discord server Id not found");
+
+        var newVoiceChannel = await guild.CreateVoiceChannelAsync(voiceChannelName);
+        return $"https://discord.com/channels/{_discord.ServerId}/{newVoiceChannel.Id}";
+    }
+
+    #endregion
 
     #region Class
 
@@ -110,11 +157,18 @@ public class ClassService : IClassService
     {
         await CheckPermission();
 
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
+                          ?? throw new BadRequestException($"ClassID {dto.ClassId} not found");
+
+        string? discordLink = null;
+        if (dto.RoomUrl == string.Empty)
+            discordLink = await CreateVoiceChannelAsync("Class: " + entityClass.Code);
+
         var time = TimeUtils.GetTimeFromSlot(dto.Slot, dto.SlotTime);
 
         var schedule = dto.Days.Select(day => new ClassSchedule
         {
-            RoomUrl = dto.RoomUrl,
+            RoomUrl = discordLink ?? dto.RoomUrl,
             ClassId = dto.ClassId,
             Slot = dto.Slot,
             StudyDay = day,
@@ -160,7 +214,6 @@ public class ClassService : IClassService
                 schedule.StartTime = time.Item1;
                 schedule.EndTime = time.Item2;
                 schedule.Slot = dto.SlotNumber;
-                schedule.RoomUrl = dto.RoomUrl;
                 schedule.Status = ScheduleStatus.Active;
             }
 
@@ -187,7 +240,7 @@ public class ClassService : IClassService
                 {
                     ClassId = dto.ClassId,
                     Slot = dto.SlotNumber,
-                    RoomUrl = dto.RoomUrl,
+                    RoomUrl = schedules.FirstOrDefault()?.RoomUrl,
                     Days = remainingStudyDays,
                     SlotTime = dto.SlotTime
                 };

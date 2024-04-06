@@ -25,6 +25,7 @@ if (configuration != null)
 //Gateway
 builder.Services.Configure<MomoConfig>(builder.Configuration.GetSection(MomoConfig.ConfigName));
 builder.Services.Configure<ZaloPayConfig>(builder.Configuration.GetSection(ZaloPayConfig.ConfigName));
+builder.Services.Configure<DiscordConfig>(builder.Configuration.GetSection(DiscordConfig.ConfigName));
 
 var app = builder.Build();
 
