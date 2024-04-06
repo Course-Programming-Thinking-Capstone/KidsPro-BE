@@ -51,6 +51,7 @@ public class GamesController : ControllerBase
         var result = await _gameService.GetAllShopItem(page, size);
         return Ok(result);
     }
+
     /// <summary>
     /// Get all of shop item
     /// </summary>
@@ -142,16 +143,26 @@ public class GamesController : ControllerBase
     #region Admin API
 
     /// <summary>
-    /// Admin Get Levels details by game mode id
+    /// Admin Get Levels by game mode id
     /// </summary>
     /// <returns></returns>
     [HttpGet("game-mode/{modeId}/game-level")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<LevelDataResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId)
+    public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId,
+        [FromQuery] int? page,
+        [FromQuery] int? size)
     {
-        var result = await _gameService.GetLevelsByMode(modeId);
-        return Ok(result);
+        if (page == null || size == null)
+        {
+            var result = await _gameService.GetLevelsByMode(modeId);
+            return Ok(result);
+        }
+        else
+        {
+            var result = await _gameService.GetLevelsByMode(modeId, page, size);
+            return Ok(result);
+        }
     }
 
     /// <summary>

@@ -1172,12 +1172,51 @@ public class GameService : IGameService
         var query = await _unitOfWork.GameLevelRepository.GetAsync(
             o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
             , includeProperties: $"{nameof(GameLevel.GameLevelType)}");
+
         if (!query.Any())
         {
             throw new NotFoundException("Not found any level");
         }
 
         var result = query.Select(gameLevel => new LevelDataResponse()
+        {
+            Id = gameLevel.Id,
+            LevelIndex = gameLevel.LevelIndex ?? 0,
+            CoinReward = gameLevel.CoinReward ?? 0,
+            GemReward = gameLevel.GemReward ?? 0,
+            VStartPosition = gameLevel.VStartPosition,
+            GameLevelTypeId = gameLevel.GameLevelTypeId,
+            GameLevelTypeName = gameLevel.GameLevelType.TypeName,
+            LevelDetail = new List<LevelDetail>()
+        }).OrderBy(o => o.LevelIndex).ToList();
+
+        foreach (var resultItem in result)
+        {
+            var levelInformation = await _unitOfWork.GameLevelDetailRepository
+                .GetAsync(o => o.GameLevelId == resultItem.Id, null);
+
+            resultItem.LevelDetail = levelInformation.Select(item => new LevelDetail()
+            {
+                VPosition = item.VPosition,
+                TypeId = item.PositionTypeId,
+            }).ToList();
+        }
+
+        return result;
+    }
+
+    public async Task<List<LevelDataResponse>> GetLevelsByMode(int modeId, int? page, int? size)
+    {
+        var query = await _unitOfWork.GameLevelRepository.GetPaginateAsync(
+            o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
+            , includeProperties: $"{nameof(GameLevel.GameLevelType)}", page: page, size: size);
+
+        if (!query.Results.Any())
+        {
+            throw new NotFoundException("Not found any level");
+        }
+
+        var result = query.Results.Select(gameLevel => new LevelDataResponse()
         {
             Id = gameLevel.Id,
             LevelIndex = gameLevel.LevelIndex ?? 0,

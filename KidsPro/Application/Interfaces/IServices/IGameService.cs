@@ -13,6 +13,8 @@ public interface IGameService
     public Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
     public Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task<List<LevelDataResponse>> GetLevelsByMode(int modeId);
+    public Task<List<LevelDataResponse>> GetLevelsByMode(int modeId, int? page,
+        int? size);
     public Task<LevelDataResponse> GetLevelDataById(int id);
     public Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData);
