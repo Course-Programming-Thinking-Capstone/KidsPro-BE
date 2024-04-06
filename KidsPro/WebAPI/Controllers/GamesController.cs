@@ -81,6 +81,19 @@ public class GamesController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Get user item owned
+    /// </summary>
+    /// <returns>List of owned shop item</returns>
+    [HttpGet("game-shop-item-owned/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<int>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<int>>> UserBuyItem([FromQuery] int userId)
+    {
+        var result = await _gameService.GetUserShopItem(userId);
+        return Ok(result);
+    }
+
     #endregion
 
     #region GAME CLIENT

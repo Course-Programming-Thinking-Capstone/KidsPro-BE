@@ -772,6 +772,22 @@ public class GameService : IGameService
         return result;
     }
 
+    public async Task<List<int>> GetUserShopItem(int userId)
+    {
+        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.Id == userId, null)
+            .ContinueWith(o => o.Result.FirstOrDefault());
+        if (user == null)
+        {
+            throw new BadRequestException("User not found");
+        }
+
+        return _unitOfWork.ItemOwnedRepository
+            .GetAsync(o => o.StudentId == user.StudentId
+                , null, includeProperties: nameof(GameItem))
+            .ContinueWith(o => o.Result.Where(o => o.GameItem.ItemType == ItemType.ShopItem)).Result
+            .Select(o => o.GameItemId).ToList();
+    }
+
     public async Task<List<GameShopItem>> GetAllShopItem()
     {
         var result = await _unitOfWork.GameItemRepository
