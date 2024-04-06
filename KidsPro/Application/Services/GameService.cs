@@ -723,7 +723,7 @@ public class GameService : IGameService
             throw new BadRequestException("Not enough coin to buy this item");
         }
 
-        var checkExisted = _unitOfWork.ItemOwnedRepository.GetAsync(
+        var checkExisted = await _unitOfWork.ItemOwnedRepository.GetAsync(
                 o => o.StudentId == user.StudentId && o.GameItemId == boughtItem.Id
                 , null)
             .ContinueWith(o => o.Result.FirstOrDefault());
