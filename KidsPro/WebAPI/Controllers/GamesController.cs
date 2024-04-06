@@ -71,10 +71,10 @@ public class GamesController : ControllerBase
     /// <param name="itemId">item id</param>
     /// <param name="userId">user id</param>
     /// <returns>List of owned shop item</returns>
-    [HttpPost("game-item-owned/")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<int>))]
+    [HttpPost("game-shop-item-owned/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BuyResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<int>>> UserBuyItem([FromQuery] int itemId,
+    public async Task<ActionResult<BuyResponse>> UserBuyItem([FromQuery] int itemId,
         [FromQuery] int userId)
     {
         var result = await _gameService.BuyItemFromShop(itemId, userId);

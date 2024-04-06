@@ -693,7 +693,7 @@ public class GameService : IGameService
 
     #region SHOPPING
 
-    public async Task<List<int>> BuyItemFromShop(int idItem, int userId)
+    public async Task<BuyResponse> BuyItemFromShop(int idItem, int userId)
     {
         var boughtItem = await _unitOfWork.GameItemRepository.GetAsync(o => o.Id == idItem, null)
             .ContinueWith(o => o.Result.FirstOrDefault());
@@ -707,10 +707,12 @@ public class GameService : IGameService
         {
             throw new BadRequestException("Item bought not valid, must be a shop item");
         }
+
         if (boughtItem.ItemRateType == ItemRateType.Default)
         {
             throw new BadRequestException("Default Item, cannot buy");
         }
+
         var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.Id == userId, null)
             .ContinueWith(o => o.Result.FirstOrDefault());
         if (user == null)
@@ -757,11 +759,17 @@ public class GameService : IGameService
             throw;
         }
 
-        return _unitOfWork.ItemOwnedRepository
-            .GetAsync(o => o.StudentId == user.StudentId
-                , null, includeProperties: nameof(GameItem))
-            .ContinueWith(o => o.Result.Where(o => o.GameItem.ItemType == ItemType.ShopItem)).Result
-            .Select(o => o.GameItemId).ToList();
+        var result = new BuyResponse
+        {
+            CurrentCoin = user.Coin,
+            CurrentGem = user.Gem,
+            OwnedItem = _unitOfWork.ItemOwnedRepository
+                .GetAsync(o => o.StudentId == user.StudentId
+                    , null, includeProperties: nameof(GameItem))
+                .ContinueWith(o => o.Result.Where(o => o.GameItem.ItemType == ItemType.ShopItem)).Result
+                .Select(o => o.GameItemId).ToList()
+        };
+        return result;
     }
 
     public async Task<List<GameShopItem>> GetAllShopItem()
