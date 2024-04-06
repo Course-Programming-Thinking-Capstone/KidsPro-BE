@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Game;
+using Application.Dtos.Response.Paging;
 
 namespace Application.Interfaces.IServices;
 
@@ -16,4 +17,6 @@ public interface IGameService
     public Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData);
     public Task SoftDeleteLevelGame(int id);
+    public Task<List<GameShopItem>> GetAllShopItem();
+    public Task<PagingResponse<GameShopItem>> GetAllShopItem(int? page, int? size);
 }

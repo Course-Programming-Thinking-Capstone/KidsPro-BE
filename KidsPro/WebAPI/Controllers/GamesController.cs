@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Game;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,38 @@ public class GamesController : ControllerBase
         return Ok();
     }
 
+    #region SHOP
+
+    /// <summary>
+    /// Get pagination of shop item
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet("shop-item/pagination")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameShopItem>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameShopItem>>> GetShopItemPagination([FromQuery] int page,
+        [FromQuery] int size)
+    {
+        var result = await _gameService.GetAllShopItem(page, size);
+        return Ok(result);
+    }
+    /// <summary>
+    /// Get all of shop item
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("shop-item/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameShopItem>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<GameShopItem>>> GetShopItem()
+    {
+        var result = await _gameService.GetAllShopItem();
+        return Ok(result);
+    }
+
+    #endregion
+
     #region GAME CLIENT
 
     /// <summary>
@@ -43,7 +76,7 @@ public class GamesController : ControllerBase
     [HttpPost("authentication/login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGameLoginDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody]StudentLoginRequest  request)
+    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody] StudentLoginRequest request)
     {
         var result = await _accountService.StudentGameLoginAsync(request);
         return Ok(result);

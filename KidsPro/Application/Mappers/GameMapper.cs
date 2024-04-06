@@ -1,6 +1,8 @@
-﻿using Application.Dtos.Response.Game;
+﻿using Application.Dtos.Request.Game;
+using Application.Dtos.Response.Game;
 using Application.Dtos.Response.Paging;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Mappers;
 
@@ -18,5 +20,18 @@ public static class GameMapper
             Price = entity.Price
         };
 
-   
+    public static GameItem GameItemRequestToGameItem(NewItemRequest newItem)
+    {
+        return new GameItem
+        {
+            Id = 0,
+            GameId = 0,
+            ItemName = newItem.ItemName,
+            Details = newItem.Details,
+            SpritesUrl = newItem.SpritesUrl,
+            ItemRateType = (ItemRateType)newItem.ItemRateType,
+            ItemType = (ItemType)newItem.ItemType,
+            Price = newItem.Price
+        };
+    }
 }

@@ -674,21 +674,11 @@ public class GameService : IGameService
             await _unitOfWork.BeginTransactionAsync();
             foreach (var newItem in tempData)
             {
-                var gameItem = new GameItem
-                {
-                    Id = 0,
-                    GameId = 0,
-                    ItemName = newItem.ItemName,
-                    Details = newItem.Details,
-                    SpritesUrl = newItem.SpritesUrl,
-                    ItemRateType = (ItemRateType)newItem.ItemRateType,
-                    ItemType = (ItemType)newItem.ItemRateType,
-                    Price = newItem.Price
-                };
-
+                var gameItem = Mappers.GameMapper.GameItemRequestToGameItem(newItem);
                 try
                 {
                     await _unitOfWork.GameItemRepository.AddAsync(gameItem);
+                    await _unitOfWork.SaveChangeAsync();
                 }
                 catch (Exception e)
                 {
@@ -706,7 +696,10 @@ public class GameService : IGameService
     public async Task<List<GameShopItem>> GetAllShopItem()
     {
         var result = await _unitOfWork.GameItemRepository
-            .GetAsync(o => o.ItemType == ItemType.ShopItem, null);
+            .GetAsync(
+                filter: o => o.ItemType == ItemType.ShopItem,
+                orderBy: q => q.OrderBy(item => item.ItemRateType)
+            );
 
         return result.Select(Mappers.GameMapper.GameItemToGameShopItem).ToList();
     }
@@ -714,7 +707,8 @@ public class GameService : IGameService
     public async Task<PagingResponse<GameShopItem>> GetAllShopItem(int? page, int? size)
     {
         var result = await _unitOfWork.GameItemRepository
-            .GetPaginateAsync(o => o.ItemType == ItemType.ShopItem, null, page, size);
+            .GetPaginateAsync(o => o.ItemType == ItemType.ShopItem, orderBy: q => q.OrderBy(item => item.ItemRateType),
+                page, size);
 
         return new PagingResponse<GameShopItem>
         {
