@@ -507,7 +507,195 @@ public class GameService : IGameService
         var baseItem = _unitOfWork.GameItemRepository.GetAll();
         if (!baseItem.Any(o => o.ItemType == ItemType.ShopItem))
         {
-            
+            var tempData = new List<NewItemRequest>()
+            {
+                new NewItemRequest
+                {
+                    ItemName = "Allue",
+                    Details =
+                        "Allue is mischievous and curious, always fond of exploring and delighting others with its adorable personality and playful antics.",
+                    SpritesUrl = "Allue",
+                    ItemRateType = 0,
+                    ItemType = 0,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Auesitle",
+                    Details =
+                        "Auesitle is an adventurous being, constantly seeking new discoveries with a playful curiosity that knows no bounds",
+                    SpritesUrl = "Auesitle",
+                    ItemRateType = 1,
+                    ItemType = 0,
+                    Price = 500
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Wirder",
+                    Details =
+                        "Wirder is a mysterious individual, known for their eccentricities and unconventional lifestyle. They possess a unique perspective, constantly questioning norms and exploring the depths of the unknown, captivating others with their enigmatic presence.",
+                    SpritesUrl = "Wirder",
+                    ItemRateType = 1,
+                    ItemType = 0,
+                    Price = 500
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Baqua",
+                    Details =
+                        "Baqua is a resilient warrior, embodying strength and determination in every step. With a heart full of courage, Baqua faces challenges head-on, inspiring others with their unwavering resolve and indomitable spirit.",
+                    SpritesUrl = "Baqua",
+                    ItemRateType = 1,
+                    ItemType = 0,
+                    Price = 500
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Wene",
+                    Details =
+                        "Wene is a spirited individual, radiating warmth and kindness wherever she goes. She possesses a resilient spirit, navigating life's challenges with grace and determination, inspiring those around her with her unwavering optimism.",
+                    SpritesUrl = "Wene",
+                    ItemRateType = 3,
+                    ItemType = 0,
+                    Price = 1000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Beir",
+                    Details =
+                        "She is a resilient warrior, wielding her blade with precision and grace. With unwavering determination, Beir faces every challenge head-on, inspiring those around her with her courage and strength.",
+                    SpritesUrl = "Beir",
+                    ItemRateType = 3,
+                    ItemType = 0,
+                    Price = 1000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Spotine",
+                    Details =
+                        "Spotine is a spirited individual, radiating warmth and positivity wherever she goes. With a contagious energy, she uplifts those around her, bringing joy and laughter to every encounter.",
+                    SpritesUrl = "Spotine",
+                    ItemRateType = 3,
+                    ItemType = 0,
+                    Price = 1000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Crimson",
+                    Details =
+                        "Crimson is a fierce warrior, renowned for his unmatched skill and unwavering determination. He commands respect with his imposing presence, leading with courage and valor on the battlefield.",
+                    SpritesUrl = "Crimson",
+                    ItemRateType = 3,
+                    ItemType = 0,
+                    Price = 1500
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Risir",
+                    Details =
+                        "Risir is a cunning strategist, wielding intellect and wit to overcome any challenge. He navigates complexities with ease, his sharp mind always one step ahead of his adversaries.",
+                    SpritesUrl = "Risir",
+                    ItemRateType = 3,
+                    ItemType = 0,
+                    Price = 1500
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Dupomo",
+                    Details =
+                        "Dupomo is a gentle soul, exuding kindness and compassion in every action. She brings harmony wherever she goes, her soothing presence a source of comfort to those around her.",
+                    SpritesUrl = "Dupomo",
+                    ItemRateType = 3,
+                    ItemType = 0,
+                    Price = 1500
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Pomo",
+                    Details =
+                        "Pomo is a lively and energetic character, always ready for adventure and excitement. He approaches life with enthusiasm and optimism, spreading joy and laughter wherever he goes.",
+                    SpritesUrl = "Pomo",
+                    ItemRateType = 5,
+                    ItemType = 0,
+                    Price = 2000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "GeDusk",
+                    Details =
+                        "GeDusk is a mysterious figure, cloaked in shadows and secrets. She moves with stealth and grace, her presence haunting yet captivating, leaving others intrigued by her enigmatic aura.",
+                    SpritesUrl = "GeDusk",
+                    ItemRateType = 5,
+                    ItemType = 0,
+                    Price = 2000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Glek",
+                    Details =
+                        "Glek is a stoic and resilient individual, weathered by life's challenges yet unyielding in spirit. He carries himself with quiet strength, his determination evident in every step he takes, inspiring others with his unwavering resolve.",
+                    SpritesUrl = "Glek",
+                    ItemRateType = 5,
+                    ItemType = 0,
+                    Price = 2000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Obube",
+                    Details =
+                        "Obube is a charismatic and dynamic character, radiating charm and charisma in every interaction. She possesses a magnetic personality, effortlessly drawing others to her with her wit and warmth, leaving a lasting impression wherever she goes.",
+                    SpritesUrl = "Obube",
+                    ItemRateType = 5,
+                    ItemType = 0,
+                    Price = 3000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Dupomo",
+                    Details =
+                        "Dupomo is a gentle soul, exuding kindness and compassion in every action. She brings harmony wherever she goes, her soothing presence a source of comfort to those around her.",
+                    SpritesUrl = "Dupomo",
+                    ItemRateType = 6,
+                    ItemType = 0,
+                    Price = 3000
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Hirgh",
+                    Details =
+                        "Hirgh is a stoic and introspective figure, his deep thoughts hidden behind a veil of mystery. He navigates the complexities of life with a quiet determination, his presence commanding respect and intrigue from those around him.",
+                    SpritesUrl = "Hirgh",
+                    ItemRateType = 6,
+                    ItemType = 0,
+                    Price = 3000
+                }
+            };
+            await _unitOfWork.BeginTransactionAsync();
+            foreach (var newItem in tempData)
+            {
+                var gameItem = new GameItem
+                {
+                    Id = 0,
+                    GameId = 0,
+                    ItemName = newItem.ItemName,
+                    Details = newItem.Details,
+                    SpritesUrl = newItem.SpritesUrl,
+                    ItemRateType = (ItemRateType)newItem.ItemRateType,
+                    ItemType = (ItemType)newItem.ItemRateType,
+                    Price = newItem.Price
+                };
+
+                try
+                {
+                    await _unitOfWork.GameItemRepository.AddAsync(gameItem);
+                }
+                catch (Exception e)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+            await _unitOfWork.CommitAsync();
         }
     }
 
