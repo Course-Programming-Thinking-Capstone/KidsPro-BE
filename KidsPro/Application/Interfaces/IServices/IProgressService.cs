@@ -4,5 +4,6 @@ namespace Application.Interfaces.IServices;
 
 public interface IProgressService
 {
-    Task<SectionProgressResponse> GetProgressSection(int studentId, int courseId);
+    Task<SectionProgressResponse> GetProgressSectionAync(int studentId, int courseId);
+    Task<List<SectionProgressResponse>> GetStudentCourseAsync();
 }

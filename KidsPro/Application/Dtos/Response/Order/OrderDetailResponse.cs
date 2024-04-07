@@ -22,4 +22,6 @@ public class OrderDetailResponse
     public List<StudentOrderDetail>? Students { get; set; } = new List<StudentOrderDetail>();
     public string? ParentName { get; set; }
     public int ParentId { get; set; }
+    public int? ClassId { get; set; }
+    public string? ClassCode { get; set; }
 }

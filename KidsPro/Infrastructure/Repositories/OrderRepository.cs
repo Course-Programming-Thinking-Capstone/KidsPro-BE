@@ -68,6 +68,8 @@ namespace Infrastructure.Repositories
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
                 .Include(x => x.Transaction).Include(x => x.Voucher)
                 .Include(x => x.Parent).ThenInclude(x => x!.Account)
+                .Include(x => x.OrderDetails)!.ThenInclude(x => x.Class)
+                .ThenInclude(x=>x.Students)
                 .FirstOrDefaultAsync(x => x.Id == orderId);
         }
 

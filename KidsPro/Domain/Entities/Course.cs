@@ -69,4 +69,5 @@ public class Course : BaseEntity
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 
     public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
+    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 }

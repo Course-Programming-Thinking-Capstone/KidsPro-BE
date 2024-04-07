@@ -2,7 +2,7 @@
 
 public enum ClassStatus
 {
-    Active = 1,
-    Inactive = 2,
-    Expired = 3
+    Opening = 1,
+    Closed = 2,
+    OnGoing = 3
 }
