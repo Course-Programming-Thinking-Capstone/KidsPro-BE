@@ -17,4 +17,6 @@ public interface ISyllabusService
         int? page,
         int? size
     );
+
+    Task<int> GetNumberOfTeacherDraftSyllabusAsync();
 }

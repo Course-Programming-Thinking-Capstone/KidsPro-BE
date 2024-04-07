@@ -27,4 +27,11 @@ public class SyllabusRepository : BaseRepository<Syllabus>, ISyllabusRepository
             .Include(s => s.PassCondition)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
+
+    public async Task<int> GetNumberOfDraftSyllabusAsync(int teacherId)
+    {
+        return await _dbSet.Include(s => s.Course)
+            .Where(s => s.Course.ModifiedById == teacherId)
+            .CountAsync();
+    }
 }

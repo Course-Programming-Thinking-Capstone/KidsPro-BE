@@ -225,4 +225,17 @@ public class SyllabusService : ISyllabusService
             throw new Exception($"Error when execute {nameof(this.FilterSyllabusAsync)} method");
         }
     }
+
+    public async Task<int> GetNumberOfTeacherDraftSyllabusAsync()
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        if (role.Equals(Constant.TeacherRole))
+        {
+            var result = await _unitOfWork.SyllabusRepository.GetNumberOfDraftSyllabusAsync(accountId);
+            return result;
+        }
+
+        return 0;
+    }
 }
