@@ -12,7 +12,7 @@ public static class DateUtils
     public static string FormatDateTimeToDatetimeV2(DateTime? date) => date?.ToString("dd/MM/yyyy HH:mm:ss dddd") ?? "";
     public static string FormatDateTimeToDatetimeV3(DateTime? date) => date?.ToString("yyyy/MM/dd HH:mm:ss") ?? "";
     public static string FormatDateTimeToTime(DateTime? date) => date?.ToString("HH:mm") ?? "";
-
+    public static string FormatDateTimeToDayOfWeek(DateTime? date) => date?.DayOfWeek.ToString() ?? "";
     public static DateTime? ConvertStringToDateTimeV1(string? dateString)
     {
         if (string.IsNullOrEmpty(dateString))

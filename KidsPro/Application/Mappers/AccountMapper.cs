@@ -39,9 +39,9 @@ public static class AccountMapper
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
         Gender = entity.Gender?.ToString(),
-        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.DateOfBirth),
         Status = entity.Status.ToString(),
-        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name
     };
 
@@ -52,9 +52,9 @@ public static class AccountMapper
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
         Gender = entity.Gender?.ToString(),
-        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.DateOfBirth),
         Status = entity.Status.ToString(),
-        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name
     };
 
@@ -66,9 +66,9 @@ public static class AccountMapper
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
         Gender = entity.Gender?.ToString(),
-        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.DateOfBirth),
         Status = entity.Status.ToString(),
-        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
         Biography = entity.Staff?.Biography,
         PhoneNumber = entity.Staff?.PhoneNumber,
@@ -83,9 +83,9 @@ public static class AccountMapper
         FullName = entity.FullName,
         PictureUrl = entity.PictureUrl,
         Gender = entity.Gender?.ToString(),
-        DateOfBirth = DateUtils.FormatDateTimeToDateV1(entity.DateOfBirth),
+        DateOfBirth = DateUtils.FormatDateTimeToDateV3(entity.DateOfBirth),
         Status = entity.Status.ToString(),
-        CreatedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.CreatedDate),
+        CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
         Field = entity.Teacher?.Field,
         Biography = entity.Teacher?.Biography,

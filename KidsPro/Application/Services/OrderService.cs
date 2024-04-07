@@ -52,7 +52,7 @@ namespace Application.Services
                 PaymentType = (PaymentType)dto.PaymentType,
                 Quantity = dto.Quantity,
                 TotalPrice = (course.Price * dto.Quantity) - (voucher?.DiscountAmount ?? 0),
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 Status = OrderStatus.Process,
                 OrderCode = getOrderCode,
                 Note = "course: " + course.Name

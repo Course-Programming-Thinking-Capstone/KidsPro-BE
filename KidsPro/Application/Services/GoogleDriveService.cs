@@ -6,7 +6,7 @@ using Google.Apis.Drive.v3;
 
 namespace Application.Services;
 
-public class GoogleGoogleDriveService : IGoogleDriveService
+public class GoogleDriveService : IGoogleDriveService
 {
     public string UploadFilesToGoogleDrive(string credentialsPath, string kidsProFolder, Stream fileStream)
     {

@@ -14,7 +14,7 @@ public static class NotificationMapper
             IsRead = entity.IsRead,
             Title = entity.Notification.Title,
             Content = entity.Notification.Content,
-            Date = DateUtils.FormatDateTimeToDatetimeV1(entity.Notification.Date),
+            Date = DateUtils.FormatDateTimeToDatetimeV3(entity.Notification.Date),
         };
 
     public static PagingResponse<NotificationDto> UserNotificationToNotificationDto(
