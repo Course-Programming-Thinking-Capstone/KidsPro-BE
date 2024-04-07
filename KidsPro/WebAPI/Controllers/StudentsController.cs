@@ -1,6 +1,7 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request.Account.Student;
 using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.StudentProgress;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +15,13 @@ public class StudentsController : Controller
 {
     private IStudentService _studentService;
     private IAuthenticationService _authentication;
+    private IProgressService _progress;
 
-    public StudentsController(IStudentService studentService, IAuthenticationService authentication)
+    public StudentsController(IStudentService studentService, IAuthenticationService authentication, IProgressService progress)
     {
         _studentService = studentService;
         _authentication = authentication;
+        _progress = progress;
     }
 
 
@@ -73,5 +76,37 @@ public class StudentsController : Controller
         
         await _studentService.UpdateStudentAsync(dto);
         return Ok("Update Student Information Success!");
+    }
+    
+    /// <summary>
+    /// Get student's course, include course ratio
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.StudentRole}")]
+    [HttpGet("progress/courses")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<SectionProgressResponse>>> GetStudentCourseAsync()
+    {
+        var resutl = await _progress.GetStudentCourseAsync();
+        return Ok(resutl);
+    }
+    
+    /// <summary>
+    /// Get student's section progress 
+    /// </summary>
+    /// <param name="studentId"></param>
+    /// <param name="courseId"></param>
+    /// <returns></returns>
+    [AllowAnonymous]
+    [HttpGet("progress/course/sections")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<SectionProgressResponse>> GetSectionProgress(int studentId, int courseId)
+    {
+        var resutl = await _progress.GetProgressSectionAync(studentId, courseId);
+        return Ok(resutl);
     }
 }
