@@ -60,8 +60,8 @@ public class ClassService : IClassService
             await _client.StartAsync();
             // Kiểm tra xem bot đã kết nối thành công
             if (_client.ConnectionState == ConnectionState.Connected) return;
-            // Đợi bot kết nối và sẵn sàng hoạt động, Chờ 10 giây
-            await Task.Delay(10000);
+            // Đợi bot kết nối và sẵn sàng hoạt động, Chờ 5 giây
+            await Task.Delay(5000);
         }
         catch (Exception ex)
         {
