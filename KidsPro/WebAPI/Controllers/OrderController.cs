@@ -102,7 +102,7 @@ namespace WebAPI.Controllers
         /// <param name="dto"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        [Authorize(Roles = $"{Constant.StaffRole}")]
+        [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
         [HttpPost("handle-cancel")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -119,7 +119,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = $"{Constant.StaffRole}")]
+        [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
         [HttpPatch("confirm/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]

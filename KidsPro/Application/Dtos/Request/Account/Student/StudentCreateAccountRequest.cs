@@ -12,4 +12,5 @@ public class StudentCreateAccountRequest
     public string? Password { get; set; }
     [Required]
     public int OrderId { get; set; }
+    
 }

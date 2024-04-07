@@ -43,6 +43,10 @@ public class StaffService : IStaffService
         student!.UserName = dto.UserName;
         student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
         _unitOfWork.StudentRepository.Update(student);
+        
+        //Add student to Class
+
+        
         await _unitOfWork.SaveChangeAsync();
 
         return EmailMapper.ShowEmailContentResponse(student, dto.Password!, order);

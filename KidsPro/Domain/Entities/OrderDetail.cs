@@ -16,4 +16,7 @@ public class OrderDetail : BaseEntity
 
     public virtual Course Course { get; set; } = null!;
     public int CourseId { get; set; }
+    
+    public virtual Class Class { get; set; } = null!;
+    public int ClassId { get; set; }
 }

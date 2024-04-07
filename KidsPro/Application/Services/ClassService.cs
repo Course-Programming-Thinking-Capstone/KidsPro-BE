@@ -45,17 +45,11 @@ public class ClassService : IClassService
 
     #region Discord
 
-    // private async Task OnReadyAsync(string classCode)
-    // {
-    //     // Gọi hàm tạo channel khi bot sẵn sàng
-    //     await CreateVoiceChannelAsync("Class: " + classCode);
-    // }
     private async Task InitializeDiscordConnection()
     {
         try
         {
             _client = new DiscordSocketClient();
-            //_client.Ready += () => OnReadyAsync(classCode);
             await _client.LoginAsync(TokenType.Bot, _discord.BotToken);
             await _client.StartAsync();
             // Kiểm tra xem bot đã kết nối thành công
@@ -100,7 +94,7 @@ public class ClassService : IClassService
             Code = dto.ClassCode,
             OpenDate = dto.OpenDay,
             CloseDate = dto.CloseDay,
-            Status = ClassStatus.Active,
+            Status = ClassStatus.Opening,
             CourseId = dto.CourseId,
             CreatedById = account.Id,
             Duration = dto.CloseDay.Month - dto.OpenDay.Month,
@@ -336,14 +330,6 @@ public class ClassService : IClassService
         var removeStudents = entityClass.Students.Where(e => students.All(s => s.Id != e.Id)).ToList();
         foreach (var x in removeStudents)
             entityClass.Students.Remove(x);
-
-        // switch (type)
-        // {
-        //     case ClassStudentType.AddToClass:
-        //         break;
-        //     case ClassStudentType.RemoveFromClass:
-        //         break;
-        // }
 
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();

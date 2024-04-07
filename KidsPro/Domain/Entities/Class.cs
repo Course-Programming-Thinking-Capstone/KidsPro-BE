@@ -16,7 +16,7 @@ public class Class : BaseEntity
     [Range(0, 250)]
     public int Duration { get; set; }
 
-    public ClassStatus Status { get; set; } = ClassStatus.Active;
+    public ClassStatus Status { get; set; } = ClassStatus.Opening;
 
     public int? TotalSlot { get; set; }
 
