@@ -15,15 +15,16 @@ public class ClassDetailResponse
     public string? TeachPhoneNumber { get; set; }
     public string? TeachEmail { get; set; }
     public string? OpenClass { get; set; }
+    public string? DayOfWeekStart { get; set; }
     public string? CloseClass { get; set; }
+    public string? DayOfWeekEnd { get; set; }
     public int Duration { get; set; }
     public int SlotDuration { get; set; }
-    public IEnumerable<DayStatus>? StudyDay  { get; set; }= new List<DayStatus>();
+    public IEnumerable<DayStatus>? StudyDay { get; set; } = new List<DayStatus>();
     public int? SlotNumber { get; set; }
     public TimeSpan? StartSlot { get; set; }
     public TimeSpan? EndSlot { get; set; }
     public int? TotalSlot { get; set; }
     public string? RoomUrl { get; set; }
-    public List<StudentClassResponse>? Students  { get; set; }= new List<StudentClassResponse>();
-
+    public List<StudentClassResponse>? Students { get; set; } = new List<StudentClassResponse>();
 }

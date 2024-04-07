@@ -10,7 +10,7 @@ public static class EmailMapper
         => new EmailContentRequest()
         {
             StudentName = student.Account.FullName,
-            Birthday = DateUtils.FormatDateTimeToDateV1(student.Account.DateOfBirth),
+            Birthday = DateUtils.FormatDateTimeToDateV3(student.Account.DateOfBirth),
             Account = student.UserName,
             Password = password,
             Email = order.Parent!.Account.Email,

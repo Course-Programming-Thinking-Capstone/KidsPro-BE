@@ -16,8 +16,10 @@ public static class ClassMapper
             ClassCode = dto.Code,
             CourseId = dto.CourseId,
             CourseName = courseName,
-            OpenDay = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
-            CloseDay = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
+            OpenDay = DateUtils.FormatDateTimeToDateV3(dto.OpenDate),
+            CloseDay = DateUtils.FormatDateTimeToDateV3(dto.CloseDate),
+            DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(dto.OpenDate),
+            DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(dto.CloseDate),
             Duration = dto.Duration,
             SlotDuration = slotDuration,
             TotalSlot = dto.TotalSlot
@@ -78,8 +80,10 @@ public static class ClassMapper
         TeacherName = dto.Teacher?.Account.FullName,
         TeachPhoneNumber = dto.Teacher?.PhoneNumber,
         TeachEmail = dto.Teacher?.Account.Email,
-        OpenClass = DateUtils.FormatDateTimeToDatetimeV1(dto.OpenDate),
-        CloseClass = DateUtils.FormatDateTimeToDatetimeV1(dto.CloseDate),
+        OpenClass = DateUtils.FormatDateTimeToDateV3(dto.OpenDate),
+        CloseClass = DateUtils.FormatDateTimeToDateV3(dto.CloseDate),
+        DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(dto.OpenDate),
+        DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(dto.CloseDate),
         Duration = dto.Duration,
         SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
@@ -95,7 +99,7 @@ public static class ClassMapper
         {
             StudentId = x.Id,
             StudentName = x.Account.FullName,
-            DateOfBirth = DateUtils.FormatDateTimeToDateV1(x.Account.DateOfBirth),
+            DateOfBirth = DateUtils.FormatDateTimeToDateV3(x.Account.DateOfBirth),
             Gender = x.Account.Gender
         }).ToList(),
         TotalStudent = dto.Students.Count()
@@ -120,7 +124,7 @@ public static class ClassMapper
             StudentId = student.Id,
             Image = student.Account.PictureUrl,
             StudentName = student.Account.FullName,
-            DateOfBirth = DateUtils.FormatDateTimeToDateV1(student.Account.DateOfBirth),
+            DateOfBirth = DateUtils.FormatDateTimeToDateV3(student.Account.DateOfBirth),
             Gender = student.Account.Gender
         }).ToList();
     }
@@ -132,8 +136,10 @@ public static class ClassMapper
         Classes = dto.Results.Select(c => new ClassesResponse()
         {
             ClassCode = c.Code,
-            DayStart = DateUtils.FormatDateTimeToDatetimeV1(c.OpenDate),
-            DayEnd = DateUtils.FormatDateTimeToDatetimeV1(c.CloseDate),
+            DayStart = DateUtils.FormatDateTimeToDateV3(c.OpenDate),
+            DayEnd = DateUtils.FormatDateTimeToDateV3(c.CloseDate),
+            DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(c.OpenDate),
+            DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(c.CloseDate),
             ClassId = c.Id
         }).ToList()
     };
@@ -146,8 +152,10 @@ public static class ClassMapper
             ClassCode = x.Code,
             SlotStart = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
             SlotEnd = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
-            DayStart = DateUtils.FormatDateTimeToDateV1(x.OpenDate),
-            DayEnd = DateUtils.FormatDateTimeToDateV1(x.CloseDate),
+            DayStart = DateUtils.FormatDateTimeToDateV3(x.OpenDate),
+            DayEnd = DateUtils.FormatDateTimeToDateV3(x.CloseDate),
+            DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(x.OpenDate),
+            DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(x.CloseDate),
             Days = x.Schedules?.Select(s=> s.StudyDay).ToList()
         }).ToList();
     }

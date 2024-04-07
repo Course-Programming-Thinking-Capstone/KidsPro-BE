@@ -30,10 +30,10 @@ public class ClassController : ControllerBase
     #region Class
 
     /// <summary>
-    /// Get classes by teacher or student Id
+    /// Teacher or student get class information
     /// </summary>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.StudentRole}")]
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole},{Constant.TeacherRole},{Constant.StudentRole}")]
     [HttpGet("teacher-or-student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
