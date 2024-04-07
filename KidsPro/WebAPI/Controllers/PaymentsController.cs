@@ -53,7 +53,7 @@ namespace WebAPI.Controllers
             momoRequest.redirectUrl = _momoConfig.ReturnUrl;
             momoRequest.ipnUrl = _momoConfig.IpnUrl;
             momoRequest.partnerCode = _momoConfig.PartnerCode;
-            momoRequest.orderInfo = " 'KidsPro Service' - You are payment for " + order.Note;
+            momoRequest.orderInfo = " 'KidsPro Service' - You are paying for " + order.Note;
             momoRequest.signature = _payment.MakeSignatureMomoPayment
                 (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
 

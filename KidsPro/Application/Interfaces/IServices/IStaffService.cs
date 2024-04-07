@@ -7,5 +7,5 @@ public interface IStaffService
 {
     Task<EmailContentRequest> CreateAccountStudentAsync(StudentCreateAccountRequest dto);
     Task<string> ViewReasonOrderCancel(int orderId);
-    Task SendEmailParentAsync(EmailContentRequest student);
+    Task SendEmailParentAsync(EmailContentRequest dto);
 }

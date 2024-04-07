@@ -40,5 +40,5 @@ public interface ICourseService
     Task<ICollection<SectionComponentNumberDto>> UpdateSectionComponentNumberAsync(
         IEnumerable<UpdateSectionComponentNumberDto> dtos);
 
-    Task<CourseOrderDto> GetCoursePaymentAsync(int id);
+    Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId);
 }

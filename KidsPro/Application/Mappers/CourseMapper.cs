@@ -405,6 +405,8 @@ public static class CourseMapper
         Picture = dto.ModifiedBy?.PictureUrl,
         CourseName = dto.Name,
         TeacherName = dto.ModifiedBy?.FullName,
-        Price = dto.Price
+        Price = dto.Price,
+        ClassId = dto.Classes.FirstOrDefault()?.Id,
+        ClassCode = dto.Classes.FirstOrDefault()?.Code
     };
 }

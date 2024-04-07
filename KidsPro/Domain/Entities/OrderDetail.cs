@@ -18,5 +18,5 @@ public class OrderDetail : BaseEntity
     public int CourseId { get; set; }
     
     public virtual Class Class { get; set; } = null!;
-    public int ClassId { get; set; }
+    public int? ClassId { get; set; }
 }

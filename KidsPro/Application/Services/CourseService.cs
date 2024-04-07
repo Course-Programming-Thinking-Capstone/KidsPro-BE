@@ -828,12 +828,12 @@ public class CourseService : ICourseService
         return CourseMapper.EntityToSectionComponentNumberDto(entities);
     }
 
-    public async Task<CourseOrderDto> GetCoursePaymentAsync(int id)
+    public async Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId)
     {
-        var result = await _unitOfWork.CourseRepository.GetCoursePayment(id);
+        var result = await _unitOfWork.CourseRepository.GetCoursePayment(courseId,classId);
         if (result != null)
             return CourseMapper.ShowCoursePayment(result);
-        throw new NotFoundException("courseId doesn't exist");
+        throw new NotFoundException("courseId or classId doesn't exist");
     }
 
     private async Task<SectionComponentNumber> GetSectionComponentNumberAsync(SectionComponentType type)

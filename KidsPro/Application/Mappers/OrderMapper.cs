@@ -53,7 +53,9 @@ namespace Application.Mappers
                 Discount = order.Voucher?.DiscountAmount,
                 NumberChildren = order.OrderDetails!.FirstOrDefault()!.Students.Count,
                 ParentName = order.Parent!.Account.FullName,
-                ParentId = order.Parent!.Account.Id
+                ParentId = order.Parent!.Account.Id,
+                ClassId = order.OrderDetails!.FirstOrDefault()!.Class?.Id,
+                ClassCode = order.OrderDetails!.FirstOrDefault()!.Class?.Code
             };
             foreach (var dto in order.OrderDetails!.FirstOrDefault()!.Students)
             {

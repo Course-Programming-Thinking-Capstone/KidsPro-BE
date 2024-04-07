@@ -36,7 +36,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
 
-    public async Task<Course?> GetCoursePayment(int id, bool disableTracking = false)
+    public async Task<Course?> GetCoursePayment(int courseId,int classId, bool disableTracking = false)
     {
         IQueryable<Course> query = _dbSet;
 
@@ -45,7 +45,8 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             query.AsNoTracking();
         }
 
-        return await query.Include(x=> x.ModifiedBy).FirstOrDefaultAsync(x=> x.Id==id);
+        return await query.Include(x=>x.Classes).Where(x=>x.Classes.Any(c=>c.Id==classId))
+            .Include(x=> x.ModifiedBy).FirstOrDefaultAsync(x=> x.Id==courseId);
     }
 
     public async Task<Course?> CheckCourseExist(int id)

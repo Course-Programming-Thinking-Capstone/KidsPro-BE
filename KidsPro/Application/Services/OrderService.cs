@@ -63,6 +63,7 @@ namespace Application.Services
             {
                 Price = course.Price,
                 CourseId = dto.CourseId,
+                ClassId = dto.ClassId,
                 Quantity = dto.Quantity,
                 Order = order
             };
