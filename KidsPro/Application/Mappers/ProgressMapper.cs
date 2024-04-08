@@ -53,7 +53,7 @@ public static class ProgressMapper
                 lessonCompletedRatio = lessonRatio * completeLessons.ToList().Count;
             }
 
-            var progress = new ProgressResponse()
+            var progress = new SectionProgress()
             {
                 SectionId = x.SectionId,
                 SectionName = x.Section.Name,
@@ -67,7 +67,7 @@ public static class ProgressMapper
         return response;
     }
 
-    private static float CalculateCourseProgress(List<ProgressResponse> sections)
+    private static float CalculateCourseProgress(List<SectionProgress> sections)
     {
         float result = 0;
         float sectionRatio = 1 / (float)sections.Count;

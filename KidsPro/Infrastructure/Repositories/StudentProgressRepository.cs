@@ -32,5 +32,12 @@ namespace Infrastructure.Repositories
                 .Include(x => x.Student).ThenInclude(x => x.Account)
                 .Where(x => x.StudentId == studentId).ToListAsync();
         }
+
+        public async Task<bool> CheckStudentSectionExistAsync(int studentId, int sectionId)
+        {
+            var entity= await _dbSet.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentId == studentId && x.SectionId == sectionId);
+            return entity == null;
+        }
     }
 }
