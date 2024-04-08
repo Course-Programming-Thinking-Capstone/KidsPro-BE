@@ -834,7 +834,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId)
     {
-        var result = await _unitOfWork.CourseRepository.GetCoursePayment(courseId,classId);
+        var result = await _unitOfWork.CourseRepository.GetCoursePayment(courseId, classId);
         if (result != null)
             return CourseMapper.ShowCoursePayment(result);
         throw new NotFoundException("courseId or classId doesn't exist");
@@ -870,5 +870,27 @@ public class CourseService : ICourseService
         }
 
         throw new BaseException($"StudentId {account.IdSubRole} && SectionId {dto.SectionId} are exist");
+    }
+
+    public async Task MarkLessonCompletedAsync(int lessonId)
+    {
+        var account = await _accountService.GetCurrentAccountInformationAsync();
+
+        var student = await _unitOfWork.StudentRepository.GetByIdAsync(account.IdSubRole)
+                      ?? throw new BadRequestException($"StudentId {account.IdSubRole} not found");
+
+        var lesson = new StudentLesson()
+        {
+            LessonId = lessonId,
+            StudentId = account.IdSubRole,
+            IsCompleted = true
+        };
+
+        if (student.StudentLessons.Count == 0)
+            student.StudentLessons = new List<StudentLesson>();
+
+        student.StudentLessons.Add(lesson);
+        _unitOfWork.StudentRepository.Update(student);
+        await _unitOfWork.SaveChangeAsync();
     }
 }

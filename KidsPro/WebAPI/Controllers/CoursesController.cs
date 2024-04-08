@@ -206,7 +206,7 @@ public class CoursesController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StudentRole}")]
-    [HttpGet("start-study")]
+    [HttpPost("start-study")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> StartStudyCourseAsyn(StudentProgressRequest dto)
@@ -215,6 +215,24 @@ public class CoursesController : ControllerBase
         return Ok(new
         {
             Message="Start study section successfully"
+        });
+    }
+    
+    /// <summary>
+    /// Student click on mark complete button when finish document or video
+    /// </summary>
+    /// <param name="lessonId"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole}")]
+    [HttpPatch("mark-lesson-completed")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> MartLessonCompletedAsync(int lessonId)
+    {
+        await _courseService.MarkLessonCompletedAsync(lessonId);
+        return Ok(new
+        {
+            Message="Mark lesson completed successfully"
         });
     }
 }
