@@ -1303,10 +1303,10 @@ public class GameService : IGameService
         var query = await _unitOfWork.GameLevelRepository.GetPaginateAsync(
             o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
             , includeProperties: $"{nameof(GameLevel.GameLevelType)}", page: page, size: size);
-
+        
         if (!query.Results.Any())
         {
-            throw new NotFoundException("Not found any level");
+            return new List<LevelDataResponse>();
         }
 
         var result = query.Results.Select(gameLevel => new LevelDataResponse()
