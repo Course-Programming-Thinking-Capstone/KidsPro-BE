@@ -774,7 +774,7 @@ public class GameService : IGameService
 
     public async Task<List<int>> GetUserShopItem(int userId)
     {
-        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.Id == userId, null)
+        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.StudentId == userId, null)
             .ContinueWith(o => o.Result.FirstOrDefault());
         if (user == null)
         {
@@ -1303,7 +1303,7 @@ public class GameService : IGameService
         var query = await _unitOfWork.GameLevelRepository.GetPaginateAsync(
             o => o.GameLevelTypeId == modeId && o.LevelIndex != -1, null
             , includeProperties: $"{nameof(GameLevel.GameLevelType)}", page: page, size: size);
-        
+
         if (!query.Results.Any())
         {
             return new List<LevelDataResponse>();
