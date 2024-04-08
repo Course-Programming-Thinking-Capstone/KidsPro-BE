@@ -1,4 +1,6 @@
-﻿namespace Application.Dtos.Response.Course;
+﻿using Domain.Entities;
+
+namespace Application.Dtos.Response.Course;
 
 public class CommonCourseDto : CourseDto
 {
