@@ -145,7 +145,7 @@ public class ClassService : IClassService
 
     #endregion
 
-    #region Schdule
+    #region Schedule
 
     public async Task<ScheduleCreateResponse> CreateScheduleAsync(ScheduleCreateRequest dto)
     {
