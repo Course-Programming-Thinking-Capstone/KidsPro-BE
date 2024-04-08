@@ -713,7 +713,7 @@ public class GameService : IGameService
             throw new BadRequestException("Default Item, cannot buy");
         }
 
-        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.Id == userId, null)
+        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.StudentId == userId, null)
             .ContinueWith(o => o.Result.FirstOrDefault());
         if (user == null)
         {
