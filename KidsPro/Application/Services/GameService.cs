@@ -821,7 +821,7 @@ public class GameService : IGameService
     {
         var result = await _unitOfWork.GameLevelRepository
             .GetAll()
-            .Where(o => o.LevelIndex > 0)
+            .Where(o => o.LevelIndex >= 0)
             .GroupBy(h => h.GameLevelType)
             .Select(group => new ModeType
             {
