@@ -14,4 +14,5 @@ public class GameLevel : BaseEntity
 
     public virtual LevelType GameLevelType { get; set; } = null!;
     public int GameLevelTypeId { get; set; }
+    public bool IsDelete { get; set; }
 }
