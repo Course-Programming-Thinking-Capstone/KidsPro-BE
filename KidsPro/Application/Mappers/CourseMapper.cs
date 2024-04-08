@@ -72,7 +72,8 @@ public static class CourseMapper
             EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
             StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             IsFree = entity.IsFree,
-            Sections = entity.Sections.Select(SectionToSectionDto).ToList()
+            Sections = entity.Sections.Select(SectionToSectionDto).ToList(),
+            Classes = ClassMapper.ClassToClassesResponse(entity.Classes.ToList())
         };
 
     public static SectionComponentNumberDto EntityToSectionComponentNumberDto(SectionComponentNumber entity)

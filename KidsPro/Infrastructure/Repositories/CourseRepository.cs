@@ -33,6 +33,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .Include(c => c.Sections.OrderBy(s => s.Order))
             .ThenInclude(s => s.Games)
             .Include(x=> x.Syllabus)
+            .Include(x=> x.Classes).ThenInclude(x=> x.Schedules)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
 
