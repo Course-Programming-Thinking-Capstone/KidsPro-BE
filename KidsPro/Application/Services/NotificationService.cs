@@ -156,4 +156,11 @@ public class NotificationService : INotificationService
         if (await _unitOfWork.SaveChangeAsync() < 0)
             throw new NotImplementedException("Add Notify Failed");
     }
+
+    public async Task<int> GetNumberOfAccountUnreadNotificationAsync()
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result =  await _unitOfWork.UserNotificationRepository.GetNumberOfAccountUnreadNotificationAsync(accountId);
+        return result;
+    }
 }

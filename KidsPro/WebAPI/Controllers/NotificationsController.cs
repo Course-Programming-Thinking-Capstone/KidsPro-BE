@@ -31,6 +31,18 @@ public class NotificationsController : ControllerBase
         var result = await _notificationService.GetAccountNotificationAsync(page, size);
         return Ok(result);
     }
+    
+    /// <summary>
+    /// Get number of unread notification 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("account/number-of-unread")]
+    [Authorize]
+    public async Task<ActionResult<int>> GetNumberOfAccountUnreadNotificationAsync()
+    {
+        var result = await _notificationService.GetNumberOfAccountUnreadNotificationAsync();
+        return Ok(result);
+    }
 
     /// <summary>
     /// Mark notification as read

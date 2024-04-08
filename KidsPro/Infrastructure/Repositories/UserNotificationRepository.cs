@@ -32,4 +32,10 @@ public class UserNotificationRepository : BaseRepository<UserNotification>, IUse
         await _dbSet.Where(un => un.AccountId == accountId && !un.IsRead)
             .ExecuteUpdateAsync(setters => setters.SetProperty(un => un.IsRead, true));
     }
+
+    public async Task<int> GetNumberOfAccountUnreadNotificationAsync(int accountId)
+    {
+        return await _dbSet.Where(un => un.AccountId == accountId && !un.IsRead)
+            .CountAsync();
+    }
 }
