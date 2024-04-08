@@ -1378,39 +1378,35 @@ public class GameService : IGameService
     public async Task SoftDeleteLevelGame(int id)
     {
         await _unitOfWork.BeginTransactionAsync();
-        var checkExisted =
+        var removeLevel =
             await _unitOfWork.GameLevelRepository.GetAsync(o
-                    => o.GameLevelTypeId == id
+                    => o.Id == id && o.LevelIndex != -1
                 , null).ContinueWith(o => o.Result.FirstOrDefault());
-        if (checkExisted == null)
+        if (removeLevel == null)
         {
             throw new BadRequestException("Game level not found");
         }
 
-        // check Existed
+        // check other level
         var currentLevels =
             await _unitOfWork.GameLevelRepository.GetAsync(o
-                    => o.GameLevelTypeId == checkExisted.GameLevelTypeId && o.LevelIndex != -1
+                    => o.GameLevelTypeId == removeLevel.GameLevelTypeId && o.LevelIndex != -1
                 , null).ContinueWith(o => o.Result.ToList());
-        if (checkExisted == null)
-        {
-            throw new BadRequestException("Game level not found");
-        }
 
         foreach (var itemLevel in currentLevels)
         {
-            if (itemLevel.LevelIndex > checkExisted.LevelIndex)
+            if (itemLevel.LevelIndex > removeLevel.LevelIndex)
             {
                 itemLevel.LevelIndex--;
                 _unitOfWork.GameLevelRepository.Update(itemLevel);
             }
         }
 
-        checkExisted.LevelIndex = -1;
+        removeLevel.LevelIndex = -1;
         try
         {
             // Update current game level
-            _unitOfWork.GameLevelRepository.Update(checkExisted);
+            _unitOfWork.GameLevelRepository.Update(removeLevel);
             await _unitOfWork.SaveChangeAsync();
             await _unitOfWork.CommitAsync();
         }
