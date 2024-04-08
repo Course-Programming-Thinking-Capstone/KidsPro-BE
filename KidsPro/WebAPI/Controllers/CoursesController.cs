@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
+using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
@@ -197,5 +198,23 @@ public class CoursesController : ControllerBase
     {
         var result = await _courseService.GetCoursePaymentAsync(courseId,classId);
         return Ok(result);
+    }
+    
+    /// <summary>
+    /// Student click on start study button
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole}")]
+    [HttpGet("start-study")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> StartStudyCourseAsyn(StudentProgressRequest dto)
+    {
+       await _courseService.StartStudySectionAsync(dto);
+        return Ok(new
+        {
+            Message="Start study section successfully"
+        });
     }
 }
