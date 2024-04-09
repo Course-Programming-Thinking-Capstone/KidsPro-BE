@@ -153,8 +153,8 @@ public class CourseService : ICourseService
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
 
-        if (courseEntity.Status != CourseStatus.Draft)
-            throw new BadRequestException("Can only update course wih status draft.");
+        if (courseEntity.Status != CourseStatus.Draft && courseEntity.Status != CourseStatus.Denied)
+            throw new BadRequestException("Can only update course wih status draft or denied.");
 
         // check authorize
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
@@ -389,6 +389,9 @@ public class CourseService : ICourseService
         {
             courseEntity.Status = CourseStatus.Pending;
 
+            //update syllabus status
+            if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Pending;
+
             //Create notification
             var notificationAccounts = await _unitOfWork.AccountRepository.GetAsync(
                 filter: a => a.Role.Name == Constant.StaffRole || a.Role.Name == Constant.AdminRole
@@ -485,6 +488,9 @@ public class CourseService : ICourseService
                 courseEntity.ApprovedBy = currentAccount;
 
                 courseEntity.Status = CourseStatus.Active;
+
+                //update syllabus status
+                if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Active;
                 break;
             }
             case Constant.AdminRole:
@@ -505,6 +511,9 @@ public class CourseService : ICourseService
                 courseEntity.ApprovedBy = currentAccount;
 
                 courseEntity.Status = CourseStatus.Active;
+                //update syllabus status
+                if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Active;
+
                 break;
             }
             default:
@@ -554,6 +563,9 @@ public class CourseService : ICourseService
         }
 
         courseEntity.Status = CourseStatus.Denied;
+        
+        //update syllabus status
+        if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Open;
 
         if (courseEntity.ModifiedById == null)
         {
