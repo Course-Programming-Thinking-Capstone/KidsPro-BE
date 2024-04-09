@@ -70,4 +70,16 @@ public class SyllabusesController : ControllerBase
     {
         return await _syllabusService.GetByIdAsync(id);
     }
+    
+    /// <summary>
+    /// Get number of syllabus that teacher has not created yet
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("account/number-draft-syllabus")]
+    [Authorize(Roles = $"{Constant.TeacherRole}")]
+    public async Task<ActionResult<int>> GetNumberOfAccountDraftSyllabusAsync()
+    {
+        var result = await _syllabusService.GetNumberOfTeacherDraftSyllabusAsync();
+        return Ok(result);
+    }
 }

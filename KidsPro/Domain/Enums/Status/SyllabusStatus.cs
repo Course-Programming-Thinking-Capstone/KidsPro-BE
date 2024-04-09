@@ -6,5 +6,7 @@ public enum SyllabusStatus
     Open = 2,
     Closed = 3,
     Active = 4,
-    Inactive = 5
+    Inactive = 5,
+    Pending = 6,
+    Denied = 7
 }

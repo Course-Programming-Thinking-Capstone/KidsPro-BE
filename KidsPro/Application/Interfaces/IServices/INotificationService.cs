@@ -11,4 +11,6 @@ public interface INotificationService
 
     Task<PagingResponse<NotificationDto>> MarkAllNotificationAsReadAsync(int? page, int? size);
     Task SendNotifyToAccountAsync(int toId, string title, string content);
+    
+    Task<int> GetNumberOfAccountUnreadNotificationAsync();
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
+using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
@@ -40,5 +41,7 @@ public interface ICourseService
     Task<ICollection<SectionComponentNumberDto>> UpdateSectionComponentNumberAsync(
         IEnumerable<UpdateSectionComponentNumberDto> dtos);
 
-    Task<CourseOrderDto> GetCoursePaymentAsync(int id);
+    Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId);
+    Task StartStudySectionAsync(StudentProgressRequest dto);
+    Task MarkLessonCompletedAsync(int lessonId);
 }

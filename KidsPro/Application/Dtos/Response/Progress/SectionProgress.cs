@@ -1,6 +1,6 @@
 ﻿namespace Application.Dtos.Response.StudentProgress;
 
-public class ProgressResponse
+public class SectionProgress
 {
     public int SectionId { get; set; }
     public string? SectionName { get; set; }

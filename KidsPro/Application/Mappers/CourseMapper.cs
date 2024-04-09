@@ -56,7 +56,8 @@ public static class CourseMapper
             ApprovedByName = entity.ApprovedBy?.FullName,
             StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             IsFree = entity.IsFree,
-            Sections = entity.Sections.Select(SectionToSectionDto).ToList()
+            Sections = entity.Sections.Select(SectionToSectionDto).ToList(),
+            Classes = ClassMapper.ClassToClassesResponse(entity.Classes.ToList())
         };
 
     public static CommonCourseDto CourseToCommonCourseDto(Course entity)
@@ -72,7 +73,8 @@ public static class CourseMapper
             EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
             StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             IsFree = entity.IsFree,
-            Sections = entity.Sections.Select(SectionToSectionDto).ToList()
+            Sections = entity.Sections.Select(SectionToSectionDto).ToList(),
+            Classes = ClassMapper.ClassToClassesResponse(entity.Classes.ToList())
         };
 
     public static SectionComponentNumberDto EntityToSectionComponentNumberDto(SectionComponentNumber entity)
@@ -405,6 +407,8 @@ public static class CourseMapper
         Picture = dto.ModifiedBy?.PictureUrl,
         CourseName = dto.Name,
         TeacherName = dto.ModifiedBy?.FullName,
-        Price = dto.Price
+        Price = dto.Price,
+        ClassId = dto.Classes.FirstOrDefault()?.Id,
+        ClassCode = dto.Classes.FirstOrDefault()?.Code
     };
 }

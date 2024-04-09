@@ -2,9 +2,11 @@
 using Application.Configurations;
 using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
+using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
+using Application.Dtos.Response.StudentProgress;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -22,14 +24,16 @@ public class CourseService : ICourseService
     private IAuthenticationService _authenticationService;
     private IImageService _imageService;
     private ILogger<AccountService> _logger;
+    private IAccountService _accountService;
 
     public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
-        IImageService imageService, ILogger<AccountService> logger)
+        IImageService imageService, ILogger<AccountService> logger, IAccountService accountService)
     {
         _unitOfWork = unitOfWork;
         _authenticationService = authenticationService;
         _imageService = imageService;
         _logger = logger;
+        _accountService = accountService;
     }
 
     public async Task<CourseDto> GetByIdAsync(int id, string? action)
@@ -149,8 +153,8 @@ public class CourseService : ICourseService
         var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
 
-        if (courseEntity.Status != CourseStatus.Draft)
-            throw new BadRequestException("Can only update course wih status draft.");
+        if (courseEntity.Status != CourseStatus.Draft && courseEntity.Status != CourseStatus.Denied)
+            throw new BadRequestException("Can only update course wih status draft or denied.");
 
         // check authorize
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
@@ -385,6 +389,9 @@ public class CourseService : ICourseService
         {
             courseEntity.Status = CourseStatus.Pending;
 
+            //update syllabus status
+            if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Pending;
+
             //Create notification
             var notificationAccounts = await _unitOfWork.AccountRepository.GetAsync(
                 filter: a => a.Role.Name == Constant.StaffRole || a.Role.Name == Constant.AdminRole
@@ -481,6 +488,9 @@ public class CourseService : ICourseService
                 courseEntity.ApprovedBy = currentAccount;
 
                 courseEntity.Status = CourseStatus.Active;
+
+                //update syllabus status
+                if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Active;
                 break;
             }
             case Constant.AdminRole:
@@ -501,6 +511,9 @@ public class CourseService : ICourseService
                 courseEntity.ApprovedBy = currentAccount;
 
                 courseEntity.Status = CourseStatus.Active;
+                //update syllabus status
+                if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Active;
+
                 break;
             }
             default:
@@ -550,6 +563,9 @@ public class CourseService : ICourseService
         }
 
         courseEntity.Status = CourseStatus.Denied;
+        
+        //update syllabus status
+        if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Open;
 
         if (courseEntity.ModifiedById == null)
         {
@@ -828,12 +844,12 @@ public class CourseService : ICourseService
         return CourseMapper.EntityToSectionComponentNumberDto(entities);
     }
 
-    public async Task<CourseOrderDto> GetCoursePaymentAsync(int id)
+    public async Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId)
     {
-        var result = await _unitOfWork.CourseRepository.GetCoursePayment(id);
+        var result = await _unitOfWork.CourseRepository.GetCoursePayment(courseId, classId);
         if (result != null)
             return CourseMapper.ShowCoursePayment(result);
-        throw new NotFoundException("courseId doesn't exist");
+        throw new NotFoundException("courseId or classId doesn't exist");
     }
 
     private async Task<SectionComponentNumber> GetSectionComponentNumberAsync(SectionComponentType type)
@@ -843,5 +859,50 @@ public class CourseService : ICourseService
         if (sectionComponentNumber != null) return sectionComponentNumber;
         _logger.LogError("Section component type {} can not found.", type.ToString());
         throw new Exception($"Section component type {type.ToString()} can not found.");
+    }
+
+    public async Task StartStudySectionAsync(StudentProgressRequest dto)
+    {
+        var account = await _accountService.GetCurrentAccountInformationAsync();
+
+        if (await _unitOfWork.StudentProgressRepository
+                .CheckStudentSectionExistAsync(account.IdSubRole, dto.SectionId))
+        {
+            var progress = new StudentProgress()
+            {
+                SectionId = dto.SectionId,
+                StudentId = account.IdSubRole,
+                CourseId = dto.CourseId,
+                Status = StudentProgressStatus.OnGoing,
+                EnrolledDate = DateTime.UtcNow,
+            };
+            await _unitOfWork.StudentProgressRepository.AddAsync(progress);
+            await _unitOfWork.SaveChangeAsync();
+            return;
+        }
+
+        throw new BaseException($"StudentId {account.IdSubRole} && SectionId {dto.SectionId} are exist");
+    }
+
+    public async Task MarkLessonCompletedAsync(int lessonId)
+    {
+        var account = await _accountService.GetCurrentAccountInformationAsync();
+
+        var student = await _unitOfWork.StudentRepository.GetByIdAsync(account.IdSubRole)
+                      ?? throw new BadRequestException($"StudentId {account.IdSubRole} not found");
+
+        var lesson = new StudentLesson()
+        {
+            LessonId = lessonId,
+            StudentId = account.IdSubRole,
+            IsCompleted = true
+        };
+
+        if (student.StudentLessons.Count == 0)
+            student.StudentLessons = new List<StudentLesson>();
+
+        student.StudentLessons.Add(lesson);
+        _unitOfWork.StudentRepository.Update(student);
+        await _unitOfWork.SaveChangeAsync();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
 namespace Application.Dtos.Request.Class;
 
 public class ClassCreateRequest

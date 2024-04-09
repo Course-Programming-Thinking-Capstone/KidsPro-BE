@@ -45,7 +45,7 @@ public class PaymentService : IPaymentService
         var transaction = new Transaction()
         {
             OrderId = orderId,
-            CreatedDate = DateTime.Now,
+            CreatedDate = DateTime.UtcNow,
             TransactionCode = dto.transId,
             Amount = dto.amount,
             Status = TransactionStatus.Success

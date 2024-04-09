@@ -43,7 +43,7 @@ namespace Application.Mappers
                 CourseName = order.OrderDetails!.FirstOrDefault()!.Course.Name,
                 Price = order.OrderDetails!.FirstOrDefault()!.Course.Price,
                 QuantityPurchased = order.Quantity,
-                OrderDate = DateUtils.FormatDateTimeToDatetimeV1(order.Date),
+                OrderDate = DateUtils.FormatDateTimeToDatetimeV3(order.Date),
                 OrderCode = order.OrderCode,
                 PaymentType = order.PaymentType.ToString(),
                 TransactionCode = order.Transaction?.TransactionCode,
@@ -53,7 +53,9 @@ namespace Application.Mappers
                 Discount = order.Voucher?.DiscountAmount,
                 NumberChildren = order.OrderDetails!.FirstOrDefault()!.Students.Count,
                 ParentName = order.Parent!.Account.FullName,
-                ParentId = order.Parent!.Account.Id
+                ParentId = order.Parent!.Account.Id,
+                ClassId = order.OrderDetails!.FirstOrDefault()!.Class?.Id,
+                ClassCode = order.OrderDetails!.FirstOrDefault()!.Class?.Code
             };
             foreach (var dto in order.OrderDetails!.FirstOrDefault()!.Students)
             {
@@ -61,7 +63,7 @@ namespace Application.Mappers
                 {
                     StudentId = dto.Id,
                     StudentName = dto.Account.FullName,
-                    DateOfBirth = DateUtils.FormatDateTimeToDatetimeV1(dto.Account.DateOfBirth),
+                    DateOfBirth = DateUtils.FormatDateTimeToDateV3(dto.Account.DateOfBirth),
                     UserName = dto.UserName
                 };
                 x.Students?.Add(stu);

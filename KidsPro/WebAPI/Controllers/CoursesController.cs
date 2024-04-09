@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
+using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
@@ -186,15 +187,52 @@ public class CoursesController : ControllerBase
     /// <summary>
     /// Get thông tin course hiển thị ra trong màn hình coursepayment
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="courseId"></param>
+    /// <param name="classId"></param>
     /// <returns></returns>
     [AllowAnonymous]
-    [HttpGet("payment/{id}")]
+    [HttpGet("payment")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int id)
+    public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int courseId,int classId)
     {
-        var result = await _courseService.GetCoursePaymentAsync(id);
+        var result = await _courseService.GetCoursePaymentAsync(courseId,classId);
         return Ok(result);
+    }
+    
+    /// <summary>
+    /// Student click on start study button
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole}")]
+    [HttpPost("start-study")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> StartStudyCourseAsyn(StudentProgressRequest dto)
+    {
+       await _courseService.StartStudySectionAsync(dto);
+        return Ok(new
+        {
+            Message="Start study section successfully"
+        });
+    }
+    
+    /// <summary>
+    /// Student click on mark complete button when finish document or video
+    /// </summary>
+    /// <param name="lessonId"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole}")]
+    [HttpPatch("mark-lesson-completed")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> MartLessonCompletedAsync(int lessonId)
+    {
+        await _courseService.MarkLessonCompletedAsync(lessonId);
+        return Ok(new
+        {
+            Message="Mark lesson completed successfully"
+        });
     }
 }

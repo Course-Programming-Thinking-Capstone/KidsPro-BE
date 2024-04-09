@@ -6,4 +6,6 @@ namespace Application.Interfaces.IRepositories;
 public interface IUserNotificationRepository:IBaseRepository<UserNotification>
 {
     Task MarkAllNotificationAsReadAsync(int accountId);
+    
+    Task<int> GetNumberOfAccountUnreadNotificationAsync(int accountId);
 }

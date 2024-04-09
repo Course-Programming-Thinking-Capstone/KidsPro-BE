@@ -10,6 +10,7 @@ using Infrastructure.Repositories.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using WebAPI.Gateway.Configuration;
 using WebAPI.Gateway.IConfig;
@@ -41,6 +42,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IMomoConfig,MomoConfig>();
         services.AddScoped<IZaloPayConfig,ZaloPayConfig>();
+        services.AddScoped<IDiscordConfig,DiscordConfig>();
+        services.AddScoped<IDriveConfig,DriveConfig>();
         
         //Add service
         services.Scan(scan => scan
@@ -126,6 +129,12 @@ public static class DependencyInjection
                     },
                     Array.Empty<string>()
                 }
+            });
+            option.MapType<DateTime>(()=>new OpenApiSchema
+            {
+                Type = "string",
+                Format = "date", 
+                Example = new OpenApiString(DateTime.Now.ToString("yyyy-MM-dd"))
             });
         });
 

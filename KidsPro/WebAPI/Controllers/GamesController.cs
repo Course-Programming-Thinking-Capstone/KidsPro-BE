@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Game;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,68 @@ public class GamesController : ControllerBase
         return Ok();
     }
 
+    #region SHOP
+
+    /// <summary>
+    /// Get pagination of shop item
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet("shop-item/pagination")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameShopItem>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameShopItem>>> GetShopItemPagination([FromQuery] int page,
+        [FromQuery] int size)
+    {
+        var result = await _gameService.GetAllShopItem(page, size);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get all of shop item
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("shop-item/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameShopItem>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<GameShopItem>>> GetShopItem()
+    {
+        var result = await _gameService.GetAllShopItem();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// User buy item from shop
+    /// </summary>
+    /// <param name="itemId">item id</param>
+    /// <param name="userId">user id</param>
+    /// <returns>List of owned shop item</returns>
+    [HttpPost("game-shop-item-owned/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BuyResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<BuyResponse>> UserBuyItem([FromQuery] int itemId,
+        [FromQuery] int userId)
+    {
+        var result = await _gameService.BuyItemFromShop(itemId, userId);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get user item owned
+    /// </summary>
+    /// <returns>List of owned shop item</returns>
+    [HttpGet("game-shop-item-owned/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<int>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<int>>> UserBuyItem([FromQuery] int userId)
+    {
+        var result = await _gameService.GetUserShopItem(userId);
+        return Ok(result);
+    }
+
+    #endregion
+
     #region GAME CLIENT
 
     /// <summary>
@@ -43,7 +106,7 @@ public class GamesController : ControllerBase
     [HttpPost("authentication/login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGameLoginDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody]StudentLoginRequest  request)
+    public async Task<ActionResult<StudentGameLoginDto>> StudentGameLoginAsync([FromBody] StudentLoginRequest request)
     {
         var result = await _accountService.StudentGameLoginAsync(request);
         return Ok(result);
@@ -109,16 +172,26 @@ public class GamesController : ControllerBase
     #region Admin API
 
     /// <summary>
-    /// Admin Get Levels details by game mode id
+    /// Admin Get Levels by game mode id
     /// </summary>
     /// <returns></returns>
     [HttpGet("game-mode/{modeId}/game-level")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<LevelDataResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId)
+    public async Task<ActionResult<List<LevelDataResponse>>> GetLevelsByGameMode([FromRoute] int modeId,
+        [FromQuery] int? page,
+        [FromQuery] int? size)
     {
-        var result = await _gameService.GetLevelsByMode(modeId);
-        return Ok(result);
+        if (page == null || size == null)
+        {
+            var result = await _gameService.GetLevelsByMode(modeId);
+            return Ok(result);
+        }
+        else
+        {
+            var result = await _gameService.GetLevelsByMode(modeId, page, size);
+            return Ok(result);
+        }
     }
 
     /// <summary>
