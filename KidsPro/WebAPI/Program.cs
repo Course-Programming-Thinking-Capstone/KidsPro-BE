@@ -26,6 +26,7 @@ if (configuration != null)
 builder.Services.Configure<MomoConfig>(builder.Configuration.GetSection(MomoConfig.ConfigName));
 builder.Services.Configure<ZaloPayConfig>(builder.Configuration.GetSection(ZaloPayConfig.ConfigName));
 builder.Services.Configure<DiscordConfig>(builder.Configuration.GetSection(DiscordConfig.ConfigName));
+builder.Services.Configure<DriveConfig>(builder.Configuration.GetSection(DriveConfig.ConfigName));
 
 var app = builder.Build();
 

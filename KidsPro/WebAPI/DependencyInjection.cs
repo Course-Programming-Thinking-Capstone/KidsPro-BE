@@ -43,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IMomoConfig,MomoConfig>();
         services.AddScoped<IZaloPayConfig,ZaloPayConfig>();
         services.AddScoped<IDiscordConfig,DiscordConfig>();
+        services.AddScoped<IDriveConfig,DriveConfig>();
         
         //Add service
         services.Scan(scan => scan

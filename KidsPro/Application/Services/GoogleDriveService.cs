@@ -3,65 +3,72 @@ using Application.Interfaces.IServices;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Drive.v3;
+using Newtonsoft.Json;
+using WebAPI.Gateway.Configuration;
+using WebAPI.Gateway.IConfig;
 
 namespace Application.Services;
 
 public class GoogleDriveService : IGoogleDriveService
 {
-    public string UploadFilesToGoogleDrive(string credentialsPath, string kidsProFolder, Stream fileStream)
+    private IDriveConfig _drive;
+    private string _folderId = "1_m7ttcV-49Ct9rd2LuXN4ral1VZTxXw9";
+
+    public GoogleDriveService(IDriveConfig drive)
     {
+        _drive = drive;
+    }
+
+    public string UploadFilesToGoogleDrive(Stream videoStream)
+    {
+        
+        string jsonDrive = JsonConvert.SerializeObject(_drive);
+        
         //khởi tạo phương thức google drive
         GoogleCredential credential;
-        using (var stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read))
+        // {
+        credential = GoogleCredential.FromJson(jsonDrive).CreateScoped(new[]
         {
-            credential = GoogleCredential.FromStream(stream).CreateScoped(new[]
-            {
-                DriveService.ScopeConstants.DriveFile
-            });
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Google Drive Upload Console App"
-            });
+            DriveService.ScopeConstants.DriveFile
+        });
 
-            // Tạo thư mục "Course"
-            var courseFolder = CreateFolder(service, "Course", kidsProFolder);
-            Console.WriteLine("Created Course folder with ID: " + courseFolder.Id);
 
-            // Tạo thư mục "Section" trong thư mục "Course"
-            var sectionFolder = CreateFolder(service, "Section", courseFolder.Id);
-            Console.WriteLine("Created Section folder with ID: " + sectionFolder.Id);
+        var service = new DriveService(new BaseClientService.Initializer()
+        {
+            HttpClientInitializer = credential,
+            ApplicationName = "Google Drive Upload Console App"
+        });
 
-            #region Video
+        // Tạo thư mục "Course"
+        var courseFolder = CreateFolder(service, "Course35", _folderId);
 
-            // Tạo metadata cho file
-            var fileMetadataVideo = new Google.Apis.Drive.v3.Data.File()
-            {
-                Name = "Tên video",
-                Parents = new List<string> { sectionFolder.Id }
-            };
+        // Tạo thư mục "Section" trong thư mục "Course"
+        var sectionFolder = CreateFolder(service, "Section", courseFolder.Id);
 
-            // Tạo yêu cầu tải file lên Google Drive
-            var requestImage = service.Files.Create
-                (fileMetadataVideo, fileStream, "video/*");
-            requestImage.Fields = "id, webViewLink";
+        #region Video
 
-            // Thực hiện yêu cầu
-            requestImage.Upload();
-            // Lấy thông tin file đã tải lên
-            var uploadedFileVideo = requestImage.ResponseBody;
+        // Tạo metadata cho file
+        var fileMetadataVideo = new Google.Apis.Drive.v3.Data.File()
+        {
+            Name = "Tên video",
+            Parents = new List<string> { sectionFolder.Id }
+        };
 
-            // In ra ID và URL của file
-            Console.WriteLine($"Video uploaded with ID: {uploadedFileVideo.Id}");
-            return uploadedFileVideo.WebViewLink;
+        // Tạo yêu cầu tải file lên Google Drive
+        var requestImage = service.Files.Create
+            (fileMetadataVideo, videoStream, "video/*");
+        requestImage.Fields = "id, webViewLink";
 
-            #endregion
-        } //end using
+        // Thực hiện yêu cầu
+        requestImage.Upload();
+        // Lấy thông tin file đã tải lên
+        var uploadedFileVideo = requestImage.ResponseBody;
+        return uploadedFileVideo.WebViewLink;
 
-        throw new BadRequestException("File not found");
+        #endregion
     } //end function
 
-    public Google.Apis.Drive.v3.Data.File CreateFolder(DriveService service, string folderName, string parentFolderId)
+    private Google.Apis.Drive.v3.Data.File CreateFolder(DriveService service, string folderName, string parentFolderId)
     {
         var folderMetadata = new Google.Apis.Drive.v3.Data.File()
         {
