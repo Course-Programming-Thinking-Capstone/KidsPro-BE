@@ -1,4 +1,4 @@
-﻿namespace Domain.Enums;
+﻿namespace Domain.Enums.Status;
 
 public enum SyllabusStatus
 {
@@ -7,6 +7,5 @@ public enum SyllabusStatus
     Closed = 3,
     Active = 4,
     Inactive = 5,
-    Pending = 6,
-    Denied = 7
+    Pending = 6
 }

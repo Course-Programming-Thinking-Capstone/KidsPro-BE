@@ -3,6 +3,7 @@ using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.Syllabus;
 using Application.Interfaces.IServices;
 using Domain.Enums;
+using Domain.Enums.Status;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Constant = Application.Configurations.Constant;
@@ -60,6 +61,30 @@ public class SyllabusesController : ControllerBase
     }
 
     /// <summary>
+    /// Filter teacher syllabus
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="sortName"></param>
+    /// <param name="sortCreatedDate"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet("teacher")]
+    [Authorize(Roles = $"{Constant.TeacherRole}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<FilterSyllabusDto>))]
+    public async Task<ActionResult<PagingResponse<FilterSyllabusDto>>> FilterTeacherSyllabusAsync(
+        [FromQuery] string? name,
+        [FromQuery] string? sortName,
+        [FromQuery] string? sortCreatedDate,
+        [FromQuery] int? page,
+        [FromQuery] int? size
+    )
+    {
+        var result = await _syllabusService.FilterTeacherSyllabusAsync(name, sortName, sortCreatedDate, page, size);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get syllabus by id
     /// </summary>
     /// <param name="id"></param>
@@ -70,7 +95,7 @@ public class SyllabusesController : ControllerBase
     {
         return await _syllabusService.GetByIdAsync(id);
     }
-    
+
     /// <summary>
     /// Get number of syllabus that teacher has not created yet
     /// </summary>

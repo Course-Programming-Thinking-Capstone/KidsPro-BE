@@ -2,6 +2,7 @@
 using Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Enums.Status;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities

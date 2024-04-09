@@ -13,6 +13,7 @@ using Application.Mappers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Enums.Status;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
