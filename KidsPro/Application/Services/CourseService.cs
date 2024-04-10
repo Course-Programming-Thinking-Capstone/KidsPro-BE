@@ -146,12 +146,12 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToManageCourseDto(entity);
     }
 
-    public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
+    public async Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
         string? action)
     {
         // check course
-        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} does not exist."));
 
         if (courseEntity.Status != CourseStatus.Draft && courseEntity.Status != CourseStatus.Denied)
             throw new BadRequestException("Can only update course wih status draft or denied.");
@@ -163,9 +163,7 @@ public class CourseService : ICourseService
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Id != courseEntity.ModifiedById)
-        {
             throw new ForbiddenException("Access denied.");
-        }
 
         //Get Section component number of each type in section
 
@@ -186,9 +184,10 @@ public class CourseService : ICourseService
             foreach (var sectionDto in dto.Sections)
             {
                 var section = courseEntity.Sections.FirstOrDefault(s => s.Id == sectionDto.Id);
-
+                
                 if (section != null)
                 {
+                    
                     //update section lesson
                     if (sectionDto.Lessons != null)
                     {
@@ -196,6 +195,7 @@ public class CourseService : ICourseService
                         var lessonOrder = 1;
                         var videoNumber = 0;
                         var documentNumber = 0;
+                        var fileNumber = 0;
 
                         //Count total lesson
                         var originNumberSectionLesson = section.Lessons.Count;
@@ -204,6 +204,7 @@ public class CourseService : ICourseService
 
                         foreach (var lessonDto in sectionDto.Lessons)
                         {
+                            
                             if (!lessonDto.Id.HasValue)
                             {
                                 var lesson = CourseMapper.UpdateLessonDtoToLesson(lessonDto);

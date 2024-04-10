@@ -1,8 +1,11 @@
 ﻿using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Domain.Entities;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebAPI.Gateway.Configuration;
 using WebAPI.Gateway.IConfig;
@@ -12,73 +15,137 @@ namespace Application.Services;
 public class GoogleDriveService : IGoogleDriveService
 {
     private IDriveConfig _drive;
-    private string _folderId = "1_m7ttcV-49Ct9rd2LuXN4ral1VZTxXw9";
+    private IUnitOfWork _unit;
 
-    public GoogleDriveService(IDriveConfig drive)
+    //khởi tạo phương thức google drive
+    GoogleCredential _credential;
+    private DriveService _service;
+    private string KidsproFolderId = "1_m7ttcV-49Ct9rd2LuXN4ral1VZTxXw9";
+
+    public GoogleDriveService(IDriveConfig drive, IUnitOfWork unit)
     {
         _drive = drive;
+        _unit = unit;
     }
 
-    public string UploadFilesToGoogleDrive(Stream videoStream)
+   
+    private void InitializeGgDrive()
     {
-        
         string jsonDrive = JsonConvert.SerializeObject(_drive);
-        
-        //khởi tạo phương thức google drive
-        GoogleCredential credential;
-        // {
-        credential = GoogleCredential.FromJson(jsonDrive).CreateScoped(new[]
+
+        _credential = GoogleCredential.FromJson(jsonDrive).CreateScoped(new[]
         {
             DriveService.ScopeConstants.DriveFile
         });
 
-
-        var service = new DriveService(new BaseClientService.Initializer()
+        _service = new DriveService(new BaseClientService.Initializer()
         {
-            HttpClientInitializer = credential,
+            HttpClientInitializer = _credential,
             ApplicationName = "Google Drive Upload Console App"
         });
+    }
 
-        // Tạo thư mục "Course"
-        var courseFolder = CreateFolder(service, "Course35", _folderId);
-
-        // Tạo thư mục "Section" trong thư mục "Course"
-        var sectionFolder = CreateFolder(service, "Section", courseFolder.Id);
-
-        #region Video
-
+    public async Task<string?> UploadVideoToGoogleDrive(IFormFile fileVideo,string? videoName,string sectionFolderId)
+    {
+        // Tạo một luồng từ tệp đã tải lên
+        using var stream = new MemoryStream();
+        await fileVideo.CopyToAsync(stream);
+        stream.Position = 0; // Đặt lại vị trí của con trỏ luồng
+        
         // Tạo metadata cho file
         var fileMetadataVideo = new Google.Apis.Drive.v3.Data.File()
         {
-            Name = "Tên video",
-            Parents = new List<string> { sectionFolder.Id }
+            Name = videoName,
+            Parents = new List<string> { sectionFolderId}
         };
 
         // Tạo yêu cầu tải file lên Google Drive
-        var requestImage = service.Files.Create
-            (fileMetadataVideo, videoStream, "video/*");
+        var requestImage = _service.Files.Create
+            (fileMetadataVideo, stream, "video/*");
         requestImage.Fields = "id, webViewLink";
-
-        // Thực hiện yêu cầu
         requestImage.Upload();
+        
         // Lấy thông tin file đã tải lên
         var uploadedFileVideo = requestImage.ResponseBody;
         return uploadedFileVideo.WebViewLink;
+    } 
 
-        #endregion
-    } //end function
-
-    private Google.Apis.Drive.v3.Data.File CreateFolder(DriveService service, string folderName, string parentFolderId)
+    public string CreateCourseFolder(string folderName)
     {
-        var folderMetadata = new Google.Apis.Drive.v3.Data.File()
-        {
-            Name = folderName,
-            MimeType = "application/vnd.google-apps.folder",
-            Parents = new List<string> { parentFolderId }
-        };
+        InitializeGgDrive();
 
-        var request = service.Files.Create(folderMetadata);
-        request.Fields = "id";
-        return request.Execute();
+        var getCourseFolderIdExist = FindCourseFolderId(folderName);
+
+        if (getCourseFolderIdExist == null)
+        {
+            var folderMetadata = new Google.Apis.Drive.v3.Data.File()
+            {
+                Name = folderName,
+                MimeType = "application/vnd.google-apps.folder",
+                Parents = new List<string> { KidsproFolderId }
+            };
+
+            var request = _service.Files.Create(folderMetadata);
+            request.Fields = "id";
+            var createdFolder = request.Execute();
+            return createdFolder.Id;
+        }
+
+        return getCourseFolderIdExist;
+    }
+
+    public string CreateSectionFolder( string sectionFolderName, string courseFolderId)
+    {
+        InitializeGgDrive();
+
+        var getSectionFolderIdExist = FindSectionFolderId(courseFolderId,sectionFolderName);
+        if (getSectionFolderIdExist == null)
+        {
+            var folderMetadata = new Google.Apis.Drive.v3.Data.File()
+            {
+                Name = sectionFolderName,
+                MimeType = "application/vnd.google-apps.folder",
+                Parents = new List<string> { courseFolderId }
+            };
+
+            var request = _service.Files.Create(folderMetadata);
+            request.Fields = "id";
+            var createdFolder = request.Execute();
+            return createdFolder.Id;
+        }
+
+        return getSectionFolderIdExist;
+    }
+
+    private string? FindCourseFolderId(string folderName)
+    {
+        FilesResource.ListRequest listRequest = _service.Files.List();
+        listRequest.Q = $"name = '{folderName}' and mimeType = 'application/vnd.google-apps.folder'";
+        listRequest.Fields = "files(id)";
+
+        FileList files = listRequest.Execute();
+        if (files.Files.Count > 0)
+            return files.Files[0].Id;
+        return null;
+    }
+
+    private string? FindSectionFolderId(string courseFolderId, string sectionFolderName)
+    {
+        FilesResource.ListRequest listRequest = _service.Files.List();
+        listRequest.Q =
+            $"name = '{sectionFolderName}' and '{courseFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder'";
+        listRequest.Fields = "files(id)";
+
+        FileList files = listRequest.Execute();
+        if (files.Files.Count > 0)
+            return files.Files[0].Id;
+        return null;
+    }
+    public async Task<Section> GetSectionInformationAsync(int sectionId)
+    {
+        var section = await _unit.SectionRepository.GetByIdAsync(sectionId)
+            ?? throw new BadRequestException($"SectionId {sectionId} not found");
+
+        return section;
     }
 }
