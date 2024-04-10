@@ -1020,6 +1020,11 @@ public class GameService : IGameService
             throw new BadRequestException("LevelIndex not valid");
         }
 
+        if (!ValidateGameLevel(modifiedLevelData, out string message))
+        {
+            throw new BadRequestException(message);
+        }
+
         if (modifiedLevelData.LevelIndex - currentMaxLevel > 1) // add at last
         {
             modifiedLevelData.LevelIndex = currentMaxLevel + 1;
@@ -1428,6 +1433,210 @@ public class GameService : IGameService
             o => o.GameLevelTypeId == gameModeId && o.LevelIndex == levelIndex
             , null);
         return result.FirstOrDefault();
+    }
+
+    private bool ValidateGameLevel(ModifiedLevelDataRequest newLevel, out string message)
+    {
+        message = "";
+        if (newLevel.LevelDetail.Count == 0)
+        {
+            message = "Level details cannot empty";
+            return false;
+        }
+
+        if (newLevel.VStartPosition < 1 || newLevel.VStartPosition > 48)
+        {
+            message = "Player start position is not valid";
+            return false;
+        }
+
+        if (newLevel.LevelDetail.Count(o => o.TypeId == 2) == 0)
+        {
+            message = "The game must have at least 1 target";
+            return false;
+        }
+
+        switch (newLevel.GameLevelTypeId)
+        {
+            case 1: // Basic
+            {
+                if (newLevel.LevelDetail.Count(o => o.TypeId == 2) > 1)
+                {
+                    message = "This mode can only have one target";
+                    return false;
+                }
+
+                if (newLevel.LevelDetail.Any(o => o.TypeId == 3))
+                {
+                    message = "This mode does not need rock";
+                    return false;
+                }
+
+                if (!CheckConnect(newLevel.VStartPosition,
+                        newLevel.LevelDetail.FirstOrDefault(o => o.TypeId == 2).VPosition,
+                        newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()
+                    ))
+                {
+                    message = "Road map not valid, start position must connect to target";
+                    return false;
+                }
+
+                break;
+            }
+            case 2: // Sequence
+            {
+                if (newLevel.LevelDetail.Count(o => o.TypeId == 1) > 0)
+                {
+                    message = "This mode does not need road";
+                    return false;
+                }
+
+                break;
+            }
+
+            case 3: // Loop
+            {
+                if (newLevel.LevelDetail.Count(o => o.TypeId == 3) > 0)
+                {
+                    message = "This mode does not need rock";
+                    return false;
+                }
+
+                break;
+            }
+
+            case 4: // Function
+            {
+                if (newLevel.LevelDetail.Count(o => o.TypeId == 3) > 0)
+                {
+                    message = "This mode does not need rock";
+                    return false;
+                }
+
+                break;
+            }
+            case 5: // Condition
+            {
+                if (newLevel.LevelDetail.Count(o => o.TypeId == 1) > 0)
+                {
+                    message = "This mode does not need road";
+                    return false;
+                }
+
+                break;
+            }
+            case 6: // custom
+            {
+                if (newLevel.LevelDetail.Count(o => o.TypeId == 1) > 0)
+                {
+                    message = "This mode does not need road";
+                    return false;
+                }
+
+                break;
+            }
+            default:
+                message = "Game mode not valid";
+                return false;
+        }
+
+        return true;
+    }
+
+    public bool CheckConnect(int startPos, List<int> targets, List<int> board)
+    {
+        HashSet<int> visited = new HashSet<int>();
+        visited.Add(startPos);
+        Queue<int> queue = new Queue<int>();
+        queue.Enqueue(startPos);
+
+        HashSet<int> connectedTargets = new HashSet<int>();
+
+        foreach (int target in targets)
+        {
+            connectedTargets.Add(target);
+        }
+
+        while (queue.Count > 0)
+        {
+            int currentPos = queue.Dequeue();
+
+            // Kiểm tra xem tất cả các target đã được nối từ startPos hay chưa
+            if (connectedTargets.Count == 0)
+            {
+                return true;
+            }
+
+            List<int> adjacentPoints = GetAdjacentPoints(currentPos);
+            foreach (int adjacentPoint in adjacentPoints)
+            {
+                if (!visited.Contains(adjacentPoint) && board.Contains(adjacentPoint))
+                {
+                    visited.Add(adjacentPoint);
+                    queue.Enqueue(adjacentPoint);
+                    if (connectedTargets.Contains(adjacentPoint))
+                    {
+                        connectedTargets.Remove(adjacentPoint);
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public bool CheckConnect(int startPos, int target, List<int> board)
+    {
+        HashSet<int> visited = new HashSet<int>();
+        visited.Add(startPos);
+        Queue<int> queue = new Queue<int>();
+        queue.Enqueue(startPos);
+        while (queue.Count > 0)
+        {
+            int currentPos = queue.Dequeue();
+
+         
+
+            List<int> adjacentPoints = GetAdjacentPoints(currentPos);
+            foreach (int adjacentPoint in adjacentPoints)
+            {
+                // Nếu currentPos là target, trả về true vì startPos có thể nối đến target
+                if (adjacentPoint == target)
+                {
+                    return true;
+                }
+                if (!visited.Contains(adjacentPoint) && board.Contains(adjacentPoint))
+                {
+                    visited.Add(adjacentPoint);
+                    queue.Enqueue(adjacentPoint);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public List<int> GetAdjacentPoints(int baseInt)
+    {
+        List<int> adjacentPoints = new List<int>();
+
+        int[] directions = { 1, -1, 8, -8 };
+
+        foreach (int direction in directions)
+        {
+            int adjacentPoint = baseInt + direction;
+            if (IsValidPosition(adjacentPoint))
+            {
+                adjacentPoints.Add(adjacentPoint);
+            }
+        }
+
+        return adjacentPoints;
+    }
+
+    public bool IsValidPosition(int checkInt)
+    {
+        return checkInt >= 1 && checkInt <= 48;
     }
 
     #endregion
