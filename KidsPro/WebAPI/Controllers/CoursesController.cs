@@ -103,6 +103,7 @@ public class CoursesController : ControllerBase
     /// <param name="id"></param>
     /// <param name="dto"></param>
     /// <param name="action"></param>
+    /// <param name="videoFiles"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole}")]
     [HttpPut("{id:int}")]
@@ -110,11 +111,11 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto,
-        [FromQuery] string? action)
+    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id,[FromBody] UpdateCourseDto dto, [FromQuery] string? action)
+
     {
-        var result = await _courseService.UpdateCourseAsync(id, dto, action);
-        return Ok(result);
+         var result = await _courseService.UpdateCourseAsync(id, dto, action);
+        return Ok();
     }
 
     /// <summary>
