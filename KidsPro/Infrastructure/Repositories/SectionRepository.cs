@@ -31,6 +31,8 @@ public class SectionRepository : BaseRepository<Section>, ISectionRepository
         return await query.Include(s => s.Lessons.OrderBy(l => l.Order))
             .Include(s => s.Quizzes.OrderBy(q => q.Order))
             .Include(s => s.Games)
+            .Include(x=> x.Course)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
+    
 }
