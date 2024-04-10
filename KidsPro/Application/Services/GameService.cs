@@ -1128,7 +1128,10 @@ public class GameService : IGameService
         {
             throw new BadRequestException("LevelIndex not valid");
         }
-
+        if (!ValidateGameLevel(modifiedLevelData, out string message))
+        {
+            throw new BadRequestException(message);
+        }
         // Move updated level out
         if (checkExisted.LevelIndex != modifiedLevelData.LevelIndex)
         {
@@ -1274,7 +1277,7 @@ public class GameService : IGameService
 
         if (!query.Any())
         {
-            throw new NotFoundException("Not found any level");
+            return new List<LevelDataResponse>();
         }
 
         var result = query.Select(gameLevel => new LevelDataResponse()
