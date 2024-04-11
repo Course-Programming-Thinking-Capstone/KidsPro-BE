@@ -34,6 +34,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .ThenInclude(s => s.Games)
             .Include(x=> x.Syllabus)
             .Include(x=> x.Classes).ThenInclude(x=> x.Schedules)
+            .Include(x=> x.Classes).ThenInclude(x=> x.Teacher).ThenInclude(x=> x!.Account)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
     }
 

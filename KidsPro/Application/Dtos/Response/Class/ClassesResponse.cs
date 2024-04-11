@@ -13,4 +13,5 @@ public class ClassesResponse
     public List<DayStatus>? Days { get; set; } = new List<DayStatus>();
     public string? SlotStart { get; set; }
     public string? SlotEnd { get; set; }
+    public string? Teacher { get; set; }
 }

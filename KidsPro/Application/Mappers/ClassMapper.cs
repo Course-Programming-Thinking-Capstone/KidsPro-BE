@@ -156,7 +156,8 @@ public static class ClassMapper
             DayEnd = DateUtils.FormatDateTimeToDateV3(x.CloseDate),
             DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(x.OpenDate),
             DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(x.CloseDate),
-            Days = x.Schedules?.Select(s=> s.StudyDay).ToList()
+            Days = x.Schedules?.Select(s=> s.StudyDay).ToList(),
+            Teacher = x.Teacher?.Account.FullName
         }).ToList();
     }
 }
