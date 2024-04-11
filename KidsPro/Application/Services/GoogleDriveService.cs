@@ -60,14 +60,25 @@ public class GoogleDriveService : IGoogleDriveService
         };
 
         // Tạo yêu cầu tải file lên Google Drive
-        var requestImage = _service.Files.Create
+        var requestVideo = _service.Files.Create
             (fileMetadataVideo, stream, "video/*");
-        requestImage.Fields = "id, webViewLink";
-        requestImage.Upload();
+        requestVideo.Fields = "id";
+        requestVideo.Upload();
         
-        // Lấy thông tin file đã tải lên
-        var uploadedFileVideo = requestImage.ResponseBody;
-        return uploadedFileVideo.WebViewLink;
+        // Lấy ID của file đã tải lên
+        var uploadedFileVideo = requestVideo.ResponseBody;
+        var fileId = uploadedFileVideo.Id;
+        
+        // Cập nhật quyền chia sẻ file để công khai
+        var permission = new Google.Apis.Drive.v3.Data.Permission()
+        {
+            Type = "anyone",
+            Role = "reader"
+        };
+        await _service.Permissions.Create(permission, fileId).ExecuteAsync();
+        // Tạo link preview
+        var linkPreview = "https://drive.google.com/file/d/" + fileId + "/preview";
+        return linkPreview;
     } 
 
     public string CreateCourseFolder(string folderName)

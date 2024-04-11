@@ -236,4 +236,21 @@ public class CoursesController : ControllerBase
             Message="Mark lesson completed successfully"
         });
     }
+    
+    /// <summary>
+    /// API Internal TEST, Update course to pending status
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPatch("update-status/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> UpdateToPendingStaus(int id)
+    {
+        await _courseService.UpdateToPendingStatus(id);
+        return Ok(new
+        {
+            Message="Update to pending status completed successfully"
+        });
+    }
 }

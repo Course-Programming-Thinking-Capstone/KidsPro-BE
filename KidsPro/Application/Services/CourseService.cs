@@ -907,4 +907,13 @@ public class CourseService : ICourseService
         _unitOfWork.StudentRepository.Update(student);
         await _unitOfWork.SaveChangeAsync();
     }
+
+    public async Task UpdateToPendingStatus(int courseId)
+    {
+        var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)??
+                     throw new BadRequestException("CourseId not found");
+        course.Status = CourseStatus.Pending;
+        _unitOfWork.CourseRepository.Update(course);
+        await _unitOfWork.SaveChangeAsync();
+    }
 }
