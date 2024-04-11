@@ -1,5 +1,7 @@
-﻿using Application.Dtos.Request;
+﻿using Application.Configurations;
+using Application.Dtos.Request;
 using Application.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +24,7 @@ public class DriveController : ControllerBase
     /// <param name="videoFile"></param>
     /// <param name="sectionId"></param>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
     [HttpPost("{sectionId:int}")]
     public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile videoFile, int sectionId)
     {
