@@ -52,6 +52,8 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
 
         }
 
-        return await query.Include(x => x.Schedules).ToListAsync();
+        return await query.Include(x=>x.Course)
+            .Include(x=>x.Teacher).ThenInclude(x=>x!.Account)
+            .Include(x => x.Schedules).ToListAsync();
     }
 }

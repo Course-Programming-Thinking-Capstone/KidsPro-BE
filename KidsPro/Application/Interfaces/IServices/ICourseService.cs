@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Domain.Enums;
@@ -45,4 +46,5 @@ public interface ICourseService
     Task StartStudySectionAsync(StudentProgressRequest dto);
     Task MarkLessonCompletedAsync(int lessonId);
     Task UpdateToPendingStatus(int courseId, int number);
+    Task<List<CourseModerationResponse>> GetCourseModerationAsync();
 }

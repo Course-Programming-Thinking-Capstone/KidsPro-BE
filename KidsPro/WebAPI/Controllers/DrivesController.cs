@@ -24,24 +24,26 @@ public class DrivesController : ControllerBase
     /// </summary>
     /// <param name="videoFile"></param>
     /// <param name="sectionId"></param>
-    /// <param name="lessonId"></param>
+    /// <param name="index"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
     [HttpPost]
-    public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile? videoFile, int sectionId,int lessonId)
+    public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile? videoFile, int sectionId,int index)
     {
         if (videoFile == null) throw new BadRequestException("Video file is empty");
         
         var section = await _driveService.GetSectionInformationAsync(sectionId);
 
         //Create course folder
-        var courseFolderId = _driveService.CreateCourseFolder("Course: "+section.Course.Name);
-        //Create section folder 
-        var sectionFolderId = _driveService.CreateSectionFolder("Lesson: "+section.Name, courseFolderId);
+        var courseFolderId = _driveService.CreateParentFolder("Course: "+section.Course.Name);
+        //Create lesson folder 
+        var lessonFolderId = _driveService.CreateChildFolder("Lesson: "+section.Id, courseFolderId);
+        //Create video  folder 
+        var videoFolderId = _driveService.CreateChildFolder("Video: "+index, lessonFolderId);
 
         //Upload video file to gg drive
         var videoUrl = await _driveService
-            .UploadVideoToGoogleDrive(videoFile,"Video: Lesson " +lessonId, sectionFolderId);
+            .UploadVideoToGoogleDrive(videoFile,"Lesson "+section.Id+" - Video " +index, videoFolderId);
 
         return Ok(videoUrl);
     }

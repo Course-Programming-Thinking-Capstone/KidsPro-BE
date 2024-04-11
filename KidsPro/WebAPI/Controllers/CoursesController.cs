@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
@@ -254,4 +255,20 @@ public class CoursesController : ControllerBase
             Message="Update to pending status completed successfully"
         });
     }
+    
+    /// <summary>
+    /// Staff get list course moderation
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [HttpGet("moderation")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<CourseModerationResponse>>> GetCourseModerationAsync()
+    {
+        var course = await _courseService.GetCourseModerationAsync();
+        return Ok(course);
+    }
+    
+    
 }

@@ -81,7 +81,7 @@ public class GoogleDriveService : IGoogleDriveService
         return linkPreview;
     } 
 
-    public string CreateCourseFolder(string folderName)
+    public string CreateParentFolder(string folderName)
     {
         InitializeGgDrive();
 
@@ -105,7 +105,7 @@ public class GoogleDriveService : IGoogleDriveService
         return getCourseFolderIdExist;
     }
 
-    public string CreateSectionFolder( string sectionFolderName, string courseFolderId)
+    public string CreateChildFolder( string sectionFolderName, string courseFolderId)
     {
         InitializeGgDrive();
 

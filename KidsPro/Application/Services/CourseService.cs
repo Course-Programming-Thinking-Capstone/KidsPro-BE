@@ -4,6 +4,7 @@ using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentProgress;
@@ -923,5 +924,14 @@ public class CourseService : ICourseService
         _unitOfWork.CourseRepository.Update(course);
         await _unitOfWork.SaveChangeAsync();
     }
-   
+    private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
+    {
+      return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
+    }
+    
+    public async Task<List<CourseModerationResponse>> GetCourseModerationAsync()
+    {
+        var course = await GetCourseByStatusAsync(CourseStatus.Pending);
+        return CourseMapper.CourseToCourseModerationResponse(course);
+    }
 }

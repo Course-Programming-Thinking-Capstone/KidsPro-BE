@@ -21,17 +21,19 @@ public class ClassService : IClassService
     private IAccountService _account;
     private INotificationService _notify;
     private IDiscordConfig _discord;
+    private IProgressService _progress;
 
     //Discord
     private static DiscordSocketClient _client;
 
     public ClassService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
-        IDiscordConfig discord)
+        IDiscordConfig discord, IProgressService progress)
     {
         _unitOfWork = unitOfWork;
         _account = account;
         _notify = notify;
         _discord = discord;
+        _progress = progress;
     }
 
     private async Task<AccountDto> CheckPermission()
@@ -140,7 +142,15 @@ public class ClassService : IClassService
         var classes = await _unitOfWork.ClassRepository.GetClassByRole(account.IdSubRole, account.Role);
         if (classes.Count == 0) throw new BadRequestException($"Teacher or student {account.IdSubRole} not found");
 
-        return ClassMapper.ClassToClassesResponse(classes);
+        var classResponse= ClassMapper.ClassToClassesResponse(classes);
+
+        foreach (var x in classResponse)
+        {
+            var course = await _progress.GetCourseProgressAsync(account.IdSubRole, x.CourseId);
+            x.CourseProgress =course?.CourseProgress??0;
+        }
+
+        return classResponse;
     }
 
     #endregion

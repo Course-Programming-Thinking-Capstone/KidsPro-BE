@@ -4,6 +4,7 @@ using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Course.Update.Quiz;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Lesson;
 using Application.Dtos.Response.Course.Quiz;
@@ -439,4 +440,18 @@ public static class CourseMapper
         ClassId = dto.Classes.FirstOrDefault()?.Id,
         ClassCode = dto.Classes.FirstOrDefault()?.Code
     };
+
+    public static List<CourseModerationResponse> CourseToCourseModerationResponse(List<Course> dto)
+    {
+        return dto.Select(x => new CourseModerationResponse()
+        {
+            CourseId = x.Id,
+            ImageUrl = x.PictureUrl,
+            CourseName = x.Name,
+            TeacherName = x.ModifiedBy?.FullName,
+            TotalLesson = CalculateTotal(x,LessonType.Section),
+            ModifiedDate = x.ModifiedDate,
+            Status = x.Status
+        }).ToList();
+    }
 }
