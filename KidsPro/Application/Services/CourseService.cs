@@ -185,10 +185,9 @@ public class CourseService : ICourseService
             foreach (var sectionDto in dto.Sections)
             {
                 var section = courseEntity.Sections.FirstOrDefault(s => s.Id == sectionDto.Id);
-                
+
                 if (section != null)
                 {
-                    
                     //update section lesson
                     if (sectionDto.Lessons != null)
                     {
@@ -205,7 +204,6 @@ public class CourseService : ICourseService
 
                         foreach (var lessonDto in sectionDto.Lessons)
                         {
-                            
                             if (!lessonDto.Id.HasValue)
                             {
                                 var lesson = CourseMapper.UpdateLessonDtoToLesson(lessonDto);
@@ -565,7 +563,7 @@ public class CourseService : ICourseService
         }
 
         courseEntity.Status = CourseStatus.Denied;
-        
+
         //update syllabus status
         if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Open;
 
@@ -908,12 +906,22 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
     }
 
-    public async Task UpdateToPendingStatus(int courseId)
+    public async Task UpdateToPendingStatus(int courseId, int number)
     {
-        var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)??
+        var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId) ??
                      throw new BadRequestException("CourseId not found");
-        course.Status = CourseStatus.Pending;
+        switch (number)
+        {
+            case 1:
+                course.Status = CourseStatus.Pending;
+                break;
+            case 2:
+                course.Price = 10000;
+                break;
+        }
+
         _unitOfWork.CourseRepository.Update(course);
         await _unitOfWork.SaveChangeAsync();
     }
+   
 }

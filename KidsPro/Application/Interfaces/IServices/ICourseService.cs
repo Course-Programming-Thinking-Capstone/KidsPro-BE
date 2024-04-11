@@ -44,5 +44,5 @@ public interface ICourseService
     Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId);
     Task StartStudySectionAsync(StudentProgressRequest dto);
     Task MarkLessonCompletedAsync(int lessonId);
-    Task UpdateToPendingStatus(int courseId);
+    Task UpdateToPendingStatus(int courseId, int number);
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Configurations;
 using Application.Dtos.Request;
+using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -23,21 +24,24 @@ public class DrivesController : ControllerBase
     /// </summary>
     /// <param name="videoFile"></param>
     /// <param name="sectionId"></param>
+    /// <param name="lessonId"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
-    [HttpPost("{sectionId:int}")]
-    public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile videoFile, int sectionId)
+    [HttpPost]
+    public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile? videoFile, int sectionId,int lessonId)
     {
+        if (videoFile == null) throw new BadRequestException("Video file is empty");
+        
         var section = await _driveService.GetSectionInformationAsync(sectionId);
 
         //Create course folder
-        var courseFolderId = _driveService.CreateCourseFolder(section.Course.Name);
+        var courseFolderId = _driveService.CreateCourseFolder("Course: "+section.Course.Name);
         //Create section folder 
-        var sectionFolderId = _driveService.CreateSectionFolder("Section: "+section.Name, courseFolderId);
+        var sectionFolderId = _driveService.CreateSectionFolder("Lesson: "+section.Name, courseFolderId);
 
         //Upload video file to gg drive
         var videoUrl = await _driveService
-            .UploadVideoToGoogleDrive(videoFile,"Video: SectionId " +section.Id, sectionFolderId);
+            .UploadVideoToGoogleDrive(videoFile,"Video: Lesson " +lessonId, sectionFolderId);
 
         return Ok(videoUrl);
     }
