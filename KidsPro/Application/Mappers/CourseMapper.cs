@@ -11,6 +11,7 @@ using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Utils;
 using Domain.Entities;
+using Domain.Enums;
 using CommonCourseDto = Application.Dtos.Response.Course.CommonCourseDto;
 
 namespace Application.Mappers;
@@ -46,7 +47,7 @@ public static class CourseMapper
             Status = entity.Status.ToString(),
             DiscountPrice = entity.DiscountPrice,
             ModifiedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
-            TotalLesson = entity.TotalLesson,
+            TotalLesson = CalculateTotal(entity,LessonType.Section),
             CreatedById = entity.CreatedById,
             CreatedByName = entity.CreatedBy.FullName,
             EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
@@ -69,13 +70,40 @@ public static class CourseMapper
             Price = entity.Price,
             PictureUrl = entity.PictureUrl,
             DiscountPrice = entity.DiscountPrice,
-            TotalLesson = entity.TotalLesson,
             EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
             StartSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.StartSaleDate),
             IsFree = entity.IsFree,
             Sections = entity.Sections.Select(SectionToSectionDto).ToList(),
-            Classes = ClassMapper.ClassToClassesResponse(entity.Classes.ToList())
+            Classes = ClassMapper.ClassToClassesResponse(entity.Classes.ToList()),
+            TotalLesson =CalculateTotal(entity,LessonType.Section),
+            TotalVideo = CalculateTotal(entity,LessonType.Video),
+            TotalDocument = CalculateTotal(entity,LessonType.Document),
+            TotalQuiz = CalculateTotal(entity,LessonType.Quiz)
         };
+
+    private static int CalculateTotal(Course dto, LessonType type)
+    {
+        int total = 0;
+        switch (type)
+        {
+            case LessonType.Section:
+                total = dto.Sections.Count;
+                break;
+            case LessonType.Video:
+                total = dto.Sections.SelectMany(x => x.Lessons)
+                    .Count(x => x.Type == LessonType.Video);
+                break;
+            case LessonType.Document:
+                total = dto.Sections.SelectMany(x => x.Lessons)
+                    .Count(x => x.Type == LessonType.Document);
+                break;
+            case LessonType.Quiz:
+                total = dto.Sections.SelectMany(x => x.Quizzes).Count();
+                break;
+        }
+
+        return total;
+    }
 
     public static SectionComponentNumberDto EntityToSectionComponentNumberDto(SectionComponentNumber entity)
         => new SectionComponentNumberDto()

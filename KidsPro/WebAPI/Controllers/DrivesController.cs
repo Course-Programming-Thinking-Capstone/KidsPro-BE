@@ -9,11 +9,11 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/drives")]
-public class DriveController : ControllerBase
+public class DrivesController : ControllerBase
 {
     private IGoogleDriveService _driveService;
 
-    public DriveController(IGoogleDriveService drive)
+    public DrivesController(IGoogleDriveService drive)
     {
         _driveService = drive;
     }
