@@ -1128,10 +1128,12 @@ public class GameService : IGameService
         {
             throw new BadRequestException("LevelIndex not valid");
         }
+
         if (!ValidateGameLevel(modifiedLevelData, out string message))
         {
             throw new BadRequestException(message);
         }
+
         // Move updated level out
         if (checkExisted.LevelIndex != modifiedLevelData.LevelIndex)
         {
@@ -1475,6 +1477,15 @@ public class GameService : IGameService
                     return false;
                 }
 
+                if (!IsValidBoard(
+                        newLevel.VStartPosition,
+                        newLevel.LevelDetail.Where(o => o.TypeId == 2).Select(o => o.VPosition).ToList(),
+                        newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()))
+                {
+                    message = "Board not valid, there is something strange in there";
+                    return false;
+                }
+
                 if (!CheckConnect(newLevel.VStartPosition,
                         newLevel.LevelDetail.FirstOrDefault(o => o.TypeId == 2).VPosition,
                         newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()
@@ -1505,6 +1516,24 @@ public class GameService : IGameService
                     return false;
                 }
 
+                if (!IsValidBoard(
+                        newLevel.VStartPosition,
+                        newLevel.LevelDetail.Where(o => o.TypeId == 2).Select(o => o.VPosition).ToList(),
+                        newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()))
+                {
+                    message = "Board not valid, there is something strange in there";
+                    return false;
+                }
+
+                if (!CheckConnect(newLevel.VStartPosition,
+                        newLevel.LevelDetail.Where(o => o.TypeId == 2).Select(o => o.VPosition).ToList(),
+                        newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()
+                    ))
+                {
+                    message = "Road map not valid, start position must connect to target";
+                    return false;
+                }
+
                 break;
             }
 
@@ -1513,6 +1542,24 @@ public class GameService : IGameService
                 if (newLevel.LevelDetail.Count(o => o.TypeId == 3) > 0)
                 {
                     message = "This mode does not need rock";
+                    return false;
+                }
+
+                if (!IsValidBoard(
+                        newLevel.VStartPosition,
+                        newLevel.LevelDetail.Where(o => o.TypeId == 2).Select(o => o.VPosition).ToList(),
+                        newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()))
+                {
+                    message = "Board not valid, there is something strange in there";
+                    return false;
+                }
+
+                if (!CheckConnect(newLevel.VStartPosition,
+                        newLevel.LevelDetail.Where(o => o.TypeId == 2).Select(o => o.VPosition).ToList(),
+                        newLevel.LevelDetail.Where(o => o.TypeId == 1).Select(o => o.VPosition).ToList()
+                    ))
+                {
+                    message = "Road map not valid, start position must connect to target";
                     return false;
                 }
 
@@ -1588,7 +1635,7 @@ public class GameService : IGameService
         return false;
     }
 
-    public bool CheckConnect(int startPos, int target, List<int> board)
+    private bool CheckConnect(int startPos, int target, List<int> board)
     {
         HashSet<int> visited = new HashSet<int>();
         visited.Add(startPos);
@@ -1597,29 +1644,79 @@ public class GameService : IGameService
         while (queue.Count > 0)
         {
             int currentPos = queue.Dequeue();
-
-         
-
             List<int> adjacentPoints = GetAdjacentPoints(currentPos);
+            int unvisitedAdjacentPoints = 0;
             foreach (int adjacentPoint in adjacentPoints)
             {
-                // Nếu currentPos là target, trả về true vì startPos có thể nối đến target
+                // Nếu adjacentPoint là target, trả về true vì startPos có thể nối đến target
                 if (adjacentPoint == target)
                 {
                     return true;
                 }
+
                 if (!visited.Contains(adjacentPoint) && board.Contains(adjacentPoint))
                 {
+                    unvisitedAdjacentPoints++;
                     visited.Add(adjacentPoint);
                     queue.Enqueue(adjacentPoint);
                 }
+            }
+
+            // Nếu có 2 điểm kề chưa được thăm và nằm trên bảng, trả về false (ngã rẽ)
+            if (unvisitedAdjacentPoints == 2)
+            {
+                return false;
             }
         }
 
         return false;
     }
 
-    public List<int> GetAdjacentPoints(int baseInt)
+    private bool IsValidBoard(int startPos, List<int> targets, List<int> board)
+    {
+        // Tạo một HashSet để lưu trữ tất cả các điểm trên bảng, bao gồm cả startPos và targets
+        HashSet<int> allPoints = new HashSet<int>(board);
+        allPoints.Add(startPos);
+        allPoints.UnionWith(targets);
+
+        // Duyệt qua tất cả các điểm trên bảng để kiểm tra tính hợp lệ
+        foreach (int position in allPoints)
+        {
+            // Lấy danh sách các điểm kề của position
+            List<int> adjacentPoints = GetAdjacentPoints(position);
+
+            // Đếm số lượng điểm kề
+            int countAdjacent = 0;
+            foreach (int adjacentPoint in adjacentPoints)
+            {
+                if (allPoints.Contains(adjacentPoint))
+                {
+                    countAdjacent++;
+                }
+            }
+
+            // Kiểm tra số lượng điểm kề
+            if (position == startPos && countAdjacent != 1)
+            {
+                return false;
+            }
+
+            if (targets.Contains(position) && countAdjacent != 1 && countAdjacent != 2)
+            {
+                return false;
+            }
+
+            if (board.Contains(position) && countAdjacent != 2)
+            {
+                return false;
+            }
+        }
+
+        // Nếu tất cả các điểm đều có số lượng điểm kề hợp lệ, trả về true
+        return true;
+    }
+
+    private List<int> GetAdjacentPoints(int baseInt)
     {
         List<int> adjacentPoints = new List<int>();
 
@@ -1637,7 +1734,7 @@ public class GameService : IGameService
         return adjacentPoints;
     }
 
-    public bool IsValidPosition(int checkInt)
+    private bool IsValidPosition(int checkInt)
     {
         return checkInt >= 1 && checkInt <= 48;
     }
