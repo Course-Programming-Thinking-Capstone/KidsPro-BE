@@ -81,6 +81,15 @@ public class ClassService : IClassService
 
     #region Class
 
+    public async Task UpdateClassStatusAsync(int classId, ClassStatus status)
+    {
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
+            ?? throw new NotFoundException($"ClassId {classId} not found");
+        
+        entityClass.Status = status;
+        _unitOfWork.ClassRepository.Update(entityClass);
+        await _unitOfWork.SaveChangeAsync();
+    }
     public async Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto)
     {
         var account = await CheckPermission();
@@ -140,7 +149,7 @@ public class ClassService : IClassService
         var account = await _account.GetCurrentAccountInformationAsync();
 
         var classes = await _unitOfWork.ClassRepository.GetClassByRole(account.IdSubRole, account.Role);
-        if (classes.Count == 0) throw new BadRequestException($"Teacher or student {account.IdSubRole} not found");
+        if (classes.Count == 0) throw new NotFoundException($"Teacher or student do not have a class");
 
         var classResponse= ClassMapper.ClassToClassesResponse(classes);
 

@@ -76,10 +76,7 @@ public static class ClassMapper
         ClassId = dto.Id,
         ClassCode = dto.Code,
         CourseName = dto.Course.Name,
-        TeacherId = dto.Teacher?.Id,
-        TeacherName = dto.Teacher?.Account.FullName,
-        TeachPhoneNumber = dto.Teacher?.PhoneNumber,
-        TeachEmail = dto.Teacher?.Account.Email,
+        ClassStatus = dto.Status,
         OpenClass = DateUtils.FormatDateTimeToDateV3(dto.OpenDate),
         CloseClass = DateUtils.FormatDateTimeToDateV3(dto.CloseDate),
         DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(dto.OpenDate),
@@ -87,6 +84,11 @@ public static class ClassMapper
         Duration = dto.Duration,
         SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
+        //Teacher
+        TeacherId = dto.Teacher?.Id,
+        TeacherName = dto.Teacher?.Account.FullName,
+        TeachPhoneNumber = dto.Teacher?.PhoneNumber,
+        TeachEmail = dto.Teacher?.Account.Email,
         //Schedules
         RoomUrl = dto.Schedules?.FirstOrDefault()?.RoomUrl,
         SlotNumber = dto.Schedules?.FirstOrDefault()?.Slot ?? 0,
@@ -129,20 +131,22 @@ public static class ClassMapper
         }).ToList();
     }
 
-    public static PagingClassesResponse ClassToClassesPagingResponse(PagingResponse<Class> dto) => new PagingClassesResponse()
-    {
-        TotalPage = dto.TotalPages,
-        TotalRecord = dto.TotalRecords,
-        Classes = dto.Results.Select(c => new ClassesResponse()
+    public static PagingClassesResponse ClassToClassesPagingResponse(PagingResponse<Class> dto) =>
+        new PagingClassesResponse()
         {
-            ClassCode = c.Code,
-            DayStart = DateUtils.FormatDateTimeToDateV3(c.OpenDate),
-            DayEnd = DateUtils.FormatDateTimeToDateV3(c.CloseDate),
-            DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(c.OpenDate),
-            DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(c.CloseDate),
-            ClassId = c.Id
-        }).ToList()
-    };
+            TotalPage = dto.TotalPages,
+            TotalRecord = dto.TotalRecords,
+            Classes = dto.Results.Select(c => new ClassesResponse()
+            {
+                ClassCode = c.Code,
+                DayStart = DateUtils.FormatDateTimeToDateV3(c.OpenDate),
+                DayEnd = DateUtils.FormatDateTimeToDateV3(c.CloseDate),
+                DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(c.OpenDate),
+                DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(c.CloseDate),
+                ClassId = c.Id,
+                ClassStatus = c.Status
+            }).ToList()
+        };
 
     public static List<ClassesResponse> ClassToClassesResponse(List<Class> dto)
     {
@@ -156,11 +160,12 @@ public static class ClassMapper
             DayEnd = DateUtils.FormatDateTimeToDateV3(x.CloseDate),
             DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(x.OpenDate),
             DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(x.CloseDate),
-            Days = x.Schedules?.Select(s=> s.StudyDay).ToList(),
+            Days = x.Schedules?.Select(s => s.StudyDay).ToList(),
             Teacher = x.Teacher?.Account.FullName,
             CourseName = x.Course.Name,
             CourseId = x.CourseId,
-            CourseImage = x.Course.PictureUrl
+            CourseImage = x.Course.PictureUrl,
+            ClassStatus = x.Status
         }).ToList();
     }
 }

@@ -23,4 +23,5 @@ public interface IClassService
      Task<PagingClassesResponse> GetClassesAsync(int? page, int? size);
      Task<List<ClassesResponse>> GetClassByRoleAsync();
      List<Student> GetStudentsCanAddToClass(List<Student> students, Class entityClass);
+     Task UpdateClassStatusAsync(int classId, ClassStatus status);
 }

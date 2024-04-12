@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
             return Ok(new
             { 
                 OrderTotal=result.Item1,
-                OrderDetail=result.Item2
+                Order=result.Item2
             });
         }
 
