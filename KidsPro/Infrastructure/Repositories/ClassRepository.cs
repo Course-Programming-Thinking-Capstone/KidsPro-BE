@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IRepositories;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,8 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
 
         }
 
-        return await query.Include(x=>x.Course)
+        return await query.Where(x=>x.Status==ClassStatus.OnGoing)
+            .Include(x=>x.Course)
             .Include(x=>x.Teacher).ThenInclude(x=>x!.Account)
             .Include(x => x.Schedules).ToListAsync();
     }

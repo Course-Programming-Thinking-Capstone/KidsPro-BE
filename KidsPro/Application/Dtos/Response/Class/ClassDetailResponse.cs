@@ -6,6 +6,7 @@ namespace Application.Dtos.Response;
 
 public class ClassDetailResponse
 {
+    public ClassStatus ClassStatus { get; set; }
     public int ClassId { get; set; }
     public string? ClassCode { get; set; }
     public string? CourseName { get; set; }
