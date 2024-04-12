@@ -27,7 +27,6 @@ public class GoogleDriveService : IGoogleDriveService
         _drive = drive;
         _unit = unit;
     }
-
    
     private void InitializeGgDrive()
     {
@@ -45,7 +44,7 @@ public class GoogleDriveService : IGoogleDriveService
         });
     }
 
-    public async Task<string?> UploadVideoToGoogleDrive(IFormFile fileVideo,string? videoName,string sectionFolderId)
+    public async Task<string?> UploadVideoToGoogleDrive(IFormFile fileVideo,string? videoName,string videoFolderId)
     {
         // Tạo một luồng từ tệp đã tải lên
         using var stream = new MemoryStream();
@@ -56,9 +55,11 @@ public class GoogleDriveService : IGoogleDriveService
         var fileMetadataVideo = new Google.Apis.Drive.v3.Data.File()
         {
             Name = videoName,
-            Parents = new List<string> { sectionFolderId}
+            Parents = new List<string> { videoFolderId}
         };
 
+        await CheckVideoExist(videoName, videoFolderId);
+        
         // Tạo yêu cầu tải file lên Google Drive
         var requestVideo = _service.Files.Create
             (fileMetadataVideo, stream, "video/*");
@@ -81,17 +82,18 @@ public class GoogleDriveService : IGoogleDriveService
         return linkPreview;
     } 
 
-    public string CreateParentFolder(string folderName)
+    
+    public string CreateParentFolder(string parentFolderName)
     {
         InitializeGgDrive();
 
-        var getCourseFolderIdExist = FindCourseFolderId(folderName);
+        var getCourseFolderIdExist = FindParentFolderId(parentFolderName);
 
         if (getCourseFolderIdExist == null)
         {
             var folderMetadata = new Google.Apis.Drive.v3.Data.File()
             {
-                Name = folderName,
+                Name = parentFolderName,
                 MimeType = "application/vnd.google-apps.folder",
                 Parents = new List<string> { KidsproFolderId }
             };
@@ -105,18 +107,18 @@ public class GoogleDriveService : IGoogleDriveService
         return getCourseFolderIdExist;
     }
 
-    public string CreateChildFolder( string sectionFolderName, string courseFolderId)
+    public string CreateChildFolder( string childFolderName, string parentFolderId)
     {
         InitializeGgDrive();
 
-        var getSectionFolderIdExist = FindSectionFolderId(courseFolderId,sectionFolderName);
+        var getSectionFolderIdExist = FindChildFolderId(parentFolderId,childFolderName);
         if (getSectionFolderIdExist == null)
         {
             var folderMetadata = new Google.Apis.Drive.v3.Data.File()
             {
-                Name = sectionFolderName,
+                Name = childFolderName,
                 MimeType = "application/vnd.google-apps.folder",
-                Parents = new List<string> { courseFolderId }
+                Parents = new List<string> { parentFolderId }
             };
 
             var request = _service.Files.Create(folderMetadata);
@@ -128,10 +130,10 @@ public class GoogleDriveService : IGoogleDriveService
         return getSectionFolderIdExist;
     }
 
-    private string? FindCourseFolderId(string folderName)
+    private string? FindParentFolderId(string parentFolderName)
     {
         FilesResource.ListRequest listRequest = _service.Files.List();
-        listRequest.Q = $"name = '{folderName}' and mimeType = 'application/vnd.google-apps.folder'";
+        listRequest.Q = $"name = '{parentFolderName}' and mimeType = 'application/vnd.google-apps.folder'";
         listRequest.Fields = "files(id)";
 
         FileList files = listRequest.Execute();
@@ -140,11 +142,11 @@ public class GoogleDriveService : IGoogleDriveService
         return null;
     }
 
-    private string? FindSectionFolderId(string courseFolderId, string sectionFolderName)
+    private string? FindChildFolderId(string parentFolderId, string childFolderName)
     {
         FilesResource.ListRequest listRequest = _service.Files.List();
         listRequest.Q =
-            $"name = '{sectionFolderName}' and '{courseFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder'";
+            $"name = '{childFolderName}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder'";
         listRequest.Fields = "files(id)";
 
         FileList files = listRequest.Execute();
@@ -152,6 +154,23 @@ public class GoogleDriveService : IGoogleDriveService
             return files.Files[0].Id;
         return null;
     }
+    private async Task CheckVideoExist(string? videoName,string videoFolderId)
+    {
+        FilesResource.ListRequest listRequest = _service.Files.List();
+        listRequest.Q = $"name='{videoName}' and '{videoFolderId}' in parents";
+        
+        var files = listRequest.Execute().Files;
+        
+        if (files != null && files.Count > 0)
+        {
+            // If the video exists, delete it
+            foreach (var oldFile in files)
+            {
+                await _service.Files.Delete(oldFile.Id).ExecuteAsync();
+            }
+        }
+    }
+
     public async Task<Section> GetSectionInformationAsync(int sectionId)
     {
         var section = await _unit.SectionRepository.GetByIdAsync(sectionId)
