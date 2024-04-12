@@ -37,7 +37,6 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .Include(x => x.Classes).ThenInclude(x => x.Schedules)
             .Include(x => x.Classes).ThenInclude(x => x.Teacher).ThenInclude(x => x!.Account)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDelete);
-
     }
 
     public async Task<Course?> GetCoursePayment(int courseId, int classId, bool disableTracking = false)
@@ -72,40 +71,5 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
         return await query.Include(x => x.Sections)
             .Include(x => x.ModifiedBy).ToListAsync();
     }
-   
-
-    // public async Task<Course?> GerCourseDetailActive(int courseId)
-    // {
-    //     IQueryable<Course> query = _dbSet.AsNoTracking();
-    //
-    //     return  query
-    //         .Include(c => c.Sections.OrderBy(s => s.Order))
-    //         .ThenInclude(s => s.Lessons.OrderBy(l => l.Order))
-    //         .Include(c => c.Sections.OrderBy(s => s.Order))
-    //         .ThenInclude(s => s.Quizzes.OrderBy(q => q.Order))
-    //         .ThenInclude(q => q.Questions.OrderBy(qu => qu.Order))
-    //         .ThenInclude(q => q.Options.OrderBy(o => o.Order))
-    //         .Include(c => c.Sections.OrderBy(s => s.Order))
-    //         .ThenInclude(s => s.Games)
-    //         //  .Include(x => x.Syllabus)
-    //         .Include(x => x.Classes).ThenInclude(x => x.Schedules)
-    //         .Include(x => x.Classes).ThenInclude(x => x.Teacher).ThenInclude(x => x!.Account)
-    //      
-    //     .FirstOrDefaultAsync(c => c.Item1.Id == courseId && !c.Item1.IsDelete && c.Item1.Status==CourseStatus.Active);
-    //
-    // }
-    //  .Where(c => c.Id == courseId)
-    // .Select(c => new Tuple<Course, List<Section>, List<LessonDto>>(
-    // c,
-    // c.Sections.ToList(),
-    // c.Sections.SelectMany(s => s.Lessons.Select(l => new LessonDto()
-    // {
-    //     Id = l.Id,
-    //     Name = l.Name,
-    //     Duration = l.Duration,
-    //     Order = l.Order,
-    //     Type = l.Type.ToString()
-    // })).ToList()
-    //     ))
 
 }

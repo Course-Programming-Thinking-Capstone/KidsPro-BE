@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> MomoReturnAsync([FromQuery] MomoResultRequest dto)
         {
             var orderId = await _payment.CreateTransactionAsync(dto);
-            return Redirect($"https://kid-pro.vercel.app/payment-success/{orderId}");
+            return Redirect($"https://capstone1-phi.vercel.app/payment-success/{orderId}");
         }
 
         #endregion
