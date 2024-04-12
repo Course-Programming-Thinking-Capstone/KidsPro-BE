@@ -4,6 +4,7 @@ using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentProgress;
@@ -147,12 +148,12 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToManageCourseDto(entity);
     }
 
-    public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
+    public async Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
         string? action)
     {
         // check course
-        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} does not exist."));
 
         if (courseEntity.Status != CourseStatus.Draft && courseEntity.Status != CourseStatus.Denied)
             throw new BadRequestException("Can only update course wih status draft or denied.");
@@ -164,9 +165,7 @@ public class CourseService : ICourseService
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Id != courseEntity.ModifiedById)
-        {
             throw new ForbiddenException("Access denied.");
-        }
 
         //Get Section component number of each type in section
 
@@ -197,6 +196,7 @@ public class CourseService : ICourseService
                         var lessonOrder = 1;
                         var videoNumber = 0;
                         var documentNumber = 0;
+                        var fileNumber = 0;
 
                         //Count total lesson
                         var originNumberSectionLesson = section.Lessons.Count;
@@ -564,7 +564,7 @@ public class CourseService : ICourseService
         }
 
         courseEntity.Status = CourseStatus.Denied;
-        
+
         //update syllabus status
         if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Open;
 
@@ -905,5 +905,33 @@ public class CourseService : ICourseService
         student.StudentLessons.Add(lesson);
         _unitOfWork.StudentRepository.Update(student);
         await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task UpdateToPendingStatus(int courseId, int number)
+    {
+        var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId) ??
+                     throw new BadRequestException("CourseId not found");
+        switch (number)
+        {
+            case 1:
+                course.Status = CourseStatus.Pending;
+                break;
+            case 2:
+                course.Price = 10000;
+                break;
+        }
+
+        _unitOfWork.CourseRepository.Update(course);
+        await _unitOfWork.SaveChangeAsync();
+    }
+    private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
+    {
+      return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
+    }
+    
+    public async Task<List<CourseModerationResponse>> GetCourseModerationAsync()
+    {
+        var course = await GetCourseByStatusAsync(CourseStatus.Pending);
+        return CourseMapper.CourseToCourseModerationResponse(course);
     }
 }

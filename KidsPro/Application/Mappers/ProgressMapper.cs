@@ -27,7 +27,8 @@ public static class ProgressMapper
             StudentName = dto.FirstOrDefault()!.Student.Account.FullName,
             CourseName = dto.FirstOrDefault()!.Course.Name,
             TeacherName = dto.FirstOrDefault()!.Course.ModifiedBy!.FullName,
-            CourseId = dto.FirstOrDefault()!.CourseId
+            CourseId = dto.FirstOrDefault()!.CourseId,
+            CourseImage = dto.FirstOrDefault()!.Course.PictureUrl
         };
 
         foreach (var x in dto)

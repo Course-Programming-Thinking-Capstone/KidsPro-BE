@@ -8,10 +8,6 @@ public class LessonDto
 
     public int Order { get; set; }
 
-    public string? Content { get; set; }
-
-    public string? ResourceUrl { get; set; }
-
     public int? Duration { get; set; }
 
     public string Type { get; set; } = null!;

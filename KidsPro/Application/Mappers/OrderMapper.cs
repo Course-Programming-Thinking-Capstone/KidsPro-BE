@@ -7,9 +7,7 @@ namespace Application.Mappers
 {
     public class OrderMapper
     {
-        
-
-        public static List<OrderResponse> ShowOrder(List<Order> orders)
+        public static  List<OrderResponse> MobileShowOrder(List<Order> orders)
         {
             var list = new List<OrderResponse>();
             foreach (var x in orders)
@@ -31,6 +29,32 @@ namespace Application.Mappers
             }
 
             return list;
+        }
+
+        public static (int, List<OrderResponse>) ShowOrder(List<Order> orders)
+        {
+            int totalOrder = orders.Count;
+
+            var list = new List<OrderResponse>();
+            foreach (var x in orders)
+            {
+                var dto = new OrderResponse()
+                {
+                    OrderId = x.Id,
+                    OrderCode = x.OrderCode,
+                    CourseName = x.OrderDetails!.FirstOrDefault()?.Course.Name,
+                    PictureUrl = x.OrderDetails!.FirstOrDefault()?.Course.PictureUrl,
+                    Quantity = x.Quantity,
+                    TotalPrice = x.TotalPrice,
+                    OrderStatus = x.Status.ToString(),
+                    ParentName = x.Parent!.Account.FullName,
+                    PaymentType = x.PaymentType.ToString(),
+                    Note = x.Note
+                };
+                list.Add(dto);
+            }
+
+            return (totalOrder, list);
         }
 
         public static OrderDetailResponse ShowOrderDetail(Order order)
@@ -71,7 +95,5 @@ namespace Application.Mappers
 
             return x;
         }
-        
-        
     }
 }

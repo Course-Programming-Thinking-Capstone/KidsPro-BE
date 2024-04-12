@@ -8,7 +8,7 @@ namespace Application.Dtos.Response.Certificate
 {
     public class CertificateResponseDto
     {
-        public string? title {  get; set; } = null;
-        public string? url { get; set; } = null;
+        public string? CourseName {  get; set; } = null;
+        public string? CertificateUrl { get; set; } = null;
     }
 }

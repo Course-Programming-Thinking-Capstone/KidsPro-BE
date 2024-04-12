@@ -21,17 +21,19 @@ public class ClassService : IClassService
     private IAccountService _account;
     private INotificationService _notify;
     private IDiscordConfig _discord;
+    private IProgressService _progress;
 
     //Discord
     private static DiscordSocketClient _client;
 
     public ClassService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
-        IDiscordConfig discord)
+        IDiscordConfig discord, IProgressService progress)
     {
         _unitOfWork = unitOfWork;
         _account = account;
         _notify = notify;
         _discord = discord;
+        _progress = progress;
     }
 
     private async Task<AccountDto> CheckPermission()
@@ -79,6 +81,15 @@ public class ClassService : IClassService
 
     #region Class
 
+    public async Task UpdateClassStatusAsync(int classId, ClassStatus status)
+    {
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
+            ?? throw new NotFoundException($"ClassId {classId} not found");
+        
+        entityClass.Status = status;
+        _unitOfWork.ClassRepository.Update(entityClass);
+        await _unitOfWork.SaveChangeAsync();
+    }
     public async Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto)
     {
         var account = await CheckPermission();
@@ -138,9 +149,17 @@ public class ClassService : IClassService
         var account = await _account.GetCurrentAccountInformationAsync();
 
         var classes = await _unitOfWork.ClassRepository.GetClassByRole(account.IdSubRole, account.Role);
-        if (classes.Count == 0) throw new BadRequestException($"Teacher or student {account.IdSubRole} not found");
+        if (classes.Count == 0) throw new NotFoundException($"Teacher or student do not have a class");
 
-        return ClassMapper.ClassToClassesResponse(classes);
+        var classResponse= ClassMapper.ClassToClassesResponse(classes);
+
+        foreach (var x in classResponse)
+        {
+            var course = await _progress.GetCourseProgressAsync(account.IdSubRole, x.CourseId);
+            x.CourseProgress =course?.CourseProgress??0;
+        }
+
+        return classResponse;
     }
 
     #endregion

@@ -2,6 +2,7 @@
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
@@ -103,6 +104,7 @@ public class CoursesController : ControllerBase
     /// <param name="id"></param>
     /// <param name="dto"></param>
     /// <param name="action"></param>
+    /// <param name="videoFiles"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole}")]
     [HttpPut("{id:int}")]
@@ -110,11 +112,11 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto,
-        [FromQuery] string? action)
+    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id,[FromBody] UpdateCourseDto dto, [FromQuery] string? action)
+
     {
-        var result = await _courseService.UpdateCourseAsync(id, dto, action);
-        return Ok(result);
+         var result = await _courseService.UpdateCourseAsync(id, dto, action);
+        return Ok();
     }
 
     /// <summary>
@@ -235,4 +237,38 @@ public class CoursesController : ControllerBase
             Message="Mark lesson completed successfully"
         });
     }
+
+    /// <summary>
+    /// API INTERNAL TEST, Update Course (Status, Price)
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="number">1. Update status, 2. Update Price</param>
+    /// <returns></returns>
+    [HttpPatch("update-status/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<IActionResult> UpdateToPendingStaus(int id,int number)
+    {
+        await _courseService.UpdateToPendingStatus(id,number);
+        return Ok(new
+        {
+            Message="Update to pending status completed successfully"
+        });
+    }
+    
+    /// <summary>
+    /// Staff get list course moderation
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [HttpGet("moderation")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<CourseModerationResponse>>> GetCourseModerationAsync()
+    {
+        var course = await _courseService.GetCourseModerationAsync();
+        return Ok(course);
+    }
+    
+    
 }

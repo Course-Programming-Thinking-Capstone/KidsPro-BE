@@ -37,7 +37,7 @@ public class ClassController : ControllerBase
     [HttpGet("teacher-or-student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<ClassesResponse>> GetClassesByRoleAsync()
     {
         //Check if the account is activated or not or inactive
@@ -57,7 +57,7 @@ public class ClassController : ControllerBase
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<PagingClassesResponse>> GetClassesAsync(int? page, int? size)
     {
         //Check if the account is activated or not or inactive
@@ -84,6 +84,29 @@ public class ClassController : ControllerBase
 
         var result = await _class.GetClassByIdAsync(id);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Update class status
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [HttpPatch("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingClassesResponse>> UpdateClassStatusAsync(int id, ClassStatus status)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        await _class.UpdateClassStatusAsync(id, status);
+        return Ok(new
+        {
+            Message = "Update class status to " + status + " successfully!"
+        });
     }
 
     /// <summary>

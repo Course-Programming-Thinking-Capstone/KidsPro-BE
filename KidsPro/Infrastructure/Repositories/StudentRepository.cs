@@ -51,6 +51,7 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .Include(x => x.Certificates)
             .Include(x => x.StudentProgresses)!.ThenInclude(x => x.Course)
             .Include(x => x.Parent).ThenInclude(x => x.Account)
+            .Include(x=>x.Classes).ThenInclude(x=>x.Course)
             .FirstOrDefaultAsync();
     }
 

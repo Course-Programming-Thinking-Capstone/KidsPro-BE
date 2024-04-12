@@ -24,7 +24,7 @@ public class Student : BaseEntity
     public virtual ICollection<Certificate>? Certificates { get; set; }
 
     public virtual ICollection<StudentProgress>? StudentProgresses { get; set; }
-    public virtual IEnumerable<Class> Classes { get; } = new List<Class>();
+    public virtual ICollection<Class> Classes { get; } = new List<Class>();
     public virtual ICollection<StudentQuiz> StudentQuizzes { get; set; } = new List<StudentQuiz>();
 
     public virtual ICollection<StudentLesson> StudentLessons { get; set; } = new List<StudentLesson>();

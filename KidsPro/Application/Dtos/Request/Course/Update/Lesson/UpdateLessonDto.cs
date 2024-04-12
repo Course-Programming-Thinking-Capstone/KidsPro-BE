@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Dtos.Request.Course.Update.Lesson;
 
@@ -16,7 +17,7 @@ public record UpdateLessonDto
     public string? Content { get; init; }
 
     [StringLength(250, ErrorMessage = "Url can not exceed 250 character")]
-    public string? ResourceUrl { get; init; }
+    public string? ResourceUrl { get; set; }
 
     // [Required] 
     public LessonType? Type { get; init; }
