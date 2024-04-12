@@ -867,16 +867,29 @@ public class GameService : IGameService
 
     public async Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId)
     {
-        var result = await _unitOfWork.GamePlayHistoryRepository
-            .GetAll()
-            .Where(h => h.StudentId == userId) // Filter by userId
-            .GroupBy(h => h.GameLevelType)
-            .Select(group => new CurrentLevelData
+        var result = new List<CurrentLevelData>();
+        var query = await _unitOfWork.GamePlayHistoryRepository
+            .GetAsync(h => h.StudentId == userId, null).ContinueWith(o => o.Result.ToList());
+        var dicTemp = new Dictionary<int, List<int>>();
+        var allMode = _unitOfWork.LevelTypeRepository.GetAll();
+        foreach (var gameMode in allMode)
+        {
+            dicTemp.Add(gameMode.Id, new List<int>());
+        }
+
+        foreach (var history in query)
+        {
+            dicTemp[history.GameLevelTypeId].Add(history.LevelIndex);
+        }
+
+        foreach (var data in dicTemp)
+        {
+            result.Add(new CurrentLevelData
             {
-                Mode = group.Key.Id,
-                LevelIndex = group.Max(h => h.LevelIndex)
-            })
-            .ToListAsync();
+                Mode = data.Key,
+                PlayedLevel = data.Value
+            });
+        }
 
         return result;
     }
