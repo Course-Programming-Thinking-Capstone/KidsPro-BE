@@ -122,7 +122,7 @@ namespace Application.Services
                                             $"to {currentStatus} status from {toStatus} status failed");
         }
 
-        public async Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status)
+        public async Task<(int,List<OrderResponse>)> GetListOrderAsync(OrderStatus status)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
             var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);

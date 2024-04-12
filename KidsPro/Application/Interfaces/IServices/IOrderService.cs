@@ -11,7 +11,7 @@ namespace Application.Interfaces.IServices
 
         Task UpdateOrderStatusAsync(int orderId,OrderStatus currentStatus, OrderStatus toStatus, string? reason="");
 
-        Task<List<OrderResponse>> GetListOrderAsync(OrderStatus status);
+        Task<(int,List<OrderResponse>)> GetListOrderAsync(OrderStatus status);
 
         Task<OrderDetailResponse> GetOrderDetail(int orderId);
 

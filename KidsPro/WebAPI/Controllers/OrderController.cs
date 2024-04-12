@@ -57,7 +57,11 @@ namespace WebAPI.Controllers
             _authentication.CheckAccountStatus();
             
             var result = await _order.GetListOrderAsync(status);
-            return Ok(result);
+            return Ok(new
+            { 
+                OrderTotal=result.Item1,
+                OrderDetail=result.Item2
+            });
         }
 
         /// <summary>

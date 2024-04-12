@@ -9,8 +9,10 @@ namespace Application.Mappers
     {
         
 
-        public static List<OrderResponse> ShowOrder(List<Order> orders)
+        public static (int,List<OrderResponse>) ShowOrder(List<Order> orders)
         {
+            int totalOrder = orders.Count;
+            
             var list = new List<OrderResponse>();
             foreach (var x in orders)
             {
@@ -30,7 +32,7 @@ namespace Application.Mappers
                 list.Add(dto);
             }
 
-            return list;
+            return (totalOrder, list);
         }
 
         public static OrderDetailResponse ShowOrderDetail(Order order)
