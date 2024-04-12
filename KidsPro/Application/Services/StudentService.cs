@@ -4,6 +4,7 @@ using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
 using Application.Utils;
+using Domain.Entities;
 using Domain.Enums;
 
 namespace Application.Services;
@@ -58,10 +59,16 @@ public class StudentService:IStudentService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
-        var studentsCanAddToClass = _classService.GetStudentsCanAddToClass(students, entityClass);
+        var studentsWithoutCourse = GetStudentWithoutCourse(students, entityClass.CourseId);
+
+        var studentsCanAddToClass = _classService.GetStudentsCanAddToClass(studentsWithoutCourse, entityClass);
 
         return StudentMapper.ShowStudentList(studentsCanAddToClass);
     }
-    
-    
+
+    private  List<Student> GetStudentWithoutCourse(List<Student> students,int courseId)
+    {
+        return students.Where(x => x.Classes
+            .All(c => c.CourseId != courseId)).ToList();
+    }
 }

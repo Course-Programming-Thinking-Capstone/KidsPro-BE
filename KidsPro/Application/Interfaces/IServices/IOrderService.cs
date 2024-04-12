@@ -18,5 +18,6 @@ namespace Application.Interfaces.IServices
         Task ParentCanCelOrderAsync(OrderCancelRequest dto);
         Task HandleRefundRequest(OrderRefundRequest dto, ModerationStatus status);
         Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status);
+        Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status);
     }
 }

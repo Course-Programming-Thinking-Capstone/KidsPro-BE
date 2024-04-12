@@ -128,6 +128,13 @@ namespace Application.Services
             var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.ShowOrder(orders!);
         }
+        
+        public async Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status)
+        {
+            var account = await _account.GetCurrentAccountInformationAsync();
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
+            return OrderMapper.MobileShowOrder(orders!);
+        }
 
         public async Task<OrderDetailResponse> GetOrderDetail(int orderId)
         {
