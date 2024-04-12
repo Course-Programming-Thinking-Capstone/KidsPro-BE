@@ -37,13 +37,13 @@ public class DrivesController : ControllerBase
         //Create course folder
         var courseFolderId = _driveService.CreateParentFolder("Course: "+section.Course.Name);
         //Create lesson folder 
-        var lessonFolderId = _driveService.CreateChildFolder("Lesson: "+section.Id, courseFolderId);
+        var sectionFolderId = _driveService.CreateChildFolder("Section: "+section.Id, courseFolderId);
         //Create video  folder 
-        var videoFolderId = _driveService.CreateChildFolder("Video: "+index, lessonFolderId);
+        var lessonFolderId = _driveService.CreateChildFolder("Lesson: "+index, sectionFolderId);
 
         //Upload video file to gg drive
         var videoUrl = await _driveService
-            .UploadVideoToGoogleDrive(videoFile,"Lesson "+section.Id+" - Video " +index, videoFolderId);
+            .UploadVideoToGoogleDrive(videoFile,"Lesson "+index+" - Video", lessonFolderId);
 
         return Ok(videoUrl);
     }
