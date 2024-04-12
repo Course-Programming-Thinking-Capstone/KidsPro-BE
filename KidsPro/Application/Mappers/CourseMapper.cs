@@ -136,15 +136,6 @@ public static class CourseMapper
             Order = entity.Order,
             Type = entity.Type.ToString(),
             Duration = entity.Duration,
-        };
-    public static LessonDetailDto LessonToLessonDetailDto(Lesson entity)
-        => new LessonDetailDto()
-        {
-            Id = entity.Id,
-            Name = entity.Name,
-            Order = entity.Order,
-            Type = entity.Type.ToString(),
-            Duration = entity.Duration,
             ResourceUrl = entity.ResourceUrl,
             Content = entity.Content
         };
