@@ -48,7 +48,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
                 break;
             case Constant.StudentRole:
                 query = query.Include(x => x.Students)
-                    .Where(x => x.Students.All(s => s.Id == id));
+                    .Where(x => x.Students.Any(s => s.Id == id && x.Students.Count>0));
                 break;
 
         }
