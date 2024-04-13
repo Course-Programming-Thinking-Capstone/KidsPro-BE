@@ -1606,7 +1606,7 @@ public class GameService : IGameService
         return true;
     }
 
-    public bool CheckConnect(int startPos, List<int> targets, List<int> board)
+    private bool CheckConnect(int startPos, List<int> targets, List<int> board)
     {
         HashSet<int> visited = new HashSet<int>();
         visited.Add(startPos);
@@ -1622,9 +1622,8 @@ public class GameService : IGameService
 
         while (queue.Count > 0)
         {
+            int unvisitedAdjacentPoints = 0;
             int currentPos = queue.Dequeue();
-
-            // Kiểm tra xem tất cả các target đã được nối từ startPos hay chưa
             if (connectedTargets.Count == 0)
             {
                 return true;
@@ -1635,12 +1634,23 @@ public class GameService : IGameService
             {
                 if (!visited.Contains(adjacentPoint) && board.Contains(adjacentPoint))
                 {
+                    unvisitedAdjacentPoints++;
                     visited.Add(adjacentPoint);
                     queue.Enqueue(adjacentPoint);
-                    if (connectedTargets.Contains(adjacentPoint))
-                    {
-                        connectedTargets.Remove(adjacentPoint);
-                    }
+                }
+
+                if (connectedTargets.Contains(adjacentPoint))
+                {
+                    unvisitedAdjacentPoints++;
+                    connectedTargets.Remove(adjacentPoint);
+                    visited.Add(adjacentPoint);
+                    queue.Enqueue(adjacentPoint);
+                }
+
+                // Nếu có 2 điểm kề chưa được thăm và nằm trên bảng, trả về false (ngã rẽ)
+                if (unvisitedAdjacentPoints == 2)
+                {
+                    return false;
                 }
             }
         }
