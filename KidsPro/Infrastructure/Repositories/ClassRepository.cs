@@ -52,8 +52,8 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
                 break;
 
         }
-
-        return await query.Where(x=>x.Status==ClassStatus.OnGoing)
+//.Where(x=>x.Status==ClassStatus.OnGoing).Where(x=>x.Status==ClassStatus.OnGoing)
+        return await query
             .Include(x=>x.Course)
             .Include(x=>x.Teacher).ThenInclude(x=>x!.Account)
             .Include(x => x.Schedules).ToListAsync();
