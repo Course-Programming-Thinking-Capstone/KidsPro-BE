@@ -4,5 +4,6 @@ public class QuizSubmitResponse
 {
     public int StudentId { get; set; }
     public string? StudentName { get; set; }
-    public List<QuizDto> Quizs { get; set; } = new List<QuizDto>();
+    public QuizSubmitDto? QuizSubmit { get; set; } 
+    
 }

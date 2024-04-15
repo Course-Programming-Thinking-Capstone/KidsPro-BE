@@ -2,6 +2,7 @@
 
 public class OptionDto
 {
+    public int OptionId { get; set; }
     public int Order { get; set; }
     public string Content { get; set; } = null!;
     public string? AnswerExplain { get; set; }

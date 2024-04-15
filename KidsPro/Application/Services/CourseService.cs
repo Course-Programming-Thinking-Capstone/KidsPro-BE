@@ -196,7 +196,6 @@ public class CourseService : ICourseService
                         var lessonOrder = 1;
                         var videoNumber = 0;
                         var documentNumber = 0;
-                        var fileNumber = 0;
 
                         //Count total lesson
                         var originNumberSectionLesson = section.Lessons.Count;
@@ -277,12 +276,12 @@ public class CourseService : ICourseService
                                     throw new NotFoundException($"Quiz {sectionDtoQuiz.Id} does not exist.");
 
                                 //Update quiz information
-                                CourseMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
+                                QuizMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
                             }
                             else
                             {
                                 // Create new quiz
-                                quiz = CourseMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz);
+                                quiz = QuizMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz);
                                 quiz.CreatedDate = DateTime.UtcNow;
                                 quiz.CreatedById = accountId;
                                 quiz.CreatedBy = currentAccount;
@@ -300,11 +299,11 @@ public class CourseService : ICourseService
                                     if (question != null)
                                     {
                                         //Update section information
-                                        CourseMapper.UpdateQuestionDtoToQuestion(updateQuestionDto, ref question);
+                                        QuizMapper.UpdateQuestionDtoToQuestion(updateQuestionDto, ref question);
                                     }
                                     else
                                     {
-                                        question = CourseMapper.UpdateQuestionDtoToQuestion(updateQuestionDto);
+                                        question = QuizMapper.UpdateQuestionDtoToQuestion(updateQuestionDto);
                                     }
 
                                     // update total score
@@ -321,11 +320,11 @@ public class CourseService : ICourseService
                                                 question.Options.FirstOrDefault(o => o.Id == updateOption.Id);
                                             if (option == null)
                                             {
-                                                option = CourseMapper.UpdateOptionDtoToOption(updateOption);
+                                                option = QuizMapper.UpdateOptionDtoToOption(updateOption);
                                             }
                                             else
                                             {
-                                                CourseMapper.UpdateOptionDtoToOption(updateOption, ref option);
+                                                QuizMapper.UpdateOptionDtoToOption(updateOption, ref option);
                                             }
 
                                             option.Order = optionOrder;
