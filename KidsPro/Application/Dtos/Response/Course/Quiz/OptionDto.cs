@@ -6,4 +6,5 @@ public class OptionDto
     public string Content { get; set; } = null!;
     public string? AnswerExplain { get; set; }
     public bool IsCorrect { get; set; }
+    public bool IsStudentChoose { get; set; }
 }
