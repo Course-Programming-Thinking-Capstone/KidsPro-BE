@@ -14,10 +14,11 @@ public static class QuizMapper
         StudentId = dto.StudentId,
         QuizId = dto.QuizId,
         Score = dto.Score,
-        Attempt = dto.Attempt,
-        StartTime = dto.StartTime,
+        Attempt = 0,
+        StartTime = DateTime.UtcNow.AddMinutes(-dto.QuizMinutes),
         EndTime = DateTime.UtcNow,
-        IsPass = false
+        IsPass = false,
+        Duration = dto.Duration
     };
 
     public static QuizSubmitResponse StudentQuizToQuizSubmitResponse(StudentQuiz dto, Student student) =>
@@ -30,7 +31,7 @@ public static class QuizMapper
 
     public static QuizSubmitDto StudentQuizToQuizSubmitDto(StudentQuiz dto) => new QuizSubmitDto()
     {
-        Score = dto.Score,
+        Score = Math.Round(dto.Score, 1),
         AttemptTurnNumber = 3 - dto.Attempt,
         Duration = dto.Duration,
         StartTime = DateUtils.FormatDateTimeToDatetimeV1(dto.StartTime),

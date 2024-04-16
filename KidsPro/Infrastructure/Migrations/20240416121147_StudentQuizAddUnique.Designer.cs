@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240416121147_StudentQuizAddUnique")]
+    partial class StudentQuizAddUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,55 +95,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 33, 599, DateTimeKind.Utc).AddTicks(6476),
+                            CreatedDate = new DateTime(2024, 4, 16, 12, 11, 44, 870, DateTimeKind.Utc).AddTicks(3035),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$LZWeYBAuAf4x/CYIm68zpum5Dv6yS3jwtd1IPR2r36QFC9mDJWIze",
+                            PasswordHash = "$2a$11$kGxmoEAto4PtU9U/iUvUeOkEadxBFpLoTIztkdNOf4HH/nUq.vBBG",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 33, 823, DateTimeKind.Utc).AddTicks(5095),
+                            CreatedDate = new DateTime(2024, 4, 16, 12, 11, 45, 119, DateTimeKind.Utc).AddTicks(2119),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$RUo8l6h9sIJH5atUZFfJZeN88LJtGDO5NRndn7a443knrShGYHaiG",
+                            PasswordHash = "$2a$11$RIikhBhJ.2uDHglJngE5XObbhAdr5YixmPvtmYQ5U0G1sCcf2Cm4i",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 34, 61, DateTimeKind.Utc).AddTicks(6735),
+                            CreatedDate = new DateTime(2024, 4, 16, 12, 11, 45, 492, DateTimeKind.Utc).AddTicks(5439),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$qon0TmLSIBbMHrpCAJVoweP1810E9dTqWQ6u/Hh/KwKPQ8FVYL/3C",
+                            PasswordHash = "$2a$11$7S4H.qoZnmcksC6JOZ5/c.2v1HRAFXuQWtqbp7aNptiMMzQPHBWQC",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 34, 347, DateTimeKind.Utc).AddTicks(7824),
+                            CreatedDate = new DateTime(2024, 4, 16, 12, 11, 45, 942, DateTimeKind.Utc).AddTicks(1225),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$d1ICdaNzrm.LtjD2IsGMY.hsCVdWqmAizGAhCpt5Mw3Xj5PNc6Ola",
+                            PasswordHash = "$2a$11$h0uzFy5KiabJEWBS3.hcVe5Dr6yUZyak25n7HZoxuSzppusahoeoa",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 34, 579, DateTimeKind.Utc).AddTicks(3782),
+                            CreatedDate = new DateTime(2024, 4, 16, 12, 11, 46, 389, DateTimeKind.Utc).AddTicks(1498),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$DY3HgfYWKQQfiODN3rR6K.CzFVRSaAmeK5tbWkynmriTTgvP2YtOS",
+                            PasswordHash = "$2a$11$sXx1.9rhbzIokYb1UJ58wOX/pi5VWTmZANyFjcqIYhaw8./2LccCu",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -1753,7 +1756,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.HasIndex("StudentId", "SectionId")
+                    b.HasIndex("StudentId", "CourseId")
                         .IsUnique();
 
                     b.ToTable("StudentProgresses");

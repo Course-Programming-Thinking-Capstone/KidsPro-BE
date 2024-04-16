@@ -16,6 +16,7 @@ public class StudentQuizRepository:BaseRepository<StudentQuiz>,IStudentQuizRepos
     public async Task<StudentQuiz?> GetStudentQuizByFk(int studentId, int quizId)
     {
         return await _dbSet.Include(x=>x.Quiz).Include(x=>x.Student)
+            .Include(x=>x.StudentAnswers)
             .FirstOrDefaultAsync(x => x.StudentId == studentId && x.QuizId == quizId);
     }
 

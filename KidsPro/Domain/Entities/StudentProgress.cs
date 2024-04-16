@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[Index(nameof(StudentId), nameof(CourseId), IsUnique = true)]
+[Index(nameof(StudentId), nameof(SectionId), IsUnique = true)]
 public class StudentProgress:BaseEntity
 {
     public virtual Student Student { get; set; } = null!;
