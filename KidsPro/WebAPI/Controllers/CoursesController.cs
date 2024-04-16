@@ -11,6 +11,7 @@ using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Constant = Application.Configurations.Constant;
 using CourseDto = Application.Dtos.Response.Course.CourseDto;
@@ -24,7 +25,7 @@ public class CoursesController : ControllerBase
 {
     private ICourseService _courseService;
     private IQuizService _quizService;
-    
+
     public CoursesController(ICourseService courseService, IQuizService quizService)
     {
         _courseService = courseService;
@@ -116,10 +117,11 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id,[FromBody] UpdateCourseDto dto, [FromQuery] string? action)
+    public async Task<ActionResult<CourseDto>> UpdateCourseAsync([FromRoute] int id, [FromBody] UpdateCourseDto dto,
+        [FromQuery] string? action)
 
     {
-         var result = await _courseService.UpdateCourseAsync(id, dto, action);
+        var result = await _courseService.UpdateCourseAsync(id, dto, action);
         return Ok();
     }
 
@@ -200,12 +202,12 @@ public class CoursesController : ControllerBase
     [HttpGet("payment")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int courseId,int classId)
+    public async Task<ActionResult<CourseOrderDto>> GetCoursePaymentAsync(int courseId, int classId)
     {
-        var result = await _courseService.GetCoursePaymentAsync(courseId,classId);
+        var result = await _courseService.GetCoursePaymentAsync(courseId, classId);
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Student click on start study button
     /// </summary>
@@ -217,13 +219,13 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<IActionResult> StartStudyCourseAsyn(StudentProgressRequest dto)
     {
-       await _courseService.StartStudySectionAsync(dto);
+        await _courseService.StartStudySectionAsync(dto);
         return Ok(new
         {
-            Message="Start study section successfully"
+            Message = "Start study section successfully"
         });
     }
-    
+
     /// <summary>
     /// Student click on mark complete button when finish document or video
     /// </summary>
@@ -238,7 +240,7 @@ public class CoursesController : ControllerBase
         await _courseService.MarkLessonCompletedAsync(lessonId);
         return Ok(new
         {
-            Message="Mark lesson completed successfully"
+            Message = "Mark lesson completed successfully"
         });
     }
 
@@ -251,15 +253,15 @@ public class CoursesController : ControllerBase
     [HttpPatch("update-status/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<IActionResult> UpdateToPendingStaus(int id,int number)
+    public async Task<IActionResult> UpdateToPendingStaus(int id, int number)
     {
-        await _courseService.UpdateToPendingStatus(id,number);
+        await _courseService.UpdateToPendingStatus(id, number);
         return Ok(new
         {
-            Message="Update to pending status completed successfully"
+            Message = "Update to pending status completed successfully"
         });
     }
-    
+
     /// <summary>
     /// Staff get list course moderation
     /// </summary>
@@ -273,7 +275,7 @@ public class CoursesController : ControllerBase
         var course = await _courseService.GetCourseModerationAsync();
         return Ok(course);
     }
-    
+
     /// <summary>
     /// Student submit quiz
     /// </summary>
@@ -288,5 +290,18 @@ public class CoursesController : ControllerBase
         var result = await _quizService.StudentSubmitQuizAsync(dto);
         return Ok(result);
     }
-    
+
+    /// <summary>
+    /// Common user get ACTIVE course by id. The course just include outline (section, quiz, document, video)
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("study/{id:int}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<Application.Dtos.Response.Course.Study.StudyCourseDto>> GetStudyCourseByIdAsync(
+        [FromRoute] int id)
+    {
+        var result = await _courseService.GetStudyCourseByIdAsync(id);
+        return Ok(result);
+    }
 }

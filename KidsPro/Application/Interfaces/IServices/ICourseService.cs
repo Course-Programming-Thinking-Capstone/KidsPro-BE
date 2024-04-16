@@ -14,6 +14,8 @@ public interface ICourseService
 {
     Task<CourseDto> GetByIdAsync(int id, string? action);
 
+    Task<Dtos.Response.Course.Study.StudyCourseDto?> GetStudyCourseByIdAsync(int id);
+
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 
     Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto, string? action);

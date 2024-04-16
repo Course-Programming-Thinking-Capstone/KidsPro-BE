@@ -48,6 +48,17 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCommonCourseDto(course);
     }
 
+    public async Task<Dtos.Response.Course.Study.StudyCourseDto?> GetStudyCourseByIdAsync(int id)
+    {
+        var statuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active
+        };
+        var course = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+
+        return course == null ? null : CourseMapper.CourseToStudyCourseDto(course);
+    }
+
     /// <summary>
     /// Admin create course with exist section and assign teacher to edit course
     /// </summary>
@@ -923,11 +934,12 @@ public class CourseService : ICourseService
         _unitOfWork.CourseRepository.Update(course);
         await _unitOfWork.SaveChangeAsync();
     }
+
     private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
     {
-      return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
+        return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
     }
-    
+
     public async Task<List<CourseModerationResponse>> GetCourseModerationAsync()
     {
         var course = await GetCourseByStatusAsync(CourseStatus.Pending);

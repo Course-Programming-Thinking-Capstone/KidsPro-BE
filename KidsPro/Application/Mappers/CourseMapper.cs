@@ -7,6 +7,7 @@ using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Lesson;
 using Application.Dtos.Response.Course.Quiz;
+using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Utils;
@@ -47,7 +48,7 @@ public static class CourseMapper
             Status = entity.Status.ToString(),
             DiscountPrice = entity.DiscountPrice,
             ModifiedDate = DateUtils.FormatDateTimeToDatetimeV1(entity.ModifiedDate),
-            TotalLesson = CalculateTotal(entity,LessonType.Section),
+            TotalLesson = CalculateTotal(entity, LessonType.Section),
             CreatedById = entity.CreatedById,
             CreatedByName = entity.CreatedBy.FullName,
             EndSaleDate = DateUtils.FormatDateTimeToDatetimeV1(entity.EndSaleDate),
@@ -75,10 +76,10 @@ public static class CourseMapper
             IsFree = entity.IsFree,
             Sections = entity.Sections.Select(SectionToSectionDto).ToList(),
             Classes = ClassMapper.ClassToClassesResponse(entity.Classes.ToList()),
-            TotalLesson =CalculateTotal(entity,LessonType.Section),
-            TotalVideo = CalculateTotal(entity,LessonType.Video),
-            TotalDocument = CalculateTotal(entity,LessonType.Document),
-            TotalQuiz = CalculateTotal(entity,LessonType.Quiz)
+            TotalLesson = CalculateTotal(entity, LessonType.Section),
+            TotalVideo = CalculateTotal(entity, LessonType.Video),
+            TotalDocument = CalculateTotal(entity, LessonType.Document),
+            TotalQuiz = CalculateTotal(entity, LessonType.Quiz)
         };
 
     private static int CalculateTotal(Course dto, LessonType type)
@@ -138,7 +139,7 @@ public static class CourseMapper
             ResourceUrl = entity.ResourceUrl,
             Content = entity.Content
         };
-   
+
     public static List<LessonDto> LessonToLessonDto(IEnumerable<Lesson> entities)
         => entities.Select(LessonToLessonDto).ToList();
 
@@ -178,7 +179,6 @@ public static class CourseMapper
         }
     }
 
-    
 
     public static FilterCourseDto CourseToFilterCourseDto(Course entity)
         => new FilterCourseDto()
@@ -307,9 +307,79 @@ public static class CourseMapper
             ImageUrl = x.PictureUrl,
             CourseName = x.Name,
             TeacherName = x.ModifiedBy?.FullName,
-            TotalLesson = CalculateTotal(x,LessonType.Section),
+            TotalLesson = CalculateTotal(x, LessonType.Section),
             ModifiedDate = x.ModifiedDate,
             Status = x.Status
         }).ToList();
     }
+
+    public static StudyCourseDto CourseToStudyCourseDto(Course entity)
+    {
+        var totalVideo = 0;
+        var totalDocument = 0;
+        var totalQuiz = 0;
+
+        foreach (var entitySection in entity.Sections)
+        {
+            foreach (var entitySectionLesson in entitySection.Lessons)
+            {
+                switch (entitySectionLesson.Type)
+                {
+                    case LessonType.Video:
+                        totalVideo++;
+                        break;
+                    case LessonType.Document:
+                        totalDocument++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            totalQuiz += entitySection.Quizzes.Count;
+        }
+
+        return new StudyCourseDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            PictureUrl = entity.PictureUrl,
+            IsFree = entity.IsFree,
+            TotalSection = entity.Sections.Count,
+            TotalDocument = totalDocument,
+            TotalVideo = totalVideo,
+            TotalQuiz = totalQuiz,
+            Sections = entity.Sections.Select(SectionToCommonStudySectionDto).ToList()
+        };
+    }
+
+    public static CommonStudyLessonDto LessonToCommonStudyLessonDto(Lesson entity)
+        => new CommonStudyLessonDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Duration = entity.Duration,
+            Type = entity.Type.ToString(),
+            IsFree = entity.IsFree
+        };
+
+    public static CommonStudyQuizDto QuizToCommonStudyQuizDto(Quiz entity)
+        => new CommonStudyQuizDto()
+        {
+            Id = entity.Id,
+            TotalQuestion = entity.TotalQuestion,
+            Duration = entity.Duration,
+            Title = entity.Title
+        };
+
+    public static CommonStudySectionDto SectionToCommonStudySectionDto(Section entity)
+        => new CommonStudySectionDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            SectionTime = entity.SectionTime,
+            Lessons = entity?.Lessons.Select(LessonToCommonStudyLessonDto).ToList() ?? new List<CommonStudyLessonDto>(),
+            Quizzes = entity?.Quizzes.Select(QuizToCommonStudyQuizDto).ToList() ?? new List<CommonStudyQuizDto>()
+        };
 }

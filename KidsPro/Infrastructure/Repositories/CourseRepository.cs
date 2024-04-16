@@ -72,4 +72,41 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             .Include(x => x.ModifiedBy).ToListAsync();
     }
 
+    public async Task<Course?> GetCourseDetailByIdAndStatusAsync(int courseId, List<CourseStatus> statuses)
+    {
+        return await _dbSet
+            .Where(course =>
+                course.Id == courseId &&
+                !course.IsDelete &&
+                statuses.Contains(course.Status))
+            .Select(course => new Course()
+            {
+                Id = course.Id,
+                Name = course.Name,
+                Description = course.Description,
+                PictureUrl = course.PictureUrl,
+                IsFree = course.IsFree,
+                Sections = course.Sections.Select(s => new Section()
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    SectionTime = s.SectionTime,
+                    Lessons = s.Lessons.Select(lesson => new Lesson()
+                    {
+                        Id = lesson.Id,
+                        Name = lesson.Name,
+                        Duration = lesson.Duration,
+                        Type = lesson.Type,
+                        IsFree = lesson.IsFree
+                    }).ToList(),
+                    Quizzes = s.Quizzes.Select(quiz => new Quiz()
+                    {
+                        Id = quiz.Id,
+                        TotalQuestion = quiz.TotalQuestion,
+                        Duration = quiz.Duration,
+                        Title = quiz.Title
+                    }).ToList()
+                }).ToList(),
+            }).FirstOrDefaultAsync();
+    }
 }
