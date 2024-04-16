@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Domain.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
-[PrimaryKey(nameof(StudentId), nameof(QuizId))]
-public class StudentQuiz
+public class StudentQuiz:BaseEntity
 {
     public virtual Student Student { get; set; } = null!;
     public int StudentId { get; set; }

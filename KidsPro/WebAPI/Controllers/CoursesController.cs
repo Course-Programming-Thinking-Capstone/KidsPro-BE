@@ -1,9 +1,11 @@
 ﻿using Application.Dtos.Request.Course;
+using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Quiz;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -21,10 +23,12 @@ namespace WebAPI.Controllers;
 public class CoursesController : ControllerBase
 {
     private ICourseService _courseService;
-
-    public CoursesController(ICourseService courseService)
+    private IQuizService _quizService;
+    
+    public CoursesController(ICourseService courseService, IQuizService quizService)
     {
         _courseService = courseService;
+        _quizService = quizService;
     }
 
     /// <summary>
@@ -270,5 +274,19 @@ public class CoursesController : ControllerBase
         return Ok(course);
     }
     
+    /// <summary>
+    /// Student submit quiz
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole}")]
+    [HttpPost("quiz/submit")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<QuizSubmitResponse>> SubmitQuizAsync(QuizSubmitRequest dto)
+    {
+        var result = await _quizService.StudentSubmitQuizAsync(dto);
+        return Ok(result);
+    }
     
 }

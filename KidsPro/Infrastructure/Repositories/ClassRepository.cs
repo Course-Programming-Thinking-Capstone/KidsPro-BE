@@ -31,12 +31,6 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    
-    // public Task<IEnumerable<Class>> GetAsync(Expression<Func<Class, bool>>? filter, Func<IQueryable<Class>, IOrderedQueryable<Class>>? orderBy, string? includeProperties = null, bool disableTracking = false)
-    // {
-    //     throw new NotImplementedException();
-    // }
-
     public async Task<List<Class>> GetClassByRole(int id,string role)
     {
         IQueryable<Class> query = _dbSet.AsNoTracking();
@@ -52,8 +46,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
                 break;
 
         }
-//.Where(x=>x.Status==ClassStatus.OnGoing).Where(x=>x.Status==ClassStatus.OnGoing)
-        return await query
+        return await query.Where(x=>x.Status==ClassStatus.OnGoing)
             .Include(x=>x.Course)
             .Include(x=>x.Teacher).ThenInclude(x=>x!.Account)
             .Include(x => x.Schedules).ToListAsync();

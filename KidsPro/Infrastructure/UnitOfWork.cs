@@ -54,6 +54,8 @@ public class UnitOfWork : IUnitOfWork
     public IScheduleReposisoty ScheduleReposisoty { get; }
     public IClassRepository ClassRepository { get; }
     public IStudentProgressRepository StudentProgressRepository { get; }
+    public IStudentOptionRepository StudentOptionRepository { get; }
+    public IStudentQuizRepository StudentQuizRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
@@ -66,7 +68,7 @@ public class UnitOfWork : IUnitOfWork
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
         , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
-        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository, IScheduleReposisoty scheduleReposisoty, IClassRepository classRepository, IStudentProgressRepository studentProgressRepository)
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository, IScheduleReposisoty scheduleReposisoty, IClassRepository classRepository, IStudentProgressRepository studentProgressRepository, IStudentOptionRepository studentOptionRepository, IStudentQuizRepository studentQuizRepository)
     {
         _context = context;
         _logger = logger;
@@ -106,6 +108,8 @@ public class UnitOfWork : IUnitOfWork
         ScheduleReposisoty = scheduleReposisoty;
         ClassRepository = classRepository;
         StudentProgressRepository = studentProgressRepository;
+        StudentOptionRepository = studentOptionRepository;
+        StudentQuizRepository = studentQuizRepository;
     }
 
     public async Task<int> SaveChangeAsync()
