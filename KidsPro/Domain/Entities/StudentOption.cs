@@ -1,7 +1,7 @@
 ﻿using Domain.Entities.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
-
 public class StudentOption : BaseEntity
 {
     public int OptionId { get; set; }

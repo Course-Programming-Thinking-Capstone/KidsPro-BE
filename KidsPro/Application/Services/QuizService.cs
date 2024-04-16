@@ -30,34 +30,37 @@ public class QuizService : IQuizService
         //Check xem student đã làm quiz này chưa
         var studentQuizExist = await _unit.StudentQuizRepository.GetStudentQuizByFk(dto.StudentId, dto.QuizId);
 
-        //Nếu đã làm rồi thì cộng dồn số turn
-        if (studentQuizExist != null)
-        {
-            dto.Attempt += studentQuizExist.Attempt;
-
-            if (dto.Attempt >= 4)
-                throw new ConflictException(
-                    "Student have run out of turns to do the quiz, the total number of turns is 3");
-        }
+        if (studentQuizExist?.Attempt >= 3)
+            throw new ConflictException(
+                "Student have run out of turns to do the quiz, the total number of turns is 3");
 
         var studentQuiz = QuizMapper.QuizSubmitRequestToStudentQuiz(dto);
 
-        //Add data to studentOption table
-        var studentOptions = dto.QuizResults.Select(x => new StudentOption()
-        {
-            StudentQuiz = studentQuiz,
-            QuestionId = x.QuestionId,
-            OptionId = x.OptionId
-        }).ToList();
-
         if (studentQuizExist == null)
+        {
+            //Add data to studentOption table
+            var studentOptions = dto.QuizResults.Select(x => new StudentOption()
+            {
+                StudentQuiz = studentQuiz,
+                QuestionId = x.QuestionId,
+                OptionId = x.OptionId
+            }).ToList();
             await _unit.StudentOptionRepository.AddRangeAsync(studentOptions);
+        }
         else
-            _unit.StudentOptionRepository.UpdateRange(studentOptions);
+        {
+            //Update data to studentOption table
+            foreach (var (sa, qr) in studentQuizExist.StudentAnswers.Zip(dto.QuizResults))
+            {
+                sa.OptionId = qr.OptionId;
+            }
+
+            _unit.StudentOptionRepository.UpdateRange(studentQuizExist.StudentAnswers);
+        }
 
         await _unit.SaveChangeAsync();
 
-        studentQuiz = await CalculateQuizScore(studentQuiz.Id);
+        studentQuiz = await CalculateQuizScore(studentQuizExist?.Id ?? studentQuiz.Id);
 
         return QuizMapper.StudentQuizToQuizSubmitResponse(studentQuiz, student);
     }
@@ -75,16 +78,19 @@ public class QuizService : IQuizService
         //Check the number correct answer of student
         var numberCorrect = studentQuiz.Quiz.Questions
             .Count(q => q.Options
-                .Any(o =>studentQuiz.StudentAnswers
-                    .Any(s => o.Id ==  s.OptionId) && o.IsCorrect));
+                .Any(o => studentQuiz.StudentAnswers
+                    .Any(s => o.Id == s.OptionId) && o.IsCorrect));
         //Score
         float correctAnswerRatio = questionRatio * numberCorrect;
 
         if (correctAnswerRatio >= passRatio)
             studentQuiz.IsPass = true;
+        else
+            studentQuiz.IsPass = false;
 
         //Calculate score, convert to percent
         studentQuiz.Score = (decimal)correctAnswerRatio / 10;
+        studentQuiz.Attempt += 1;
 
         _unit.StudentQuizRepository.Update(studentQuiz);
         await _unit.SaveChangeAsync();
