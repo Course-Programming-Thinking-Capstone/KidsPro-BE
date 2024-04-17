@@ -46,4 +46,6 @@ public interface IUnitOfWork : IDisposable
     public IScheduleReposisoty ScheduleReposisoty { get; }
     public IClassRepository ClassRepository { get; }
     public IStudentProgressRepository StudentProgressRepository { get; }
+    public IStudentOptionRepository StudentOptionRepository { get; }
+    public IStudentQuizRepository StudentQuizRepository { get; }
 }

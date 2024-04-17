@@ -20,7 +20,7 @@ public static class StudentMapper
             student.Gender = x.Account.Gender?.ToString();
             student.ParentId = x.ParentId;
             student.ParentName = x.Parent.Account.FullName;
-            student.DateOfBirth =DateUtils.FormatDateTimeToDateV3(x.Account.DateOfBirth);
+            student.DateOfBirth = DateUtils.FormatDateTimeToDateV3(x.Account.DateOfBirth);
             list.Add(student);
         }
 
@@ -43,29 +43,20 @@ public static class StudentMapper
             Role = entity.Account.Role.Name,
             Age = Math.Max(0, DateTime.Now.Year - (entity.Account.DateOfBirth?.Year ?? 0)),
             ParentId = entity.ParentId,
-            ParentName = entity.Parent.Account.FullName
+            ParentName = entity.Parent.Account.FullName,
+            StudentsCertificate = entity.Certificates?.Select(x => new CertificateResponseDto
+            {
+                CourseName = x.Course.Name,
+                CertificateUrl = x.ResourceUrl
+            }).ToList(),
+            CertificateTotal = entity.Certificates?.Count??0,
+            StudentsCourse = entity.Classes.Select(x=> new TitleDto
+            {
+                CourseId = x.CourseId, 
+                CourseName = x.Course.Name
+            }).ToList(),
+            CourseTotal = entity.Classes?.Count??0
         };
-
-        if (entity.Certificates != null && entity.StudentProgresses != null)
-        {
-            foreach (var x in entity.Certificates)
-            {
-                //List certificate
-                var certificate = new CertificateResponseDto() { title = x.Course.Name, url = x.ResourceUrl };
-                student.StudentsCertificate.Add(certificate);
-            }
-
-            student.CertificateTotal = entity.Certificates.Count();
-
-            foreach (var x in entity.StudentProgresses)
-            {
-                //List courses
-                var course = new TitleDto() { Id = x.Course.Id, Title = x.Course.Name };
-                student.StudentsCourse.Add(course);
-            }
-
-            student.CourseTotal = entity.StudentProgresses.Count();
-        }
 
         return student;
     }

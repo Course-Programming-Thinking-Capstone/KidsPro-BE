@@ -8,6 +8,7 @@ using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Enums.Status;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -223,6 +224,84 @@ public class SyllabusService : ISyllabusService
             _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
                 nameof(this.FilterSyllabusAsync), e.Message);
             throw new Exception($"Error when execute {nameof(this.FilterSyllabusAsync)} method");
+        }
+    }
+
+    public async Task<PagingResponse<FilterSyllabusDto>> FilterTeacherSyllabusAsync(string? name, string? sortName,
+        string? sortCreatedDate, int? page, int? size)
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var parameter = Expression.Parameter(typeof(Syllabus));
+        Expression filter = Expression.Constant(true);
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(
+                    Expression.Property(
+                        Expression.Property(parameter, nameof(Syllabus.Course)),
+                        nameof(Course.ModifiedById)),
+                    Expression.Constant(accountId, typeof(int?))));
+            
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Syllabus.Status)),
+                    Expression.Constant(SyllabusStatus.Open)));
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Syllabus.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            //Default sort by modified date desc
+            Func<IQueryable<Syllabus>, IOrderedQueryable<Syllabus>> orderBy = q =>
+                q.OrderByDescending(c => c.Course.CreatedDate);
+
+            if (sortName != null && sortName.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Name);
+            }
+            else if (sortName != null && sortName.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Name);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("asc"))
+            {
+                orderBy = q => q.OrderBy(s => s.Course.CreatedDate);
+            }
+            else if (sortCreatedDate != null && sortCreatedDate.Trim().ToLower().Equals("desc"))
+            {
+                orderBy = q => q.OrderByDescending(s => s.Course.CreatedDate);
+            }
+
+            var entities = await _unitOfWork.SyllabusRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Syllabus, bool>>(filter, parameter),
+                orderBy: orderBy,
+                includeProperties: $"{nameof(Syllabus.Course)}",
+                page: page,
+                size: size
+            );
+            var result = SyllabusMapper.SyllabusToFilterSyllabusDto(entities);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.FilterTeacherSyllabusAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterTeacherSyllabusAsync)} method");
         }
     }
 

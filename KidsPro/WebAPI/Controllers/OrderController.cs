@@ -21,7 +21,23 @@ namespace WebAPI.Controllers
             _order = order;
             _authentication = authentication;
         }
-
+        /// <summary>
+        /// API INTERNAL, MOBILE get order by status
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        [Authorize(Roles = $"{Constant.ParentRole}")]
+        [HttpGet("mobile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+        public async Task<ActionResult<List<OrderResponse>>> MobileGetOrdersAsync(OrderStatus status)
+        {
+            //Check if the account is activated or not or inactive
+            _authentication.CheckAccountStatus();
+            
+            var result = await _order.MobileGetListOrderAsync(status);
+            return Ok(result);
+        }
         /// <summary>
         /// Create order
         /// </summary>
@@ -57,7 +73,11 @@ namespace WebAPI.Controllers
             _authentication.CheckAccountStatus();
             
             var result = await _order.GetListOrderAsync(status);
-            return Ok(result);
+            return Ok(new
+            { 
+                OrderTotal=result.Item1,
+                Order=result.Item2
+            });
         }
 
         /// <summary>

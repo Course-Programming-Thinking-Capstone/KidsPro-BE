@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using Domain.Enums.Status;
 
 namespace Application.Dtos.Response.Syllabus;
 

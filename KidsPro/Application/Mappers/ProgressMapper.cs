@@ -15,7 +15,7 @@ public static class ProgressMapper
         // Convert từng group 
         foreach (var courseGroup in groupedByCourse)
             result.Add(StudentToProgressResponse(courseGroup));
-        
+
         return result;
     }
 
@@ -27,7 +27,8 @@ public static class ProgressMapper
             StudentName = dto.FirstOrDefault()!.Student.Account.FullName,
             CourseName = dto.FirstOrDefault()!.Course.Name,
             TeacherName = dto.FirstOrDefault()!.Course.ModifiedBy!.FullName,
-            CourseId = dto.FirstOrDefault()!.CourseId
+            CourseId = dto.FirstOrDefault()!.CourseId,
+            CourseImage = dto.FirstOrDefault()!.Course.PictureUrl
         };
 
         foreach (var x in dto)
@@ -44,13 +45,13 @@ public static class ProgressMapper
 
                 //Check to see how many lessons have been completed
                 var completeLessons = x.Section.Lessons
-                    .Select(l => l.StudentLessons?.Select(s => s.IsCompleted));
+                    .Count(l => l.StudentLessons != null && l.StudentLessons.Any(s => s.IsCompleted));
 
                 quizRatio = x.Section.Quizzes.FirstOrDefault()?.StudentQuizzes.FirstOrDefault()?.IsPass == true
                     ? 20
                     : 0;
 
-                lessonCompletedRatio = lessonRatio * completeLessons.ToList().Count;
+                lessonCompletedRatio = lessonRatio * completeLessons;
             }
 
             var progress = new SectionProgress()

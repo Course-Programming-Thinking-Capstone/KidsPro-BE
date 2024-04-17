@@ -30,5 +30,5 @@ public class Lesson : BaseEntity
 
     public virtual ICollection<StudentLesson>? StudentLessons { get; set; }
 
-    public virtual ICollection<Quiz>? Quizzes { get; set; }
+    // public virtual ICollection<Quiz>? Quizzes { get; set; }
 }

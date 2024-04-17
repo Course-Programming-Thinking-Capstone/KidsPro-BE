@@ -8,7 +8,7 @@ namespace Application.Dtos.Response.Course
 {
     public class TitleDto
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
+        public int CourseId { get; set; }
+        public string? CourseName { get; set; }
     }
 }

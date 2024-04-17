@@ -92,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 4, 8, 5, 56, 56, 858, DateTimeKind.Utc).AddTicks(4470),
+                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 33, 599, DateTimeKind.Utc).AddTicks(6476),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$RHVoEejUmS7n65UQ1T8IT.cmHoFD6vzfeXbwKzLFFe774kMH7X8HW",
+                            PasswordHash = "$2a$11$LZWeYBAuAf4x/CYIm68zpum5Dv6yS3jwtd1IPR2r36QFC9mDJWIze",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 4, 8, 5, 56, 57, 179, DateTimeKind.Utc).AddTicks(1521),
+                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 33, 823, DateTimeKind.Utc).AddTicks(5095),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$HJqoi7zPTLhrsSlRp9FmKO98I4i.g7CFQD1axv9ErMPrNe7ZNnce6",
+                            PasswordHash = "$2a$11$RUo8l6h9sIJH5atUZFfJZeN88LJtGDO5NRndn7a443knrShGYHaiG",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 4, 8, 5, 56, 57, 507, DateTimeKind.Utc).AddTicks(3008),
+                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 34, 61, DateTimeKind.Utc).AddTicks(6735),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$sMhaSq3SmB6GS6.ej60NSeM/XhKQ8Wxs.C2GoIJiNNSU3zKuQ8qPi",
+                            PasswordHash = "$2a$11$qon0TmLSIBbMHrpCAJVoweP1810E9dTqWQ6u/Hh/KwKPQ8FVYL/3C",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 4, 8, 5, 56, 57, 984, DateTimeKind.Utc).AddTicks(4656),
+                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 34, 347, DateTimeKind.Utc).AddTicks(7824),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$.jYiA8tjiQHF72vmM9C3WOuhJr1WNmDVKkyK4rhM9//jtvIipJg8y",
+                            PasswordHash = "$2a$11$d1ICdaNzrm.LtjD2IsGMY.hsCVdWqmAizGAhCpt5Mw3Xj5PNc6Ola",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 4, 8, 5, 56, 58, 294, DateTimeKind.Utc).AddTicks(7549),
+                            CreatedDate = new DateTime(2024, 4, 16, 14, 4, 34, 579, DateTimeKind.Utc).AddTicks(3782),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$bnfN.OzdKD71fJvq4Lytg.AqNc94FruXLsKbVG/Mvjy6/T7wkF.5S",
+                            PasswordHash = "$2a$11$DY3HgfYWKQQfiODN3rR6K.CzFVRSaAmeK5tbWkynmriTTgvP2YtOS",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -1698,12 +1698,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StudentQuizId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentQuizQuizId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentQuizStudentId")
-                        .HasColumnType("int");
-
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -1714,7 +1708,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.HasIndex("StudentQuizStudentId", "StudentQuizQuizId");
+                    b.HasIndex("StudentQuizId");
 
                     b.ToTable("StudentOptions");
                 });
@@ -1759,7 +1753,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.HasIndex("StudentId", "CourseId")
+                    b.HasIndex("StudentId", "SectionId")
                         .IsUnique();
 
                     b.ToTable("StudentProgresses");
@@ -1767,11 +1761,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.StudentQuiz", b =>
                 {
-                    b.Property<int>("StudentId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Attempt")
                         .HasColumnType("int");
@@ -1786,6 +1780,9 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsPass")
                         .HasColumnType("bit");
 
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Score")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
@@ -1794,9 +1791,21 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.HasKey("StudentId", "QuizId");
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("QuizId");
+
+                    b.HasIndex("StudentId", "QuizId")
+                        .IsUnique();
 
                     b.ToTable("StudentQuizzes");
                 });
@@ -2488,7 +2497,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Student", "Student")
-                        .WithMany()
+                        .WithMany("StudentLessons")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2527,7 +2536,7 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.StudentQuiz", "StudentQuiz")
                         .WithMany("StudentAnswers")
-                        .HasForeignKey("StudentQuizStudentId", "StudentQuizQuizId")
+                        .HasForeignKey("StudentQuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2754,6 +2763,8 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("GameUserProfile")
                         .IsRequired();
+
+                    b.Navigation("StudentLessons");
 
                     b.Navigation("StudentProgresses");
 

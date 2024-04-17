@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IRepositories;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -30,12 +31,6 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    
-    // public Task<IEnumerable<Class>> GetAsync(Expression<Func<Class, bool>>? filter, Func<IQueryable<Class>, IOrderedQueryable<Class>>? orderBy, string? includeProperties = null, bool disableTracking = false)
-    // {
-    //     throw new NotImplementedException();
-    // }
-
     public async Task<List<Class>> GetClassByRole(int id,string role)
     {
         IQueryable<Class> query = _dbSet.AsNoTracking();
@@ -47,11 +42,13 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
                 break;
             case Constant.StudentRole:
                 query = query.Include(x => x.Students)
-                    .Where(x => x.Students.All(s => s.Id == id));
+                    .Where(x => x.Students.Any(s => s.Id == id && x.Students.Count>0));
                 break;
 
         }
-
-        return await query.Include(x => x.Schedules).ToListAsync();
+        return await query.Where(x=>x.Status==ClassStatus.OnGoing)
+            .Include(x=>x.Course)
+            .Include(x=>x.Teacher).ThenInclude(x=>x!.Account)
+            .Include(x => x.Schedules).ToListAsync();
     }
 }

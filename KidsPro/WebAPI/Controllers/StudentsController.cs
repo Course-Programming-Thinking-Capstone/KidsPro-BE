@@ -89,8 +89,8 @@ public class StudentsController : Controller
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<List<SectionProgressResponse>>> GetStudentCourseAsync()
     {
-        var resutl = await _progress.GetStudentCourseAsync();
-        return Ok(resutl);
+        var result = await _progress.GetStudentCoursesProgressAsync();
+        return Ok(result);
     }
     
     /// <summary>
@@ -100,13 +100,13 @@ public class StudentsController : Controller
     /// <param name="courseId"></param>
     /// <returns></returns>
     [AllowAnonymous]
-    [HttpGet("progress/course/sections")]
+    [HttpGet("progress/course/lessons")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<SectionProgressResponse>> GetSectionProgress(int studentId, int courseId)
     {
-        var resutl = await _progress.GetProgressSectionAync(studentId, courseId);
-        return Ok(resutl);
+        var result = await _progress.GetCourseProgressAsync(studentId, courseId);
+        return Ok(result);
     }
 }

@@ -4,7 +4,9 @@ using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentProgress;
 using Application.ErrorHandlers;
@@ -13,6 +15,7 @@ using Application.Mappers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Enums.Status;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -44,6 +47,57 @@ public class CourseService : ICourseService
         if (action == "manage")
             return CourseMapper.CourseToManageCourseDto(course);
         return CourseMapper.CourseToCommonCourseDto(course);
+    }
+
+    public async Task<Dtos.Response.Course.Study.StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id)
+    {
+        var statuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active
+        };
+        var course = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+
+        return course == null ? null : CourseMapper.CourseToStudyCourseDto(course);
+    }
+
+    public async Task<StudyCourseDto?> GetTeacherStudyCourseByIdAsync(int id)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+
+        var entity = await _unitOfWork.CourseRepository.GetTeacherCourseDetailByIdAsync(id, accountId);
+
+        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
+    }
+
+    public async Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id)
+    {
+        var statuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active,
+            CourseStatus.Denied,
+            CourseStatus.Draft,
+            CourseStatus.Inactive,
+            CourseStatus.Pending,
+            CourseStatus.Waiting
+        };
+        var entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id)
+    {
+        var courseStatuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active
+        };
+        var entity = await _unitOfWork.SectionRepository.GetStudySectionById(id, courseStatuses);
+        return entity != null ? CourseMapper.SectionToCommonStudySectionDto(entity) : null;
+    }
+
+    public Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -146,12 +200,12 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToManageCourseDto(entity);
     }
 
-    public async Task<CourseDto> UpdateCourseAsync(int id, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
+    public async Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
         string? action)
     {
         // check course
-        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(id)
-            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {id} does not exist."));
+        var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(courseId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Course {courseId} does not exist."));
 
         if (courseEntity.Status != CourseStatus.Draft && courseEntity.Status != CourseStatus.Denied)
             throw new BadRequestException("Can only update course wih status draft or denied.");
@@ -163,9 +217,7 @@ public class CourseService : ICourseService
             .ContinueWith(t => t.Result ?? throw new UnauthorizedException("UserName not found."));
 
         if (currentAccount.Role.Name != Constant.AdminRole && currentAccount.Id != courseEntity.ModifiedById)
-        {
             throw new ForbiddenException("Access denied.");
-        }
 
         //Get Section component number of each type in section
 
@@ -276,12 +328,12 @@ public class CourseService : ICourseService
                                     throw new NotFoundException($"Quiz {sectionDtoQuiz.Id} does not exist.");
 
                                 //Update quiz information
-                                CourseMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
+                                QuizMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
                             }
                             else
                             {
                                 // Create new quiz
-                                quiz = CourseMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz);
+                                quiz = QuizMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz);
                                 quiz.CreatedDate = DateTime.UtcNow;
                                 quiz.CreatedById = accountId;
                                 quiz.CreatedBy = currentAccount;
@@ -299,11 +351,11 @@ public class CourseService : ICourseService
                                     if (question != null)
                                     {
                                         //Update section information
-                                        CourseMapper.UpdateQuestionDtoToQuestion(updateQuestionDto, ref question);
+                                        QuizMapper.UpdateQuestionDtoToQuestion(updateQuestionDto, ref question);
                                     }
                                     else
                                     {
-                                        question = CourseMapper.UpdateQuestionDtoToQuestion(updateQuestionDto);
+                                        question = QuizMapper.UpdateQuestionDtoToQuestion(updateQuestionDto);
                                     }
 
                                     // update total score
@@ -320,11 +372,11 @@ public class CourseService : ICourseService
                                                 question.Options.FirstOrDefault(o => o.Id == updateOption.Id);
                                             if (option == null)
                                             {
-                                                option = CourseMapper.UpdateOptionDtoToOption(updateOption);
+                                                option = QuizMapper.UpdateOptionDtoToOption(updateOption);
                                             }
                                             else
                                             {
-                                                CourseMapper.UpdateOptionDtoToOption(updateOption, ref option);
+                                                QuizMapper.UpdateOptionDtoToOption(updateOption, ref option);
                                             }
 
                                             option.Order = optionOrder;
@@ -563,7 +615,7 @@ public class CourseService : ICourseService
         }
 
         courseEntity.Status = CourseStatus.Denied;
-        
+
         //update syllabus status
         if (courseEntity.Syllabus != null) courseEntity.Syllabus.Status = SyllabusStatus.Open;
 
@@ -904,5 +956,34 @@ public class CourseService : ICourseService
         student.StudentLessons.Add(lesson);
         _unitOfWork.StudentRepository.Update(student);
         await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task UpdateToPendingStatus(int courseId, int number)
+    {
+        var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId) ??
+                     throw new BadRequestException("CourseId not found");
+        switch (number)
+        {
+            case 1:
+                course.Status = CourseStatus.Pending;
+                break;
+            case 2:
+                course.Price = 10000;
+                break;
+        }
+
+        _unitOfWork.CourseRepository.Update(course);
+        await _unitOfWork.SaveChangeAsync();
+    }
+
+    private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
+    {
+        return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
+    }
+
+    public async Task<List<CourseModerationResponse>> GetCourseModerationAsync()
+    {
+        var course = await GetCourseByStatusAsync(CourseStatus.Pending);
+        return CourseMapper.CourseToCourseModerationResponse(course);
     }
 }
