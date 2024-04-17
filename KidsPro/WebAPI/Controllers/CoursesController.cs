@@ -12,7 +12,6 @@ using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Constant = Application.Configurations.Constant;
 using CourseDto = Application.Dtos.Response.Course.CourseDto;
@@ -110,7 +109,6 @@ public class CoursesController : ControllerBase
     /// <param name="id"></param>
     /// <param name="dto"></param>
     /// <param name="action"></param>
-    /// <param name="videoFiles"></param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},{Constant.TeacherRole}")]
     [HttpPut("{id:int}")]
@@ -123,7 +121,7 @@ public class CoursesController : ControllerBase
 
     {
         var result = await _courseService.UpdateCourseAsync(id, dto, action);
-        return Ok();
+        return Ok(result);
     }
 
     /// <summary>
@@ -317,7 +315,7 @@ public class CoursesController : ControllerBase
     /// <returns></returns>
     [HttpGet("study/{id:int}")]
     [AllowAnonymous]
-    public async Task<ActionResult<Application.Dtos.Response.Course.Study.StudyCourseDto>>
+    public async Task<ActionResult<StudyCourseDto>>
         GetActiveStudyCourseByIdAsync(
             [FromRoute] int id)
     {
