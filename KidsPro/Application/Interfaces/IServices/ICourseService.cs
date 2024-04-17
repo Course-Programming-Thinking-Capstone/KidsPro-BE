@@ -29,7 +29,8 @@ public interface ICourseService
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 
-    Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto, string? action);
+    Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
+        string? action);
 
     Task ApproveCourseAsync(int id, AcceptCourseDto to);
 
@@ -46,6 +47,13 @@ public interface ICourseService
         string? sortCreatedDate,
         string? sortModifiedDate,
         string? action,
+        int? page,
+        int? size
+    );
+
+    Task<IPagingResponse<ManageFilterCourseDto>> FilterTeacherCourseAsync(
+        string? name,
+        CourseStatus? status,
         int? page,
         int? size
     );

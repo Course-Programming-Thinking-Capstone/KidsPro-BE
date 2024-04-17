@@ -321,6 +321,24 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
+    /// Filter teacher created courses.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="status"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [HttpGet("teacher")]
+    [Authorize(Roles = $"{Constant.TeacherRole}")]
+    public async Task<ActionResult<PagingResponse<ManageFilterCourseDto>>> FilterTeacherCourseAsync(
+        [FromQuery] string? name,
+        [FromQuery] CourseStatus? status, [FromQuery] int? page, [FromQuery] int? size)
+    {
+        var result = await _courseService.FilterTeacherCourseAsync(name, status, page, size);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Admin and staff can view course detail with all status in the system
     /// </summary>
     /// <param name="id"></param>
