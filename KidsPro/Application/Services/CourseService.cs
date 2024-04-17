@@ -85,6 +85,23 @@ public class CourseService : ICourseService
         return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
     }
 
+    public async Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+
+        var course = await _unitOfWork.CourseRepository.GetStudentCourseDetailByIdAsync(courseId, accountId);
+        if (course == null)
+            return null;
+
+        var studentProgress = await _unitOfWork.StudentProgressRepository.GetStudentProgressAsync(accountId, courseId);
+        var currentSectionOrder = studentProgress == null ? 1 : studentProgress.Section.Order;
+
+        var result = CourseMapper.CourseToStudyCourseDto(course, currentSectionOrder);
+
+        return result;
+    }
+
     public async Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id)
     {
         var courseStatuses = new List<CourseStatus>()

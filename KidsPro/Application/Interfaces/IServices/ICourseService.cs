@@ -21,6 +21,8 @@ public interface ICourseService
 
     Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id);
 
+    Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId);
+
     Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id);
 
     Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id);

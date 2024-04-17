@@ -28,7 +28,7 @@ public class Lesson : BaseEntity
     public virtual Section Section { get; set; } = null!;
     public int SectionId { get; set; }
 
-    public virtual ICollection<StudentLesson>? StudentLessons { get; set; }
+    public virtual ICollection<StudentLesson>? StudentLessons { get; set; } = new List<StudentLesson>();
 
     // public virtual ICollection<Quiz>? Quizzes { get; set; }
 }

@@ -313,7 +313,7 @@ public static class CourseMapper
         }).ToList();
     }
 
-    public static StudyCourseDto CourseToStudyCourseDto(Course entity)
+    public static StudyCourseDto CourseToStudyCourseDto(Course entity, int? currentSectionOrder = null)
     {
         var totalVideo = 0;
         var totalDocument = 0;
@@ -350,19 +350,24 @@ public static class CourseMapper
             TotalDocument = totalDocument,
             TotalVideo = totalVideo,
             TotalQuiz = totalQuiz,
-            Sections = entity.Sections.Select(SectionToCommonStudySectionDto).ToList()
+            Sections = entity.Sections.Select(section => SectionToCommonStudySectionDto(section, currentSectionOrder))
+                .ToList()
         };
     }
 
     public static CommonStudyLessonDto LessonToCommonStudyLessonDto(Lesson entity)
-        => new CommonStudyLessonDto()
+    {
+        var studentLesson = entity.StudentLessons?.FirstOrDefault();
+        return new CommonStudyLessonDto()
         {
             Id = entity.Id,
             Name = entity.Name,
             Duration = entity.Duration,
             Type = entity.Type.ToString(),
-            IsFree = entity.IsFree
+            IsFree = entity.IsFree,
+            IsComplete = studentLesson is { IsCompleted: true }  
         };
+    }
 
     public static CommonStudyQuizDto QuizToCommonStudyQuizDto(Quiz entity)
         => new CommonStudyQuizDto()
@@ -373,12 +378,13 @@ public static class CourseMapper
             Title = entity.Title
         };
 
-    public static CommonStudySectionDto SectionToCommonStudySectionDto(Section entity)
+    public static CommonStudySectionDto SectionToCommonStudySectionDto(Section entity, int? currentSectionOrder = null)
         => new CommonStudySectionDto()
         {
             Id = entity.Id,
             Name = entity.Name,
             SectionTime = entity.SectionTime,
+            IsBlock = currentSectionOrder.HasValue ? entity.Order > currentSectionOrder.Value : null,
             Lessons = entity?.Lessons.Select(LessonToCommonStudyLessonDto).ToList() ?? new List<CommonStudyLessonDto>(),
             Quizzes = entity?.Quizzes.Select(QuizToCommonStudyQuizDto).ToList() ?? new List<CommonStudyQuizDto>()
         };
@@ -392,6 +398,7 @@ public static class CourseMapper
             Duration = entity.Duration,
             Content = entity.Content,
             ResourceUrl = entity.ResourceUrl,
+            IsFree = entity.IsFree,
             Type = entity.Type.ToString()
         };
     }

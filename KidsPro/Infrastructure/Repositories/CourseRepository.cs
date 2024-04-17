@@ -91,6 +91,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                     Id = s.Id,
                     Name = s.Name,
                     SectionTime = s.SectionTime,
+                    Order = s.Order,
                     Lessons = s.Lessons.Select(lesson => new Lesson()
                     {
                         Id = lesson.Id,
@@ -113,10 +114,12 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
     public async Task<Course?> GetTeacherCourseDetailByIdAsync(int courseId, int teacherId)
     {
         return await _dbSet
+            .Include(c => c.Classes)
             .Where(course =>
                 course.Id == courseId &&
                 !course.IsDelete &&
-                (course.Status == CourseStatus.Active || course.ModifiedById == teacherId || course.Classes.Any(c => c.TeacherId == teacherId)))
+                (course.Status == CourseStatus.Active || course.ModifiedById == teacherId ||
+                 course.Classes.Any(c => c.TeacherId == teacherId)))
             .Select(course => new Course()
             {
                 Id = course.Id,
@@ -129,6 +132,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                     Id = s.Id,
                     Name = s.Name,
                     SectionTime = s.SectionTime,
+                    Order = s.Order,
                     Lessons = s.Lessons.Select(lesson => new Lesson()
                     {
                         Id = lesson.Id,
@@ -146,5 +150,50 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                     }).ToList()
                 }).ToList(),
             }).FirstOrDefaultAsync();
+    }
+
+    public async Task<Course?> GetStudentCourseDetailByIdAsync(int courseId, int studentId)
+    {
+        return await _dbSet
+            .Where(course =>
+                course.Id == courseId &&
+                !course.IsDelete
+                && course.Classes.Any(c => c.Students.Any(s => s.AccountId == studentId))
+            )
+            .Select(course => new Course()
+            {
+                Id = course.Id,
+                Name = course.Name,
+                Description = course.Description,
+                PictureUrl = course.PictureUrl,
+                IsFree = course.IsFree,
+                Sections = course.Sections.Select(s => new Section()
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    SectionTime = s.SectionTime,
+                    Order = s.Order,
+                    Lessons = s.Lessons.Select(lesson => new Lesson()
+                    {
+                        Id = lesson.Id,
+                        Name = lesson.Name,
+                        Duration = lesson.Duration,
+                        Type = lesson.Type,
+                        IsFree = lesson.IsFree,
+                        StudentLessons = lesson.StudentLessons != null
+                            ? lesson.StudentLessons
+                                .Where(sl => sl.StudentId == studentId && sl.LessonId == lesson.Id).ToList()
+                            : null,
+                    }).ToList(),
+                    Quizzes = s.Quizzes.Select(quiz => new Quiz()
+                    {
+                        Id = quiz.Id,
+                        TotalQuestion = quiz.TotalQuestion,
+                        Duration = quiz.Duration,
+                        Title = quiz.Title
+                    }).ToList()
+                }).ToList(),
+            })
+            .FirstOrDefaultAsync();
     }
 }

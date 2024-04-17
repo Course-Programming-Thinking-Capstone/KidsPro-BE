@@ -334,6 +334,19 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
+    /// Student get course by id to learn. It contains progress of student in this course
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("student/study/{id:int}")]
+    [Authorize(Roles = $"{Constant.StudentRole}")]
+    public async Task<ActionResult<StudyCourseDto>> GetStudentStudyCourseByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetStudentStudyCourseByIdAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get study section by Id
     /// </summary>
     /// <param name="id"></param>

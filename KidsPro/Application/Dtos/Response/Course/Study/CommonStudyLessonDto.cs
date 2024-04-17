@@ -10,4 +10,6 @@ public class CommonStudyLessonDto
     public bool IsFree { get; set; }
 
     public string Type { get; set; } = null!;
+    
+    public bool? IsComplete { get; set; }
 }
