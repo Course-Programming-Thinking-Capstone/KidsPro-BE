@@ -86,7 +86,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 Description = course.Description,
                 PictureUrl = course.PictureUrl,
                 IsFree = course.IsFree,
-                Sections = course.Sections.Select(s => new Section()
+                Sections = course.Sections.OrderBy(lesson => lesson.Order).Select(s => new Section()
                 {
                     Id = s.Id,
                     Name = s.Name,
@@ -100,7 +100,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                         Type = lesson.Type,
                         IsFree = lesson.IsFree
                     }).ToList(),
-                    Quizzes = s.Quizzes.Select(quiz => new Quiz()
+                    Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
                     {
                         Id = quiz.Id,
                         TotalQuestion = quiz.TotalQuestion,
@@ -119,7 +119,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 course.Id == courseId &&
                 !course.IsDelete &&
                 (course.Status == CourseStatus.Active || course.ModifiedById == teacherId ||
-                 course.Classes.Any(c => c.TeacherId == teacherId)))
+                 course.Classes.Any(c => c.Teacher != null && c.Teacher.AccountId == teacherId)))
             .Select(course => new Course()
             {
                 Id = course.Id,
@@ -127,13 +127,13 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 Description = course.Description,
                 PictureUrl = course.PictureUrl,
                 IsFree = course.IsFree,
-                Sections = course.Sections.Select(s => new Section()
+                Sections = course.Sections.OrderBy(s => s.Order).Select(s => new Section()
                 {
                     Id = s.Id,
                     Name = s.Name,
                     SectionTime = s.SectionTime,
                     Order = s.Order,
-                    Lessons = s.Lessons.Select(lesson => new Lesson()
+                    Lessons = s.Lessons.OrderBy(lesson => lesson.Order).Select(lesson => new Lesson()
                     {
                         Id = lesson.Id,
                         Name = lesson.Name,
@@ -141,7 +141,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                         Type = lesson.Type,
                         IsFree = lesson.IsFree
                     }).ToList(),
-                    Quizzes = s.Quizzes.Select(quiz => new Quiz()
+                    Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
                     {
                         Id = quiz.Id,
                         TotalQuestion = quiz.TotalQuestion,
@@ -167,13 +167,13 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 Description = course.Description,
                 PictureUrl = course.PictureUrl,
                 IsFree = course.IsFree,
-                Sections = course.Sections.Select(s => new Section()
+                Sections = course.Sections.OrderBy(s => s.Order).Select(s => new Section()
                 {
                     Id = s.Id,
                     Name = s.Name,
                     SectionTime = s.SectionTime,
                     Order = s.Order,
-                    Lessons = s.Lessons.Select(lesson => new Lesson()
+                    Lessons = s.Lessons.OrderBy(lesson => lesson.Order).Select(lesson => new Lesson()
                     {
                         Id = lesson.Id,
                         Name = lesson.Name,
@@ -185,7 +185,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                                 .Where(sl => sl.StudentId == studentId && sl.LessonId == lesson.Id).ToList()
                             : null,
                     }).ToList(),
-                    Quizzes = s.Quizzes.Select(quiz => new Quiz()
+                    Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
                     {
                         Id = quiz.Id,
                         TotalQuestion = quiz.TotalQuestion,

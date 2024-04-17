@@ -18,6 +18,27 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
         throw new NotImplementedException();
     }
 
+    public async Task<Lesson?> GetTeacherLessonDetailByIdAsync(int lessonId, int teacherId)
+    {
+        return await _dbSet
+            .Where(lesson => lesson.Id == lessonId
+            && !lesson.Section.Course.IsDelete
+            && (lesson.Section.Course.ModifiedById == teacherId 
+            || lesson.Section.Course.Classes.Any(c => c.TeacherId == teacherId))
+            )
+            .Select(lesson => new Lesson()
+            {
+                Id = lesson.Id,
+                Name = lesson.Name,
+                Duration = lesson.Duration,
+                IsFree = lesson.IsFree,
+                Content = lesson.Content,
+                ResourceUrl = lesson.ResourceUrl,
+                Type = lesson.Type
+
+            }).FirstOrDefaultAsync();
+    }
+
     public override async Task<Lesson?> GetByIdAsync(int id, bool disableTracking = false)
     {
         IQueryable<Lesson> query = _dbSet;

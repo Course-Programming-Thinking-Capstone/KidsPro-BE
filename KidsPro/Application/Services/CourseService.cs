@@ -102,14 +102,45 @@ public class CourseService : ICourseService
         return result;
     }
 
-    public async Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id)
+    public async Task<CommonStudySectionDto?> GetActiveCourseStudySectionByIdAsync(int id)
     {
         var courseStatuses = new List<CourseStatus>()
         {
             CourseStatus.Active
         };
-        var entity = await _unitOfWork.SectionRepository.GetStudySectionById(id, courseStatuses);
+        var entity = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(id, courseStatuses);
         return entity != null ? CourseMapper.SectionToCommonStudySectionDto(entity) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetTeacherSectionDetailByIdAsync(int sectionId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var section = await _unitOfWork.SectionRepository.GetTeacherSectionDetailByIdAsync(sectionId, accountId);
+        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetSectionDetailByIdAsync(int sectionId)
+    {
+        var statuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active,
+            CourseStatus.Inactive,
+            CourseStatus.Denied,
+            CourseStatus.Draft,
+            CourseStatus.Pending,
+            CourseStatus.Waiting
+        };
+        var section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, statuses);
+        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result = await _unitOfWork.SectionRepository.GetStudentSectionDetailByIdAsync(sectionId, accountId);
+        return result != null ? CourseMapper.SectionToCommonStudySectionDto(result) : null;
     }
 
     public Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id)
@@ -730,12 +761,13 @@ public class CourseService : ICourseService
             page = 1;
             size = 10;
         }
+
         try
         {
             filter = Expression.AndAlso(filter,
                 Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
                     Expression.Constant(false)));
-            
+
             filter = Expression.AndAlso(filter,
                 Expression.Equal(Expression.Property(parameter, nameof(Course.ModifiedById)),
                     Expression.Constant(accountId, typeof(int?))));

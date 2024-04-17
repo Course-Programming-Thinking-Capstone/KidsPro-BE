@@ -20,15 +20,16 @@ public class SectionRepository : BaseRepository<Section>, ISectionRepository
             .ContinueWith(t => t.Result != null);
     }
 
-    public async Task<Section?> GetStudySectionById(int id, List<CourseStatus> courseStatuses)
+    public async Task<Section?> GetStudySectionByIdAsync(int id, List<CourseStatus> courseStatuses)
     {
-        return await _dbSet.Where(s => s.Id == id && !s.Course.IsDelete && courseStatuses.Contains(s.Course.Status) )
+        return await _dbSet.Where(s => s.Id == id && !s.Course.IsDelete && courseStatuses.Contains(s.Course.Status))
             .Select(s => new Section()
             {
                 Id = s.Id,
                 Name = s.Name,
                 SectionTime = s.SectionTime,
-                Lessons = s.Lessons.Select(lesson => new Lesson()
+                Order = s.Order,
+                Lessons = s.Lessons.OrderBy(lesson => lesson.Order).Select(lesson => new Lesson()
                 {
                     Id = lesson.Id,
                     Name = lesson.Name,
@@ -36,7 +37,72 @@ public class SectionRepository : BaseRepository<Section>, ISectionRepository
                     Type = lesson.Type,
                     IsFree = lesson.IsFree
                 }).ToList(),
-                Quizzes = s.Quizzes.Select(quiz => new Quiz()
+                Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
+                {
+                    Id = quiz.Id,
+                    TotalQuestion = quiz.TotalQuestion,
+                    Duration = quiz.Duration,
+                    Title = quiz.Title
+                }).ToList()
+            }).FirstOrDefaultAsync();
+    }
+
+    public async Task<Section?> GetTeacherSectionDetailByIdAsync(int sectionId, int teacherId)
+    {
+        return await _dbSet.Where(s =>
+                s.Id == sectionId && !s.Course.IsDelete &&
+                (s.Course.Status == CourseStatus.Active ||
+                 s.Course.ModifiedById == teacherId ||
+                 s.Course.Classes.Any(c => c.Teacher != null && c.Teacher.AccountId == teacherId)))
+            .Select(s => new Section()
+            {
+                Id = s.Id,
+                Name = s.Name,
+                SectionTime = s.SectionTime,
+                Order = s.Order,
+                Lessons = s.Lessons.OrderBy(lesson => lesson.Order).Select(lesson => new Lesson()
+                {
+                    Id = lesson.Id,
+                    Name = lesson.Name,
+                    Duration = lesson.Duration,
+                    Type = lesson.Type,
+                    IsFree = lesson.IsFree
+                }).ToList(),
+                Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
+                {
+                    Id = quiz.Id,
+                    TotalQuestion = quiz.TotalQuestion,
+                    Duration = quiz.Duration,
+                    Title = quiz.Title
+                }).ToList()
+            }).FirstOrDefaultAsync();
+    }
+
+    public async Task<Section?> GetStudentSectionDetailByIdAsync(int sectionId, int studentId)
+    {
+        return await _dbSet.Where(s =>
+                s.Id == sectionId && !s.Course.IsDelete &&
+                s.Course.Classes.Any(c => c.Students.Any(student => student.AccountId == studentId))
+            )
+            .Select(s => new Section()
+            {
+                Id = s.Id,
+                Name = s.Name,
+                SectionTime = s.SectionTime,
+                Order = s.Order,
+                Lessons = s.Lessons.OrderBy(lesson => lesson.Order).Select(lesson => new Lesson()
+                {
+                    Id = lesson.Id,
+                    Name = lesson.Name,
+                    Duration = lesson.Duration,
+                    Type = lesson.Type,
+                    IsFree = lesson.IsFree,
+                    StudentLessons = lesson.StudentLessons != null
+                        ? lesson.StudentLessons
+                            .Where(sl => sl.StudentId == studentId && sl.LessonId == lesson.Id).ToList()
+                        : null,
+                }).ToList(),
+                Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
                 {
                     Id = quiz.Id,
                     TotalQuestion = quiz.TotalQuestion,

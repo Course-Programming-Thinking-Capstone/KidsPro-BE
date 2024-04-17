@@ -7,5 +7,5 @@ public interface ILessonRepository:IBaseRepository<Lesson>
 {
     Task<bool> ExistBySectionIdAndOrder(int sectionId, int order);
 
-    // Task<Lesson?> GetCustomerStudyCourseByIdAsync(int lessonId);
+    Task<Lesson?> GetTeacherLessonDetailByIdAsync(int lessonId, int teacherId);
 }
