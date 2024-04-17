@@ -12,4 +12,6 @@ public interface ICourseRepository:IBaseRepository<Course>
 
     Task<Course?> GetCourseDetailByIdAndStatusAsync(int courseId, List<CourseStatus> statuses);
     Task<Course?> GetTeacherCourseDetailByIdAsync(int courseId, int teacherId);
+
+    Task<Course?> GetStudentCourseDetailByIdAsync(int courseId, int studentId);
 }

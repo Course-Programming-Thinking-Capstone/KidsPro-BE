@@ -21,13 +21,26 @@ public interface ICourseService
 
     Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id);
 
-    Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id);
+    Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId);
 
-    Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id);
+    Task<CommonStudySectionDto?> GetActiveCourseStudySectionByIdAsync(int id);
+
+    Task<CommonStudySectionDto?> GetTeacherSectionDetailByIdAsync(int sectionId);
+    
+    //Admin/staff view section detail
+    Task<CommonStudySectionDto?> GetSectionDetailByIdAsync(int sectionId);
+
+    //Get student section for learning purpose
+    Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId);
+
+    Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id);
+
+    Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId);
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 
-    Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto, string? action);
+    Task<CourseDto> UpdateCourseAsync(int courseId, Dtos.Request.Course.Update.Course.UpdateCourseDto dto,
+        string? action);
 
     Task ApproveCourseAsync(int id, AcceptCourseDto to);
 
@@ -44,6 +57,13 @@ public interface ICourseService
         string? sortCreatedDate,
         string? sortModifiedDate,
         string? action,
+        int? page,
+        int? size
+    );
+
+    Task<IPagingResponse<ManageFilterCourseDto>> FilterTeacherCourseAsync(
+        string? name,
+        CourseStatus? status,
         int? page,
         int? size
     );

@@ -9,5 +9,9 @@ public interface ISectionRepository:IBaseRepository<Section>
 {
     Task<bool> ExistByOrderAsync(int courseId, int order);
 
-    Task<Section?> GetStudySectionById(int id, List<CourseStatus> courseStatuses);
+    Task<Section?> GetStudySectionByIdAsync(int id, List<CourseStatus> courseStatuses);
+
+    Task<Section?> GetTeacherSectionDetailByIdAsync(int sectionId, int teacherId);
+
+    Task<Section?> GetStudentSectionDetailByIdAsync(int sectionId, int studentId);
 }

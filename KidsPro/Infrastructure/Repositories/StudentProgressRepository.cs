@@ -35,9 +35,16 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> CheckStudentSectionExistAsync(int studentId, int sectionId)
         {
-            var entity= await _dbSet.AsNoTracking()
+            var entity = await _dbSet.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.StudentId == studentId && x.SectionId == sectionId);
             return entity == null;
+        }
+
+        public async Task<StudentProgress?> GetStudentProgressAsync(int studentId, int courseId)
+        {
+            return await _dbSet.Include(sp => sp.Section)
+                .Where(sp => sp.StudentId == studentId && sp.CourseId == courseId)
+                .FirstOrDefaultAsync();
         }
     }
 }

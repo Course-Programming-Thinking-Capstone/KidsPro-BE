@@ -9,4 +9,5 @@ public class CommonStudyQuizDto
     public int TotalQuestion { get; set; }
     
     public int? Duration { get; set; }
+    
 }

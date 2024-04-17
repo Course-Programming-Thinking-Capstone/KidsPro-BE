@@ -85,19 +85,78 @@ public class CourseService : ICourseService
         return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
     }
 
-    public async Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id)
+    public async Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+
+        var course = await _unitOfWork.CourseRepository.GetStudentCourseDetailByIdAsync(courseId, accountId);
+        if (course == null)
+            return null;
+
+        var studentProgress = await _unitOfWork.StudentProgressRepository.GetStudentProgressAsync(accountId, courseId);
+        var currentSectionOrder = studentProgress == null ? 1 : studentProgress.Section.Order;
+
+        var result = CourseMapper.CourseToStudyCourseDto(course, currentSectionOrder);
+
+        return result;
+    }
+
+    public async Task<CommonStudySectionDto?> GetActiveCourseStudySectionByIdAsync(int id)
     {
         var courseStatuses = new List<CourseStatus>()
         {
             CourseStatus.Active
         };
-        var entity = await _unitOfWork.SectionRepository.GetStudySectionById(id, courseStatuses);
+        var entity = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(id, courseStatuses);
         return entity != null ? CourseMapper.SectionToCommonStudySectionDto(entity) : null;
     }
 
-    public Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id)
+    public async Task<CommonStudySectionDto?> GetTeacherSectionDetailByIdAsync(int sectionId)
     {
-        throw new NotImplementedException();
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var section = await _unitOfWork.SectionRepository.GetTeacherSectionDetailByIdAsync(sectionId, accountId);
+        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetSectionDetailByIdAsync(int sectionId)
+    {
+        var statuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active,
+            CourseStatus.Inactive,
+            CourseStatus.Denied,
+            CourseStatus.Draft,
+            CourseStatus.Pending,
+            CourseStatus.Waiting
+        };
+        var section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, statuses);
+        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result = await _unitOfWork.SectionRepository.GetStudentSectionDetailByIdAsync(sectionId, accountId);
+        return result != null ? CourseMapper.SectionToCommonStudySectionDto(result) : null;
+    }
+
+    public async Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result = await _unitOfWork.LessonRepository.GetStudentLessonDetailByIdAsync(id, accountId);
+        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
+    }
+
+    public async Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result = await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId, accountId);
+        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
     }
 
     /// <summary>
@@ -696,6 +755,69 @@ public class CourseService : ICourseService
         else
         {
             return await FilterCommonCourseAsync(name, sortName, page, size);
+        }
+    }
+
+    public async Task<IPagingResponse<ManageFilterCourseDto>> FilterTeacherCourseAsync(string? name,
+        CourseStatus? status, int? page, int? size)
+    {
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        //need to check role
+        var parameter = Expression.Parameter(typeof(Course));
+        Expression filter = Expression.Constant(true); // default is "where true"
+
+        //set default page size
+        if (!page.HasValue || !size.HasValue)
+        {
+            page = 1;
+            size = 10;
+        }
+
+        try
+        {
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
+                    Expression.Constant(false)));
+
+            filter = Expression.AndAlso(filter,
+                Expression.Equal(Expression.Property(parameter, nameof(Course.ModifiedById)),
+                    Expression.Constant(accountId, typeof(int?))));
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Call(
+                        Expression.Property(parameter, nameof(Course.Name)),
+                        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+                        ?? throw new NotImplementException(
+                            $"{nameof(string.Contains)} method is deprecated or not supported."),
+                        Expression.Constant(name)));
+            }
+
+            if (status.HasValue)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
+                        Expression.Constant(status.Value)));
+            }
+
+            //Default sort by modified date desc
+            Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.CreatedDate);
+
+            var entities = await _unitOfWork.CourseRepository.GetPaginateAsync(
+                filter: Expression.Lambda<Func<Course, bool>>(filter, parameter),
+                orderBy: orderBy,
+                page: page,
+                size: size
+            );
+            var result = CourseMapper.CourseToManageFilterCourseDto(entities);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error when execute {methodName} method: \nDetail: {errorDetail}.",
+                nameof(this.FilterTeacherCourseAsync), e.Message);
+            throw new Exception($"Error when execute {nameof(this.FilterTeacherCourseAsync)} method");
         }
     }
 
