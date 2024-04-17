@@ -289,7 +289,7 @@ public class CoursesController : ControllerBase
         var result = await _quizService.StudentSubmitQuizAsync(dto);
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Filter teacher created courses.
     /// </summary>
@@ -313,158 +313,77 @@ public class CoursesController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("study/{id:int}")]
+    [HttpGet("study/common/{id:int}")]
     [AllowAnonymous]
-    public async Task<ActionResult<StudyCourseDto>>
-        GetActiveStudyCourseByIdAsync(
-            [FromRoute] int id)
+    public async Task<ActionResult<StudyCourseDto>> GetActiveStudyCourseByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetActiveStudyCourseByIdAsync(id);
         return Ok(result);
     }
-    
+
+    /// <summary>
+    /// Get Course detail by role
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("study/{id:int}")]
+    [Authorize]
+    public async Task<ActionResult<StudyCourseDto>> GetStudyCourseByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetStudyCourseByIdAsync(id);
+        return Ok(result);
+    }
+
     /// <summary>
     /// Get study section by Id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     /// Need to authorize this api
-    [HttpGet("study/section/{id:int}")]
+    [HttpGet("study/common/section/{id:int}")]
     [AllowAnonymous]
-    public async Task<ActionResult<CommonStudySectionDto>> GetStudySectionByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<CommonStudySectionDto>> GetCommonStudySectionByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetActiveCourseStudySectionByIdAsync(id);
         return Ok(result);
     }
     
     /// <summary>
-    /// Guest user view free lesson in a course or in free course. Api used for guest or parent learn some trial lessons.
+    /// Get section detail by id by role
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("study/section/lesson/{id:int}")]
-    [AllowAnonymous]
-    public async Task<ActionResult<StudyLessonDto>> GetStudyLessonByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetFreeStudyLessonByIdAsync(id);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Teacher can get course detail that is currently active or created by him/her or the course that he/she teaches in a class
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("teacher/study/{id:int}")]
-    [Authorize(Roles = $"{Constant.TeacherRole}")]
-    public async Task<ActionResult<StudyCourseDto>> GetTeacherStudyCourseByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetTeacherStudyCourseByIdAsync(id);
-        return Ok(result);
-    }
-    
-    /// <summary>
-    /// Teacher get course section detail. Can just view section detail of course that is currently active or
-    /// created by him/her or the course that he/she teaches in a class 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("teacher/section/{id:int}")]
-    [Authorize(Roles = $"{Constant.TeacherRole}")]
-    public async Task<ActionResult<CommonStudySectionDto>> GetTeacherSectionDetailByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetTeacherSectionDetailByIdAsync(id);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Get lesson detail in teacher role
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("teacher/section/lesson/{id:int}")]
-    [Authorize(Roles = $"{Constant.TeacherRole}")]
-    public async Task<ActionResult<StudyLessonDto>> GetTeacherLessonDetailByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetTeacherStudyLessonByIdAsync(id);
-        return Ok(result);
-    }
-    
-    /// <summary>
-    /// Admin and staff can view course detail with all status in the system
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("admin/study/{id:int}")]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
-    public async Task<ActionResult<StudyCourseDto>> GetStudyCourseByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetStudyCourseByIdAsync(id);
-        return Ok(result);
-    }
-    
-    /// <summary>
-    /// Admin/staff can view all section detail by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("admin/section/{id:int}")]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
+    [HttpGet("study/section/{id:int}")]
+    [Authorize]
     public async Task<ActionResult<CommonStudySectionDto>> GetSectionDetailByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetSectionDetailByIdAsync(id);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Guest user view free lesson in a course or in free course. Api used for guest or parent learn some trial lessons.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("study/common/section/lesson/{id:int}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<StudyLessonDto>> GetFreeStudyLessonByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetFreeStudyLessonByIdAsync(id);
+        return Ok(result);
+    }
     
     /// <summary>
-    /// Admin/staff get lesson detail
+    /// Get lesson detail by id and by role
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("admin/section/lesson/{id:int}")]
-    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
-    public async Task<ActionResult<CommonStudySectionDto>> GetLessonDetailByIdAsync([FromRoute] int id)
+    [HttpGet("study/section/lesson/{id:int}")]
+    [Authorize]
+    public async Task<ActionResult<StudyLessonDto>> GetStudyLessonByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetStudyLessonByIdAsync(id);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Student get course by id to learn. It contains progress of student in this course
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("student/study/{id:int}")]
-    [Authorize(Roles = $"{Constant.StudentRole}")]
-    public async Task<ActionResult<StudyCourseDto>> GetStudentStudyCourseByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetStudentStudyCourseByIdAsync(id);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Get section detail by id for student for study purpose.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("student/study/section/{id:int}")]
-    [Authorize(Roles = $"{Constant.StudentRole}")]
-    public async Task<ActionResult<CommonStudySectionDto>> GetStudentStudySectionDetailByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetStudentSectionDetailByIdAsync(id);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Get lesson detail in student role. Student can just get lesson in their course.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("student/study/section/lesson/{id:int}")]
-    [Authorize(Roles = $"{Constant.StudentRole}")]
-    public async Task<ActionResult<StudyLessonDto>> GetStudentLessonDetailByIdAsync([FromRoute] int id)
-    {
-        var result = await _courseService.GetStudentStudyLessonByIdAsync(id);
         return Ok(result);
     }
 }

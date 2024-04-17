@@ -48,7 +48,7 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCommonCourseDto(course);
     }
 
-    public async Task<Dtos.Response.Course.Study.StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id)
+    public async Task<StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id)
     {
         var statuses = new List<CourseStatus>()
         {
@@ -59,46 +59,56 @@ public class CourseService : ICourseService
         return course == null ? null : CourseMapper.CourseToStudyCourseDto(course);
     }
 
-    public async Task<StudyCourseDto?> GetTeacherStudyCourseByIdAsync(int id)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-
-        var entity = await _unitOfWork.CourseRepository.GetTeacherCourseDetailByIdAsync(id, accountId);
-
-        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
-    }
-
     public async Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id)
     {
-        var statuses = new List<CourseStatus>()
-        {
-            CourseStatus.Active,
-            CourseStatus.Denied,
-            CourseStatus.Draft,
-            CourseStatus.Inactive,
-            CourseStatus.Pending,
-            CourseStatus.Waiting
-        };
-        var entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
-        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
-    }
-
-    public async Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId)
-    {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
-        var course = await _unitOfWork.CourseRepository.GetStudentCourseDetailByIdAsync(courseId, accountId);
-        if (course == null)
-            return null;
+        Course? entity = null;
+        switch (role)
+        {
+            case Constant.AdminRole:
+            case Constant.StaffRole:
+            {
+                var statuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active,
+                    CourseStatus.Denied,
+                    CourseStatus.Draft,
+                    CourseStatus.Inactive,
+                    CourseStatus.Pending,
+                    CourseStatus.Waiting
+                };
+                entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+                break;
+            }
+            case Constant.TeacherRole:
+                entity = await _unitOfWork.CourseRepository.GetTeacherCourseDetailByIdAsync(id, accountId);
+                break;
+            case Constant.StudentRole:
+            {
+                entity = await _unitOfWork.CourseRepository.GetStudentCourseDetailByIdAsync(id, accountId);
+                if (entity == null)
+                    return null;
 
-        var studentProgress = await _unitOfWork.StudentProgressRepository.GetStudentProgressAsync(accountId, courseId);
-        var currentSectionOrder = studentProgress == null ? 1 : studentProgress.Section.Order;
+                var studentProgress =
+                    await _unitOfWork.StudentProgressRepository.GetStudentProgressAsync(accountId, id);
+                var currentSectionOrder = studentProgress == null ? 1 : studentProgress.Section.Order;
+                var result = CourseMapper.CourseToStudyCourseDto(entity, currentSectionOrder);
+                return result;
+            }
+            default:
+            {
+                var statuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active
+                };
+                entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+                break;
+            }
+        }
 
-        var result = CourseMapper.CourseToStudyCourseDto(course, currentSectionOrder);
-
-        return result;
+        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
     }
 
     public async Task<CommonStudySectionDto?> GetActiveCourseStudySectionByIdAsync(int id)
@@ -111,35 +121,48 @@ public class CourseService : ICourseService
         return entity != null ? CourseMapper.SectionToCommonStudySectionDto(entity) : null;
     }
 
-    public async Task<CommonStudySectionDto?> GetTeacherSectionDetailByIdAsync(int sectionId)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var section = await _unitOfWork.SectionRepository.GetTeacherSectionDetailByIdAsync(sectionId, accountId);
-        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
-    }
-
     public async Task<CommonStudySectionDto?> GetSectionDetailByIdAsync(int sectionId)
     {
-        var statuses = new List<CourseStatus>()
-        {
-            CourseStatus.Active,
-            CourseStatus.Inactive,
-            CourseStatus.Denied,
-            CourseStatus.Draft,
-            CourseStatus.Pending,
-            CourseStatus.Waiting
-        };
-        var section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, statuses);
-        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
-    }
-
-    public async Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId)
-    {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var result = await _unitOfWork.SectionRepository.GetStudentSectionDetailByIdAsync(sectionId, accountId);
-        return result != null ? CourseMapper.SectionToCommonStudySectionDto(result) : null;
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        Section? section = null;
+
+        switch (role)
+        {
+            case Constant.AdminRole:
+            case Constant.StaffRole:
+            {
+                var statuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active,
+                    CourseStatus.Inactive,
+                    CourseStatus.Denied,
+                    CourseStatus.Draft,
+                    CourseStatus.Pending,
+                    CourseStatus.Waiting
+                };
+                section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, statuses);
+                break;
+            }
+            case Constant.TeacherRole:
+                section = await _unitOfWork.SectionRepository.GetTeacherSectionDetailByIdAsync(sectionId, accountId);
+                break;
+            case Constant.StudentRole:
+                section = await _unitOfWork.SectionRepository.GetStudentSectionDetailByIdAsync(sectionId, accountId);
+                break;
+            default:
+            {
+                var courseStatuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active
+                };
+                section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, courseStatuses);
+                break;
+            }
+        }
+
+        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
     }
 
     public async Task<StudyLessonDto?> GetFreeStudyLessonByIdAsync(int id)
@@ -148,26 +171,22 @@ public class CourseService : ICourseService
         return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
     }
 
-    public async Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var result = await _unitOfWork.LessonRepository.GetStudentLessonDetailByIdAsync(id, accountId);
-        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
-    }
-
-    public async Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var result = await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId, accountId);
-        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
-    }
-
     public async Task<StudyLessonDto?> GetStudyLessonByIdAsync(int lessonId)
     {
-        var result = await _unitOfWork.LessonRepository.GetByIdAsync(lessonId);
-        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var lesson = role switch
+        {
+            Constant.AdminRole or Constant.StaffRole => await _unitOfWork.LessonRepository.GetByIdAsync(lessonId),
+            Constant.TeacherRole => await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId,
+                accountId),
+            Constant.StudentRole => await _unitOfWork.LessonRepository.GetStudentLessonDetailByIdAsync(lessonId,
+                accountId),
+            _ => await _unitOfWork.LessonRepository.GetCommonLessonDetailByIdAsync(lessonId)
+        };
+
+        return lesson != null ? CourseMapper.LessonToStudyLessonDto(lesson) : null;
     }
 
     /// <summary>
