@@ -22,9 +22,10 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
     {
         return await _dbSet
             .Where(lesson => lesson.Id == lessonId
-            && !lesson.Section.Course.IsDelete
-            && (lesson.Section.Course.ModifiedById == teacherId 
-            || lesson.Section.Course.Classes.Any(c => c.TeacherId == teacherId))
+                             && !lesson.Section.Course.IsDelete
+                             && (lesson.Section.Course.ModifiedById == teacherId
+                                 || lesson.Section.Course.Classes.Any(c =>
+                                     c.Teacher != null && c.Teacher.AccountId == teacherId))
             )
             .Select(lesson => new Lesson()
             {
@@ -35,7 +36,26 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 Content = lesson.Content,
                 ResourceUrl = lesson.ResourceUrl,
                 Type = lesson.Type
+            }).FirstOrDefaultAsync();
+    }
 
+    public async Task<Lesson?> GetStudentLessonDetailByIdAsync(int lessonId, int studentId)
+    {
+        return await _dbSet
+            .Where(
+                lesson => lesson.Id == lessonId
+                          && !lesson.Section.Course.IsDelete
+                          && lesson.Section.Course.Classes.Any(c => c.Students.Any(s => s.AccountId == studentId))
+            )
+            .Select(lesson => new Lesson()
+            {
+                Id = lesson.Id,
+                Name = lesson.Name,
+                Duration = lesson.Duration,
+                IsFree = lesson.IsFree,
+                Content = lesson.Content,
+                ResourceUrl = lesson.ResourceUrl,
+                Type = lesson.Type
             }).FirstOrDefaultAsync();
     }
 

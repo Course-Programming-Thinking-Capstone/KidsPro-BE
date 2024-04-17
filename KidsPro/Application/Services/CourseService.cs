@@ -143,9 +143,20 @@ public class CourseService : ICourseService
         return result != null ? CourseMapper.SectionToCommonStudySectionDto(result) : null;
     }
 
-    public Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id)
+    public async Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result = await _unitOfWork.LessonRepository.GetStudentLessonDetailByIdAsync(id, accountId);
+        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
+    }
+
+    public async Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        var result = await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId, accountId);
+        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
     }
 
     /// <summary>
