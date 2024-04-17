@@ -336,6 +336,19 @@ public class CoursesController : ControllerBase
         var result = await _courseService.GetActiveCourseStudySectionByIdAsync(id);
         return Ok(result);
     }
+    
+    /// <summary>
+    /// Guest user view free lesson in a course or in free course. Api used for guest or parent learn some trial lessons.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("study/section/lesson/{id:int}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<StudyLessonDto>> GetStudyLessonByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetFreeStudyLessonByIdAsync(id);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Teacher can get course detail that is currently active or created by him/her or the course that he/she teaches in a class
@@ -400,6 +413,19 @@ public class CoursesController : ControllerBase
     public async Task<ActionResult<CommonStudySectionDto>> GetSectionDetailByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetSectionDetailByIdAsync(id);
+        return Ok(result);
+    }
+    
+    /// <summary>
+    /// Admin/staff get lesson detail
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("admin/section/lesson/{id:int}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<CommonStudySectionDto>> GetLessonDetailByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetStudyLessonByIdAsync(id);
         return Ok(result);
     }
 

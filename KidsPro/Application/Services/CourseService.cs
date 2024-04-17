@@ -8,7 +8,6 @@ using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
-using Application.Dtos.Response.StudentProgress;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -143,6 +142,12 @@ public class CourseService : ICourseService
         return result != null ? CourseMapper.SectionToCommonStudySectionDto(result) : null;
     }
 
+    public async Task<StudyLessonDto?> GetFreeStudyLessonByIdAsync(int id)
+    {
+        var result = await _unitOfWork.LessonRepository.GetCommonLessonDetailByIdAsync(id);
+        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
+    }
+
     public async Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id)
     {
         // check authorize
@@ -156,6 +161,12 @@ public class CourseService : ICourseService
         // check authorize
         _authenticationService.GetCurrentUserInformation(out var accountId, out _);
         var result = await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId, accountId);
+        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
+    }
+
+    public async Task<StudyLessonDto?> GetStudyLessonByIdAsync(int lessonId)
+    {
+        var result = await _unitOfWork.LessonRepository.GetByIdAsync(lessonId);
         return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
     }
 

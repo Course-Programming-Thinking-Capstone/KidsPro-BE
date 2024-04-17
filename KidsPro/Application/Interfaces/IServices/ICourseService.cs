@@ -33,9 +33,14 @@ public interface ICourseService
     //Get student section for learning purpose
     Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId);
 
+    Task<StudyLessonDto?> GetFreeStudyLessonByIdAsync(int id);
+    
     Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id);
 
     Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId);
+    
+    //for admin and staff
+    Task<StudyLessonDto?> GetStudyLessonByIdAsync(int lessonId);
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 

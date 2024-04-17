@@ -5,7 +5,8 @@ namespace Application.Interfaces.IRepositories;
 
 public interface ILessonRepository:IBaseRepository<Lesson>
 {
-    Task<bool> ExistBySectionIdAndOrder(int sectionId, int order);
+
+    Task<Lesson?> GetCommonLessonDetailByIdAsync(int lessonId);
 
     Task<Lesson?> GetTeacherLessonDetailByIdAsync(int lessonId, int teacherId);
 
