@@ -6,6 +6,7 @@ using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Quiz;
+using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -298,10 +299,51 @@ public class CoursesController : ControllerBase
     /// <returns></returns>
     [HttpGet("study/{id:int}")]
     [AllowAnonymous]
-    public async Task<ActionResult<Application.Dtos.Response.Course.Study.StudyCourseDto>> GetStudyCourseByIdAsync(
-        [FromRoute] int id)
+    public async Task<ActionResult<Application.Dtos.Response.Course.Study.StudyCourseDto>>
+        GetActiveStudyCourseByIdAsync(
+            [FromRoute] int id)
+    {
+        var result = await _courseService.GetActiveStudyCourseByIdAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Teacher can get course detail that created by him/her or course that he/her teaches in a class
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("teacher/study/{id:int}")]
+    [Authorize(Roles = $"{Constant.TeacherRole}")]
+    public async Task<ActionResult<StudyCourseDto>> GetTeacherStudyCourseByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetTeacherStudyCourseByIdAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Admin and staff can view course detail with all status in the system
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("admin/study/{id:int}")]
+    [Authorize(Roles = $"{Constant.AdminRole},{Constant.StaffRole}")]
+    public async Task<ActionResult<StudyCourseDto>> GetStudyCourseByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetStudyCourseByIdAsync(id);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get study section by Id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// Need to authorize this api
+    [HttpGet("study/section/{id:int}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<CommonStudySectionDto>> GetStudySectionByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetStudySectionByIdAsync(id);
         return Ok(result);
     }
 }

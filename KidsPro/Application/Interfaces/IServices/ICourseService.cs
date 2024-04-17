@@ -4,6 +4,7 @@ using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +15,15 @@ public interface ICourseService
 {
     Task<CourseDto> GetByIdAsync(int id, string? action);
 
-    Task<Dtos.Response.Course.Study.StudyCourseDto?> GetStudyCourseByIdAsync(int id);
+    Task<Dtos.Response.Course.Study.StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id);
+
+    Task<StudyCourseDto?> GetTeacherStudyCourseByIdAsync(int id);
+
+    Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id);
+
+    Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id);
+
+    Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id);
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 

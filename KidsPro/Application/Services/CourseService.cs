@@ -6,6 +6,7 @@ using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentProgress;
 using Application.ErrorHandlers;
@@ -48,7 +49,7 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCommonCourseDto(course);
     }
 
-    public async Task<Dtos.Response.Course.Study.StudyCourseDto?> GetStudyCourseByIdAsync(int id)
+    public async Task<Dtos.Response.Course.Study.StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id)
     {
         var statuses = new List<CourseStatus>()
         {
@@ -57,6 +58,46 @@ public class CourseService : ICourseService
         var course = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
 
         return course == null ? null : CourseMapper.CourseToStudyCourseDto(course);
+    }
+
+    public async Task<StudyCourseDto?> GetTeacherStudyCourseByIdAsync(int id)
+    {
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+
+        var entity = await _unitOfWork.CourseRepository.GetTeacherCourseDetailByIdAsync(id, accountId);
+
+        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
+    }
+
+    public async Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id)
+    {
+        var statuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active,
+            CourseStatus.Denied,
+            CourseStatus.Draft,
+            CourseStatus.Inactive,
+            CourseStatus.Pending,
+            CourseStatus.Waiting
+        };
+        var entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
+    }
+
+    public async Task<CommonStudySectionDto?> GetStudySectionByIdAsync(int id)
+    {
+        var courseStatuses = new List<CourseStatus>()
+        {
+            CourseStatus.Active
+        };
+        var entity = await _unitOfWork.SectionRepository.GetStudySectionById(id, courseStatuses);
+        return entity != null ? CourseMapper.SectionToCommonStudySectionDto(entity) : null;
+    }
+
+    public Task<StudyLessonDto> GetStudentStudyLessonByIdAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>

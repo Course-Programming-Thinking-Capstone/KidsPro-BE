@@ -382,4 +382,17 @@ public static class CourseMapper
             Lessons = entity?.Lessons.Select(LessonToCommonStudyLessonDto).ToList() ?? new List<CommonStudyLessonDto>(),
             Quizzes = entity?.Quizzes.Select(QuizToCommonStudyQuizDto).ToList() ?? new List<CommonStudyQuizDto>()
         };
+
+    public static StudyLessonDto LessonToStudyLessonDto(Lesson entity)
+    {
+        return new StudyLessonDto()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Duration = entity.Duration,
+            Content = entity.Content,
+            ResourceUrl = entity.ResourceUrl,
+            Type = entity.Type.ToString()
+        };
+    }
 }
