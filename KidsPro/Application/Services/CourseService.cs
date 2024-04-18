@@ -6,6 +6,7 @@ using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Quiz;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
@@ -187,6 +188,13 @@ public class CourseService : ICourseService
         };
 
         return lesson != null ? CourseMapper.LessonToStudyLessonDto(lesson) : null;
+    }
+
+    public async Task<QuizDto> GetQuizByIdAsync(int quizId)
+    {
+        var quiz = await _unitOfWork.QuizRepository.GetByIdAsync(quizId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Quiz not found"));
+        return QuizMapper.QuizToQuizDto(quiz);
     }
 
     /// <summary>

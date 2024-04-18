@@ -48,4 +48,6 @@ public interface IUnitOfWork : IDisposable
     public IStudentProgressRepository StudentProgressRepository { get; }
     public IStudentOptionRepository StudentOptionRepository { get; }
     public IStudentQuizRepository StudentQuizRepository { get; }
+    
+    public IQuizRepository QuizRepository { get; }
 }

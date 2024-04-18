@@ -386,4 +386,17 @@ public class CoursesController : ControllerBase
         var result = await _courseService.GetStudyLessonByIdAsync(id);
         return Ok(result);
     }
+    
+    /// <summary>
+    /// Get quiz detail by id 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("study/section/quiz/{id:int}")]
+    [Authorize]
+    public async Task<ActionResult<QuizDto>> GetQuizByIdAsync([FromRoute] int id)
+    {
+        var result = await _courseService.GetQuizByIdAsync(id);
+        return Ok(result);
+    }
 }

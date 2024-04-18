@@ -4,6 +4,7 @@ using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Quiz;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Domain.Enums;
@@ -27,6 +28,8 @@ public interface ICourseService
     Task<StudyLessonDto?> GetFreeStudyLessonByIdAsync(int id);
     
     Task<StudyLessonDto?> GetStudyLessonByIdAsync(int lessonId);
+
+    Task<QuizDto> GetQuizByIdAsync(int quizId);
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 
