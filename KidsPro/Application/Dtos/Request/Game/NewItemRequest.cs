@@ -4,7 +4,7 @@ namespace Application.Dtos.Request.Game;
 
 public class NewItemRequest
 {
-    public int GameId { get; set; }
+    public int Id { get; set; }
     public string ItemName { get; set; } = null!;
     public string Details { get; set; } = null!;
     public string SpritesUrl { get; set; } = null!;

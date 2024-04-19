@@ -1021,7 +1021,29 @@ public class GameService : IGameService
     #endregion
 
     #region ADMIN SERVICES
+    public async Task DeleteGameItem(int deleteId)
+    {
+        await _unitOfWork.BeginTransactionAsync();
+        var exist = await _unitOfWork.GameItemRepository.GetAsync(
+            o => o.Id == deleteId, null
+        ).ContinueWith(o => o.Result.FirstOrDefault());
+        if (exist == null)
+        {
+            throw new BadRequestException("Item not existed");
+        }
 
+        try
+        {
+            _unitOfWork.GameItemRepository.Delete(exist);
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+    }
     public async Task AddNewGameItem(NewItemRequest newItemRequest)
     {
         await _unitOfWork.BeginTransactionAsync();
@@ -1054,7 +1076,7 @@ public class GameService : IGameService
     {
         await _unitOfWork.BeginTransactionAsync();
         var exist = await _unitOfWork.GameItemRepository.GetAsync(
-            o => o.Id == newItemRequest.GameId, null
+            o => o.Id == newItemRequest.Id, null
         ).ContinueWith(o => o.Result.FirstOrDefault());
         if (exist == null)
         {

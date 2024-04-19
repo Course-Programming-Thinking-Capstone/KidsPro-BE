@@ -29,4 +29,5 @@ public interface IGameService
     public Task<PagingResponse<GameItemResponse>> GetGameItemPagination(int? page, int ?size);
     public Task AddNewGameItem(NewItemRequest newItemRequest);
     public Task UpdateGameItem(NewItemRequest newItemRequest);
+    public Task DeleteGameItem(int deleteId);
 }

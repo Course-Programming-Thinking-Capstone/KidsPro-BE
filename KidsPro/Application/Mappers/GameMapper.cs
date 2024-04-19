@@ -25,7 +25,7 @@ public static class GameMapper
     {
         return new GameItem
         {
-            Id = newItem.GameId,
+            Id = newItem.Id,
             GameId = 0,
             ItemName = newItem.ItemName,
             Details = newItem.Details,

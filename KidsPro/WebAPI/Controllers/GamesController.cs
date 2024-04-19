@@ -37,6 +37,20 @@ public class GamesController : ControllerBase
     }
 
     #region SHOP & Item
+
+    /// <summary>
+    /// Admin Delete game item
+    /// </summary>
+    /// <returns></returns>
+    [HttpDelete("game-item/")]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> UpdateNewGameItem(
+        [FromRoute] int deleteId)
+    {
+        await _gameService.DeleteGameItem(deleteId);
+        return Ok();
+    }
+
     /// <summary>
     /// Admin update game item
     /// </summary>
@@ -49,6 +63,7 @@ public class GamesController : ControllerBase
         await _gameService.UpdateGameItem(newItemRequest);
         return Ok();
     }
+
     /// <summary>
     /// Admin Add new game item
     /// </summary>
