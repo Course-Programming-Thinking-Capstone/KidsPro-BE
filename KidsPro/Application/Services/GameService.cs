@@ -7,6 +7,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using GameItem = Application.Dtos.Response.Game.GameItem;
 
 namespace Application.Services;
 
@@ -691,6 +692,12 @@ public class GameService : IGameService
         }
     }
 
+
+    #region ITEM
+
+
+    #endregion
+    
     #region SHOPPING
 
     public async Task<BuyResponse> BuyItemFromShop(int idItem, int userId)
@@ -765,7 +772,7 @@ public class GameService : IGameService
             CurrentGem = user.Gem,
             OwnedItem = _unitOfWork.ItemOwnedRepository
                 .GetAsync(o => o.StudentId == user.StudentId
-                    , null, includeProperties: nameof(GameItem))
+                    , null, includeProperties: nameof(Domain.Entities.GameItem))
                 .ContinueWith(o => o.Result.Where(o => o.GameItem.ItemType == ItemType.ShopItem)).Result
                 .Select(o => o.GameItemId).ToList()
         };
@@ -783,12 +790,12 @@ public class GameService : IGameService
 
         return _unitOfWork.ItemOwnedRepository
             .GetAsync(o => o.StudentId == user.StudentId
-                , null, includeProperties: nameof(GameItem))
+                , null, includeProperties: nameof(Domain.Entities.GameItem))
             .ContinueWith(o => o.Result.Where(o => o.GameItem.ItemType == ItemType.ShopItem)).Result
             .Select(o => o.GameItemId).ToList();
     }
 
-    public async Task<List<GameShopItem>> GetAllShopItem()
+    public async Task<List<GameItem>> GetAllShopItem()
     {
         var result = await _unitOfWork.GameItemRepository
             .GetAsync(
@@ -796,20 +803,20 @@ public class GameService : IGameService
                 orderBy: q => q.OrderBy(item => item.ItemRateType)
             );
 
-        return result.Select(Mappers.GameMapper.GameItemToGameShopItem).ToList();
+        return result.Select(Mappers.GameMapper.GameItemToGameItemResponse).ToList();
     }
 
-    public async Task<PagingResponse<GameShopItem>> GetAllShopItem(int? page, int? size)
+    public async Task<PagingResponse<GameItem>> GetAllShopItem(int? page, int? size)
     {
         var result = await _unitOfWork.GameItemRepository
             .GetPaginateAsync(o => o.ItemType == ItemType.ShopItem, orderBy: q => q.OrderBy(item => item.ItemRateType),
                 page, size);
 
-        return new PagingResponse<GameShopItem>
+        return new PagingResponse<GameItem>
         {
             TotalPages = result.TotalPages,
             TotalRecords = result.TotalRecords,
-            Results = result.Results.Select(Mappers.GameMapper.GameItemToGameShopItem)
+            Results = result.Results.Select(Mappers.GameMapper.GameItemToGameItemResponse)
         };
     }
 
@@ -993,7 +1000,7 @@ public class GameService : IGameService
     public async Task AddNewGameItem(NewItemRequest newItemRequest)
     {
         await _unitOfWork.BeginTransactionAsync();
-        var gameItem = new GameItem
+        var gameItem = new Domain.Entities.GameItem
         {
             Id = 0,
             GameId = 0,

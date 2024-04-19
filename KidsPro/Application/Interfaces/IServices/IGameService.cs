@@ -21,8 +21,8 @@ public interface IGameService
     public Task UpdateLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task UpdateLevelIndex(ModifiedLevelIndex modifiedLevelData);
     public Task SoftDeleteLevelGame(int id);
-    public Task<List<GameShopItem>> GetAllShopItem();
-    public Task<PagingResponse<GameShopItem>> GetAllShopItem(int? page, int? size);
+    public Task<List<GameItem>> GetAllShopItem();
+    public Task<PagingResponse<GameItem>> GetAllShopItem(int? page, int? size);
     public Task<BuyResponse> BuyItemFromShop(int idItem, int userId);
     public Task<List<int>> GetUserShopItem(int userId);
 }

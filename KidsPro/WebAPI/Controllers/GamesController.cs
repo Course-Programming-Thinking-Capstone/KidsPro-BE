@@ -43,9 +43,9 @@ public class GamesController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet("shop-item/pagination")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameShopItem>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItem>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameShopItem>>> GetShopItemPagination([FromQuery] int page,
+    public async Task<ActionResult<PagingResponse<GameItem>>> GetShopItemPagination([FromQuery] int page,
         [FromQuery] int size)
     {
         var result = await _gameService.GetAllShopItem(page, size);
@@ -57,9 +57,9 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("shop-item/")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameShopItem>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameItem>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<GameShopItem>>> GetShopItem()
+    public async Task<ActionResult<List<GameItem>>> GetShopItem()
     {
         var result = await _gameService.GetAllShopItem();
         return Ok(result);

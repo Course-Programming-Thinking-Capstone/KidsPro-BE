@@ -3,13 +3,14 @@ using Application.Dtos.Response.Game;
 using Application.Dtos.Response.Paging;
 using Domain.Entities;
 using Domain.Enums;
+using GameItem = Application.Dtos.Response.Game.GameItem;
 
 namespace Application.Mappers;
 
 public static class GameMapper
 {
-    public static GameShopItem GameItemToGameShopItem(GameItem entity)
-        => new GameShopItem
+    public static GameItem GameItemToGameItemResponse(Domain.Entities.GameItem entity)
+        => new GameItem
         {
             Id = entity.Id,
             ItemName = entity.ItemName,
@@ -20,11 +21,11 @@ public static class GameMapper
             Price = entity.Price
         };
 
-    public static GameItem GameItemRequestToGameItem(NewItemRequest newItem)
+    public static Domain.Entities.GameItem GameItemRequestToGameItem(NewItemRequest newItem)
     {
-        return new GameItem
+        return new Domain.Entities.GameItem
         {
-            Id = 0,
+            Id = newItem.GameId,
             GameId = 0,
             ItemName = newItem.ItemName,
             Details = newItem.Details,
