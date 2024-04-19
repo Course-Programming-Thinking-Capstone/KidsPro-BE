@@ -182,7 +182,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                         IsFree = lesson.IsFree,
                         StudentLessons = lesson.StudentLessons != null
                             ? lesson.StudentLessons
-                                .Where(sl => sl.StudentId == studentId && sl.LessonId == lesson.Id).ToList()
+                                .Where(sl => sl.Student.AccountId == studentId && sl.LessonId == lesson.Id).ToList()
                             : null,
                     }).ToList(),
                     Quizzes = s.Quizzes.OrderBy(q => q.Order).Select(quiz => new Quiz()
