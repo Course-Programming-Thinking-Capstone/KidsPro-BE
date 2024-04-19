@@ -1,10 +1,12 @@
-﻿using Application.Dtos.Request.Authentication;
+﻿using Application.Configurations;
+using Application.Dtos.Request.Authentication;
 using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Game;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -71,6 +73,7 @@ public class GamesController : ControllerBase
     /// <param name="itemId">item id</param>
     /// <param name="userId">user id</param>
     /// <returns>List of owned shop item</returns>
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpPost("game-shop-item-owned/")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BuyResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -85,6 +88,7 @@ public class GamesController : ControllerBase
     /// Get user item owned
     /// </summary>
     /// <returns>List of owned shop item</returns>
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpGet("game-shop-item-owned/")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<int>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -117,6 +121,7 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <param name="id">User Id</param>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpGet("user-process/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrentLevelData))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -157,6 +162,7 @@ public class GamesController : ControllerBase
     /// <summary>
     /// User finish a level game, return new user coin if first time clear level
     /// </summary>
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpPost("game-play-history")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -175,6 +181,7 @@ public class GamesController : ControllerBase
     /// Admin Get Levels by game mode id
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpGet("game-mode/{modeId}/game-level")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<LevelDataResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -198,6 +205,7 @@ public class GamesController : ControllerBase
     /// Admin Get Level detail by level id
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpGet("game-level/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LevelDataResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -211,6 +219,7 @@ public class GamesController : ControllerBase
     /// Admin add a new game level to game
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpPost("game-level")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -225,6 +234,7 @@ public class GamesController : ControllerBase
     /// Admin update an level
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpPut("game-level")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -239,6 +249,7 @@ public class GamesController : ControllerBase
     /// Admin remove an level
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpDelete("game-level/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -253,6 +264,7 @@ public class GamesController : ControllerBase
     /// Admin update index of level
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpPut("game-level-index")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
