@@ -20,5 +20,5 @@ public class GameItem : BaseEntity
     public ItemRateType ItemRateType { get; set; }
     public ItemType ItemType { get; set; }
     public int Price { get; set; }
-    // public bool? IsDelete { get; set; }
+    public bool IsDelete { get; set; }
 }
