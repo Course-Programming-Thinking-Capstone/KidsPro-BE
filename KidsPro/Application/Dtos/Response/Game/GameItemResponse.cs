@@ -1,6 +1,6 @@
 ﻿namespace Application.Dtos.Response.Game;
 
-public class GameItem
+public class GameItemResponse
 {
     public int Id { get; set; }
     public string ItemName { get; set; } = null!;

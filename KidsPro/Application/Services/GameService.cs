@@ -7,7 +7,6 @@ using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using GameItem = Application.Dtos.Response.Game.GameItem;
 
 namespace Application.Services;
 
@@ -692,12 +691,10 @@ public class GameService : IGameService
         }
     }
 
-
     #region ITEM
 
-
     #endregion
-    
+
     #region SHOPPING
 
     public async Task<BuyResponse> BuyItemFromShop(int idItem, int userId)
@@ -779,6 +776,20 @@ public class GameService : IGameService
         return result;
     }
 
+    public async Task<PagingResponse<GameItemResponse>> GetGameItemPagination(int? page, int? size)
+    {
+        var result = await _unitOfWork.GameItemRepository
+            .GetPaginateAsync(o => o.ItemType == ItemType.DropItem, orderBy: q => q.OrderBy(item => item.ItemRateType),
+                page, size);
+
+        return new PagingResponse<GameItemResponse>
+        {
+            TotalPages = result.TotalPages,
+            TotalRecords = result.TotalRecords,
+            Results = result.Results.Select(Mappers.GameMapper.GameItemToGameItemResponse)
+        };
+    }
+
     public async Task<List<int>> GetUserShopItem(int userId)
     {
         var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.StudentId == userId, null)
@@ -795,7 +806,7 @@ public class GameService : IGameService
             .Select(o => o.GameItemId).ToList();
     }
 
-    public async Task<List<GameItem>> GetAllShopItem()
+    public async Task<List<GameItemResponse>> GetAllShopItem()
     {
         var result = await _unitOfWork.GameItemRepository
             .GetAsync(
@@ -806,13 +817,27 @@ public class GameService : IGameService
         return result.Select(Mappers.GameMapper.GameItemToGameItemResponse).ToList();
     }
 
-    public async Task<PagingResponse<GameItem>> GetAllShopItem(int? page, int? size)
+    public async Task<List<GameItemResponse>> GetUserItem(int userId)
+    {
+        var query = await _unitOfWork.GameItemRepository
+            .GetAsync(o => o.ItemType == ItemType.DropItem, orderBy: q => q.OrderBy(item => item.ItemRateType));
+
+        var result = new List<GameItemResponse>();
+        foreach (var item in query)
+        {
+            result.Add(Mappers.GameMapper.GameItemToGameItemResponse(item));
+        }
+
+        return result;
+    }
+
+    public async Task<PagingResponse<GameItemResponse>> GetAllShopItem(int? page, int? size)
     {
         var result = await _unitOfWork.GameItemRepository
             .GetPaginateAsync(o => o.ItemType == ItemType.ShopItem, orderBy: q => q.OrderBy(item => item.ItemRateType),
                 page, size);
 
-        return new PagingResponse<GameItem>
+        return new PagingResponse<GameItemResponse>
         {
             TotalPages = result.TotalPages,
             TotalRecords = result.TotalRecords,
@@ -1000,7 +1025,7 @@ public class GameService : IGameService
     public async Task AddNewGameItem(NewItemRequest newItemRequest)
     {
         await _unitOfWork.BeginTransactionAsync();
-        var gameItem = new Domain.Entities.GameItem
+        var gameItem = new GameItem
         {
             Id = 0,
             GameId = 0,
@@ -1015,6 +1040,38 @@ public class GameService : IGameService
         try
         {
             await _unitOfWork.GameItemRepository.AddAsync(gameItem);
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task UpdateGameItem(NewItemRequest newItemRequest)
+    {
+        await _unitOfWork.BeginTransactionAsync();
+        var exist = await _unitOfWork.GameItemRepository.GetAsync(
+            o => o.Id == newItemRequest.GameId, null
+        ).ContinueWith(o => o.Result.FirstOrDefault());
+        if (exist == null)
+        {
+            throw new BadRequestException("Item not existed");
+        }
+
+        exist.ItemName = newItemRequest.ItemName;
+        exist.Details = newItemRequest.Details;
+        exist.SpritesUrl = newItemRequest.SpritesUrl;
+        exist.ItemRateType = (ItemRateType)newItemRequest.ItemRateType;
+        exist.ItemType = (ItemType)newItemRequest.ItemRateType;
+        exist.Price = newItemRequest.Price;
+
+        try
+        {
+            _unitOfWork.GameItemRepository.Update(exist);
+            await _unitOfWork.SaveChangeAsync();
             await _unitOfWork.CommitAsync();
         }
         catch (Exception)
