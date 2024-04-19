@@ -336,6 +336,7 @@ public class CourseService : ICourseService
             foreach (var sectionDto in dto.Sections)
             {
                 var section = courseEntity.Sections.FirstOrDefault(s => s.Id == sectionDto.Id);
+                var sectionTime = 0;
 
                 if (section != null)
                 {
@@ -357,6 +358,7 @@ public class CourseService : ICourseService
                             if (!lessonDto.Id.HasValue)
                             {
                                 var lesson = CourseMapper.UpdateLessonDtoToLesson(lessonDto);
+                                sectionTime += lesson.Duration ?? 0;
                                 lesson.Order = lessonOrder;
                                 lessons.Add(lesson);
                             }
@@ -366,6 +368,7 @@ public class CourseService : ICourseService
                                 if (lessonToUpdate != null)
                                 {
                                     CourseMapper.UpdateLessonDtoToLesson(lessonDto, ref lessonToUpdate);
+                                    sectionTime += lessonDto.Duration ?? 0;
                                     lessons.Add(lessonToUpdate);
                                 }
                                 else
@@ -427,6 +430,8 @@ public class CourseService : ICourseService
 
                                 //Update quiz information
                                 QuizMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
+
+                                sectionTime += quiz.Duration ?? 0;
                             }
                             else
                             {
@@ -435,6 +440,8 @@ public class CourseService : ICourseService
                                 quiz.CreatedDate = DateTime.UtcNow;
                                 quiz.CreatedById = accountId;
                                 quiz.CreatedBy = currentAccount;
+
+                                sectionTime += quiz.Duration ?? 0;
                             }
 
                             // Update quiz question
@@ -520,6 +527,9 @@ public class CourseService : ICourseService
 
                         section.Quizzes = quizzes;
                     }
+                    
+                    // update section time
+                    section.SectionTime = sectionTime;
                 }
                 else
                 {

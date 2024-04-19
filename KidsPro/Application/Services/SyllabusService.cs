@@ -68,6 +68,15 @@ public class SyllabusService : ISyllabusService
             Status = CourseStatus.Draft
         };
 
+        if (dto.CourseGameId.HasValue)
+        {
+            if (!await _unitOfWork.CourseGameRepository.ExistByIdAsync(dto.CourseGameId.Value))
+            {
+                throw new NotFoundException($"Course game ${dto.CourseGameId} does not exist.");
+            }
+            course.CourseGameId = dto.CourseGameId.Value;
+        }
+
         //Add section
         if (dto.Sections != null)
         {
