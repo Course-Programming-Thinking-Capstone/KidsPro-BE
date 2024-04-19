@@ -42,6 +42,7 @@ public class GamesController : ControllerBase
     /// Admin Delete game item
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpDelete("game-item/")]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<PagingResponse<GameItemResponse>>> UpdateNewGameItem(
@@ -55,6 +56,7 @@ public class GamesController : ControllerBase
     /// Admin update game item
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpPut("game-item/")]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<PagingResponse<GameItemResponse>>> UpdateNewGameItem(
@@ -68,6 +70,7 @@ public class GamesController : ControllerBase
     /// Admin Add new game item
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpPost("game-item/")]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<PagingResponse<GameItemResponse>>> AddNewGameItem(
@@ -81,6 +84,7 @@ public class GamesController : ControllerBase
     /// Admin get all drop able item in game
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
     [HttpGet("game-item/pagination")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItemResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -96,6 +100,7 @@ public class GamesController : ControllerBase
     /// Get user Items
     /// </summary>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpGet("game-drop-item-owned/")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameItemResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -111,6 +116,7 @@ public class GamesController : ControllerBase
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
     [HttpGet("shop-item/pagination")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItemResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
