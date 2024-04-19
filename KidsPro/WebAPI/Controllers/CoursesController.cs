@@ -6,6 +6,7 @@ using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Quiz;
+using Application.Dtos.Response.Course.Quiz.QuizDetail;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
@@ -394,7 +395,7 @@ public class CoursesController : ControllerBase
     /// <returns></returns>
     [HttpGet("study/section/quiz/{id:int}")]
     [Authorize]
-    public async Task<ActionResult<QuizDto>> GetQuizByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<QuizDetailDto>> GetQuizByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetQuizByIdAsync(id);
         return Ok(result);
