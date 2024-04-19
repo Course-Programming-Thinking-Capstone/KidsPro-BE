@@ -57,6 +57,7 @@ public class UnitOfWork : IUnitOfWork
     public IStudentOptionRepository StudentOptionRepository { get; }
     public IStudentQuizRepository StudentQuizRepository { get; }
     public IQuizRepository QuizRepository { get; }
+    public ICourseGameRepository CourseGameRepository { get; }
 
     public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IRoleRepository roleRepository,
         IAccountRepository accountRepository, IParentRepository parentRepository, IStudentRepository studentRepository,
@@ -69,7 +70,7 @@ public class UnitOfWork : IUnitOfWork
         IItemOwnedRepository itemOwnedRepository, ILevelTypeRepository levelTypeRepository,
         IPositionTypeRepository positionTypeRepository, ISectionRepository sectionRepository, ISectionComponentNumberRepository sectionComponentNumberRepository, ILessonRepository lessonRepository
         , ICertificateRepository certificateRepository, IOrderRepository orderRepository, IVoucherRepository voucherRepository, IOrderDetailRepository orderDetailRepository
-        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository, IScheduleReposisoty scheduleReposisoty, IClassRepository classRepository, IStudentProgressRepository studentProgressRepository, IStudentOptionRepository studentOptionRepository, IStudentQuizRepository studentQuizRepository, IQuizRepository quizRepository)
+        ,  IUserNotificationRepository userNotificationRepository, INotificationRepository notificationRepository, ITransactionRepository transactionRepository, ISyllabusRepository syllabusRepository, IPassConditionRepository passConditionRepository, IScheduleReposisoty scheduleReposisoty, IClassRepository classRepository, IStudentProgressRepository studentProgressRepository, IStudentOptionRepository studentOptionRepository, IStudentQuizRepository studentQuizRepository, IQuizRepository quizRepository, ICourseGameRepository courseGameRepository)
     {
         _context = context;
         _logger = logger;
@@ -112,6 +113,7 @@ public class UnitOfWork : IUnitOfWork
         StudentOptionRepository = studentOptionRepository;
         StudentQuizRepository = studentQuizRepository;
         QuizRepository = quizRepository;
+        CourseGameRepository = courseGameRepository;
     }
 
     public async Task<int> SaveChangeAsync()
