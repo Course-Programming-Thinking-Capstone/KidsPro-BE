@@ -4,6 +4,8 @@ using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Quiz;
+using Application.Dtos.Response.Course.Quiz.QuizDetail;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Domain.Enums;
@@ -15,27 +17,20 @@ public interface ICourseService
 {
     Task<CourseDto> GetByIdAsync(int id, string? action);
 
-    Task<Dtos.Response.Course.Study.StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id);
-
-    Task<StudyCourseDto?> GetTeacherStudyCourseByIdAsync(int id);
+    Task<StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id);
 
     Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id);
 
-    Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId);
-
     Task<CommonStudySectionDto?> GetActiveCourseStudySectionByIdAsync(int id);
-
-    Task<CommonStudySectionDto?> GetTeacherSectionDetailByIdAsync(int sectionId);
     
     //Admin/staff view section detail
     Task<CommonStudySectionDto?> GetSectionDetailByIdAsync(int sectionId);
 
-    //Get student section for learning purpose
-    Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId);
+    Task<StudyLessonDto?> GetFreeStudyLessonByIdAsync(int id);
+    
+    Task<StudyLessonDto?> GetStudyLessonByIdAsync(int lessonId);
 
-    Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id);
-
-    Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId);
+    Task<QuizDetailDto> GetQuizByIdAsync(int quizId);
 
     Task<CourseDto> CreateCourseAsync(CreateCourseDto dto);
 

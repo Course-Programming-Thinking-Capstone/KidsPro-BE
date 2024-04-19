@@ -6,9 +6,10 @@ using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
+using Application.Dtos.Response.Course.Quiz;
+using Application.Dtos.Response.Course.Quiz.QuizDetail;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
-using Application.Dtos.Response.StudentProgress;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
@@ -49,7 +50,7 @@ public class CourseService : ICourseService
         return CourseMapper.CourseToCommonCourseDto(course);
     }
 
-    public async Task<Dtos.Response.Course.Study.StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id)
+    public async Task<StudyCourseDto?> GetActiveStudyCourseByIdAsync(int id)
     {
         var statuses = new List<CourseStatus>()
         {
@@ -60,46 +61,56 @@ public class CourseService : ICourseService
         return course == null ? null : CourseMapper.CourseToStudyCourseDto(course);
     }
 
-    public async Task<StudyCourseDto?> GetTeacherStudyCourseByIdAsync(int id)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-
-        var entity = await _unitOfWork.CourseRepository.GetTeacherCourseDetailByIdAsync(id, accountId);
-
-        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
-    }
-
     public async Task<StudyCourseDto?> GetStudyCourseByIdAsync(int id)
     {
-        var statuses = new List<CourseStatus>()
-        {
-            CourseStatus.Active,
-            CourseStatus.Denied,
-            CourseStatus.Draft,
-            CourseStatus.Inactive,
-            CourseStatus.Pending,
-            CourseStatus.Waiting
-        };
-        var entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
-        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
-    }
-
-    public async Task<StudyCourseDto?> GetStudentStudyCourseByIdAsync(int courseId)
-    {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
 
-        var course = await _unitOfWork.CourseRepository.GetStudentCourseDetailByIdAsync(courseId, accountId);
-        if (course == null)
-            return null;
+        Course? entity = null;
+        switch (role)
+        {
+            case Constant.AdminRole:
+            case Constant.StaffRole:
+            {
+                var statuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active,
+                    CourseStatus.Denied,
+                    CourseStatus.Draft,
+                    CourseStatus.Inactive,
+                    CourseStatus.Pending,
+                    CourseStatus.Waiting
+                };
+                entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+                break;
+            }
+            case Constant.TeacherRole:
+                entity = await _unitOfWork.CourseRepository.GetTeacherCourseDetailByIdAsync(id, accountId);
+                break;
+            case Constant.StudentRole:
+            {
+                entity = await _unitOfWork.CourseRepository.GetStudentCourseDetailByIdAsync(id, accountId);
+                if (entity == null)
+                    return null;
 
-        var studentProgress = await _unitOfWork.StudentProgressRepository.GetStudentProgressAsync(accountId, courseId);
-        var currentSectionOrder = studentProgress == null ? 1 : studentProgress.Section.Order;
+                var studentProgress =
+                    await _unitOfWork.StudentProgressRepository.GetStudentProgressAsync(accountId, id);
+                var currentSectionOrder = studentProgress == null ? 1 : studentProgress.Section.Order;
+                var result = CourseMapper.CourseToStudyCourseDto(entity, currentSectionOrder);
+                return result;
+            }
+            default:
+            {
+                var statuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active
+                };
+                entity = await _unitOfWork.CourseRepository.GetCourseDetailByIdAndStatusAsync(id, statuses);
+                break;
+            }
+        }
 
-        var result = CourseMapper.CourseToStudyCourseDto(course, currentSectionOrder);
-
-        return result;
+        return entity != null ? CourseMapper.CourseToStudyCourseDto(entity) : null;
     }
 
     public async Task<CommonStudySectionDto?> GetActiveCourseStudySectionByIdAsync(int id)
@@ -112,51 +123,79 @@ public class CourseService : ICourseService
         return entity != null ? CourseMapper.SectionToCommonStudySectionDto(entity) : null;
     }
 
-    public async Task<CommonStudySectionDto?> GetTeacherSectionDetailByIdAsync(int sectionId)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var section = await _unitOfWork.SectionRepository.GetTeacherSectionDetailByIdAsync(sectionId, accountId);
-        return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
-    }
-
     public async Task<CommonStudySectionDto?> GetSectionDetailByIdAsync(int sectionId)
     {
-        var statuses = new List<CourseStatus>()
+        // check authorize
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        Section? section = null;
+
+        switch (role)
         {
-            CourseStatus.Active,
-            CourseStatus.Inactive,
-            CourseStatus.Denied,
-            CourseStatus.Draft,
-            CourseStatus.Pending,
-            CourseStatus.Waiting
-        };
-        var section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, statuses);
+            case Constant.AdminRole:
+            case Constant.StaffRole:
+            {
+                var statuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active,
+                    CourseStatus.Inactive,
+                    CourseStatus.Denied,
+                    CourseStatus.Draft,
+                    CourseStatus.Pending,
+                    CourseStatus.Waiting
+                };
+                section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, statuses);
+                break;
+            }
+            case Constant.TeacherRole:
+                section = await _unitOfWork.SectionRepository.GetTeacherSectionDetailByIdAsync(sectionId, accountId);
+                break;
+            case Constant.StudentRole:
+                section = await _unitOfWork.SectionRepository.GetStudentSectionDetailByIdAsync(sectionId, accountId);
+                break;
+            default:
+            {
+                var courseStatuses = new List<CourseStatus>()
+                {
+                    CourseStatus.Active
+                };
+                section = await _unitOfWork.SectionRepository.GetStudySectionByIdAsync(sectionId, courseStatuses);
+                break;
+            }
+        }
+
         return section != null ? CourseMapper.SectionToCommonStudySectionDto(section) : null;
     }
 
-    public async Task<CommonStudySectionDto?> GetStudentSectionDetailByIdAsync(int sectionId)
+    public async Task<StudyLessonDto?> GetFreeStudyLessonByIdAsync(int id)
     {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var result = await _unitOfWork.SectionRepository.GetStudentSectionDetailByIdAsync(sectionId, accountId);
-        return result != null ? CourseMapper.SectionToCommonStudySectionDto(result) : null;
-    }
-
-    public async Task<StudyLessonDto?> GetStudentStudyLessonByIdAsync(int id)
-    {
-        // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var result = await _unitOfWork.LessonRepository.GetStudentLessonDetailByIdAsync(id, accountId);
+        var result = await _unitOfWork.LessonRepository.GetCommonLessonDetailByIdAsync(id);
         return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
     }
 
-    public async Task<StudyLessonDto?> GetTeacherStudyLessonByIdAsync(int lessonId)
+    public async Task<StudyLessonDto?> GetStudyLessonByIdAsync(int lessonId)
     {
         // check authorize
-        _authenticationService.GetCurrentUserInformation(out var accountId, out _);
-        var result = await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId, accountId);
-        return result != null ? CourseMapper.LessonToStudyLessonDto(result) : null;
+        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+
+        var lesson = role switch
+        {
+            Constant.AdminRole or Constant.StaffRole => await _unitOfWork.LessonRepository.GetByIdAsync(lessonId),
+            Constant.TeacherRole => await _unitOfWork.LessonRepository.GetTeacherLessonDetailByIdAsync(lessonId,
+                accountId),
+            Constant.StudentRole => await _unitOfWork.LessonRepository.GetStudentLessonDetailByIdAsync(lessonId,
+                accountId),
+            _ => await _unitOfWork.LessonRepository.GetCommonLessonDetailByIdAsync(lessonId)
+        };
+
+        return lesson != null ? CourseMapper.LessonToStudyLessonDto(lesson) : null;
+    }
+
+    public async Task<QuizDetailDto> GetQuizByIdAsync(int quizId)
+    {
+        var quiz = await _unitOfWork.QuizRepository.GetByIdAsync(quizId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Quiz not found"));
+        return QuizMapper.QuizToQuizDetailDto(quiz);
     }
 
     /// <summary>
@@ -297,6 +336,7 @@ public class CourseService : ICourseService
             foreach (var sectionDto in dto.Sections)
             {
                 var section = courseEntity.Sections.FirstOrDefault(s => s.Id == sectionDto.Id);
+                var sectionTime = 0;
 
                 if (section != null)
                 {
@@ -318,6 +358,7 @@ public class CourseService : ICourseService
                             if (!lessonDto.Id.HasValue)
                             {
                                 var lesson = CourseMapper.UpdateLessonDtoToLesson(lessonDto);
+                                sectionTime += lesson.Duration ?? 0;
                                 lesson.Order = lessonOrder;
                                 lessons.Add(lesson);
                             }
@@ -327,6 +368,7 @@ public class CourseService : ICourseService
                                 if (lessonToUpdate != null)
                                 {
                                     CourseMapper.UpdateLessonDtoToLesson(lessonDto, ref lessonToUpdate);
+                                    sectionTime += lessonDto.Duration ?? 0;
                                     lessons.Add(lessonToUpdate);
                                 }
                                 else
@@ -388,6 +430,8 @@ public class CourseService : ICourseService
 
                                 //Update quiz information
                                 QuizMapper.UpdateQuizDtoToQuiz(sectionDtoQuiz, ref quiz);
+
+                                sectionTime += quiz.Duration ?? 0;
                             }
                             else
                             {
@@ -396,6 +440,8 @@ public class CourseService : ICourseService
                                 quiz.CreatedDate = DateTime.UtcNow;
                                 quiz.CreatedById = accountId;
                                 quiz.CreatedBy = currentAccount;
+
+                                sectionTime += quiz.Duration ?? 0;
                             }
 
                             // Update quiz question
@@ -481,6 +527,9 @@ public class CourseService : ICourseService
 
                         section.Quizzes = quizzes;
                     }
+                    
+                    // update section time
+                    section.SectionTime = sectionTime;
                 }
                 else
                 {

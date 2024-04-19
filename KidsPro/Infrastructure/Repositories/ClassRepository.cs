@@ -26,12 +26,12 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
         IQueryable<Class> query = _dbSet;
         return query.Include(x => x.Schedules)
             .Include(x => x.Teacher).ThenInclude(x => x!.Account)
-            .Include(x => x.Course).ThenInclude(x=> x.Syllabus)
+            .Include(x => x.Course).ThenInclude(x => x.Syllabus)
             .Include(x => x.Students).ThenInclude(x => x.Account)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<List<Class>> GetClassByRole(int id,string role)
+    public async Task<List<Class>> GetClassByRole(int id, string role)
     {
         IQueryable<Class> query = _dbSet.AsNoTracking();
 
@@ -42,13 +42,22 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
                 break;
             case Constant.StudentRole:
                 query = query.Include(x => x.Students)
-                    .Where(x => x.Students.Any(s => s.Id == id && x.Students.Count>0));
+                    .Where(x => x.Students.Any(s => s.Id == id && x.Students.Count > 0));
                 break;
-
         }
-        return await query.Where(x=>x.Status==ClassStatus.OnGoing)
-            .Include(x=>x.Course)
-            .Include(x=>x.Teacher).ThenInclude(x=>x!.Account)
+
+        return await query.Where(x => x.Status == ClassStatus.OnGoing)
+            .Include(x => x.Course)
+            .Include(x => x.Teacher).ThenInclude(x => x!.Account)
             .Include(x => x.Schedules).ToListAsync();
+    }
+
+    public async Task<Class?> GetClassByCode(string code)
+    {
+        return await _dbSet.Where(c => c.Code == code)
+            .Include(c => c.Students.OrderBy(s => s.Account.FullName))
+            .ThenInclude(s => s.Account)
+            .Include(c => c.Course)
+            .FirstOrDefaultAsync();
     }
 }

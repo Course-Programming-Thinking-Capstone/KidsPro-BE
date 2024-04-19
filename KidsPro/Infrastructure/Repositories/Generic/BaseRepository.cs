@@ -93,7 +93,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
                 query = includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
             }
-
+            
             result.TotalRecords = await query.CountAsync();
 
             if (orderBy != null)
@@ -141,7 +141,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
             query.AsNoTracking();
         }
 
-        return await query.FirstOrDefaultAsync(e => e.Id == id);
+        return await query.Where(e => e.Id == id).FirstOrDefaultAsync();
     }
 
     public virtual async Task AddAsync(T entity)

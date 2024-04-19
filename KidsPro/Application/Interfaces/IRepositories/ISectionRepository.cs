@@ -1,5 +1,4 @@
-﻿using Application.Dtos.Response.Course;
-using Application.Interfaces.IRepositories.Generic;
+﻿using Application.Interfaces.IRepositories.Generic;
 using Domain.Entities;
 using Domain.Enums;
 

@@ -24,4 +24,6 @@ public class CreateSyllabusDto
     public List<CreateSyllabusSectionDto>? Sections { get; init; }
 
     public int TeacherId { get; init; }
+    
+    public int? CourseGameId { get; init; }
 }

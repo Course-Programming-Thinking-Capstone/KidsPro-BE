@@ -1,12 +1,10 @@
 ﻿using Application.Dtos.Request.Course;
 using Application.Dtos.Request.Course.Lesson;
-using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Section;
 using Application.Dtos.Response.Course;
 using Application.Dtos.Response.Course.CourseModeration;
 using Application.Dtos.Response.Course.FilterCourse;
 using Application.Dtos.Response.Course.Lesson;
-using Application.Dtos.Response.Course.Quiz;
 using Application.Dtos.Response.Course.Study;
 using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
@@ -331,8 +329,6 @@ public static class CourseMapper
                     case LessonType.Document:
                         totalDocument++;
                         break;
-                    default:
-                        break;
                 }
             }
 
@@ -385,8 +381,8 @@ public static class CourseMapper
             Name = entity.Name,
             SectionTime = entity.SectionTime,
             IsBlock = currentSectionOrder.HasValue ? entity.Order > currentSectionOrder.Value : null,
-            Lessons = entity?.Lessons.Select(LessonToCommonStudyLessonDto).ToList() ?? new List<CommonStudyLessonDto>(),
-            Quizzes = entity?.Quizzes.Select(QuizToCommonStudyQuizDto).ToList() ?? new List<CommonStudyQuizDto>()
+            Lessons = entity.Lessons.Select(LessonToCommonStudyLessonDto).ToList() ,
+            Quizzes = entity.Quizzes.Select(QuizToCommonStudyQuizDto).ToList() 
         };
 
     public static StudyLessonDto LessonToStudyLessonDto(Lesson entity)

@@ -8,8 +8,9 @@ namespace Application.Mappers;
 
 public static class GameMapper
 {
-    public static GameShopItem GameItemToGameShopItem(GameItem entity)
-        => new GameShopItem
+    public static GameItemResponse GameItemToGameItemResponse(GameItem entity)
+    
+        => new GameItemResponse
         {
             Id = entity.Id,
             ItemName = entity.ItemName,
@@ -24,7 +25,7 @@ public static class GameMapper
     {
         return new GameItem
         {
-            Id = 0,
+            Id = newItem.Id,
             GameId = 0,
             ItemName = newItem.ItemName,
             Details = newItem.Details,

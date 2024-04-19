@@ -70,4 +70,8 @@ public class Course : BaseEntity
 
     public virtual ICollection<CourseResource> CourseResources { get; set; } = new List<CourseResource>();
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
+    
+    public int? CourseGameId { get; set; }
+    
+    public virtual CourseGame? CourseGame { get; set; }
 }

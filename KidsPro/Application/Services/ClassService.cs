@@ -2,6 +2,8 @@
 using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Class.TeacherClass;
+using Application.Dtos.Response.Class.TeacherSchedule;
 using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -90,6 +92,14 @@ public class ClassService : IClassService
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();
     }
+
+    public async Task<TeacherClassDto> GetTeacherClassByCodeAsync(string classCode)
+    {
+        var entity = await _unitOfWork.ClassRepository.GetClassByCode(classCode)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException($"Class {classCode} not found."));
+        return ClassMapper.ClassToTeacherClassDto(entity);
+    }
+
     public async Task<ClassCreateResponse> CreateClassAsync(ClassCreateRequest dto)
     {
         var account = await CheckPermission();

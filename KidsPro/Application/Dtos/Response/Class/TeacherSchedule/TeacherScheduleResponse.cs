@@ -1,4 +1,4 @@
-﻿namespace Application.Dtos.Response;
+﻿namespace Application.Dtos.Response.Class.TeacherSchedule;
 
 public class TeacherScheduleResponse
 {

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IRepositories;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,20 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
     {
     }
 
-    public Task<bool> ExistBySectionIdAndOrder(int sectionId, int order)
+    public async Task<Lesson?> GetCommonLessonDetailByIdAsync(int lessonId)
     {
-        throw new NotImplementedException();
+        return await _dbSet.Where(l =>
+                l.IsFree || (l.Section.Course.Status == CourseStatus.Active && l.Section.Course.IsFree))
+            .Select(lesson => new Lesson()
+            {
+                Id = lesson.Id,
+                Name = lesson.Name,
+                Duration = lesson.Duration,
+                IsFree = lesson.IsFree,
+                Content = lesson.Content,
+                ResourceUrl = lesson.ResourceUrl,
+                Type = lesson.Type
+            }).FirstOrDefaultAsync();
     }
 
     public async Task<Lesson?> GetTeacherLessonDetailByIdAsync(int lessonId, int teacherId)
@@ -23,7 +35,10 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
         return await _dbSet
             .Where(lesson => lesson.Id == lessonId
                              && !lesson.Section.Course.IsDelete
-                             && (lesson.Section.Course.ModifiedById == teacherId
+                             && (lesson.IsFree ||
+                                 (lesson.Section.Course.Status == CourseStatus.Active &&
+                                  lesson.Section.Course.IsFree)
+                                 || lesson.Section.Course.ModifiedById == teacherId
                                  || lesson.Section.Course.Classes.Any(c =>
                                      c.Teacher != null && c.Teacher.AccountId == teacherId))
             )
@@ -45,7 +60,10 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             .Where(
                 lesson => lesson.Id == lessonId
                           && !lesson.Section.Course.IsDelete
-                          && lesson.Section.Course.Classes.Any(c => c.Students.Any(s => s.AccountId == studentId))
+                          && (lesson.IsFree
+                              || (lesson.Section.Course.Status == CourseStatus.Active
+                                  && lesson.Section.Course.IsFree)
+                              || lesson.Section.Course.Classes.Any(c => c.Students.Any(s => s.AccountId == studentId)))
             )
             .Select(lesson => new Lesson()
             {
@@ -68,6 +86,6 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             query.AsNoTracking();
         }
 
-        return await query.FirstOrDefaultAsync(l => l.Id == id);
+        return await query.Where(l => l.Id == id).FirstOrDefaultAsync();
     }
 }

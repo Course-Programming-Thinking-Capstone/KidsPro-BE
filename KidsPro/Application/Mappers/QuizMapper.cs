@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.Request.Course.Quiz;
 using Application.Dtos.Request.Course.Update.Quiz;
 using Application.Dtos.Response.Course.Quiz;
+using Application.Dtos.Response.Course.Quiz.QuizDetail;
 using Application.ErrorHandlers;
 using Application.Utils;
 using Domain.Entities;
@@ -186,4 +187,30 @@ public static class QuizMapper
             NumberOfAttempt = dto.NumberOfAttempt,
             IsOrderRandom = dto.IsOrderRandom ?? false
         };
+
+    public static OptionDetailDto OptionToOptionDetailDto(Option entity) => new OptionDetailDto()
+    {
+        Id = entity.Id,
+        Content = entity.Content
+    };
+
+    public static QuestionDetailDto QuestionToQuestionDetailDto(Question entity) => new QuestionDetailDto()
+    {
+        Id = entity.Id,
+        Score = entity.Score,
+        Title = entity.Title,
+        Options = entity.Options.Select(OptionToOptionDetailDto).ToList()
+    };
+
+    public static QuizDetailDto QuizToQuizDetailDto(Quiz entity) => new QuizDetailDto()
+    {
+        Id = entity.Id,
+        Title = entity.Title,
+        Description = entity.Description,
+        Duration = entity.Duration,
+        TotalQuestion = entity.TotalQuestion,
+        TotalScore = entity.TotalScore,
+        NumberOfAttempt = entity.NumberOfAttempt,
+        Questions = entity.Questions.Select(QuestionToQuestionDetailDto).ToList()
+    };
 }

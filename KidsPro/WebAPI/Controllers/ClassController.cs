@@ -2,6 +2,8 @@
 using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.Class.TeacherClass;
+using Application.Dtos.Response.Class.TeacherSchedule;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.ErrorHandlers;
@@ -125,6 +127,18 @@ public class ClassController : ControllerBase
         _authentication.CheckAccountStatus();
 
         var result = await _class.CreateClassAsync(dto);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get teacher class detail by code
+    /// </summary>
+    /// <param name="classCode"></param>
+    /// <returns></returns>
+    [HttpGet("teacher/code/{classCode}")]
+    public async Task<ActionResult<TeacherClassDto>> GetTeacherClassByCodeAsync([FromRoute] string classCode)
+    {
+        var result = await _class.GetTeacherClassByCodeAsync(classCode);
         return Ok(result);
     }
 

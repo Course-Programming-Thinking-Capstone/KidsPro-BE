@@ -1,6 +1,7 @@
 ﻿using Application.Configurations;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Enums.Status;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -125,6 +126,12 @@ public class AppDbContext : DbContext
                     .OnDelete(DeleteBehavior.Restrict)
             );
 
+        modelBuilder.Entity<Course>()
+            .HasOne(c => c.CourseGame)
+            .WithOne(cg => cg.Course)
+            .HasForeignKey<Course>(c => c.CourseGameId)
+            .IsRequired(false);
+
         //data seeding
         modelBuilder.Entity<Role>().HasData(
             new Role() { Id = 1, Name = Constant.AdminRole },
@@ -210,6 +217,16 @@ public class AppDbContext : DbContext
             new PassCondition() { Id = 3, PassRatio = 80 },
             new PassCondition() { Id = 4, PassRatio = 90 },
             new PassCondition() { Id = 5, PassRatio = 100 }
+        );
+
+        modelBuilder.Entity<CourseGame>().HasData(
+            new CourseGame()
+            {
+                Id = 1, Name = "Introduction to programming.",
+                Url = "https://kidspro-capstone.github.io/Capstone-Game-WebGL/",
+                Status = CourseGameStatus.Active,
+                IsDelete = false,
+            }
         );
     }
 }
