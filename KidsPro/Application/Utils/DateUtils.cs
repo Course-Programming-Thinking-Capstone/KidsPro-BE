@@ -13,6 +13,7 @@ public static class DateUtils
     public static string FormatDateTimeToDatetimeV3(DateTime? date) => date?.ToString("yyyy/MM/dd HH:mm:ss") ?? "";
     public static string FormatDateTimeToTime(DateTime? date) => date?.ToString("HH:mm") ?? "";
     public static string FormatDateTimeToDayOfWeek(DateTime? date) => date?.DayOfWeek.ToString() ?? "";
+
     public static DateTime? ConvertStringToDateTimeV1(string? dateString)
     {
         if (string.IsNullOrEmpty(dateString))
@@ -59,5 +60,21 @@ public static class DateUtils
         }
 
         return null;
+    }
+
+    public static int? CalculateAge(DateTime? dateOfBirth)
+    {
+        if (!dateOfBirth.HasValue)
+            return null;
+
+        var today = DateTime.Today;
+        var age = today.Year - dateOfBirth.Value.Year;
+
+        if (dateOfBirth > today.AddYears(-age))
+        {
+            age--;
+        }
+
+        return age;
     }
 }

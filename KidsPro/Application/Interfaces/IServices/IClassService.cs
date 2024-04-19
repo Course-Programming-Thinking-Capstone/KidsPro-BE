@@ -1,6 +1,8 @@
 ﻿using Application.Dtos.Request.Class;
 using Application.Dtos.Response;
 using Application.Dtos.Response.Account.Student;
+using Application.Dtos.Response.Class.TeacherClass;
+using Application.Dtos.Response.Class.TeacherSchedule;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Domain.Entities;
@@ -24,4 +26,6 @@ public interface IClassService
      Task<List<ClassesResponse>> GetClassByRoleAsync();
      List<Student> GetStudentsCanAddToClass(List<Student> students, Class entityClass);
      Task UpdateClassStatusAsync(int classId, ClassStatus status);
+
+     Task<TeacherClassDto> GetTeacherClassByCodeAsync(string classCode);
 }

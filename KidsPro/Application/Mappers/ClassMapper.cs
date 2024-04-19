@@ -1,4 +1,6 @@
 ﻿using Application.Dtos.Response;
+using Application.Dtos.Response.Class.TeacherClass;
+using Application.Dtos.Response.Class.TeacherSchedule;
 using Application.Dtos.Response.Paging;
 using Application.Dtos.Response.StudentSchedule;
 using Application.Utils;
@@ -167,5 +169,33 @@ public static class ClassMapper
             CourseImage = x.Course.PictureUrl,
             ClassStatus = x.Status
         }).ToList();
+    }
+
+    public static TeacherClassStudentDto StudentToTeacherClassStudentDto(Student entity)
+    {
+        return new TeacherClassStudentDto()
+        {
+            AccountId = entity.AccountId,
+            FullName = entity.Account.FullName,
+            PictureUrl = entity.Account.PictureUrl,
+            Gender = entity.Account.Gender?.ToString() ?? "Other",
+            Age = DateUtils.CalculateAge(entity.Account.DateOfBirth),
+        };
+    }
+
+    public static TeacherClassDto ClassToTeacherClassDto(Class entity)
+    {
+        return new TeacherClassDto()
+        {
+            Id = entity.Id,
+            Code = entity.Code,
+            TotalSlot = entity.TotalSlot,
+            Status = entity.Status.ToString(),
+            Duration = entity.Duration,
+            CourseName = entity.Course.Name,
+            CourseId = entity.CourseId,
+            TotalStudent = entity.TotalStudent,
+            Students = entity.Students.Select(StudentToTeacherClassStudentDto).ToList()
+        };
     }
 }
