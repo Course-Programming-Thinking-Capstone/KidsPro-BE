@@ -25,7 +25,7 @@ public interface IGameService
     public Task<PagingResponse<GameItemResponse>> GetAllShopItem(int? page, int? size);
     public Task<BuyResponse> BuyItemFromShop(int idItem, int userId);
     public Task<List<int>> GetUserShopItem(int userId);
-    public Task<List<GameItemResponse>> GetUserItem(int userId);
+    public Task<List<UserInventoryResponse>> GetUserItem(int userId);
     public Task<PagingResponse<GameItemResponse>> GetGameItemPagination(int? page, int ?size);
     public Task AddNewGameItem(NewItemRequest newItemRequest);
     public Task UpdateGameItem(NewItemRequest newItemRequest);

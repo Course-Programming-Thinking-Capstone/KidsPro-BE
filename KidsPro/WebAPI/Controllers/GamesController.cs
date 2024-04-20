@@ -102,9 +102,9 @@ public class GamesController : ControllerBase
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpGet("game-drop-item-owned/{userId}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameItemResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserInventoryResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<GameItemResponse>>> GetUserItem([FromRoute] int userId)
+    public async Task<ActionResult<List<UserInventoryResponse>>> GetUserItem([FromRoute] int userId)
     {
         var result = await _gameService.GetUserItem(userId);
         return Ok(result);

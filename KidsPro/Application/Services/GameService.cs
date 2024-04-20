@@ -941,15 +941,32 @@ public class GameService : IGameService
         return result.Select(Mappers.GameMapper.GameItemToGameItemResponse).ToList();
     }
 
-    public async Task<List<GameItemResponse>> GetUserItem(int userId)
+    public async Task<List<UserInventoryResponse>> GetUserItem(int userId)
     {
-        var query = await _unitOfWork.GameItemRepository
-            .GetAsync(o => o.ItemType == ItemType.DropItem, orderBy: q => q.OrderBy(item => item.ItemRateType));
+        var query = await _unitOfWork.ItemOwnedRepository
+            .GetAsync(o => o.StudentId == userId, null
+                , includeProperties: nameof(GameItem));
 
-        var result = new List<GameItemResponse>();
+        var result = new List<UserInventoryResponse>();
         foreach (var item in query)
         {
-            result.Add(Mappers.GameMapper.GameItemToGameItemResponse(item));
+            if (item.GameItem.ItemType != ItemType.DropItem)
+            {
+                continue;
+            }
+
+            if (item.Quantity == 0)
+            {
+                continue;
+            }
+
+            result.Add(
+                new UserInventoryResponse
+                {
+                    Quantity = item.Quantity,
+                    GameItem = Mappers.GameMapper.GameItemToGameItemResponse(item.GameItem)
+                }
+            );
         }
 
         return result;
@@ -1102,8 +1119,8 @@ public class GameService : IGameService
             DisplayName = userData.DisplayName,
             OldGem = userData.Gem,
             OldCoin = userData.Coin,
-            UserCoin = userData.Gem,
-            UserGem = userData.Coin
+            UserCoin = userData.Coin,
+            UserGem = userData.Gem
         };
         // COIN ADD
         await _unitOfWork.BeginTransactionAsync();
@@ -1141,8 +1158,8 @@ public class GameService : IGameService
                         Id = 0,
                         DisplayName = dropItem.ItemName,
                         Quantity = 1,
-                        StudentId = 0,
-                        GameItemId = 0,
+                        StudentId = userFinishLevelRequest.UserID,
+                        GameItemId = dropItem.Id,
                     };
                     await _unitOfWork.ItemOwnedRepository.AddAsync(ownedData);
                 }
