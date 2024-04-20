@@ -689,6 +689,130 @@ public class GameService : IGameService
 
             await _unitOfWork.CommitAsync();
         }
+
+        if (!baseItem.Any(o => o.ItemType == ItemType.DropItem))
+        {
+            var tempData = new List<NewItemRequest>()
+            {
+                new NewItemRequest
+                {
+                    ItemName = "Pear",
+                    Details =
+                        "A sweet and crisp fruit, comes in various shapes and colors. Its delicate flavor and juicy texture make it perfect for snacks, salads, and desserts. Packed with fiber, vitamins, and antioxidants, pears offer both taste and health benefits.",
+                    SpritesUrl = "T_fruit_1",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Oranges",
+                    Details =
+                        " vibrant, tangy fruits beloved for their refreshing flavor and bright color. Packed with vitamin C, fiber, and antioxidants, they offer numerous health benefits. ",
+                    SpritesUrl = "T_fruit_2",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Cherry",
+                    Details =
+                        "Cherries are small, vibrant fruits known for their sweet and tart flavor profiles. These juicy delights come in various shades ranging from deep red to bright yellow. ",
+                    SpritesUrl = "T_fruit_5",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Grapes",
+                    Details =
+                        "Sweet flavor and deep hue. These luscious fruits are packed with antioxidants, vitamins, and minerals, offering a host of health benefits. ",
+                    SpritesUrl = "T_fruit_6",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Apple",
+                    Details =
+                        " crunchy and juicy, are one of the most popular fruits worldwide",
+                    SpritesUrl = "T_fruit_10",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "StrawBerry",
+                    Details =
+                        "small, delicate fruits bursting with sweet and tangy flavors. Unlike their larger cultivated counterparts, these tiny treasures are prized for their intense taste and aromatic fragrance.",
+                    SpritesUrl = "T_fruit_18",
+                    ItemRateType = 2,
+                    ItemType = 1,
+                    Price = 150
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Bananas",
+                    Details =
+                        "Rich in potassium, fiber, and vitamins, bananas offer a range of health benefits, including improved digestion and heart health. ",
+                    SpritesUrl = "T_fruit_28",
+                    ItemRateType = 2,
+                    ItemType = 1,
+                    Price = 150
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Pomegranates",
+                    Details =
+                        "with their vibrant red arils nestled within a tough outer shell, are renowned for their unique flavor and abundance of juicy seeds. Bursting with antioxidants, vitamins, and minerals, pomegranates offer numerous health benefits, from promoting heart health to boosting immunity.",
+                    SpritesUrl = "T_fruit_30",
+                    ItemRateType = 3,
+                    ItemType = 1,
+                    Price = 200
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Pineapple",
+                    Details =
+                        "with its prickly exterior and sweet, juicy flesh, is a tropical fruit loved for its refreshing taste. Packed with vitamin C, manganese, and bromelain, pineapple offers various health benefits, including improved digestion and immune support.",
+                    SpritesUrl = "T_fruit_48",
+                    ItemRateType = 4,
+                    ItemType = 1,
+                    Price = 250
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Black Cherries",
+                    Details =
+                        "These luscious fruits are not only delicious but also packed with antioxidants and nutrients, offering numerous health benefits. Whether enjoyed fresh as a snack, baked into pies, or preserved in jams, purple cherries add a delightful burst of sweetness to any dish or dessert.",
+                    SpritesUrl = "Dupomo",
+                    ItemRateType = 5,
+                    ItemType = 1,
+                    Price = 300
+                },
+            };
+            await _unitOfWork.BeginTransactionAsync();
+            foreach (var newItem in tempData)
+            {
+                var gameItem = Mappers.GameMapper.GameItemRequestToGameItem(newItem);
+                try
+                {
+                    await _unitOfWork.GameItemRepository.AddAsync(gameItem);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+                catch (Exception)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+
+            await _unitOfWork.CommitAsync();
+        }
     }
 
     #region ITEM
@@ -1021,6 +1145,7 @@ public class GameService : IGameService
     #endregion
 
     #region ADMIN SERVICES
+
     public async Task DeleteGameItem(int deleteId)
     {
         await _unitOfWork.BeginTransactionAsync();
@@ -1044,6 +1169,7 @@ public class GameService : IGameService
             throw;
         }
     }
+
     public async Task AddNewGameItem(NewItemRequest newItemRequest)
     {
         await _unitOfWork.BeginTransactionAsync();
