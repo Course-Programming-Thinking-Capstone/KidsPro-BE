@@ -43,9 +43,9 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole},")]
-    [HttpDelete("game-item/")]
+    [HttpDelete("game-item/{deleteId}")]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameItemResponse>>> UpdateNewGameItem(
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> DeleteGameItem(
         [FromRoute] int deleteId)
     {
         await _gameService.DeleteGameItem(deleteId);
@@ -101,7 +101,7 @@ public class GamesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
-    [HttpGet("game-drop-item-owned/")]
+    [HttpGet("game-drop-item-owned/{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GameItemResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
     public async Task<ActionResult<List<GameItemResponse>>> GetUserItem([FromRoute] int userId)
