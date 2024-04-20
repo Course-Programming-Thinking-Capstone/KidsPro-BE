@@ -689,6 +689,130 @@ public class GameService : IGameService
 
             await _unitOfWork.CommitAsync();
         }
+
+        if (!baseItem.Any(o => o.ItemType == ItemType.DropItem))
+        {
+            var tempData = new List<NewItemRequest>()
+            {
+                new NewItemRequest
+                {
+                    ItemName = "Pear",
+                    Details =
+                        "A sweet and crisp fruit, comes in various shapes and colors. Its delicate flavor and juicy texture make it perfect for snacks, salads, and desserts. Packed with fiber, vitamins, and antioxidants, pears offer both taste and health benefits.",
+                    SpritesUrl = "T_fruit_1",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Oranges",
+                    Details =
+                        " vibrant, tangy fruits beloved for their refreshing flavor and bright color. Packed with vitamin C, fiber, and antioxidants, they offer numerous health benefits. ",
+                    SpritesUrl = "T_fruit_2",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Cherry",
+                    Details =
+                        "Cherries are small, vibrant fruits known for their sweet and tart flavor profiles. These juicy delights come in various shades ranging from deep red to bright yellow. ",
+                    SpritesUrl = "T_fruit_5",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Grapes",
+                    Details =
+                        "Sweet flavor and deep hue. These luscious fruits are packed with antioxidants, vitamins, and minerals, offering a host of health benefits. ",
+                    SpritesUrl = "T_fruit_6",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Apple",
+                    Details =
+                        " crunchy and juicy, are one of the most popular fruits worldwide",
+                    SpritesUrl = "T_fruit_10",
+                    ItemRateType = 1,
+                    ItemType = 1,
+                    Price = 100
+                },
+                new NewItemRequest
+                {
+                    ItemName = "StrawBerry",
+                    Details =
+                        "small, delicate fruits bursting with sweet and tangy flavors. Unlike their larger cultivated counterparts, these tiny treasures are prized for their intense taste and aromatic fragrance.",
+                    SpritesUrl = "T_fruit_18",
+                    ItemRateType = 2,
+                    ItemType = 1,
+                    Price = 150
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Bananas",
+                    Details =
+                        "Rich in potassium, fiber, and vitamins, bananas offer a range of health benefits, including improved digestion and heart health. ",
+                    SpritesUrl = "T_fruit_28",
+                    ItemRateType = 2,
+                    ItemType = 1,
+                    Price = 150
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Pomegranates",
+                    Details =
+                        "with their vibrant red arils nestled within a tough outer shell, are renowned for their unique flavor and abundance of juicy seeds. Bursting with antioxidants, vitamins, and minerals, pomegranates offer numerous health benefits, from promoting heart health to boosting immunity.",
+                    SpritesUrl = "T_fruit_30",
+                    ItemRateType = 3,
+                    ItemType = 1,
+                    Price = 200
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Pineapple",
+                    Details =
+                        "with its prickly exterior and sweet, juicy flesh, is a tropical fruit loved for its refreshing taste. Packed with vitamin C, manganese, and bromelain, pineapple offers various health benefits, including improved digestion and immune support.",
+                    SpritesUrl = "T_fruit_48",
+                    ItemRateType = 4,
+                    ItemType = 1,
+                    Price = 250
+                },
+                new NewItemRequest
+                {
+                    ItemName = "Black Cherries",
+                    Details =
+                        "These luscious fruits are not only delicious but also packed with antioxidants and nutrients, offering numerous health benefits. Whether enjoyed fresh as a snack, baked into pies, or preserved in jams, purple cherries add a delightful burst of sweetness to any dish or dessert.",
+                    SpritesUrl = "Dupomo",
+                    ItemRateType = 5,
+                    ItemType = 1,
+                    Price = 300
+                },
+            };
+            await _unitOfWork.BeginTransactionAsync();
+            foreach (var newItem in tempData)
+            {
+                var gameItem = Mappers.GameMapper.GameItemRequestToGameItem(newItem);
+                try
+                {
+                    await _unitOfWork.GameItemRepository.AddAsync(gameItem);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+                catch (Exception)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+
+            await _unitOfWork.CommitAsync();
+        }
     }
 
     #region ITEM
@@ -817,15 +941,32 @@ public class GameService : IGameService
         return result.Select(Mappers.GameMapper.GameItemToGameItemResponse).ToList();
     }
 
-    public async Task<List<GameItemResponse>> GetUserItem(int userId)
+    public async Task<List<UserInventoryResponse>> GetUserItem(int userId)
     {
-        var query = await _unitOfWork.GameItemRepository
-            .GetAsync(o => o.ItemType == ItemType.DropItem, orderBy: q => q.OrderBy(item => item.ItemRateType));
+        var query = await _unitOfWork.ItemOwnedRepository
+            .GetAsync(o => o.StudentId == userId, null
+                , includeProperties: nameof(GameItem));
 
-        var result = new List<GameItemResponse>();
+        var result = new List<UserInventoryResponse>();
         foreach (var item in query)
         {
-            result.Add(Mappers.GameMapper.GameItemToGameItemResponse(item));
+            if (item.GameItem.ItemType != ItemType.DropItem)
+            {
+                continue;
+            }
+
+            if (item.Quantity == 0)
+            {
+                continue;
+            }
+
+            result.Add(
+                new UserInventoryResponse
+                {
+                    Quantity = item.Quantity,
+                    GameItem = Mappers.GameMapper.GameItemToGameItemResponse(item.GameItem)
+                }
+            );
         }
 
         return result;
@@ -954,7 +1095,7 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
+    public async Task<UserFinishLevelResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
         var winLevel =
             await GetGameLevelByTypeAndIndex(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
@@ -972,25 +1113,62 @@ public class GameService : IGameService
 
         var userData = await _unitOfWork.GameUserProfileRepository.GetAsync(
             o => o.StudentId == userFinishLevelRequest.UserID, null).ContinueWith(o => o.Result.FirstOrDefault());
-        var result = new UserDataResponse
+        var result = new UserFinishLevelResponse
         {
             UserId = userData!.StudentId,
             DisplayName = userData.DisplayName,
             OldGem = userData.Gem,
             OldCoin = userData.Coin,
-            UserCoin = userData.Gem,
-            UserGem = userData.Coin
+            UserCoin = userData.Coin,
+            UserGem = userData.Gem
         };
         // COIN ADD
         await _unitOfWork.BeginTransactionAsync();
-        if (oldData == null) // first play -> add  coin
+        if (oldData == null) // first play -> add coin and drop an item
         {
             userData.Coin += winLevel.CoinReward ?? 0;
             userData.Gem += winLevel.GemReward ?? 0;
-
             result.UserGem = userData.Gem;
             result.UserCoin = userData.Coin;
+
             _unitOfWork.GameUserProfileRepository.Update(userData);
+
+            var availableItem = await _unitOfWork.GameItemRepository
+                .GetAsync(o => o.ItemType == ItemType.DropItem, null)
+                .ContinueWith(o => o.Result.ToList());
+
+            if (availableItem.Count > 0)
+            {
+                Random rd = new Random();
+                var dropItem = availableItem[rd.Next(0, availableItem.Count - 1)];
+
+                var existedOwned = await _unitOfWork.ItemOwnedRepository.GetAsync(
+                    o => o.StudentId == userFinishLevelRequest.UserID
+                         && o.GameItemId == dropItem.Id, null
+                ).ContinueWith(o => o.Result.FirstOrDefault());
+                if (existedOwned != null)
+                {
+                    existedOwned.Quantity += 1;
+                    _unitOfWork.ItemOwnedRepository.Update(existedOwned);
+                }
+                else
+                {
+                    var ownedData = new ItemOwned
+                    {
+                        Id = 0,
+                        DisplayName = dropItem.ItemName,
+                        Quantity = 1,
+                        StudentId = userFinishLevelRequest.UserID,
+                        GameItemId = dropItem.Id,
+                    };
+                    await _unitOfWork.ItemOwnedRepository.AddAsync(ownedData);
+                }
+
+                result.GameItemGet = new List<GameItemResponse>()
+                {
+                    Mappers.GameMapper.GameItemToGameItemResponse(dropItem)
+                };
+            }
         }
 
         await _unitOfWork.GamePlayHistoryRepository.AddAsync(new GamePlayHistory
@@ -1021,6 +1199,7 @@ public class GameService : IGameService
     #endregion
 
     #region ADMIN SERVICES
+
     public async Task DeleteGameItem(int deleteId)
     {
         await _unitOfWork.BeginTransactionAsync();
@@ -1044,6 +1223,7 @@ public class GameService : IGameService
             throw;
         }
     }
+
     public async Task AddNewGameItem(NewItemRequest newItemRequest)
     {
         await _unitOfWork.BeginTransactionAsync();

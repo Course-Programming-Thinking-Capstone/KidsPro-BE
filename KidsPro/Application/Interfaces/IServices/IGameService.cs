@@ -10,7 +10,7 @@ public interface IGameService
     public Task<List<ModeType>> GetAllGameMode();
     public Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId);
     public Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex);
-    public Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
+    public Task<UserFinishLevelResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
     public Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task<List<LevelDataResponse>> GetLevelsByMode(int modeId);
 
@@ -25,7 +25,7 @@ public interface IGameService
     public Task<PagingResponse<GameItemResponse>> GetAllShopItem(int? page, int? size);
     public Task<BuyResponse> BuyItemFromShop(int idItem, int userId);
     public Task<List<int>> GetUserShopItem(int userId);
-    public Task<List<GameItemResponse>> GetUserItem(int userId);
+    public Task<List<UserInventoryResponse>> GetUserItem(int userId);
     public Task<PagingResponse<GameItemResponse>> GetGameItemPagination(int? page, int ?size);
     public Task AddNewGameItem(NewItemRequest newItemRequest);
     public Task UpdateGameItem(NewItemRequest newItemRequest);
