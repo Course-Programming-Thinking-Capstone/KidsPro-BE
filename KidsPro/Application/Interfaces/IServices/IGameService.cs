@@ -10,7 +10,7 @@ public interface IGameService
     public Task<List<ModeType>> GetAllGameMode();
     public Task<List<CurrentLevelData>> GetUserCurrentLevel(int userId);
     public Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex);
-    public Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
+    public Task<UserFinishLevelResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest);
     public Task AddNewLevel(ModifiedLevelDataRequest modifiedLevelData);
     public Task<List<LevelDataResponse>> GetLevelsByMode(int modeId);
 

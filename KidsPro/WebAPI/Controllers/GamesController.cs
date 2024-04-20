@@ -238,9 +238,9 @@ public class GamesController : ControllerBase
     /// </summary>
     [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
     [HttpPost("game-play-history")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDataResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserFinishLevelResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<UserDataResponse>> FinishLevelGame(
+    public async Task<ActionResult<UserFinishLevelResponse>> FinishLevelGame(
         [FromBody] UserFinishLevelRequest userFinishLevelRequest)
     {
         var result = await _gameService.UserFinishLevel(userFinishLevelRequest);

@@ -1078,7 +1078,7 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<UserDataResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
+    public async Task<UserFinishLevelResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
         var winLevel =
             await GetGameLevelByTypeAndIndex(userFinishLevelRequest.ModeId, userFinishLevelRequest.LevelIndex);
@@ -1096,7 +1096,7 @@ public class GameService : IGameService
 
         var userData = await _unitOfWork.GameUserProfileRepository.GetAsync(
             o => o.StudentId == userFinishLevelRequest.UserID, null).ContinueWith(o => o.Result.FirstOrDefault());
-        var result = new UserDataResponse
+        var result = new UserFinishLevelResponse
         {
             UserId = userData!.StudentId,
             DisplayName = userData.DisplayName,
@@ -1107,14 +1107,51 @@ public class GameService : IGameService
         };
         // COIN ADD
         await _unitOfWork.BeginTransactionAsync();
-        if (oldData == null) // first play -> add  coin
+        if (oldData == null) // first play -> add coin and drop an item
         {
             userData.Coin += winLevel.CoinReward ?? 0;
             userData.Gem += winLevel.GemReward ?? 0;
-
             result.UserGem = userData.Gem;
             result.UserCoin = userData.Coin;
+
             _unitOfWork.GameUserProfileRepository.Update(userData);
+
+            var availableItem = await _unitOfWork.GameItemRepository
+                .GetAsync(o => o.ItemType == ItemType.DropItem, null)
+                .ContinueWith(o => o.Result.ToList());
+
+            if (availableItem.Count > 0)
+            {
+                Random rd = new Random();
+                var dropItem = availableItem[rd.Next(0, availableItem.Count - 1)];
+
+                var existedOwned = await _unitOfWork.ItemOwnedRepository.GetAsync(
+                    o => o.StudentId == userFinishLevelRequest.UserID
+                         && o.GameItemId == dropItem.Id, null
+                ).ContinueWith(o => o.Result.FirstOrDefault());
+                if (existedOwned != null)
+                {
+                    existedOwned.Quantity += 1;
+                    _unitOfWork.ItemOwnedRepository.Update(existedOwned);
+                }
+                else
+                {
+                    var ownedData = new ItemOwned
+                    {
+                        Id = 0,
+                        DisplayName = dropItem.ItemName,
+                        Quantity = 1,
+                        StudentId = 0,
+                        GameItemId = 0,
+                    };
+                    await _unitOfWork.ItemOwnedRepository.AddAsync(ownedData);
+                }
+
+                result.GameItemGet = new List<GameItemResponse>()
+                {
+                    Mappers.GameMapper.GameItemToGameItemResponse(dropItem)
+                };
+            }
         }
 
         await _unitOfWork.GamePlayHistoryRepository.AddAsync(new GamePlayHistory
