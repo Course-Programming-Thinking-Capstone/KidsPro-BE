@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Request.Order.Momo;
-using Application.Dtos.Response.Order;
 using Application.Dtos.Response.Order.Momo;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -7,8 +6,6 @@ using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Text;
 using System.Text.RegularExpressions;
 using Application.Dtos.Request.Order.ZaloPay;
 using Application.Dtos.Response.Order.ZaloPay;
@@ -21,12 +18,15 @@ public class PaymentService : IPaymentService
     readonly IUnitOfWork _unitOfWork;
     private IAccountService _accountService;
     IMomoConfig _momoConfig;
+    private IMomoService _momoService;
 
-    public PaymentService(IUnitOfWork unitOfWork,IAccountService accountService, IMomoConfig momoConfig)
+    public PaymentService(IUnitOfWork unitOfWork, IAccountService accountService, IMomoConfig momoConfig,
+        IMomoService momoService)
     {
         _unitOfWork = unitOfWork;
         _accountService = accountService;
         _momoConfig = momoConfig;
+        _momoService = momoService;
     }
 
     #region Transaction
@@ -37,11 +37,11 @@ public class PaymentService : IPaymentService
         //var parentId = GetIdMomoResponse(dto.requestId);
 
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId, OrderStatus.Process)
-            ??throw new  BadRequestException($"OrderId {orderId} not found, can't update to pending status");
+                    ?? throw new BadRequestException($"OrderId {orderId} not found, can't update to pending status");
 
         order.Status = OrderStatus.Pending;
         _unitOfWork.OrderRepository.Update(order);
-        
+
         var transaction = new Transaction()
         {
             OrderId = orderId,
@@ -56,7 +56,7 @@ public class PaymentService : IPaymentService
         return orderId;
     }
 
-    public async Task<Transaction> GetTransactionByOrderIdAsync(int orderId)
+    private async Task<Transaction> GetTransactionByOrderIdAsync(int orderId)
     {
         var transaction = await _unitOfWork.TransactionRepository.GetByIdAsync(orderId);
         return transaction ?? throw new NotFoundException($"OrderId: {orderId} not found in transaction");
@@ -68,7 +68,7 @@ public class PaymentService : IPaymentService
 
         var transaction = await GetTransactionByOrderIdAsync(orderId);
         transaction.Status = TransactionStatus.Refunded;
-        
+
         _unitOfWork.TransactionRepository.Update(transaction);
         await _unitOfWork.SaveChangeAsync();
     }
@@ -77,74 +77,6 @@ public class PaymentService : IPaymentService
 
     #region Momo
 
-    public string MakeSignatureMomoPayment(string accessKey, string secretKey, MomoPaymentRequest momo)
-    {
-        var rawHash = "accessKey=" + accessKey +
-                      "&amount=" + momo.amount + "&extraData=" + momo.extraData +
-                      "&ipnUrl=" + momo.ipnUrl + "&orderId=" + momo.orderId +
-                      "&orderInfo=" + momo.orderInfo + "&partnerCode=" + momo.partnerCode +
-                      "&redirectUrl=" + momo.redirectUrl + "&requestId=" + momo.requestId + "&requestType=" +
-                      momo.requestType;
-        return momo.signature = HashingUtils.HmacSha256(rawHash, secretKey);
-    }
-
-    public string MakeSignatureMomoRefund(string accessKey, string secretKey, MomoRefundRequest momo)
-    {
-        var rawHash = "accessKey=" + accessKey +
-                      "&amount=" + momo.amount + "&description=" + momo.description +
-                      "&orderId=" + momo.orderId + "&partnerCode=" + momo.partnerCode +
-                      "&requestId=" + momo.requestId + "&transId=" + momo.transId;
-        return momo.signature = HashingUtils.HmacSha256(rawHash, secretKey);
-    }
-
-    public (string?, string?) GetLinkMomoGateway(string paymentUrl, MomoPaymentRequest momoRequest)
-    {
-        using HttpClient client = new HttpClient();
-        var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Formatting = Formatting.Indented,
-        });
-        var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
-
-        var createPaymentLink = client.PostAsync(paymentUrl, requestContent).Result;
-        if (createPaymentLink.IsSuccessStatusCode)
-        {
-            var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
-            var responeseData = JsonConvert.DeserializeObject<MomoPaymentResponse>(responseContent);
-            // return QRcode
-            if (responeseData?.resultCode == 0)
-                return (responeseData.payUrl, responeseData.qrCodeUrl);
-            throw new NotImplementException($"Error Momo: {responeseData?.message}");
-        }
-
-        throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
-    }
-    
-    public MomoPaymentResponse SentRequestMomoRefund(string paymentUrl, MomoRefundRequest momoRequest)
-    {
-        using HttpClient client = new HttpClient();
-        var requestData = JsonConvert.SerializeObject(momoRequest, new JsonSerializerSettings()
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Formatting = Formatting.Indented,
-        });
-        var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
-
-        var createPaymentLink = client.PostAsync(paymentUrl, requestContent).Result;
-        if (createPaymentLink.IsSuccessStatusCode)
-        {
-            var responseContent = createPaymentLink.Content.ReadAsStringAsync().Result;
-            var responeseData = JsonConvert.DeserializeObject<MomoPaymentResponse>(responseContent);
-            // return QRcode
-            if (responeseData?.resultCode == 0)
-                return responeseData;
-            throw new NotImplementException($"Error Momo: {responeseData?.message}");
-        }
-
-        throw new NotImplementException($"Error Momo: {createPaymentLink.ReasonPhrase}");
-    }
-    
     private int GetIdMomoResponse(string id)
     {
         Regex regex = new Regex("-(\\d+)");
@@ -152,7 +84,7 @@ public class PaymentService : IPaymentService
         if (macth.Success) return Int32.Parse(macth.Groups[1].Value);
         return 0;
     }
-    
+
     public async Task<MomoPaymentResponse> RequestMomoRefundAsync(int orderId)
     {
         var momoRequest = new MomoRefundRequest();
@@ -165,12 +97,12 @@ public class PaymentService : IPaymentService
         momoRequest.amount = (long)transaction.Amount;
         momoRequest.partnerCode = _momoConfig.PartnerCode;
         momoRequest.transId = long.Parse(transaction.TransactionCode!);
-        momoRequest.description = "KidsPro refunds for order with OrderCode '" +transaction.Order!.OrderCode+ "'";
-        momoRequest.signature = MakeSignatureMomoRefund
+        momoRequest.description = "KidsPro refunds for order with OrderCode '" + transaction.Order!.OrderCode + "'";
+        momoRequest.signature = _momoService.MakeSignatureMomoRefund
             (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
 
         // Request Momo Refund
-        return SentRequestMomoRefund(_momoConfig.RefundUrl, momoRequest);
+        return _momoService.SentRequestMomoRefund(_momoConfig.RefundUrl, momoRequest);
     }
 
     #endregion

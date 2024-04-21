@@ -1,18 +1,18 @@
-﻿using Application.ErrorHandlers;
+﻿using Application;
+using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Domain.Entities;
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
+using Google.Apis.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using WebAPI.Gateway.Configuration;
 using WebAPI.Gateway.IConfig;
 
-namespace Application.Services;
+namespace Infrastructure.Services;
 
-public class GoogleDriveService : IGoogleDriveService
+public class GoogleDriveService:IGoogleDriveService
 {
     private IDriveConfig _drive;
     private IUnitOfWork _unit;
