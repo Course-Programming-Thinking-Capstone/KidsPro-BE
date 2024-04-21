@@ -15,6 +15,8 @@ public class CourseGame : BaseEntity
 
     public bool IsDelete { get; set; }
 
-    public int? CourseId { get; set; }
-    public virtual Course? Course { get; set; }
+    // public int? CourseId { get; set; }
+    // public virtual Course? Course { get; set; }
+
+    public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
 }

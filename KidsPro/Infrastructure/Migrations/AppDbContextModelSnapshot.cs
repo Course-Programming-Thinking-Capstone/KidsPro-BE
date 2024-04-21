@@ -92,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 4, 19, 14, 38, 54, 801, DateTimeKind.Utc).AddTicks(6358),
+                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 25, 913, DateTimeKind.Utc).AddTicks(7090),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$GXsljSyPlE75Wjfj3WYCu.7yJj2LuogjXFQravmGPev4bbu3U80RG",
+                            PasswordHash = "$2a$11$Y1ZGJfkprmOLeo4Qi41VAeI8PHv7h8QJg20euf5xy7eMR4sP5IXha",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 4, 19, 14, 38, 55, 30, DateTimeKind.Utc).AddTicks(6490),
+                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 26, 404, DateTimeKind.Utc).AddTicks(5285),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$bu5t4NGI0AFft8qqK2tB.OySs.4FdJVpA.EOm.pnOTWQK26F6Tq9G",
+                            PasswordHash = "$2a$11$D64hCBdtIWJFOcjkEeeLzuW9cxdIL7FjtRR9ny6xt8zmNuPP8k37G",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 4, 19, 14, 38, 55, 279, DateTimeKind.Utc).AddTicks(9553),
+                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 26, 745, DateTimeKind.Utc).AddTicks(9208),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$Ib2NT08XJHi7.CZAOBT94exuPkICIYdxRv.81Q.jlgsvAGVjjn9le",
+                            PasswordHash = "$2a$11$OuBmYB6.Kx6P5d8.ZfjPxOlHbJYaxcjcFvPvZ0DnxGuxraY0FPx.S",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 4, 19, 14, 38, 55, 498, DateTimeKind.Utc).AddTicks(7845),
+                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 27, 51, DateTimeKind.Utc).AddTicks(2955),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$UitaKH8rn4wWE8Yz2vvmNelR/dURZhKUSKaa/jEa9fQr8Dxg3G31W",
+                            PasswordHash = "$2a$11$VgaBgK/ro1tm71CAGlCM0uiH5IAkm/gTLZsydRpEFboTapMs01HHy",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 4, 19, 14, 38, 55, 723, DateTimeKind.Utc).AddTicks(6819),
+                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 27, 404, DateTimeKind.Utc).AddTicks(7743),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$B2aLVmUcT.qmWY9YGMp.juAztdEiDzqUW2o7n.L8hCL0dytemgkFi",
+                            PasswordHash = "$2a$11$eQlAQpt5BTCgUKcQM0JPB.dAg27NmzYUTv9ba/2Tx7r3bRwd3aN1m",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -416,9 +416,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ApprovedById");
 
-                    b.HasIndex("CourseGameId")
-                        .IsUnique()
-                        .HasFilter("[CourseGameId] IS NOT NULL");
+                    b.HasIndex("CourseGameId");
 
                     b.HasIndex("CreatedById");
 
@@ -438,9 +436,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CourseId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
@@ -2173,8 +2168,8 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ApprovedById");
 
                     b.HasOne("Domain.Entities.CourseGame", "CourseGame")
-                        .WithOne("Course")
-                        .HasForeignKey("Domain.Entities.Course", "CourseGameId");
+                        .WithMany("Courses")
+                        .HasForeignKey("CourseGameId");
 
                     b.HasOne("Domain.Entities.Account", "CreatedBy")
                         .WithMany()
@@ -2752,7 +2747,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.CourseGame", b =>
                 {
-                    b.Navigation("Course");
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("Domain.Entities.GameVoucher", b =>

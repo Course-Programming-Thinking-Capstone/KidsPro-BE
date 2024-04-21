@@ -126,11 +126,11 @@ public class AppDbContext : DbContext
                     .OnDelete(DeleteBehavior.Restrict)
             );
 
-        modelBuilder.Entity<Course>()
-            .HasOne(c => c.CourseGame)
-            .WithOne(cg => cg.Course)
-            .HasForeignKey<Course>(c => c.CourseGameId)
-            .IsRequired(false);
+        // modelBuilder.Entity<Course>()
+        //     .HasOne(c => c.CourseGame)
+        //     .WithOne(cg => cg.Course)
+        //     .HasForeignKey<Course>(c => c.CourseGameId)
+        //     .IsRequired(false);
 
         //data seeding
         modelBuilder.Entity<Role>().HasData(
