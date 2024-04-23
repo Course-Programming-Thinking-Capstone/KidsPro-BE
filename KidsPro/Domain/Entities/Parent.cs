@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Entities;
 
 [Index(nameof(PhoneNumber), IsUnique = true)]
+[Index(nameof(AccountId), IsUnique = true)]
 public class Parent : BaseEntity
 {
     [MaxLength(11)] public string? PhoneNumber { get; set; }

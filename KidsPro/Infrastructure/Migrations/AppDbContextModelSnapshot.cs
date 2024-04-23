@@ -92,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 25, 913, DateTimeKind.Utc).AddTicks(7090),
+                            CreatedDate = new DateTime(2024, 4, 23, 15, 23, 52, 479, DateTimeKind.Utc).AddTicks(3482),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$Y1ZGJfkprmOLeo4Qi41VAeI8PHv7h8QJg20euf5xy7eMR4sP5IXha",
+                            PasswordHash = "$2a$11$jJeglJ0gGdVTledAVRzvXeTCYxQhjONq3ptt594skn9rErEIlelQi",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 26, 404, DateTimeKind.Utc).AddTicks(5285),
+                            CreatedDate = new DateTime(2024, 4, 23, 15, 23, 52, 777, DateTimeKind.Utc).AddTicks(5807),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$D64hCBdtIWJFOcjkEeeLzuW9cxdIL7FjtRR9ny6xt8zmNuPP8k37G",
+                            PasswordHash = "$2a$11$OJ3xIz9YqHVhsFeY856v3ujbptHXxfNO0TSsVIHswfpw0EHAJQtfK",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 26, 745, DateTimeKind.Utc).AddTicks(9208),
+                            CreatedDate = new DateTime(2024, 4, 23, 15, 23, 53, 99, DateTimeKind.Utc).AddTicks(394),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$OuBmYB6.Kx6P5d8.ZfjPxOlHbJYaxcjcFvPvZ0DnxGuxraY0FPx.S",
+                            PasswordHash = "$2a$11$prBhys2x4ncvlawNbSxMG.j1MWOjgfRbQU1LkNFN/LArcqEZFM2T6",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 27, 51, DateTimeKind.Utc).AddTicks(2955),
+                            CreatedDate = new DateTime(2024, 4, 23, 15, 23, 53, 401, DateTimeKind.Utc).AddTicks(433),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$VgaBgK/ro1tm71CAGlCM0uiH5IAkm/gTLZsydRpEFboTapMs01HHy",
+                            PasswordHash = "$2a$11$8XDI6nJFzIkxxttDwC0MeuOvdY1keAZttnvB8MlilhV/U4/Xd.KWu",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 4, 21, 2, 23, 27, 404, DateTimeKind.Utc).AddTicks(7743),
+                            CreatedDate = new DateTime(2024, 4, 23, 15, 23, 53, 717, DateTimeKind.Utc).AddTicks(6325),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$eQlAQpt5BTCgUKcQM0JPB.dAg27NmzYUTv9ba/2Tx7r3bRwd3aN1m",
+                            PasswordHash = "$2a$11$/UIvewuLPqzKMd.SjFD6fOB/6YkBhiq5myYX144j8GSMSL71IdO9y",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -360,10 +360,6 @@ namespace Infrastructure.Migrations
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
-                    b.Property<DateTime?>("EndSaleDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
-
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
@@ -389,13 +385,6 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
-
-                    b.Property<bool>("RequireAdminApproval")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("StartSaleDate")
-                        .HasPrecision(2)
-                        .HasColumnType("datetime2(2)");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -538,8 +527,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("LevelTypeId");
 
-                    b.HasIndex("SectionId")
-                        .IsUnique();
+                    b.HasIndex("SectionId");
 
                     b.ToTable("Games");
                 });
@@ -1692,9 +1680,6 @@ namespace Infrastructure.Migrations
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
 
-                    b.Property<int>("GameQuizRoomId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("JoinTime")
                         .HasPrecision(2)
                         .HasColumnType("datetime2(2)");
@@ -2217,8 +2202,8 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Section", "Section")
-                        .WithOne("Games")
-                        .HasForeignKey("Domain.Entities.Game", "SectionId")
+                        .WithMany()
+                        .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2800,8 +2785,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Section", b =>
                 {
-                    b.Navigation("Games");
-
                     b.Navigation("Lessons");
 
                     b.Navigation("Quizzes");

@@ -14,15 +14,15 @@ public class Course : BaseEntity
 
     [MaxLength(250)] public string? PictureUrl { get; set; }
 
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
-    public DateTime? StartSaleDate { get; set; }
-
-    [DataType(DataType.DateTime)]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
-    [Precision(2)]
-    public DateTime? EndSaleDate { get; set; }
+    // [DataType(DataType.DateTime)]
+    // [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
+    // [Precision(2)]
+    // public DateTime? StartSaleDate { get; set; }
+    //
+    // [DataType(DataType.DateTime)]
+    // [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
+    // [Precision(2)]
+    // public DateTime? EndSaleDate { get; set; }
 
     [Range(0, int.MaxValue)]
     [Precision(11, 2)]
@@ -57,8 +57,6 @@ public class Course : BaseEntity
 
     public virtual Account? ModifiedBy { get; set; }
     public int? ModifiedById { get; set; }
-
-    public bool RequireAdminApproval { get; set; }
 
     public virtual Account? ApprovedBy { get; set; }
     public int? ApprovedById { get; set; }

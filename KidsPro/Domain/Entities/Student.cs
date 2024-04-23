@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Entities;
 
 [Index(nameof(UserName), IsUnique = true)]
+[Index(nameof(AccountId), IsUnique = true)]
 public class Student : BaseEntity
 {
     public int AccountId { get; set; }

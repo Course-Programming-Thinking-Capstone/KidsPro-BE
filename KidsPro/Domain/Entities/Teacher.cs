@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[Index(nameof(AccountId), IsUnique = true)]
 public class Teacher : BaseEntity
 {
     [MaxLength(150)] public string? Field { get; set; }
