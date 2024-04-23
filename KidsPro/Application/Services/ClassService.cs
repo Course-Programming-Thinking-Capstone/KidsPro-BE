@@ -9,11 +9,8 @@ using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Application.Mappers;
 using Application.Utils;
-using Discord;
-using Discord.WebSocket;
 using Domain.Entities;
 using Domain.Enums;
-using WebAPI.Gateway.IConfig;
 
 namespace Application.Services;
 
@@ -22,20 +19,19 @@ public class ClassService : IClassService
     private IUnitOfWork _unitOfWork;
     private IAccountService _account;
     private INotificationService _notify;
-    private IDiscordConfig _discord;
+    private IDiscordService _discord;
     private IProgressService _progress;
 
-    //Discord
-    private static DiscordSocketClient _client;
+   
 
     public ClassService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
-        IDiscordConfig discord, IProgressService progress)
+        IProgressService progress, IDiscordService discord)
     {
         _unitOfWork = unitOfWork;
         _account = account;
         _notify = notify;
-        _discord = discord;
         _progress = progress;
+        _discord = discord;
     }
 
     private async Task<AccountDto> CheckPermission()
@@ -47,39 +43,7 @@ public class ClassService : IClassService
         return account;
     }
 
-    #region Discord
-
-    private async Task InitializeDiscordConnection()
-    {
-        try
-        {
-            _client = new DiscordSocketClient();
-            await _client.LoginAsync(TokenType.Bot, _discord.BotToken);
-            await _client.StartAsync();
-            // Kiểm tra xem bot đã kết nối thành công
-            if (_client.ConnectionState == ConnectionState.Connected) return;
-            // Đợi bot kết nối và sẵn sàng hoạt động, Chờ 5 giây
-            await Task.Delay(5000);
-        }
-        catch (Exception ex)
-        {
-            throw new BadRequestException("Unable connect to Discord Bot, error " + ex);
-        }
-    }
-
-    private async Task<string> CreateVoiceChannelAsync(string voiceChannelName)
-    {
-        //Connect to discord
-        await InitializeDiscordConnection();
-
-        var guild = _client.GetGuild(ulong.Parse(_discord.ServerId))
-                    ?? throw new NotFoundException("Discord server Id not found");
-
-        var newVoiceChannel = await guild.CreateVoiceChannelAsync(voiceChannelName);
-        return $"https://discord.com/channels/{_discord.ServerId}/{newVoiceChannel.Id}";
-    }
-
-    #endregion
+    
 
     #region Class
 
@@ -185,7 +149,7 @@ public class ClassService : IClassService
 
         string? discordLink = null;
         if (dto.RoomUrl == string.Empty)
-            discordLink = await CreateVoiceChannelAsync("Class: " + entityClass.Code);
+            discordLink = await _discord.CreateVoiceChannelAsync("Class: " + entityClass.Code);
 
         var time = TimeUtils.GetTimeFromSlot(dto.Slot, dto.SlotTime);
 

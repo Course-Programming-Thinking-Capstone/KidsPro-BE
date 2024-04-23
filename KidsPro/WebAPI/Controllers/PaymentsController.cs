@@ -18,15 +18,17 @@ namespace WebAPI.Controllers
         IAuthenticationService _authentication;
         IZaloPayConfig _zaloPayConfig;
         private IOrderService _order;
+        private IMomoService _momoService;
 
         public PaymentsController(IPaymentService payment, IMomoConfig momoConfig,
-            IAuthenticationService authentication, IZaloPayConfig zaloPayConfig, IOrderService order)
+            IAuthenticationService authentication, IZaloPayConfig zaloPayConfig, IOrderService order, IMomoService momoService)
         {
             _payment = payment;
             _momoConfig = momoConfig;
             _authentication = authentication;
             _zaloPayConfig = zaloPayConfig;
             _order = order;
+            _momoService = momoService;
         }
 
         #region Momo
@@ -54,11 +56,11 @@ namespace WebAPI.Controllers
             momoRequest.ipnUrl = _momoConfig.IpnUrl;
             momoRequest.partnerCode = _momoConfig.PartnerCode;
             momoRequest.orderInfo = " 'KidsPro Service' - You are paying for " + order.Note;
-            momoRequest.signature = _payment.MakeSignatureMomoPayment
+            momoRequest.signature = _momoService.MakeSignatureMomoPayment
                 (_momoConfig.AccessKey, _momoConfig.SecretKey, momoRequest);
 
             // lấy link QR momo
-            var result = _payment.GetLinkMomoGateway(_momoConfig.PaymentUrl, momoRequest);
+            var result = _momoService.GetLinkMomoGateway(_momoConfig.PaymentUrl, momoRequest);
             return Ok(new
             {
                 payUrl = result.Item1,
