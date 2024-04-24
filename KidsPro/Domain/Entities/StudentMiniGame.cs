@@ -22,5 +22,5 @@ public class StudentMiniGame : BaseEntity
     public int StudentId { get; set; }
 
     public virtual MiniGame MiniGame { get; set; } = null!;
-    public int GameQuizRoomId { get; set; }
+    public int MiniGameId { get; set; }
 }

@@ -23,5 +23,4 @@ public class Section : BaseEntity
 
     public virtual List<Quiz> Quizzes { get; set; } = new List<Quiz>();
 
-    public virtual Game? Games { get; set; }
 }

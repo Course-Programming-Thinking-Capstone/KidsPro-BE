@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
+[Index(nameof(AccountId), IsUnique = true)]
 public class Staff : BaseEntity
 {
     [MaxLength(3000)] public string? Biography { get; set; }
