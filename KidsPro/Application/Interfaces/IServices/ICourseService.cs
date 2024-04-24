@@ -69,7 +69,7 @@ public interface ICourseService
         IEnumerable<UpdateSectionComponentNumberDto> dtos);
 
     Task<CourseOrderDto> GetCoursePaymentAsync(int courseId, int classId);
-    Task StartStudySectionAsync(StudentProgressRequest dto);
+    Task StartStudyCourseAsync(StudentProgressRequest dto);
     Task MarkLessonCompletedAsync(int lessonId);
     Task UpdateToPendingStatus(int courseId, int number);
     Task<List<CourseModerationResponse>> GetCourseModerationAsync();

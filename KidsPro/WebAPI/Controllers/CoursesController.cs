@@ -217,9 +217,9 @@ public class CoursesController : ControllerBase
     [HttpPost("start-study")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<IActionResult> StartStudyCourseAsyn(StudentProgressRequest dto)
+    public async Task<IActionResult> StartStudyCourseAsync(StudentProgressRequest dto)
     {
-        await _courseService.StartStudySectionAsync(dto);
+        await _courseService.StartStudyCourseAsync(dto);
         return Ok(new
         {
             Message = "Start study section successfully"
@@ -235,7 +235,7 @@ public class CoursesController : ControllerBase
     [HttpPatch("mark-lesson-completed")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<IActionResult> MartLessonCompletedAsync(int lessonId)
+    public async Task<IActionResult> MarkLessonCompletedAsync(int lessonId)
     {
         await _courseService.MarkLessonCompletedAsync(lessonId);
         return Ok(new

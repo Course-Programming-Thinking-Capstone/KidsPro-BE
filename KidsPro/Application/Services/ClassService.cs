@@ -59,7 +59,7 @@ public class ClassService : IClassService
 
     public async Task<TeacherClassDto> GetTeacherClassByCodeAsync(string classCode)
     {
-        var entity = await _unitOfWork.ClassRepository.GetClassByCode(classCode)
+        var entity = await _unitOfWork.ClassRepository.GetClassByCodeAsync(classCode)
             .ContinueWith(t => t.Result ?? throw new NotFoundException($"Class {classCode} not found."));
         return ClassMapper.ClassToTeacherClassDto(entity);
     }
@@ -68,7 +68,7 @@ public class ClassService : IClassService
     {
         var account = await CheckPermission();
 
-        if (await _unitOfWork.ClassRepository.ExistByClassCode(dto.ClassCode))
+        if (await _unitOfWork.ClassRepository.ExistByClassCodeAsync(dto.ClassCode))
             throw new BadRequestException("Class Code has been existed");
 
         var course = await _unitOfWork.CourseRepository.GetByIdAsync(dto.CourseId) ??
@@ -122,7 +122,7 @@ public class ClassService : IClassService
     {
         var account = await _account.GetCurrentAccountInformationAsync();
 
-        var classes = await _unitOfWork.ClassRepository.GetClassByRole(account.IdSubRole, account.Role);
+        var classes = await _unitOfWork.ClassRepository.GetClassByRoleAsync(account.IdSubRole, account.Role);
         if (classes.Count == 0) throw new NotFoundException($"Teacher or student do not have a class");
 
         var classResponse= ClassMapper.ClassToClassesResponse(classes);

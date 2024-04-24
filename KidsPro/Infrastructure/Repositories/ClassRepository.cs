@@ -15,7 +15,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
     {
     }
 
-    public async Task<bool> ExistByClassCode(string code)
+    public async Task<bool> ExistByClassCodeAsync(string code)
     {
         return await _dbSet.FirstOrDefaultAsync(x => x.Code == code)
             .ContinueWith(task => task.Result != null);
@@ -31,7 +31,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<List<Class>> GetClassByRole(int id, string role)
+    public async Task<List<Class>> GetClassByRoleAsync(int id, string role)
     {
         IQueryable<Class> query = _dbSet.AsNoTracking();
 
@@ -52,7 +52,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
             .Include(x => x.Schedules).ToListAsync();
     }
 
-    public async Task<Class?> GetClassByCode(string code)
+    public async Task<Class?> GetClassByCodeAsync(string code)
     {
         return await _dbSet.Where(c => c.Code == code)
             .Include(c => c.Students.OrderBy(s => s.Account.FullName))

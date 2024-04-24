@@ -1084,7 +1084,7 @@ public class CourseService : ICourseService
         throw new Exception($"Section component type {type.ToString()} can not found.");
     }
 
-    public async Task StartStudySectionAsync(StudentProgressRequest dto)
+    public async Task StartStudyCourseAsync(StudentProgressRequest dto)
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
 
