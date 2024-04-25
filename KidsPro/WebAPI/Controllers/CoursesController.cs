@@ -263,7 +263,7 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Staff get list course moderation
+    /// Staff or Admin get list course moderation
     /// </summary>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]

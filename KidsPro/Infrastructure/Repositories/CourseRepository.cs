@@ -65,6 +65,9 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             case CourseStatus.Pending:
                 query = query.Where(x => x.Status == CourseStatus.Pending);
                 break;
+            case CourseStatus.Waiting:
+                query = query.Where(x => x.Status == CourseStatus.Waiting);
+                break;
         }
 
         return await query.Include(x => x.Sections)

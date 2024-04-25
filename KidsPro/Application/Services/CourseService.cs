@@ -527,7 +527,7 @@ public class CourseService : ICourseService
 
                         section.Quizzes = quizzes;
                     }
-                    
+
                     // update section time
                     section.SectionTime = sectionTime;
                 }
@@ -1147,14 +1147,20 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
     }
 
-    private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
-    {
-        return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
-    }
+    // private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
+    // {
+    //     return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
+    // }
 
     public async Task<List<CourseModerationResponse>> GetCourseModerationAsync()
     {
-        var course = await GetCourseByStatusAsync(CourseStatus.Pending);
-        return CourseMapper.CourseToCourseModerationResponse(course);
+        var account = await _accountService.GetCurrentAccountInformationAsync();
+
+        if (account.Role == Constant.AdminRole)
+            return CourseMapper.CourseToCourseModerationResponse
+                (await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(CourseStatus.Waiting));
+        //Staff moderating course
+        return CourseMapper.CourseToCourseModerationResponse
+            (await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(CourseStatus.Pending)); 
     }
 }
