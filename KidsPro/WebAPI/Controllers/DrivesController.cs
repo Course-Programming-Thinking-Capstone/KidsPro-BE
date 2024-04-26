@@ -13,22 +13,22 @@ namespace WebAPI.Controllers;
 public class DrivesController : ControllerBase
 {
     private IGoogleDriveService _driveService;
-    private IYoutubeV3Service _youtubeV3Service;
+    private ICloudStorageService _cloudStorage;
 
-    public DrivesController(IGoogleDriveService drive, IYoutubeV3Service youtubeV3Service)
+    public DrivesController(IGoogleDriveService drive, ICloudStorageService youtubeV3Service)
     {
         _driveService = drive;
-        _youtubeV3Service = youtubeV3Service;
+        _cloudStorage = youtubeV3Service;
     }
 
     /// <summary>
-    /// Upload video to gg drive
+    /// Upload video to Google Drive
     /// </summary>
     /// <param name="videoFile"></param>
     /// <param name="sectionId"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-   // [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
+    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
     [HttpPost("drive")]
     public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile? videoFile, int sectionId,int index)
     {
@@ -37,7 +37,7 @@ public class DrivesController : ControllerBase
         var section = await _driveService.GetSectionInformationAsync(sectionId);
 
         //Create course folder
-        var courseFolderId = _driveService.CreateParentFolder("Course: "+section.Course.Name);
+        var courseFolderId = _driveService.CreateParentFolder("Course: " + section.Course.Name);
         //Create lesson folder 
         var sectionFolderId = _driveService.CreateChildFolder("Section: "+section.Id, courseFolderId);
         //Create video  folder 
@@ -49,14 +49,45 @@ public class DrivesController : ControllerBase
 
         return Ok(videoUrl);
     }
-    
-    [HttpPost("youtube")]
-    public async Task<ActionResult<string>> UploadVideoToYoutubeAsync(IFormFile? videoFile)
+
+    /// <summary>
+    /// Upload video to Google Cloud Storage
+    /// </summary>
+    /// <param name="videoFile"></param>
+    /// <param name="videoName"></param>
+    /// <param name="sectionId"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
+    [HttpPost("cloud")]
+    public async Task<ActionResult<string>> UploadVideoToStorageAsync(IFormFile? videoFile,string? videoName,int sectionId)
     {
         if (videoFile == null) throw new BadRequestException("Video file is empty");
         
+        var section = await _driveService.GetSectionInformationAsync(sectionId);
+        var bucket = "kidspro";
+        var folderName =   section.Course.Name;
+        var nameOfVideo = "Section"+sectionId+" "+videoName;
         //Upload video file to gg drive
-        var videoUrl = await _youtubeV3Service.UploadVideoToYoutube(videoFile, "Video Test");
+        var videoUrl = await _cloudStorage.CreateFolderAndUpload(videoFile,nameOfVideo,bucket,folderName);
+
+        return Ok(videoUrl);
+    }
+    /// <summary>
+    /// Get video link from cloud storage
+    /// </summary>
+    /// <param name="videoName"></param>
+    /// <param name="sectionId"></param>
+    /// <returns></returns>
+    [HttpGet("cloud")]
+    public async Task<IActionResult> GetVideoToStorageAsync(string videoName,int sectionId)
+    {
+        
+        var section = await _driveService.GetSectionInformationAsync(sectionId);
+        var bucket = "kidspro";
+        var folderName = section.Course.Name;
+        var nameOfVideo = "Section"+sectionId+" "+videoName;
+        //Upload video file to gg drive
+        var videoUrl =  _cloudStorage.GetVideoByName(bucket,folderName,nameOfVideo);
 
         return Ok(videoUrl);
     }
