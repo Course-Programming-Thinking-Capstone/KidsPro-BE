@@ -830,13 +830,13 @@ public class GameService : IGameService
 
     #region Voucher
 
-    public async Task<BuyResponse> BuyVoucher(int userId, int cost, int voucherType)
+    public async Task<BuyResponse> BuyVoucher(BuyVoucherRequest buyVoucherRequest)
     {
         var userPro5 = _unitOfWork.GameUserProfileRepository.GetAll().FirstOrDefault(
-            o => o.StudentId == userId
+            o => o.StudentId == buyVoucherRequest.UserId
         );
         var studentPro5 = await _unitOfWork.StudentRepository.GetAsync(
-            o => o.Id == userId, null,
+            o => o.Id == buyVoucherRequest.UserId, null,
             includeProperties: nameof(Parent)
         ).ContinueWith(o => o.Result.FirstOrDefault());
 
@@ -845,12 +845,12 @@ public class GameService : IGameService
             throw new BadRequestException("User not found");
         }
 
-        if (userPro5.Gem < cost)
+        if (userPro5.Gem < buyVoucherRequest.Cost)
         {
             throw new BadRequestException("User not enough gem to buy this item");
         }
 
-        userPro5.Gem -= cost;
+        userPro5.Gem -= buyVoucherRequest.Cost;
         var result = new BuyResponse
         {
             CurrentCoin = userPro5.Coin,
@@ -858,7 +858,7 @@ public class GameService : IGameService
             OwnedItem = new List<int>()
         };
 
-        var voucherCase = (VoucherType)voucherType;
+        var voucherCase = (VoucherType)buyVoucherRequest.VoucherType;
 
         var newVoucher = new GameVoucher
         {
@@ -920,12 +920,12 @@ public class GameService : IGameService
 
     #region SHOPPING
 
-    public async Task<BuyResponse> SoldItem(int userId, int soldItemId, int soldCount)
+    public async Task<BuyResponse> SoldItem(SoldItemRequest soldItemRequest)
     {
         var soldItem = await _unitOfWork.ItemOwnedRepository.GetAsync(
-                o => o.GameItemId == soldItemId
-                     && o.StudentId == userId
-                     && o.Quantity <= soldCount
+                o => o.GameItemId == soldItemRequest.SoldItemId
+                     && o.StudentId == soldItemRequest.UserId
+                     && o.Quantity <= soldItemRequest.Quantity
                 , null
                 , includeProperties: nameof(GameItem)
             )
@@ -936,7 +936,7 @@ public class GameService : IGameService
             throw new BadRequestException("Sold failed, you are not owned this item or no have enough quantity");
         }
 
-        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.StudentId == userId, null)
+        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.StudentId == soldItemRequest.UserId, null)
             .ContinueWith(o => o.Result.FirstOrDefault());
         if (user == null)
         {
@@ -946,8 +946,8 @@ public class GameService : IGameService
         await _unitOfWork.BeginTransactionAsync();
         try
         {
-            user.Gem += (soldItem.GameItem.Price * soldCount);
-            soldItem.Quantity += soldCount;
+            user.Gem += (soldItem.GameItem.Price * soldItemRequest.Quantity);
+            soldItem.Quantity += soldItemRequest.Quantity;
             _unitOfWork.ItemOwnedRepository.Update(soldItem); // minus owned item
             _unitOfWork.GameUserProfileRepository.Update(user); // update wallet
             await _unitOfWork.SaveChangeAsync();
