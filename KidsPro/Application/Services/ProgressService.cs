@@ -41,4 +41,11 @@ public class ProgressService : IProgressService
 
         return ProgressMapper.StudentToProgressResponseList(student);
     }
+
+    public async Task<List<CheckProgressResponse>> CheckSectionAsync(List<int> sectionIds)
+    {
+        var account = await _account.GetCurrentAccountInformationAsync();
+        var students = await _unit.StudentProgressRepository.CheckStudentProgressAsync(account.IdSubRole, sectionIds);
+        return ProgressMapper.StudentProgressToCheckProgressResponse(students, sectionIds);
+    }
 }

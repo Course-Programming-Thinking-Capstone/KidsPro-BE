@@ -46,5 +46,12 @@ namespace Infrastructure.Repositories
                 .Where(sp => sp.StudentId == studentId && sp.CourseId == courseId)
                 .FirstOrDefaultAsync();
         }
+        public async Task<List<StudentProgress?>> CheckStudentProgressAsync(int studentId, List<int> sectionId)
+        {
+            return (await _dbSet
+                .Where(sp => sp.StudentId == studentId && sectionId.Contains(sp.SectionId))
+                .ToListAsync())!;
+        }
+        
     }
 }

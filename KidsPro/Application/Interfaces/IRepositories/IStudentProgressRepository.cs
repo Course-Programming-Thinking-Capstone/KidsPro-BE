@@ -14,5 +14,6 @@ namespace Application.Interfaces.IRepositories
         Task<bool> CheckStudentSectionExistAsync(int studentId, int sectionId);
 
         Task<StudentProgress?> GetStudentProgressAsync(int studentId, int courseId);
+        Task<List<StudentProgress?>> CheckStudentProgressAsync(int studentId, List<int> sectionId);
     }
 }

@@ -5,6 +5,16 @@ namespace Application.Mappers;
 
 public static class ProgressMapper
 {
+    public static List<CheckProgressResponse> StudentProgressToCheckProgressResponse(List<StudentProgress?> students, List<int> sectionIds)
+    {
+
+        return sectionIds.Select(x => new CheckProgressResponse
+        {
+            SectionId = x,
+            IsCheck = students.Any(s=>s?.SectionId==x)
+        }).ToList();
+
+    }
     public static List<SectionProgressResponse> StudentToProgressResponseList(List<StudentProgress> dto)
     {
         var result = new List<SectionProgressResponse>();
