@@ -46,15 +46,15 @@ public class GamesController : ControllerBase
     /// <param name="cost">gem cost</param>
     /// <param name="voucherType">voucher type: 1,2,3</param>
     /// <returns></returns>
-    [HttpPost("game-voucher/")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<BuyResponse>> BuyVoucher(
-        [FromBody] int userId, [FromBody] int cost, [FromBody] int voucherType)
-    {
-        var result = await _gameService.BuyVoucher(userId, cost, voucherType);
-        return Ok(result);
-    }
+    // [HttpPost("game-voucher/")]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
+    // [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    // public async Task<ActionResult<BuyResponse>> BuyVoucher(
+    //     [FromBody] int userId, [FromBody] int cost, [FromBody] int voucherType)
+    // {
+    //     var result = await _gameService.BuyVoucher(userId, cost, voucherType);
+    //     return Ok(result);
+    // }
 
     #endregion
 
