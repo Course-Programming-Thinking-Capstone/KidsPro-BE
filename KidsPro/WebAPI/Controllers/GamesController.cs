@@ -36,63 +36,42 @@ public class GamesController : ControllerBase
         return Ok();
     }
 
+    #region VOUCHER
+
+    /// <summary>
+    /// Student buy Voucher for parent
+    /// </summary>
+    /// <param name="newItemRequest"></param>
+    /// <param name="userId">user buy</param>
+    /// <param name="cost">gem cost</param>
+    /// <param name="voucherType">voucher type: 1,2,3</param>
+    /// <returns></returns>
+    [HttpPost("game-voucher/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<BuyResponse>> BuyVoucher(
+        [FromBody] int userId, [FromBody] int cost, [FromBody] int voucherType)
+    {
+        var result = await _gameService.BuyVoucher(userId, cost, voucherType);
+        return Ok(result);
+    }
+
+    #endregion
+
     #region SHOP & Item
 
     /// <summary>
-    /// Admin Delete game item
+    /// Get user Items
     /// </summary>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole},")]
-    [HttpDelete("game-item/{deleteId}")]
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
+    [HttpPost("game-drop-item-owned")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameItemResponse>>> DeleteGameItem(
-        [FromRoute] int deleteId)
+    public async Task<ActionResult<List<UserInventoryResponse>>> SoldItem
+        ([FromBody] int userId, [FromBody] int soldItemId, [FromBody] int soldQuantity)
     {
-        await _gameService.DeleteGameItem(deleteId);
-        return Ok();
-    }
-
-    /// <summary>
-    /// Admin update game item
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole},")]
-    [HttpPut("game-item/")]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameItemResponse>>> UpdateNewGameItem(
-        [FromBody] NewItemRequest newItemRequest)
-    {
-        await _gameService.UpdateGameItem(newItemRequest);
-        return Ok();
-    }
-
-    /// <summary>
-    /// Admin Add new game item
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole},")]
-    [HttpPost("game-item/")]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameItemResponse>>> AddNewGameItem(
-        [FromBody] NewItemRequest newItemRequest)
-    {
-        await _gameService.AddNewGameItem(newItemRequest);
-        return Ok();
-    }
-
-    /// <summary>
-    /// Admin get all drop able item in game
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole},")]
-    [HttpGet("game-item/pagination")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItemResponse>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameItemResponse>>> GetGameItemPagination(
-        [FromQuery] int page,
-        [FromQuery] int size)
-    {
-        var result = await _gameService.GetGameItemPagination(page, size);
+        var result = await _gameService.SoldItem(userId, soldItemId, soldQuantity);
         return Ok(result);
     }
 
@@ -107,24 +86,6 @@ public class GamesController : ControllerBase
     public async Task<ActionResult<List<UserInventoryResponse>>> GetUserItem([FromRoute] int userId)
     {
         var result = await _gameService.GetUserItem(userId);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Get pagination of item
-    /// </summary>
-    /// <param name="page"></param>
-    /// <param name="size"></param>
-    /// <returns></returns>
-    [Authorize(Roles = $"{Constant.AdminRole}")]
-    [HttpGet("shop-item/pagination")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItemResponse>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<PagingResponse<GameItemResponse>>> GetShopItemPagination(
-        [FromQuery] int page,
-        [FromQuery] int size)
-    {
-        var result = await _gameService.GetAllShopItem(page, size);
         return Ok(result);
     }
 
@@ -250,6 +211,82 @@ public class GamesController : ControllerBase
     #endregion
 
     #region Admin API
+
+    /// <summary>
+    /// Get pagination of item
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
+    [HttpGet("shop-item/pagination")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItemResponse>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> GetShopItemPagination(
+        [FromQuery] int page,
+        [FromQuery] int size)
+    {
+        var result = await _gameService.GetAllShopItem(page, size);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Admin Delete game item
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
+    [HttpDelete("game-item/{deleteId}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> DeleteGameItem(
+        [FromRoute] int deleteId)
+    {
+        await _gameService.DeleteGameItem(deleteId);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Admin update game item
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
+    [HttpPut("game-item/")]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> UpdateNewGameItem(
+        [FromBody] NewItemRequest newItemRequest)
+    {
+        await _gameService.UpdateGameItem(newItemRequest);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Admin Add new game item
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
+    [HttpPost("game-item/")]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> AddNewGameItem(
+        [FromBody] NewItemRequest newItemRequest)
+    {
+        await _gameService.AddNewGameItem(newItemRequest);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Admin get all drop able item in game
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole},")]
+    [HttpGet("game-item/pagination")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagingResponse<GameItemResponse>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<PagingResponse<GameItemResponse>>> GetGameItemPagination(
+        [FromQuery] int page,
+        [FromQuery] int size)
+    {
+        var result = await _gameService.GetGameItemPagination(page, size);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Admin Get Levels by game mode id

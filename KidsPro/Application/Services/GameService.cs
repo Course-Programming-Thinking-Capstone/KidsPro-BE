@@ -702,7 +702,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_1",
                     ItemRateType = 1,
                     ItemType = 1,
-                    Price = 100
+                    Price = 10
                 },
                 new NewItemRequest
                 {
@@ -712,7 +712,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_2",
                     ItemRateType = 1,
                     ItemType = 1,
-                    Price = 100
+                    Price = 10
                 },
                 new NewItemRequest
                 {
@@ -722,7 +722,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_5",
                     ItemRateType = 1,
                     ItemType = 1,
-                    Price = 100
+                    Price = 10
                 },
                 new NewItemRequest
                 {
@@ -732,7 +732,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_6",
                     ItemRateType = 1,
                     ItemType = 1,
-                    Price = 100
+                    Price = 10
                 },
                 new NewItemRequest
                 {
@@ -742,7 +742,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_10",
                     ItemRateType = 1,
                     ItemType = 1,
-                    Price = 100
+                    Price = 10
                 },
                 new NewItemRequest
                 {
@@ -752,7 +752,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_18",
                     ItemRateType = 2,
                     ItemType = 1,
-                    Price = 150
+                    Price = 15
                 },
                 new NewItemRequest
                 {
@@ -762,7 +762,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_28",
                     ItemRateType = 2,
                     ItemType = 1,
-                    Price = 150
+                    Price = 15
                 },
                 new NewItemRequest
                 {
@@ -772,7 +772,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_30",
                     ItemRateType = 3,
                     ItemType = 1,
-                    Price = 200
+                    Price = 20
                 },
                 new NewItemRequest
                 {
@@ -782,7 +782,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_48",
                     ItemRateType = 4,
                     ItemType = 1,
-                    Price = 250
+                    Price = 25
                 },
                 new NewItemRequest
                 {
@@ -792,7 +792,7 @@ public class GameService : IGameService
                     SpritesUrl = "T_fruit_44",
                     ItemRateType = 5,
                     ItemType = 1,
-                    Price = 300
+                    Price = 30
                 },
             };
             await _unitOfWork.BeginTransactionAsync();
@@ -815,11 +815,145 @@ public class GameService : IGameService
         }
     }
 
-    #region ITEM
+    #region Voucher
+
+    public async Task<BuyResponse> BuyVoucher(int userId, int cost, int voucherType)
+    {
+        var userPro5 = _unitOfWork.GameUserProfileRepository.GetAll().FirstOrDefault(
+            o => o.StudentId == userId
+        );
+        var studentPro5 = await _unitOfWork.StudentRepository.GetAsync(
+            o => o.Id == userId, null,
+            includeProperties: nameof(Parent)
+        ).ContinueWith(o => o.Result.FirstOrDefault());
+
+        if (userPro5 == null || studentPro5 == null)
+        {
+            throw new BadRequestException("User not found");
+        }
+
+        if (userPro5.Gem < cost)
+        {
+            throw new BadRequestException("User not enough gem to buy this item");
+        }
+
+        userPro5.Gem -= cost;
+        var result = new BuyResponse
+        {
+            CurrentCoin = userPro5.Coin,
+            CurrentGem = userPro5.Gem,
+            OwnedItem = new List<int>()
+        };
+
+        var voucherCase = (VoucherType)voucherType;
+
+        var newVoucher = new GameVoucher
+        {
+            Id = 0,
+            ConvertedPoint = 0,
+            DiscountAmount = 0,
+            CreatedDate = DateTime.UtcNow,
+            ExpiredDate = DateTime.UtcNow + new TimeSpan(365, 0, 0, 0, 0),
+            Status = (VoucherStatus)1,
+            ParentId = studentPro5.ParentId
+        };
+
+        switch (voucherCase)
+        {
+            case VoucherType.FirstVoucher:
+                newVoucher.DiscountAmount = 20000;
+                break;
+            case VoucherType.SecondVoucher:
+                newVoucher.DiscountAmount = 50000;
+                break;
+            case VoucherType.ThirdVoucher:
+                newVoucher.DiscountAmount = 100000;
+                break;
+            default:
+                throw new BaseException("Voucher not valid");
+        }
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        // Add voucher
+        try
+        {
+            await _unitOfWork.VoucherRepository.AddAsync(newVoucher);
+            await _unitOfWork.SaveChangeAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        // update user wallet
+        try
+        {
+            _unitOfWork.GameUserProfileRepository.Update(userPro5);
+            await _unitOfWork.SaveChangeAsync();
+        }
+        catch (Exception e)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        await _unitOfWork.CommitAsync();
+        return result;
+    }
 
     #endregion
 
     #region SHOPPING
+
+    public async Task<BuyResponse> SoldItem(int userId, int soldItemId, int soldCount)
+    {
+        var soldItem = await _unitOfWork.ItemOwnedRepository.GetAsync(
+                o => o.GameItemId == soldItemId
+                     && o.StudentId == userId
+                     && o.Quantity <= soldCount
+                , null
+                , includeProperties: nameof(GameItem)
+            )
+            .ContinueWith(o => o.Result.FirstOrDefault());
+
+        if (soldItem == null)
+        {
+            throw new BadRequestException("Sold failed, you are not owned this item or no have enough quantity");
+        }
+
+        var user = await _unitOfWork.GameUserProfileRepository.GetAsync(o => o.StudentId == userId, null)
+            .ContinueWith(o => o.Result.FirstOrDefault());
+        if (user == null)
+        {
+            throw new BadRequestException("User not found");
+        }
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            user.Gem += (soldItem.GameItem.Price * soldCount);
+            soldItem.Quantity += soldCount;
+            _unitOfWork.ItemOwnedRepository.Update(soldItem); // minus owned item
+            _unitOfWork.GameUserProfileRepository.Update(user); // update wallet
+            await _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+        var result = new BuyResponse
+        {
+            CurrentCoin = user.Coin,
+            CurrentGem = user.Gem,
+            OwnedItem = new List<int>()
+        };
+        return result;
+    }
 
     public async Task<BuyResponse> BuyItemFromShop(int idItem, int userId)
     {
@@ -1068,32 +1202,32 @@ public class GameService : IGameService
     }
 
     public async Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex)
+    {
+        var gameLevel = await _unitOfWork.GameLevelRepository
+            .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
+
+        var firstItem = gameLevel.FirstOrDefault();
+
+        if (firstItem == null)
+            return null;
+
+        var levelInformation = await _unitOfWork.GameLevelDetailRepository
+            .GetAsync(o => o.GameLevelId == firstItem.Id, null);
+
+        var result = new LevelInformationResponse
         {
-            var gameLevel = await _unitOfWork.GameLevelRepository
-                .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
-
-            var firstItem = gameLevel.FirstOrDefault();
-
-            if (firstItem == null)
-                return null;
-
-            var levelInformation = await _unitOfWork.GameLevelDetailRepository
-                .GetAsync(o => o.GameLevelId == firstItem.Id, null);
-
-            var result = new LevelInformationResponse
+            CoinReward = firstItem.CoinReward ?? 0,
+            GameReward = firstItem.GemReward ?? 0,
+            VStartPosition = firstItem.VStartPosition,
+            levelDetail = levelInformation.Select(item => new LevelPositionData
             {
-                CoinReward = firstItem.CoinReward ?? 0,
-                GameReward = firstItem.GemReward ?? 0,
-                VStartPosition = firstItem.VStartPosition,
-                levelDetail = levelInformation.Select(item => new LevelPositionData
-                {
-                    VPosition = item.VPosition,
-                    PositionType = item.PositionTypeId
-                }).ToList()
-            };
+                VPosition = item.VPosition,
+                PositionType = item.PositionTypeId
+            }).ToList()
+        };
 
-            return result;
-        }
+        return result;
+    }
 
     public async Task<UserFinishLevelResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
