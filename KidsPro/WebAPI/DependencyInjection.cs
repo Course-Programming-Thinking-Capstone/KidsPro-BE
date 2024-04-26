@@ -44,6 +44,7 @@ public static class DependencyInjection
         services.AddScoped<IZaloPayConfig,ZaloPayConfig>();
         services.AddScoped<IDiscordConfig,DiscordConfig>();
         services.AddScoped<IDriveConfig,DriveConfig>();
+        services.AddScoped<IYoutubeConfig,YoutubeConfig>();
         
         //Add service
         services.Scan(scan => scan

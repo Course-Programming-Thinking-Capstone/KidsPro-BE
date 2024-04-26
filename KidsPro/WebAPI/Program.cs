@@ -22,12 +22,12 @@ if (configuration != null)
     builder.Services.AddApiService(configuration.Key, configuration.Issuer, configuration.Audience);
     builder.Services.AddSingleton(configuration);
 }
-//Gateway
+//Third-parties gateway
 builder.Services.Configure<MomoConfig>(builder.Configuration.GetSection(MomoConfig.ConfigName));
 builder.Services.Configure<ZaloPayConfig>(builder.Configuration.GetSection(ZaloPayConfig.ConfigName));
 builder.Services.Configure<DiscordConfig>(builder.Configuration.GetSection(DiscordConfig.ConfigName));
 builder.Services.Configure<DriveConfig>(builder.Configuration.GetSection(DriveConfig.ConfigName));
-
+builder.Services.Configure<YoutubeConfig>(builder.Configuration.GetSection(YoutubeConfig.ConfigName));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

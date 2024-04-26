@@ -13,10 +13,12 @@ namespace WebAPI.Controllers;
 public class DrivesController : ControllerBase
 {
     private IGoogleDriveService _driveService;
+    private IYoutubeV3Service _youtubeV3Service;
 
-    public DrivesController(IGoogleDriveService drive)
+    public DrivesController(IGoogleDriveService drive, IYoutubeV3Service youtubeV3Service)
     {
         _driveService = drive;
+        _youtubeV3Service = youtubeV3Service;
     }
 
     /// <summary>
@@ -26,8 +28,8 @@ public class DrivesController : ControllerBase
     /// <param name="sectionId"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
-    [HttpPost]
+   // [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
+    [HttpPost("drive")]
     public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile? videoFile, int sectionId,int index)
     {
         if (videoFile == null) throw new BadRequestException("Video file is empty");
@@ -44,6 +46,17 @@ public class DrivesController : ControllerBase
         //Upload video file to gg drive
         var videoUrl = await _driveService
             .UploadVideoToGoogleDrive(videoFile,"Lesson "+index+" - Video", lessonFolderId);
+
+        return Ok(videoUrl);
+    }
+    
+    [HttpPost("youtube")]
+    public async Task<ActionResult<string>> UploadVideoToYoutubeAsync(IFormFile? videoFile)
+    {
+        if (videoFile == null) throw new BadRequestException("Video file is empty");
+        
+        //Upload video file to gg drive
+        var videoUrl = await _youtubeV3Service.UploadVideoToYoutube(videoFile, "Video Test");
 
         return Ok(videoUrl);
     }
