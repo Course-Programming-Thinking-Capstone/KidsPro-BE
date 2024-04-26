@@ -789,7 +789,7 @@ public class GameService : IGameService
                     ItemName = "Black Cherries",
                     Details =
                         "These luscious fruits are not only delicious but also packed with antioxidants and nutrients, offering numerous health benefits. Whether enjoyed fresh as a snack, baked into pies, or preserved in jams, purple cherries add a delightful burst of sweetness to any dish or dessert.",
-                    SpritesUrl = "Dupomo",
+                    SpritesUrl = "T_fruit_44",
                     ItemRateType = 5,
                     ItemType = 1,
                     Price = 300
@@ -1068,32 +1068,32 @@ public class GameService : IGameService
     }
 
     public async Task<LevelInformationResponse?> GetLevelInformation(int typeId, int levelIndex)
-    {
-        var gameLevel = await _unitOfWork.GameLevelRepository
-            .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
-
-        var firstItem = gameLevel.FirstOrDefault();
-
-        if (firstItem == null)
-            return null;
-
-        var levelInformation = await _unitOfWork.GameLevelDetailRepository
-            .GetAsync(o => o.GameLevelId == firstItem.Id, null);
-
-        var result = new LevelInformationResponse
         {
-            CoinReward = firstItem.CoinReward ?? 0,
-            GameReward = firstItem.GemReward ?? 0,
-            VStartPosition = firstItem.VStartPosition,
-            levelDetail = levelInformation.Select(item => new LevelPositionData
-            {
-                VPosition = item.VPosition,
-                PositionType = item.PositionTypeId
-            }).ToList()
-        };
+            var gameLevel = await _unitOfWork.GameLevelRepository
+                .GetAsync(o => o.GameLevelTypeId == typeId && o.LevelIndex == levelIndex, null);
 
-        return result;
-    }
+            var firstItem = gameLevel.FirstOrDefault();
+
+            if (firstItem == null)
+                return null;
+
+            var levelInformation = await _unitOfWork.GameLevelDetailRepository
+                .GetAsync(o => o.GameLevelId == firstItem.Id, null);
+
+            var result = new LevelInformationResponse
+            {
+                CoinReward = firstItem.CoinReward ?? 0,
+                GameReward = firstItem.GemReward ?? 0,
+                VStartPosition = firstItem.VStartPosition,
+                levelDetail = levelInformation.Select(item => new LevelPositionData
+                {
+                    VPosition = item.VPosition,
+                    PositionType = item.PositionTypeId
+                }).ToList()
+            };
+
+            return result;
+        }
 
     public async Task<UserFinishLevelResponse> UserFinishLevel(UserFinishLevelRequest userFinishLevelRequest)
     {
