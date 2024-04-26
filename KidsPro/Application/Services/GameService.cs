@@ -104,8 +104,10 @@ public class GameService : IGameService
             {
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
+
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 1,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -124,8 +126,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 1,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -149,8 +152,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 1,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -192,8 +196,9 @@ public class GameService : IGameService
             {
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 2,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -207,8 +212,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 2,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -227,8 +233,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 9,
                     GameLevelTypeId = 2,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -255,8 +262,9 @@ public class GameService : IGameService
             {
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -285,8 +293,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 25,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -325,8 +334,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 43,
                     GameLevelTypeId = 3,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -388,8 +398,9 @@ public class GameService : IGameService
             {
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 26,
                     GameLevelTypeId = 4,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -418,8 +429,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 35,
                     GameLevelTypeId = 4,
                     LevelDetail = new List<LevelDetailRequest>()
@@ -453,8 +465,9 @@ public class GameService : IGameService
                 },
                 new ModifiedLevelDataRequest
                 {
+                    LevelIndex = 99,
                     CoinReward = 100,
-                    GemReward = 100,
+                    GemReward = 1,
                     VStartPosition = 25,
                     GameLevelTypeId = 4,
                     LevelDetail = new List<LevelDetailRequest>()
