@@ -64,16 +64,16 @@ public class GamesController : ControllerBase
     /// Get user Items
     /// </summary>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
-    [HttpPost("game-drop-item-owned")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<UserInventoryResponse>>> SoldItem
-        ([FromBody] int userId, [FromBody] int soldItemId, [FromBody] int soldQuantity)
-    {
-        var result = await _gameService.SoldItem(userId, soldItemId, soldQuantity);
-        return Ok(result);
-    }
+    // [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
+    // [HttpPost("game-drop-item-owned")]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
+    // [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    // public async Task<ActionResult<List<UserInventoryResponse>>> SoldItem
+    //     ([FromBody] int userId, [FromBody] int soldItemId, [FromBody] int soldQuantity)
+    // {
+    //     var result = await _gameService.SoldItem(userId, soldItemId, soldQuantity);
+    //     return Ok(result);
+    // }
 
     /// <summary>
     /// Get user Items
