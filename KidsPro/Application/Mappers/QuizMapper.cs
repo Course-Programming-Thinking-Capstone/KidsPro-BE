@@ -71,7 +71,7 @@ public static class QuizMapper
             Description = entity.Description,
             Duration = entity.Duration,
             IsOrderRandom = entity.IsOrderRandom,
-            NumberOfAttempt = entity.NumberOfQuestion,
+            NumberOfAttempt = entity.NumberOfAttempt,
             Title = entity.Title,
             TotalQuestion = entity.TotalQuestion,
             TotalScore = entity.TotalScore,
