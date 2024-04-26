@@ -26,10 +26,10 @@ public interface IGameService
     public Task<BuyResponse> BuyItemFromShop(int idItem, int userId);
     public Task<List<int>> GetUserShopItem(int userId);
     public Task<List<UserInventoryResponse>> GetUserItem(int userId);
-    public Task<BuyResponse> SoldItem(int userId, int soldItemId, int soldCount);
+    public Task<BuyResponse> SoldItem(SoldItemRequest soldItemRequest);
     public Task<PagingResponse<GameItemResponse>> GetGameItemPagination(int? page, int ?size);
     public Task AddNewGameItem(NewItemRequest newItemRequest);
     public Task UpdateGameItem(NewItemRequest newItemRequest);
     public Task DeleteGameItem(int deleteId);
-    public Task<BuyResponse> BuyVoucher(int userId,int cost, int voucherType);
+    public Task<BuyResponse> BuyVoucher(BuyVoucherRequest buyVoucherRequest);
 }

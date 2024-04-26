@@ -41,20 +41,18 @@ public class GamesController : ControllerBase
     /// <summary>
     /// Student buy Voucher for parent
     /// </summary>
-    /// <param name="newItemRequest"></param>
-    /// <param name="userId">user buy</param>
-    /// <param name="cost">gem cost</param>
-    /// <param name="voucherType">voucher type: 1,2,3</param>
+  
+    /// <param name="buyVoucherRequest"></param>
     /// <returns></returns>
-    // [HttpPost("game-voucher/")]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
-    // [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    // public async Task<ActionResult<BuyResponse>> BuyVoucher(
-    //     [FromBody] int userId, [FromBody] int cost, [FromBody] int voucherType)
-    // {
-    //     var result = await _gameService.BuyVoucher(userId, cost, voucherType);
-    //     return Ok(result);
-    // }
+    [HttpPost("game-voucher/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<BuyResponse>> BuyVoucher(
+        BuyVoucherRequest buyVoucherRequest)
+    {
+        var result = await _gameService.BuyVoucher(buyVoucherRequest);
+        return Ok(result);
+    }
 
     #endregion
 
@@ -64,16 +62,16 @@ public class GamesController : ControllerBase
     /// Get user Items
     /// </summary>
     /// <returns></returns>
-    // [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
-    // [HttpPost("game-drop-item-owned")]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
-    // [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
-    // public async Task<ActionResult<List<UserInventoryResponse>>> SoldItem
-    //     ([FromBody] int userId, [FromBody] int soldItemId, [FromBody] int soldQuantity)
-    // {
-    //     var result = await _gameService.SoldItem(userId, soldItemId, soldQuantity);
-    //     return Ok(result);
-    // }
+    [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]
+    [HttpPost("game-drop-item-owned/")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BuyResponse>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+    public async Task<ActionResult<List<UserInventoryResponse>>> SoldItem
+        (SoldItemRequest soldItemRequest)
+    {
+        var result = await _gameService.SoldItem(soldItemRequest);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Get user Items
