@@ -6,4 +6,5 @@ public interface IProgressService
 {
     Task<SectionProgressResponse?> GetCourseProgressAsync(int studentId, int courseId);
     Task<List<SectionProgressResponse>?> GetStudentCoursesProgressAsync();
+    Task<List<CheckProgressResponse>> CheckSectionAsync(List<int> sectionIds);
 }

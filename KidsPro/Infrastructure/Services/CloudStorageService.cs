@@ -1,11 +1,8 @@
 ﻿using System.Text;
-using Application;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
 using Google;
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
 using Google.Apis.Storage.v1;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;

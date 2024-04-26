@@ -26,11 +26,12 @@ public class CoursesController : ControllerBase
 {
     private ICourseService _courseService;
     private IQuizService _quizService;
-
-    public CoursesController(ICourseService courseService, IQuizService quizService)
+    private IProgressService _progress;
+    public CoursesController(ICourseService courseService, IQuizService quizService, IProgressService progress)
     {
         _courseService = courseService;
         _quizService = quizService;
+        _progress = progress;
     }
 
     /// <summary>
@@ -398,6 +399,17 @@ public class CoursesController : ControllerBase
     public async Task<ActionResult<QuizDetailDto>> GetQuizByIdAsync([FromRoute] int id)
     {
         var result = await _courseService.GetQuizByIdAsync(id);
+        return Ok(result);
+    }
+    /// <summary>
+    /// Check Student's Study Started
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPost("check-study")]
+    public async Task<ActionResult<QuizDetailDto>> CheckStudyStartedAsync(List<int> id)
+    {
+        var result = await _progress.CheckSectionAsync(id);
         return Ok(result);
     }
 }
