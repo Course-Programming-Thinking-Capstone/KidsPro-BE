@@ -1,7 +1,5 @@
 ﻿using Application.Configurations;
-using Application.Dtos.Response.Order;
 using Application.Dtos.Response.Paging;
-using Application.ErrorHandlers;
 using Application.Interfaces.IRepositories;
 using Domain.Entities;
 using Domain.Enums;
@@ -18,21 +16,21 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public async Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision)
+        public async Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode)
         {
             string orderCode = generateOrderCode(7);
 
-            switch (decision)
-            {
-                // Search By OrderCode
-                case true:
-                    return (await _dbSet.Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
-                        .FirstOrDefaultAsync(x => x.OrderCode == orderCode), null);
-                // tìm kiếm xem order code có tồn tại trong system chưa, truyền vào false, nếu mà tìm không có bằng null thì trả về 
-                // theo order code để tạo mới order, còn nếu trùng thì trả về 1 order để check rồi tạo orderCode khác
-                case false:
-                    return (await _dbSet.FirstOrDefaultAsync(x => x.OrderCode == orderCode), orderCode);
-            }
+            // tìm kiếm xem order code có tồn tại trong system chưa
+            // theo order code để tạo mới order, còn nếu trùng thì trả về 1 order để check rồi tạo orderCode khác
+            return (await _dbSet.FirstOrDefaultAsync(x => x.OrderCode == orderCode), orderCode);
+        }
+
+        public async Task<Order?> SearchByOrderCode(string code)
+        {
+            return await _dbSet.Include(x => x.OrderDetails)!
+                .ThenInclude(x => x.Course)
+                .Include(x=>x.Parent).ThenInclude(x=>x!.Account)
+                .FirstOrDefaultAsync(x => x.OrderCode == code);
         }
 
         public async Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status)
@@ -60,6 +58,7 @@ namespace Infrastructure.Repositories
 
             result.Results = await query.Include(x => x.Parent).ThenInclude(x => x!.Account)
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
+                .OrderByDescending(x => x.Date)
                 .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             result.TotalPages = (int)Math.Ceiling((double)result.TotalRecords / pageSize);

@@ -13,12 +13,13 @@ namespace Application.Interfaces.IRepositories
 {
     public interface IOrderRepository:IBaseRepository<Order>
     {
-        Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode, bool decision);
+        Task<(Order?, string?)> GetByOrderCode(Func<int, string> generateOrderCode);
         Task<Order?> GetOrderByStatusAsync( int orderId,OrderStatus status);
 
         Task<PagingResponse<Order>> GetListOrderAsync(OrderStatus status, int parentId, string role, int pageSize,
             int pageNumber);
         Task<List<Order>?> MobileGetListOrderAsync(OrderStatus status, int parentId, string role);
         Task<Order?> GetOrderDetail(int parentId, int orderId, string role);
+        Task<Order?> SearchByOrderCode(string code);
     }
 }

@@ -21,6 +21,7 @@ namespace WebAPI.Controllers
             _order = order;
             _authentication = authentication;
         }
+
         /// <summary>
         /// API INTERNAL, MOBILE get order by status
         /// </summary>
@@ -34,10 +35,11 @@ namespace WebAPI.Controllers
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
-            
+
             var result = await _order.MobileGetListOrderAsync(status);
             return Ok(result);
         }
+
         /// <summary>
         /// Create order
         /// </summary>
@@ -58,23 +60,24 @@ namespace WebAPI.Controllers
             });
         }
 
-       /// <summary>
-       /// Get order list
-       /// </summary>
-       /// <param name="pageSize"></param>
-       /// <param name="pageNumber"></param>
-       /// <param name="status"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Get order list
+        /// </summary>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
         [Authorize(Roles = $"{Constant.ParentRole},{Constant.StaffRole},{Constant.AdminRole},")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<PagingOrderResponse>> GetOrdersAsync(int? pageSize,int? pageNumber,OrderStatus status)
+        public async Task<ActionResult<PagingOrderResponse>> GetOrdersAsync(int? pageSize, int? pageNumber,
+            OrderStatus status)
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
-            
-            var result = await _order.GetListOrderAsync(status,pageSize,pageNumber);
+
+            var result = await _order.GetListOrderAsync(status, pageSize, pageNumber);
             return Ok(result);
         }
 
@@ -91,7 +94,7 @@ namespace WebAPI.Controllers
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
-            
+
             var result = await _order.GetOrderDetail(id);
             return Ok(result);
         }
@@ -109,7 +112,7 @@ namespace WebAPI.Controllers
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
-            
+
             await _order.ParentCanCelOrderAsync(dto);
             return Ok("Order cancellation request sent successfully");
         }
@@ -128,10 +131,11 @@ namespace WebAPI.Controllers
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
-            
+
             await _order.HandleRefundRequest(dto, status);
             return Ok("Handling the request successfully");
         }
+
         /// <summary>
         /// Staff click on confirm button, order update from pending status to success status
         /// </summary>
@@ -146,8 +150,27 @@ namespace WebAPI.Controllers
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
 
-            await _order.UpdateOrderStatusAsync(orderId:id, OrderStatus.Pending, OrderStatus.Success);
+            await _order.UpdateOrderStatusAsync(orderId: id, OrderStatus.Pending, OrderStatus.Success);
             return Ok("Successfully update to success status");
+        }
+
+        /// <summary>
+        /// Admin and staff search order by code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+        [HttpGet("search/{code}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
+        public async Task<IActionResult> SearchOrderByCodeAsync(string code)
+        {
+            //Check if the account is activated or not or inactive
+            _authentication.CheckAccountStatus();
+
+            var result = await _order.SearchOrderByCodeAsync(code);
+            return Ok(result);
         }
     }
 }

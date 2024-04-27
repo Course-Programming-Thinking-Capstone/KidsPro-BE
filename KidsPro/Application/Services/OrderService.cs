@@ -36,7 +36,7 @@ namespace Application.Services
             {
                 //Create and check exist order code
                 var checkOrderCode =
-                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomNumber, false);
+                    await _unitOfWork.OrderRepository.GetByOrderCode(StringUtils.GenerateRandomNumber);
                 getOrderCode = checkOrderCode.Item1 != null ? null : checkOrderCode.Item2;
                 course = await _unitOfWork.CourseRepository.CheckCourseExist(dto.CourseId);
                 if (course == null) throw new BadRequestException($"CourseId {dto.CourseId} doesn't exist");
@@ -195,6 +195,12 @@ namespace Application.Services
             return order ??
                    throw new NotFoundException($"OrderId {orderId} not exist process status");
         }
-        
+
+        public async Task<OrderResponse?> SearchOrderByCodeAsync(string code)
+        {
+            var order = await _unitOfWork.OrderRepository.SearchByOrderCode(code)
+                ??throw new NotFoundException("OrderCode "+code+" not found");
+            return OrderMapper.OrderToOrderResponse(order);
+        }
     }
 }

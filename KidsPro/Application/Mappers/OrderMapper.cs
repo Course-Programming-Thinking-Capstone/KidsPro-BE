@@ -8,54 +8,37 @@ namespace Application.Mappers
 {
     public class OrderMapper
     {
-        public static  List<OrderResponse> MobileShowOrder(List<Order> orders)
+        public static List<OrderResponse> MobileShowOrder(List<Order> orders)
         {
             var list = new List<OrderResponse>();
             foreach (var x in orders)
-            {
-                var dto = new OrderResponse()
-                {
-                    OrderId = x.Id,
-                    OrderCode = x.OrderCode,
-                    CourseName = x.OrderDetails!.FirstOrDefault()?.Course.Name,
-                    PictureUrl = x.OrderDetails!.FirstOrDefault()?.Course.PictureUrl,
-                    Quantity = x.Quantity,
-                    TotalPrice = x.TotalPrice,
-                    OrderStatus = x.Status.ToString(),
-                    ParentName = x.Parent!.Account.FullName,
-                    PaymentType = x.PaymentType.ToString(),
-                    Note = x.Note
-                };
-                list.Add(dto);
-            }
-
+                list.Add(OrderToOrderResponse(x));
             return list;
         }
+
+        public static OrderResponse OrderToOrderResponse(Order x) => new OrderResponse()
+        {
+            OrderId = x.Id,
+            OrderCode = x.OrderCode,
+            CourseName = x.OrderDetails!.FirstOrDefault()?.Course.Name,
+            PictureUrl = x.OrderDetails!.FirstOrDefault()?.Course.PictureUrl,
+            Quantity = x.Quantity,
+            TotalPrice = x.TotalPrice,
+            OrderStatus = x.Status.ToString(),
+            ParentName = x.Parent!.Account.FullName,
+            PaymentType = x.PaymentType.ToString(),
+            Note = x.Note
+        };
 
         public static PagingOrderResponse OrdersToPagingOrderResponse(PagingResponse<Order> orders)
         {
             var orderPaging = new PagingOrderResponse();
             foreach (var x in orders.Results)
-            {
-                var dto = new OrderResponse()
-                {
-                    OrderId = x.Id,
-                    OrderCode = x.OrderCode,
-                    CourseName = x.OrderDetails!.FirstOrDefault()?.Course.Name,
-                    PictureUrl = x.OrderDetails!.FirstOrDefault()?.Course.PictureUrl,
-                    Quantity = x.Quantity,
-                    TotalPrice = x.TotalPrice,
-                    OrderStatus = x.Status.ToString(),
-                    ParentName = x.Parent!.Account.FullName,
-                    PaymentType = x.PaymentType.ToString(),
-                    Note = x.Note
-                };
-                orderPaging.Order.Add(dto);
-            }
+                orderPaging.Order.Add(OrderToOrderResponse(x));
 
             orderPaging.TotalPage = orders.TotalPages;
             orderPaging.TotalRecords = orders.TotalRecords;
-            return  orderPaging;
+            return orderPaging;
         }
 
         public static OrderDetailResponse ShowOrderDetail(Order order)
