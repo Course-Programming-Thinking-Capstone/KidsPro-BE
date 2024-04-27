@@ -940,7 +940,23 @@ public class CourseService : ICourseService
         string? sortName, string? sortCreatedDate,
         string? sortModifiedDate, int? page, int? size)
     {
-        _authenticationService.GetCurrentUserInformation(out var accountId, out var role);
+        var accountId = 0;
+        string role;
+
+        try
+        {
+            _authenticationService.GetCurrentUserInformation(out accountId, out role);
+        }
+        catch (Exception e)
+        {
+            throw new UnauthorizedException("User do not login");
+        }
+
+
+        if (role != Constant.AdminRole && role != Constant.StaffRole)
+        {
+            throw new ForbiddenException("Access denied");
+        }
 
         //need to check role
         var parameter = Expression.Parameter(typeof(Course));
@@ -975,24 +991,40 @@ public class CourseService : ICourseService
                 if (status.Equals(CourseStatus.Draft))
                 {
                     //Check role
-                    if (role != Constant.TeacherRole && role != Constant.AdminRole)
+                    if (role != Constant.AdminRole)
                     {
-                        _logger.LogWarning("UserName {} is trying to filter pending course.\nDate: {}", accountId,
+                        _logger.LogWarning("Account {} is trying to filter pending course.\nDate: {}", accountId,
                             DateTime.UtcNow);
                         throw new ForbiddenException("Access denied.");
-                    }
-
-                    if (role == Constant.TeacherRole)
-                    {
-                        filter = Expression.AndAlso(filter,
-                            Expression.Equal(Expression.Property(parameter, nameof(Course.ModifiedById)),
-                                Expression.Constant(accountId, typeof(int?))));
                     }
                 }
 
                 filter = Expression.AndAlso(filter,
                     Expression.Equal(Expression.Property(parameter, nameof(Course.Status)),
                         Expression.Constant(status)));
+            }
+            else
+            {
+                if (role == Constant.StaffRole)
+                {
+                    var staffRoleCourseStatus = new[]
+                    {
+                        CourseStatus.Active,
+                        CourseStatus.Inactive,
+                        CourseStatus.Waiting,
+                        CourseStatus.Denied,
+                        CourseStatus.Pending
+                    };
+
+                    filter = Expression.AndAlso(filter,
+                        Expression.Call(
+                            typeof(Enumerable),
+                            nameof(Enumerable.Contains),
+                            new[] { typeof(CourseStatus) },
+                            Expression.Constant(staffRoleCourseStatus),
+                            Expression.Property(parameter, nameof(Course.Status))
+                        ));
+                }
             }
 
             Func<IQueryable<Course>, IOrderedQueryable<Course>> orderBy = q => q.OrderByDescending(c => c.CreatedDate);
@@ -1030,6 +1062,10 @@ public class CourseService : ICourseService
             );
             var result = CourseMapper.CourseToManageFilterCourseDto(entities);
             return result;
+        }
+        catch (ForbiddenException e)
+        {
+            throw new ForbiddenException("Access denied.");
         }
         catch (Exception e)
         {
@@ -1147,10 +1183,10 @@ public class CourseService : ICourseService
         await _unitOfWork.SaveChangeAsync();
     }
 
-    // private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
-    // {
-    //     return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
-    // }
+// private async Task<List<Course>> GetCourseByStatusAsync(CourseStatus status)
+// {
+//     return await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(status);
+// }
 
     public async Task<List<CourseModerationResponse>> GetCourseModerationAsync()
     {
@@ -1161,6 +1197,6 @@ public class CourseService : ICourseService
                 (await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(CourseStatus.Waiting));
         //Staff moderating course
         return CourseMapper.CourseToCourseModerationResponse
-            (await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(CourseStatus.Pending)); 
+            (await _unitOfWork.CourseRepository.GetCoursesByStatusAsync(CourseStatus.Pending));
     }
 }
