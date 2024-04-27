@@ -1147,7 +1147,7 @@ public class CourseService : ICourseService
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
 
-        var student = await _unitOfWork.StudentRepository.GetByIdAsync(account.IdSubRole)
+        var student = await _unitOfWork.StudentRepository.StudentGetStudentLessonAsync(account.IdSubRole)
                       ?? throw new BadRequestException($"StudentId {account.IdSubRole} not found");
 
         var lesson = new StudentLesson()
@@ -1159,7 +1159,11 @@ public class CourseService : ICourseService
 
         if (student.StudentLessons.Count == 0)
             student.StudentLessons = new List<StudentLesson>();
-
+        if (student.StudentLessons.Any(x =>
+                x.StudentId == lesson.StudentId && x.LessonId == lesson.LessonId))
+        {
+            return;
+        }
         student.StudentLessons.Add(lesson);
         _unitOfWork.StudentRepository.Update(student);
         await _unitOfWork.SaveChangeAsync();

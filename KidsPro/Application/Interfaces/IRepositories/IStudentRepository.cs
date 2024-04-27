@@ -13,4 +13,5 @@ public interface IStudentRepository:IBaseRepository<Student>
     Task<List<Student>> SearchStudent(string input, SearchType type);
     Task<List<Student>> GetStudentsByIds(List<int> ids);
     Task<Student?> GetStudentProgress(int id);
+    Task<Student?> StudentGetStudentLessonAsync(int id);
 }

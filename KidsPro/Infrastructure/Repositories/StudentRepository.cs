@@ -43,6 +43,13 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .Include(x => x.Parent).ThenInclude(x => x.Account)
             .FirstOrDefaultAsync();
     }
+    public async Task<Student?> StudentGetStudentLessonAsync(int id)
+    {
+        return await _dbSet.Where(x => x.Id == id)
+            .Include(x => x.Account).ThenInclude(x => x.Role)
+            .Include(x=> x.StudentLessons)
+            .FirstOrDefaultAsync();
+    }
 
     public async Task<Student?> GetStudentInformation(int id)
     {
