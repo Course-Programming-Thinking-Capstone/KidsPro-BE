@@ -346,6 +346,7 @@ public class AccountService : IAccountService
                     .ContinueWith(t => t.Result ?? throw new Exception("Role staff name is incorrect."));
 
                 account.Role = staffRole;
+                account.Status = UserStatus.NotActivated;
                 var staff = new Staff()
                 {
                     PhoneNumber = dto.PhoneNumber,
@@ -365,6 +366,7 @@ public class AccountService : IAccountService
                     .ContinueWith(t => t.Result ?? throw new Exception("Role teacher name is incorrect."));
 
                 account.Role = teacherRole;
+                account.Status = UserStatus.NotActivated;
                 var teacher = new Teacher()
                 {
                     PhoneNumber = dto.PhoneNumber,
@@ -557,7 +559,7 @@ public class AccountService : IAccountService
     private void SendConfirmationCode(Account account)
     {
         var link =
-            "https://kidproproduction.azurewebsites.net/api/v1/authentication/confirm/check/Email="
+            "https://kid-pro.vercel.app/verify-confirm?Email="
             + account.Email + "&Token=" + account.ConfirmAccount;
         var title = "Successful account registration";
         var content = "Welcome " + account.FullName + "<br>" + "<br>" +
