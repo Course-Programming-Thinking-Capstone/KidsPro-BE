@@ -12,32 +12,40 @@ namespace Infrastructure.Repositories
 {
     public class VoucherRepository : BaseRepository<GameVoucher>, IVoucherRepository
     {
-        public VoucherRepository(AppDbContext context, ILogger<BaseRepository<GameVoucher>> logger) : base(context, logger)
+        public VoucherRepository(AppDbContext context, ILogger<BaseRepository<GameVoucher>> logger) : base(context,
+            logger)
         {
         }
 
         public async Task<GameVoucher?> GetVoucher(int id)
         {
             return await _dbSet.FirstOrDefaultAsync(x => x.Id == id &&
-            x.Status == Valid && (x.ExpiredDate <= DateTime.UtcNow));
+                                                         x.Status == Valid && (x.ExpiredDate >= DateTime.UtcNow));
         }
-        
+
         public async Task<List<GameVoucher>?> GetListVoucher(int parentId, VoucherStatus status)
         {
+            IQueryable<GameVoucher> query = _dbSet.AsNoTracking();
             switch (status)
             {
                 case Valid:
-                    return await _dbSet.Where(x => x.ParentId == parentId &&
-                                                   x.Status == Valid && (x.ExpiredDate <= DateTime.UtcNow)).ToListAsync();
+                    query = query.Where(x => x.ParentId == parentId &&
+                                             x.Status == Valid && (x.ExpiredDate >= DateTime.UtcNow));
+                    break;
                 case Expired:
-                    return await _dbSet.Where(x => x.ParentId == parentId &&
-                                                   x.Status == Expired && (x.ExpiredDate > DateTime.UtcNow)).ToListAsync();
+                    query = query.Where(x => x.ParentId == parentId &&
+                                             x.Status == Expired && (x.ExpiredDate <= DateTime.UtcNow));
+                    break;
                 case Used:
-                    return await _dbSet.Where(x => x.ParentId == parentId &&
-                                                   x.Status == Used && (x.ExpiredDate <= DateTime.UtcNow)).ToListAsync();
+                    query = query.Where(x => x.ParentId == parentId &&
+                                             x.Status == Used );
+                    break;
+                case AllStatus:
+                    query = query.Where(x => x.ParentId == parentId);
+                    break;
             }
-            throw new BadRequestException("Get list voucher error");
+
+            return await query.ToListAsync();
         }
-        
     }
 }

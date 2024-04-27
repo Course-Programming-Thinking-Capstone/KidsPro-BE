@@ -11,8 +11,6 @@ namespace Application.Interfaces.IServices;
     {
         Task<StudentResponse> AddStudentAsync(StudentAddRequest request);
 
-       
-
         Task<ParentOrderResponse> GetParentEmail();
 
         Task<List<GameVoucher>?> GetListVoucherAsync(VoucherStatus status);

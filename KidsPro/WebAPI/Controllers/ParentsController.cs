@@ -75,4 +75,5 @@ public class ParentsController : ControllerBase
         var result=await _parent.GetListVoucherAsync(status);
         return Ok(result);
     }
+    
 }
