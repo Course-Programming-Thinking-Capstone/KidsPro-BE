@@ -91,10 +91,15 @@ public class CloudStorageService : ICloudStorageService
     {
         InitializeGgStorage();
         var objectName = $"{folderName}/{videoName}";
-        var video = _storage.GetObject(bucketName, objectName);
-        if(video.Size>0)
+        try
+        {
+            var video = _storage.GetObject(bucketName, objectName);
+        }
+        catch (GoogleApiException e) 
+        {
+            throw new NotFoundException("Video not found");
+        }
          return GenerateV4SignedReadUrl(bucketName, objectName);
-        throw new NotFoundException($"{videoName} not found");
     }
     
 }
