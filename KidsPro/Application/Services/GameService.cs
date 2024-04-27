@@ -925,7 +925,7 @@ public class GameService : IGameService
         var soldItem = await _unitOfWork.ItemOwnedRepository.GetAsync(
                 o => o.GameItemId == soldItemRequest.SoldItemId
                      && o.StudentId == soldItemRequest.UserId
-                     && o.Quantity <= soldItemRequest.Quantity
+                     && o.Quantity >= soldItemRequest.Quantity
                 , null
                 , includeProperties: nameof(GameItem)
             )
@@ -947,7 +947,7 @@ public class GameService : IGameService
         try
         {
             user.Gem += (soldItem.GameItem.Price * soldItemRequest.Quantity);
-            soldItem.Quantity += soldItemRequest.Quantity;
+            soldItem.Quantity -= soldItemRequest.Quantity;
             _unitOfWork.ItemOwnedRepository.Update(soldItem); // minus owned item
             _unitOfWork.GameUserProfileRepository.Update(user); // update wallet
             await _unitOfWork.SaveChangeAsync();

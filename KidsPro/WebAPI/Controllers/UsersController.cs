@@ -38,9 +38,29 @@ public class UsersController : ControllerBase
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-        
+
         await _accountService.ChangePasswordAsync(request);
         return Ok();
+    }
+
+    /// <summary>
+    /// Admin update user status
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
+    [HttpPatch("account/status/{id}")]
+    public async Task<ActionResult<string>> UpdateStatusAsync(int id, UserStatus status)
+    {
+        //Check if the account is activated or not or inactive
+        _authentication.CheckAccountStatus();
+
+        await _accountService.UpdateUserStatusAsync(id, status);
+        return Ok(new
+        {
+            Message = "Successfully update to status " + status
+        });
     }
 
     /// <summary>
@@ -54,7 +74,7 @@ public class UsersController : ControllerBase
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-        
+
         var result = await _accountService.UpdatePictureAsync(file);
         return Ok(result);
     }
@@ -85,7 +105,7 @@ public class UsersController : ControllerBase
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-        
+
         var result = await _accountService.GetAccountByIdAsync(id, role);
         return Ok(result);
     }
@@ -105,7 +125,7 @@ public class UsersController : ControllerBase
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-        
+
         var result = await _accountService.CreateAccountAsync(dto);
         return Created(nameof(CreateAccountAsync), result);
     }

@@ -556,9 +556,9 @@ public class AccountService : IAccountService
 
     private void SendConfirmationCode(Account account)
     {
-        var link =//"http://localhost:3000/Email="
-            "https://www.kidpro-production.somee.com/api/v1/authentication/confirm/check/Email=" 
-                + account.Email + "&Token=" + account.ConfirmAccount;
+        var link = //"http://localhost:3000/Email="
+            "https://www.kidpro-production.somee.com/api/v1/authentication/confirm/check/Email="
+            + account.Email + "&Token=" + account.ConfirmAccount;
         var title = "Successful account registration";
         var content = "Welcome " + account.FullName + "<br>" + "<br>" +
                       "Your account has been successfully registered at KidsPro" + "<br>" + "<br>" +
@@ -571,13 +571,13 @@ public class AccountService : IAccountService
     public async Task UpdateToNotActivatedStatus(string email)
     {
         var account = await _unitOfWork.AccountRepository.ExistByEmailAsync(email)
-            ??throw new BadRequestException("Email doesn't exist");
+                      ?? throw new BadRequestException("Email doesn't exist");
 
         if (account.Status == UserStatus.NotActivated)
             throw new BadRequestException("The account is not activated yet");
-        
+
         account.Status = UserStatus.NotActivated;
-        
+
         _unitOfWork.AccountRepository.Update(account);
         await _unitOfWork.SaveChangeAsync();
     }
@@ -586,7 +586,7 @@ public class AccountService : IAccountService
     {
         var account = await _unitOfWork.StudentRepository.WebStudentLoginAsync(dto.Account)
                       ?? throw new BadRequestException("Account doesn't exist");
-            
+
 
         if (!BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, account.Account.PasswordHash))
         {
@@ -597,5 +597,21 @@ public class AccountService : IAccountService
         result.AccessToken = _authenticationService.CreateAccessToken(account.Account);
         result.RefreshToken = _authenticationService.CreateRefreshToken(account.Account);
         return result;
+    }
+
+    public async Task UpdateUserStatusAsync(int id, UserStatus status)
+    {
+        var account = await GetCurrentAccountInformationAsync();
+
+        if (account.Role != Constant.AdminRole)
+            throw new BadRequestException("Please login with Admin account");
+        
+        var user = await _unitOfWork.AccountRepository.AdminGetAccountById(id)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find account."));
+
+        user.Status = status;
+
+        _unitOfWork.AccountRepository.Update(user);
+        await _unitOfWork.SaveChangeAsync();
     }
 }

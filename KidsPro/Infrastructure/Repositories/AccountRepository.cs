@@ -72,6 +72,13 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
         return await query.Include(a => a.Role)
             .FirstOrDefaultAsync(a => a.Id == id && !a.IsDelete && a.Status != UserStatus.Inactive);
     }
+    
+    public  async Task<Account?> AdminGetAccountById(int id)
+    {
+        IQueryable<Account> query = _dbSet;
 
+        return await query.Include(a => a.Role)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
     
 }
