@@ -47,7 +47,7 @@ public class ClassRepository : BaseRepository<Class>, IClassRepository
         }
 
         return await query.Where(x => x.Status == ClassStatus.OnGoing)
-            .Include(x => x.Course)
+            .Include(x => x.Course).ThenInclude(x=> x.Syllabus)
             .Include(x => x.Teacher).ThenInclude(x => x!.Account)
             .Include(x => x.Schedules).ToListAsync();
     }

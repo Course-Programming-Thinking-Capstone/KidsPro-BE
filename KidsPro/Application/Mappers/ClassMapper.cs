@@ -168,7 +168,9 @@ public static class ClassMapper
             CourseId = x.CourseId,
             CourseImage = x.Course.PictureUrl,
             ClassStatus = x.Status,
-            RoomUrl = x.Schedules?.FirstOrDefault()?.RoomUrl
+            RoomUrl = x.Schedules?.FirstOrDefault()?.RoomUrl,
+            Duration = x.Duration,
+            SlotDuration = x.Course.Syllabus?.SlotTime ?? 0,
         }).ToList();
     }
 

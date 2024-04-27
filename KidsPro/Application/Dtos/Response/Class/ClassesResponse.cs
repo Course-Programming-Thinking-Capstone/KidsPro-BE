@@ -19,5 +19,7 @@ public class ClassesResponse
     public string? EndSlot { get; set; }
     public string? TeacherName { get; set; }
     public string? RoomUrl { get; set; }
+    public int Duration { get; set; }
+    public int SlotDuration { get; set; }
     public float CourseProgress { get; set; }
 }
