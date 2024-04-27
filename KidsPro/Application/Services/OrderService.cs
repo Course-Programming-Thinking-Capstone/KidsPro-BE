@@ -122,17 +122,18 @@ namespace Application.Services
                                             $"to {currentStatus} status from {toStatus} status failed");
         }
 
-        public async Task<(int,List<OrderResponse>)> GetListOrderAsync(OrderStatus status)
+        public async Task<(int,List<OrderResponse>)> GetListOrderAsync(OrderStatus status,int pageSize,int pageNumber)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
-            return OrderMapper.ShowOrder(orders!);
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,pageSize,pageNumber);
+           
+            return(orders.Item1,OrderMapper.ShowOrder(orders.Item2!));
         }
-        
+       
         public async Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role);
+            var orders = await _unitOfWork.OrderRepository.MobileGetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.MobileShowOrder(orders!);
         }
 
