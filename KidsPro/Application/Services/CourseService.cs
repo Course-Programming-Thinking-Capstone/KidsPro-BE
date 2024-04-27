@@ -29,15 +29,20 @@ public class CourseService : ICourseService
     private IImageService _imageService;
     private ILogger<AccountService> _logger;
     private IAccountService _accountService;
+    private ICloudStorageService _cloudStorage;
+    private IGoogleDriveService _driveService;
 
     public CourseService(IUnitOfWork unitOfWork, IAuthenticationService authenticationService,
-        IImageService imageService, ILogger<AccountService> logger, IAccountService accountService)
+        IImageService imageService, ILogger<AccountService> logger, IAccountService accountService,
+        ICloudStorageService cloudStorage, IGoogleDriveService driveService)
     {
         _unitOfWork = unitOfWork;
         _authenticationService = authenticationService;
         _imageService = imageService;
         _logger = logger;
         _accountService = accountService;
+        _cloudStorage = cloudStorage;
+        _driveService = driveService;
     }
 
     public async Task<CourseDto> GetByIdAsync(int id, string? action)
@@ -188,7 +193,23 @@ public class CourseService : ICourseService
             _ => await _unitOfWork.LessonRepository.GetCommonLessonDetailByIdAsync(lessonId)
         };
 
-        return lesson != null ? CourseMapper.LessonToStudyLessonDto(lesson) : null;
+        if (lesson == null)
+            return null;
+
+        if (lesson.Type == LessonType.Video)
+        {
+            if (string.IsNullOrEmpty(lesson.ResourceUrl))
+            {
+                var section = await _driveService.GetSectionInformationAsync(lesson.SectionId);
+                var bucket = "kidspro";
+                var folderName = section.Course.Name;
+                var nameOfVideo = $"Section{lesson.SectionId} {lesson.Name}";
+                var videoUrl = _cloudStorage.GetVideoByName(bucket, folderName, nameOfVideo);
+                lesson.ResourceUrl = videoUrl;
+            }
+        }
+
+        return CourseMapper.LessonToStudyLessonDto(lesson);
     }
 
     public async Task<QuizDetailDto> GetQuizByIdAsync(int quizId)

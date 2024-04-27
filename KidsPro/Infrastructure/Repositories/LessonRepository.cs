@@ -26,7 +26,8 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 IsFree = lesson.IsFree,
                 Content = lesson.Content,
                 ResourceUrl = lesson.ResourceUrl,
-                Type = lesson.Type
+                Type = lesson.Type,
+                SectionId = lesson.SectionId
             }).FirstOrDefaultAsync();
     }
 
@@ -50,7 +51,8 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 IsFree = lesson.IsFree,
                 Content = lesson.Content,
                 ResourceUrl = lesson.ResourceUrl,
-                Type = lesson.Type
+                Type = lesson.Type,
+                SectionId = lesson.SectionId
             }).FirstOrDefaultAsync();
     }
 
@@ -73,7 +75,8 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 IsFree = lesson.IsFree,
                 Content = lesson.Content,
                 ResourceUrl = lesson.ResourceUrl,
-                Type = lesson.Type
+                Type = lesson.Type,
+                SectionId = lesson.SectionId
             }).FirstOrDefaultAsync();
     }
 
