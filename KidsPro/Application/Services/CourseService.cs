@@ -192,7 +192,7 @@ public class CourseService : ICourseService
                 accountId),
             _ => await _unitOfWork.LessonRepository.GetCommonLessonDetailByIdAsync(lessonId)
         };
-        
+
         if (lesson == null)
             return null;
 
@@ -204,7 +204,8 @@ public class CourseService : ICourseService
                 var bucket = "kidspro";
                 var folderName = section.Course.Name;
                 var nameOfVideo = $"Section{lesson.SectionId} {lesson.Name}";
-                lesson.ResourceUrl = _cloudStorage.GetVideoByName(bucket, folderName, nameOfVideo);
+                var videoUrl = _cloudStorage.GetVideoByName(bucket, folderName, nameOfVideo);
+                lesson.ResourceUrl = videoUrl;
             }
         }
 
