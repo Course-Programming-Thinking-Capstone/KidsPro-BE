@@ -1,4 +1,6 @@
 ﻿using Application.Configurations;
+using Application.Dtos.Response.Order;
+using Application.Dtos.Response.Paging;
 using Application.ErrorHandlers;
 using Application.Interfaces.IRepositories;
 using Domain.Entities;
@@ -37,12 +39,14 @@ namespace Infrastructure.Repositories
         {
             var query = _dbSet;
 
-            return await query.Include(x=>x.Parent).ThenInclude(x=>x!.Account)
-                .FirstOrDefaultAsync(x =>x.Id == orderId && x.Status == status);
+            return await query.Include(x => x.Parent).ThenInclude(x => x!.Account)
+                .FirstOrDefaultAsync(x => x.Id == orderId && x.Status == status);
         }
 
-        public async Task<(int,List<Order>?)> GetListOrderAsync(OrderStatus status, int parentId, string role,int pageSize, int pageNumber)
+        public async Task<PagingResponse<Order>> GetListOrderAsync(OrderStatus status, int parentId, string role,
+            int pageSize, int pageNumber)
         {
+            var result = new PagingResponse<Order>();
             var query = _dbSet.AsNoTracking();
             if (role == Constant.ParentRole)
             {
@@ -52,13 +56,16 @@ namespace Infrastructure.Repositories
             if (status != OrderStatus.AllStatus)
                 query = query.Where(x => x.Status == status);
 
-            int orderTotal =await query.CountAsync();
-            
-            var orders =await query.Include(x => x.Parent).ThenInclude(x => x!.Account)
+            result.TotalRecords = await query.CountAsync();
+
+            result.Results = await query.Include(x => x.Parent).ThenInclude(x => x!.Account)
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
                 .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-            return (orderTotal,orders);
+
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalRecords / pageSize);
+            return result;
         }
+
         public async Task<List<Order>?> MobileGetListOrderAsync(OrderStatus status, int parentId, string role)
         {
             var query = _dbSet.AsNoTracking();
@@ -82,13 +89,14 @@ namespace Infrastructure.Repositories
             {
                 query = query.Where(x => x.ParentId == parentId);
             }
+
             return await query.Include(x => x.OrderDetails)!
                 .ThenInclude(x => x.Students).ThenInclude(x => x.Account)
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
                 .Include(x => x.Transaction).Include(x => x.Voucher)
                 .Include(x => x.Parent).ThenInclude(x => x!.Account)
                 .Include(x => x.OrderDetails)!.ThenInclude(x => x.Class)
-                .ThenInclude(x=>x.Students)
+                .ThenInclude(x => x.Students)
                 .FirstOrDefaultAsync(x => x.Id == orderId);
         }
 

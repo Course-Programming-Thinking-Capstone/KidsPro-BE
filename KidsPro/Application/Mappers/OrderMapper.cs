@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Response.Account.Student;
 using Application.Dtos.Response.Order;
+using Application.Dtos.Response.Paging;
 using Application.Utils;
 using Domain.Entities;
 
@@ -31,10 +32,10 @@ namespace Application.Mappers
             return list;
         }
 
-        public static  List<OrderResponse> ShowOrder(List<Order> orders)
+        public static PagingOrderResponse OrdersToPagingOrderResponse(PagingResponse<Order> orders)
         {
-            var list = new List<OrderResponse>();
-            foreach (var x in orders)
+            var orderPaging = new PagingOrderResponse();
+            foreach (var x in orders.Results)
             {
                 var dto = new OrderResponse()
                 {
@@ -49,10 +50,12 @@ namespace Application.Mappers
                     PaymentType = x.PaymentType.ToString(),
                     Note = x.Note
                 };
-                list.Add(dto);
+                orderPaging.Order.Add(dto);
             }
 
-            return  list;
+            orderPaging.TotalPage = orders.TotalPages;
+            orderPaging.TotalRecords = orders.TotalRecords;
+            return  orderPaging;
         }
 
         public static OrderDetailResponse ShowOrderDetail(Order order)

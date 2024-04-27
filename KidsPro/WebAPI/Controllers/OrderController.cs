@@ -69,17 +69,13 @@ namespace WebAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<List<OrderResponse>>> GetOrdersAsync(int pageSize,int pageNumber,OrderStatus status)
+        public async Task<ActionResult<PagingOrderResponse>> GetOrdersAsync(int? pageSize,int? pageNumber,OrderStatus status)
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
             
             var result = await _order.GetListOrderAsync(status,pageSize,pageNumber);
-            return Ok(new
-            { 
-                OrderTotal=result.Item1,
-                Order=result.Item2
-            });
+            return Ok(result);
         }
 
         /// <summary>

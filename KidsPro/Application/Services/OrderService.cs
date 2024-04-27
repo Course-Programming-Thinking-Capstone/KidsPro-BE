@@ -122,12 +122,18 @@ namespace Application.Services
                                             $"to {currentStatus} status from {toStatus} status failed");
         }
 
-        public async Task<(int,List<OrderResponse>)> GetListOrderAsync(OrderStatus status,int pageSize,int pageNumber)
+        public async Task<PagingOrderResponse> GetListOrderAsync(OrderStatus status,int? pageSize,int? pageNumber)
         {
+            //set default page size
+            if (!pageSize.HasValue || !pageNumber.HasValue)
+            {
+                pageSize = 10;
+                pageNumber = 1;
+            }
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,pageSize,pageNumber);
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,pageSize.Value,pageNumber.Value);
            
-            return(orders.Item1,OrderMapper.ShowOrder(orders.Item2!));
+            return OrderMapper.OrdersToPagingOrderResponse(orders);
         }
        
         public async Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status)

@@ -3,6 +3,6 @@
 public class PagingOrderResponse
 {
     public int TotalPage { get; set; }
-    public int TotalRecord { get; set; }
-    public List<OrderResponse> Classes { get; set; }= new List<OrderResponse>();
+    public int TotalRecords { get; set; }
+    public List<OrderResponse> Order { get; set; }= new List<OrderResponse>();
 }
