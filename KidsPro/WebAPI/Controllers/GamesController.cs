@@ -59,7 +59,7 @@ public class GamesController : ControllerBase
     #region SHOP & Item
 
     /// <summary>
-    /// Get user Items
+    /// Sold dropped item for gem
     /// </summary>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.StudentRole},{Constant.AdminRole},")]

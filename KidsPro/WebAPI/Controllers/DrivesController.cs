@@ -28,7 +28,7 @@ public class DrivesController : ControllerBase
     /// <param name="sectionId"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
+    //[Authorize(Roles = $"{Constant.TeacherRole},{Constant.AdminRole}")]
     [HttpPost("drive")]
     public async Task<ActionResult<string>> UploadVideoToDriveAsync(IFormFile? videoFile, int sectionId,int index)
     {
