@@ -118,7 +118,7 @@ public class AuthenticationController : ControllerBase
     }
 
     /// <summary>
-    /// Update status account to not activated status
+    /// API INTERNAL TEST,Update status account to not activated status
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
