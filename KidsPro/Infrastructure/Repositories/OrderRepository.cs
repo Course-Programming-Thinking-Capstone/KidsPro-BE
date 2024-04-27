@@ -41,7 +41,25 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(x =>x.Id == orderId && x.Status == status);
         }
 
-        public async Task<List<Order>?> GetListOrderAsync(OrderStatus status, int parentId, string role)
+        public async Task<(int,List<Order>?)> GetListOrderAsync(OrderStatus status, int parentId, string role,int pageSize, int pageNumber)
+        {
+            var query = _dbSet.AsNoTracking();
+            if (role == Constant.ParentRole)
+            {
+                query = query.Where(x => x.ParentId == parentId);
+            }
+
+            if (status != OrderStatus.AllStatus)
+                query = query.Where(x => x.Status == status);
+
+            int orderTotal =await query.CountAsync();
+            
+            var orders =await query.Include(x => x.Parent).ThenInclude(x => x!.Account)
+                .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
+                .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return (orderTotal,orders);
+        }
+        public async Task<List<Order>?> MobileGetListOrderAsync(OrderStatus status, int parentId, string role)
         {
             var query = _dbSet.AsNoTracking();
             if (role == Constant.ParentRole)
@@ -53,7 +71,8 @@ namespace Infrastructure.Repositories
                 query = query.Where(x => x.Status == status);
 
             return await query.Include(x => x.Parent).ThenInclude(x => x!.Account)
-                .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course).ToListAsync();
+                .Include(x => x.OrderDetails)!.ThenInclude(x => x.Course)
+                .ToListAsync();
         }
 
         public async Task<Order?> GetOrderDetail(int parentId, int orderId, string role)

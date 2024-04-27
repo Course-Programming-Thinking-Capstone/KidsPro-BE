@@ -58,21 +58,23 @@ namespace WebAPI.Controllers
             });
         }
 
-        /// <summary>
-        /// Get order list
-        /// </summary>
-        /// <param name="status"></param>
-        /// <returns></returns>
+       /// <summary>
+       /// Get order list
+       /// </summary>
+       /// <param name="pageSize"></param>
+       /// <param name="pageNumber"></param>
+       /// <param name="status"></param>
+       /// <returns></returns>
         [Authorize(Roles = $"{Constant.ParentRole},{Constant.StaffRole},{Constant.AdminRole},")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-        public async Task<ActionResult<List<OrderResponse>>> GetOrdersAsync(OrderStatus status)
+        public async Task<ActionResult<List<OrderResponse>>> GetOrdersAsync(int pageSize,int pageNumber,OrderStatus status)
         {
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
             
-            var result = await _order.GetListOrderAsync(status);
+            var result = await _order.GetListOrderAsync(status,pageSize,pageNumber);
             return Ok(new
             { 
                 OrderTotal=result.Item1,
