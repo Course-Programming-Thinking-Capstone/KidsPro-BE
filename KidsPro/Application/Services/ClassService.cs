@@ -51,7 +51,13 @@ public class ClassService : IClassService
     {
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
             ?? throw new NotFoundException($"ClassId {classId} not found");
-        
+        switch (status)
+        {
+            case ClassStatus.OnGoing:
+                if (entityClass.Schedules!.Count == 0 || entityClass.TeacherId == null)
+                    throw new BadRequestException("Update status failed because class doesn't has teacher or schedule");
+                break;
+        }
         entityClass.Status = status;
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();
