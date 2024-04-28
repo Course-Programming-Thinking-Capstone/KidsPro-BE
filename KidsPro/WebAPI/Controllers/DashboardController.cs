@@ -1,8 +1,12 @@
-﻿using Application.Dtos.Response;
+﻿using Application.Configurations;
+using Application.Dtos.Response;
 using Application.Interfaces.IServices;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
+
 [ApiController]
 [Route("api/v1/dashboard")]
 public class DashboardController : ControllerBase
@@ -17,19 +21,15 @@ public class DashboardController : ControllerBase
     }
 
     /// <summary>
-    /// Admin get dashboard
+    ///  Admin get dashboard
     /// </summary>
+    /// <param name="month">Select month to view earning dashboard</param>
     /// <returns></returns>
+    [Authorize(Roles = $"{Constant.AdminRole}")]
     [HttpGet]
-    public async Task<ActionResult<DashboardResponse>> AdminGetDashboardAsync()
+    public async Task<ActionResult<DashboardResponse>> AdminGetDashboardAsync(MonthType month)
     {
-        var result = await _dashboard.GetDashboardAsync();
+        var result = await _dashboard.GetDashboardAsync(month);
         return result;
-    }
-    [HttpGet("quiz")]
-    public async Task<IActionResult> CheckAsyn()
-    {
-        await _quiz.RefeshNumberAttempt();
-        return Ok();
     }
 }

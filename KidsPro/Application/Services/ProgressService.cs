@@ -49,6 +49,6 @@ public class ProgressService : IProgressService
         var progresses = await _unit.StudentProgressRepository
             .CheckStudentProgressAsync(account.IdSubRole, sectionIds);
         var students = await _unit.StudentRepository.GetByIdAsync(account.IdSubRole);
-        return ProgressMapper.StudentProgressToCheckProgressResponse(progresses, sectionIds,students);
+        return ProgressMapper.StudentProgressToCheckProgressResponse(progresses, sectionIds,students!);
     }
 }

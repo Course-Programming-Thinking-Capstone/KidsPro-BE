@@ -19,16 +19,16 @@ public class DashboardService:IDashboardService
         _accountService = accountService;
     }
 
-    public async Task<DashboardResponse> GetDashboardAsync()
+    public async Task<DashboardResponse> GetDashboardAsync(MonthType month)
     {
-        // var account = await _accountService.GetCurrentAccountInformationAsync();
-        // if (account.Role != Constant.AdminRole)
-        //     throw new UnauthorizedException("Please login by account admin");
+        var account = await _accountService.GetCurrentAccountInformationAsync();
+        if (account.Role != Constant.AdminRole)
+            throw new UnauthorizedException("Please login by account admin");
 
         var orders = await _unitOfWork.OrderRepository.GetAllAsync();
         var courses = await _unitOfWork.CourseRepository.GetAllAsync();
         var accounts = await _unitOfWork.AccountRepository.GetAllAsync();
         var transactions= await _unitOfWork.TransactionRepository.GetAllAsync();
-        return DashboardMapper.ShowDashboardResponse(courses, orders, accounts);
+        return DashboardMapper.ShowDashboardResponse(courses, orders, accounts,transactions,month);
     }
 }

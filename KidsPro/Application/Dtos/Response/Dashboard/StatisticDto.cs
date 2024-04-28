@@ -2,8 +2,8 @@
 
 namespace Application.Dtos.Response;
 
-public class Statistic
+public class StatisticDto
 {
-    public int Total { get; set; }
+    public decimal Total { get; set; }
     public string? Status { get; set; }
 }
