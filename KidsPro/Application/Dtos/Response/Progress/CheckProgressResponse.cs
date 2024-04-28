@@ -5,4 +5,5 @@ public class CheckProgressResponse
     public int SectionId { get; set; }
     public bool IsCheck { get; set; }
     public List<CheckLessonCompleted> Lesson { get; set; } = new List<CheckLessonCompleted>();
+    public bool IsBlock { get; set; }
 }

@@ -15,4 +15,5 @@ public interface IAccountRepository : IBaseRepository<Account>
     Task<Account?> GetTeacherAccountById(int accountId);
     Task<Account?> GetStaffAccountById(int accountId);
     Task<Account?> AdminGetAccountById(int id);
+   
 }

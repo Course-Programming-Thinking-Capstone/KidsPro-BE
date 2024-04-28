@@ -41,6 +41,7 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
         return await _dbSet.Where(x => x.Id == id)
             .Include(x => x.Account).ThenInclude(x => x.Role)
             .Include(x => x.Parent).ThenInclude(x => x.Account)
+            .Include(x=>x.StudentQuizzes)
             .FirstOrDefaultAsync();
     }
     public async Task<Student?> StudentGetStudentLessonAsync(int id)

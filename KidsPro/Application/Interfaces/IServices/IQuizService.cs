@@ -6,4 +6,5 @@ namespace Application.Interfaces.IServices;
 public interface IQuizService
 {
     Task<QuizSubmitResponse> StudentSubmitQuizAsync(QuizSubmitRequest dto);
+    Task RefeshNumberAttempt();
 }

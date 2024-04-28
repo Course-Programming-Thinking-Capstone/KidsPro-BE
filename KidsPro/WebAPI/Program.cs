@@ -1,4 +1,6 @@
 using Application.Configurations;
+using Application.Services;
+using Hangfire;
 using WebAPI;
 using WebAPI.Gateway.Configuration;
 using WebAPI.Middlewares;
@@ -46,5 +48,8 @@ app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.MapControllers();
-
+//useHangfire
+app.UseHangfireDashboard();
+app.MapHangfireDashboard();
+RecurringJob.AddOrUpdate<QuizService>(x => x.RefeshNumberAttempt(), Cron.MinuteInterval(30));
 app.Run();

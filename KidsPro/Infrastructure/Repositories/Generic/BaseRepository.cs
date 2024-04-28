@@ -179,4 +179,9 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         return await GetByIdAsync(id)
             .ContinueWith(t => t.Result != null);
     }
+
+    public virtual async Task<List<T>> GetAllAsync()
+    {
+        return await _dbSet.ToListAsync();
+    }
 }

@@ -18,5 +18,10 @@ namespace Infrastructure.Repositories;
             return _dbSet.Include(x => x.Order).ThenInclude(x=> x!.Parent)
                 .FirstOrDefaultAsync(x => x.OrderId == id && x.Status==TransactionStatus.Success);
         }
-       
+
+        public override Task<List<Transaction>> GetAllAsync()
+        {
+            return _dbSet.Include(x => x.Order).ThenInclude(x=> x!.Parent)
+                .ToListAsync();
+        }
     }

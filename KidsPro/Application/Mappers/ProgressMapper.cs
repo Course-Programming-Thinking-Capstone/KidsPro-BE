@@ -6,21 +6,28 @@ namespace Application.Mappers;
 public static class ProgressMapper
 {
     public static List<CheckProgressResponse> StudentProgressToCheckProgressResponse
-        (List<StudentProgress?> students, List<int> sectionIds)
+        (List<StudentProgress?> progresses, List<int> sectionIds, Student student)
     {
         return sectionIds.Select(x => new CheckProgressResponse
         {
             SectionId = x,
-            IsCheck = students.Any(s => s?.SectionId == x),
-            Lesson = students.Where(s => s?.SectionId == x)
+            IsCheck = progresses.Any(s => s?.SectionId == x),
+            Lesson = progresses.Where(s => s?.SectionId == x)
                 .SelectMany(stu => stu?.Section.Lessons
                     .Select(z => new CheckLessonCompleted
                     {
                         LessonId = z.Id,
                         IsCompleted = z.StudentLessons?
                             .Any(o => o?.StudentId == stu.StudentId && o?.LessonId == z?.Id && o.IsCompleted) ?? false
-                    })).ToList()
+                    })).ToList(),
+            IsBlock = CheckIsBlock(x - 1, student.StudentQuizzes.ToList())
         }).ToList();
+    }
+
+    private static bool CheckIsBlock(int sectionId, List<StudentQuiz> studentQuizzes)
+    {
+        var quiz = studentQuizzes.FirstOrDefault(x => x.Quiz.SectionId - 1 == sectionId);
+        return quiz?.IsPass ?? false;
     }
 
     public static List<SectionProgressResponse> StudentToProgressResponseList(List<StudentProgress> dto)
