@@ -30,9 +30,9 @@ public class QuizService : IQuizService
         //Check xem student đã làm quiz này chưa
         var studentQuizExist = await _unit.StudentQuizRepository.GetStudentQuizByFk(dto.StudentId, dto.QuizId);
 
-        if (studentQuizExist?.Attempt >= 3)
+        if (studentQuizExist?.Attempt >= 100)
             throw new ConflictException(
-                "Student have run out of turns to do the quiz, the total number of turns is 3");
+                "Student have run out of turns to do the quiz, the total number of turns is 100");
 
         var studentQuiz = QuizMapper.QuizSubmitRequestToStudentQuiz(dto);
 
