@@ -16,7 +16,7 @@ public static class QuizMapper
         QuizId = dto.QuizId,
         Score = dto.Score,
         Attempt = 0,
-        StartTime = DateTime.UtcNow.AddMinutes(-dto.QuizMinutes),
+        StartTime = DateTime.UtcNow.AddSeconds(-dto.QuizMinutes),
         EndTime = DateTime.UtcNow,
         IsPass = false,
         Duration = dto.Duration
