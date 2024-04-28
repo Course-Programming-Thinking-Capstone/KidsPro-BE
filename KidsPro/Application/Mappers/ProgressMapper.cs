@@ -29,8 +29,8 @@ public static class ProgressMapper
     {
         if (courses.Any(x => x?.Sections.FirstOrDefault()?.Id == sectionId))
             return false;
-        var quiz = studentQuizzes?.FirstOrDefault(x => x?.Quiz.SectionId - 1 == sectionId - 1);
-        if (quiz?.IsPass == true)
+        var quiz = studentQuizzes?.Where(x => x.Quiz.SectionId == (sectionId - 1));
+        if (quiz!.Any(z=>z.IsPass))
             return false;
         return true;
     }
