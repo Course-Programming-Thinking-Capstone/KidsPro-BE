@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Application;
 using Application.Interfaces.IRepositories.Generic;
+using Hangfire;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Generic;
@@ -52,6 +53,14 @@ public static class DependencyInjection
             .AddClasses(classes => classes.Where(c => c.Name.EndsWith("Service")), publicOnly: true)
             .AsImplementedInterfaces()
             .WithScopedLifetime());
+        
+        //Add hangfire
+        services.AddHangfire(cf =>
+            cf.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(databaseConnection));
+        services.AddHangfireServer();
         
         return services;
     }
@@ -140,6 +149,7 @@ public static class DependencyInjection
         });
 
         services.AddDistributedMemoryCache();
+       
         return services;
     }
 }

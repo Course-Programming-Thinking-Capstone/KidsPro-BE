@@ -80,5 +80,12 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
         return await query.Include(a => a.Role)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
-    
+
+    public override Task<List<Account>> GetAllAsync()
+    {
+        IQueryable<Account> query = _dbSet;
+
+        return query.Include(a => a.Role)
+            .ToListAsync();
+    }
 }

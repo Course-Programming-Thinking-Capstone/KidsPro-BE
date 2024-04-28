@@ -96,4 +96,25 @@ public class QuizService : IQuizService
         await _unit.SaveChangeAsync();
         return studentQuiz;
     }
+
+    public async Task RefeshNumberAttempt()
+    {
+        var studentQuizes = await _unit.StudentQuizRepository.GetAllAsync();
+
+        foreach (var x in studentQuizes)
+        {
+            var minuteEndTime = x.EndTime!.Value.Minute;
+            var minuteCurrent = DateTime.UtcNow.Minute;
+            // Tính toán số phút đã trôi qua
+            var minutesElapsed = minuteCurrent < minuteEndTime ? 
+                (minuteCurrent + 60 - minuteEndTime) : 
+                (minuteCurrent - minuteEndTime);
+            if (minutesElapsed >= 30)
+            {
+                x.Attempt = 0;
+                _unit.StudentQuizRepository.Update(x);
+            }
+        }
+        await _unit.SaveChangeAsync();
+    }
 }

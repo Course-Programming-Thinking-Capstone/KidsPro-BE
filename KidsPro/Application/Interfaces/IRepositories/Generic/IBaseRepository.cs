@@ -40,4 +40,5 @@ public interface IBaseRepository<T> where T : BaseEntity
     void DeleteRange(IEnumerable<T> entities);
 
     Task<bool> ExistByIdAsync(int id);
+    Task<List<T>> GetAllAsync();
 }
