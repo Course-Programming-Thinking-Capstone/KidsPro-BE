@@ -52,6 +52,7 @@ namespace Infrastructure.Repositories
                 .Where(sp => sp.StudentId == studentId && sectionId.Contains(sp.SectionId))
                 .Include(x=>x.Section)
                 .ThenInclude(x=>x.Lessons).ThenInclude(x=> x.StudentLessons)
+                .Include(x=>x.Course).ThenInclude(x=>x.Sections)
                 .ToListAsync())!;
         }
         

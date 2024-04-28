@@ -20,14 +20,19 @@ public static class ProgressMapper
                         IsCompleted = z.StudentLessons?
                             .Any(o => o?.StudentId == stu.StudentId && o?.LessonId == z?.Id && o.IsCompleted) ?? false
                     })).ToList(),
-            IsBlock = CheckIsBlock(x - 1, student.StudentQuizzes.ToList())
+            IsBlock = CheckIsBlock(x, student.StudentQuizzes.Count > 0 ? student.StudentQuizzes.ToList() : null,
+                progresses.Select(a => a?.Course).ToList())
         }).ToList();
     }
 
-    private static bool CheckIsBlock(int sectionId, List<StudentQuiz> studentQuizzes)
+    private static bool CheckIsBlock(int sectionId, List<StudentQuiz>? studentQuizzes, List<Course?> courses)
     {
-        var quiz = studentQuizzes.FirstOrDefault(x => x.Quiz.SectionId - 1 == sectionId);
-        return quiz?.IsPass ?? false;
+        if (courses.Any(x => x?.Sections.FirstOrDefault()?.Id == sectionId))
+            return false;
+        var quiz = studentQuizzes?.FirstOrDefault(x => x?.Quiz.SectionId - 1 == sectionId - 1);
+        if (quiz?.IsPass == true)
+            return false;
+        return true;
     }
 
     public static List<SectionProgressResponse> StudentToProgressResponseList(List<StudentProgress> dto)
