@@ -26,10 +26,11 @@ public class ProgressService : IProgressService
     public async Task<SectionProgressResponse?> GetCourseProgressAsync(int studentId, int courseId)
     {
         var student = await GetProgressListAsync(studentId, courseId);
+        var course = await _unit.CourseRepository.GetByIdAsync(courseId);
 
         if (student.Count == 0) return null;
 
-        return ProgressMapper.StudentToProgressResponse(student);
+        return ProgressMapper.StudentToProgressResponse(student,course!.Sections.Count);
     }
 
     public async Task<List<SectionProgressResponse>?> GetStudentCoursesProgressAsync()
