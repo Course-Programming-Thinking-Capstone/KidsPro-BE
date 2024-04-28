@@ -15,4 +15,6 @@ public class OrderResponse
     public string? ParentName { get; set; }
     public string? PaymentType { get; set; }
     public string? Note { get; set; }
+    public int? CourseId { get; set; }
+    public int? ClassId { get; set; }
 }

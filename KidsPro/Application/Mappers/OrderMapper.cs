@@ -27,7 +27,9 @@ namespace Application.Mappers
             OrderStatus = x.Status.ToString(),
             ParentName = x.Parent!.Account.FullName,
             PaymentType = x.PaymentType.ToString(),
-            Note = x.Note
+            Note = x.Note,
+            CourseId = x.OrderDetails!.FirstOrDefault()?.CourseId,
+            ClassId = x.OrderDetails!.FirstOrDefault()?.ClassId
         };
 
         public static PagingOrderResponse OrdersToPagingOrderResponse(PagingResponse<Order> orders)
