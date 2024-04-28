@@ -50,6 +50,8 @@ namespace Infrastructure.Repositories
         {
             return (await _dbSet
                 .Where(sp => sp.StudentId == studentId && sectionId.Contains(sp.SectionId))
+                .Include(x=>x.Section)
+                .ThenInclude(x=>x.Lessons).ThenInclude(x=> x.StudentLessons)
                 .ToListAsync())!;
         }
         

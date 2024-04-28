@@ -11,7 +11,15 @@ public static class ProgressMapper
         return sectionIds.Select(x => new CheckProgressResponse
         {
             SectionId = x,
-            IsCheck = students.Any(s => s?.SectionId == x)
+            IsCheck = students.Any(s => s?.SectionId == x),
+            Lesson = students.Where(s => s?.SectionId == x)
+                .SelectMany(stu => stu?.Section.Lessons
+                    .Select(z => new CheckLessonCompleted
+                    {
+                        LessonId = z.Id,
+                        IsCompleted = z.StudentLessons?
+                            .Any(o => o?.StudentId == stu.StudentId && o?.LessonId == z?.Id && o.IsCompleted) ?? false
+                    })).ToList()
         }).ToList();
     }
 
