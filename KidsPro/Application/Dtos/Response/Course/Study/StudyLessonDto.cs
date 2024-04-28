@@ -9,4 +9,5 @@ public class StudyLessonDto
     public int? Duration { get; set; }
     public bool IsFree { get; set; }
     public string Type { get; set; } = null!;
+    public bool IsComplete { get; set; } 
 }

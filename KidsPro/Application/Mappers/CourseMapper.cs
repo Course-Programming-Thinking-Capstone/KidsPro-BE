@@ -387,6 +387,7 @@ public static class CourseMapper
 
     public static StudyLessonDto LessonToStudyLessonDto(Lesson entity)
     {
+        var studentLesson = entity.StudentLessons?.FirstOrDefault();
         return new StudyLessonDto()
         {
             Id = entity.Id,
@@ -395,7 +396,8 @@ public static class CourseMapper
             Content = entity.Content,
             ResourceUrl = entity.ResourceUrl,
             IsFree = entity.IsFree,
-            Type = entity.Type.ToString()
+            Type = entity.Type.ToString(),
+            IsComplete = studentLesson is {IsCompleted: true}
         };
     }
 }

@@ -52,7 +52,7 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 Content = lesson.Content,
                 ResourceUrl = lesson.ResourceUrl,
                 Type = lesson.Type,
-                SectionId = lesson.SectionId
+                SectionId = lesson.SectionId,
             }).FirstOrDefaultAsync();
     }
 
@@ -76,7 +76,11 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 Content = lesson.Content,
                 ResourceUrl = lesson.ResourceUrl,
                 Type = lesson.Type,
-                SectionId = lesson.SectionId
+                SectionId = lesson.SectionId,
+                StudentLessons = lesson.StudentLessons != null
+                    ? lesson.StudentLessons
+                        .Where(sl => sl.Student.AccountId == studentId && sl.LessonId == lesson.Id).ToList()
+                    : null,
             }).FirstOrDefaultAsync();
     }
 
