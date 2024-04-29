@@ -86,11 +86,12 @@ public static class ClassMapper
         Duration = dto.Duration,
         SlotDuration = dto.Course.Syllabus?.SlotTime ?? 0,
         TotalSlot = dto.TotalSlot,
+        SlotPerWeek = dto.Course.Syllabus?.SlotPerWeek ?? 0,
         //Teacher
         TeacherId = dto.Teacher?.Id,
         TeacherName = dto.Teacher?.Account.FullName,
-        TeachPhoneNumber = dto.Teacher?.PhoneNumber,
-        TeachEmail = dto.Teacher?.Account.Email,
+        TeacherPhoneNumber = dto.Teacher?.PhoneNumber,
+        TeacherEmail = dto.Teacher?.Account.Email,
         //Schedules
         RoomUrl = dto.Schedules?.FirstOrDefault()?.RoomUrl,
         SlotNumber = dto.Schedules?.FirstOrDefault()?.Slot ?? 0,

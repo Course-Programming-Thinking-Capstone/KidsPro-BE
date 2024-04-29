@@ -22,7 +22,6 @@ public class ClassService : IClassService
     private IDiscordService _discord;
     private IProgressService _progress;
 
-   
 
     public ClassService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
         IProgressService progress, IDiscordService discord)
@@ -43,14 +42,13 @@ public class ClassService : IClassService
         return account;
     }
 
-    
 
     #region Class
 
     public async Task UpdateClassStatusAsync(int classId, ClassStatus status)
     {
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
-            ?? throw new NotFoundException($"ClassId {classId} not found");
+                          ?? throw new NotFoundException($"ClassId {classId} not found");
         switch (status)
         {
             case ClassStatus.OnGoing:
@@ -58,6 +56,7 @@ public class ClassService : IClassService
                     throw new BadRequestException("Update status failed because class doesn't has teacher or schedule");
                 break;
         }
+
         entityClass.Status = status;
         _unitOfWork.ClassRepository.Update(entityClass);
         await _unitOfWork.SaveChangeAsync();
@@ -80,7 +79,9 @@ public class ClassService : IClassService
         var course = await _unitOfWork.CourseRepository.GetByIdAsync(dto.CourseId) ??
                      throw new BadRequestException("Course Id not exist");
 
-        var classEntity = new Class()
+        CheckTotalSlotInPeriod(course, dto.CloseDay, dto.OpenDay);
+
+        var classEntity = new Class
         {
             Code = dto.ClassCode.ToUpper().Trim(),
             OpenDate = dto.OpenDay,
@@ -88,7 +89,7 @@ public class ClassService : IClassService
             Status = ClassStatus.Opening,
             CourseId = dto.CourseId,
             CreatedById = account.Id,
-            Duration = dto.CloseDay.Month - dto.OpenDay.Month,
+            Duration = Convert.ToInt32((dto.CloseDay - dto.OpenDay).TotalDays / 7),
             TotalSlot = course.Syllabus?.TotalSlot ?? 0
         };
 
@@ -96,6 +97,21 @@ public class ClassService : IClassService
         await _unitOfWork.SaveChangeAsync();
 
         return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name, course.Syllabus?.SlotTime ?? 0);
+    }
+
+    private void CheckTotalSlotInPeriod(Course course, DateTime closeDate, DateTime openDate)
+    {
+        var weeks = (closeDate - openDate).TotalDays / 7;
+
+        var slotPerWeek = course.Syllabus!.SlotPerWeek;
+
+        var totalSlot = course.Syllabus!.TotalSlot;
+
+        int totalSlotsInPeriod = (int)Math.Ceiling(weeks) * slotPerWeek;
+
+        if (Math.Abs(totalSlotsInPeriod - totalSlot) > 1)
+            throw new BadRequestException("The total slot in the period is " + totalSlotsInPeriod +
+                                          ", BUT the total slot in the syllabus is " + totalSlot);
     }
 
     public async Task<ClassDetailResponse> GetClassByIdAsync(int classId)
@@ -131,12 +147,12 @@ public class ClassService : IClassService
         var classes = await _unitOfWork.ClassRepository.GetClassByRoleAsync(account.IdSubRole, account.Role);
         if (classes.Count == 0) throw new NotFoundException($"Teacher or student do not have a class");
 
-        var classResponse= ClassMapper.ClassToClassesResponse(classes);
+        var classResponse = ClassMapper.ClassToClassesResponse(classes);
 
         foreach (var x in classResponse)
         {
             var course = await _progress.GetCourseProgressAsync(account.IdSubRole, x.CourseId);
-            x.CourseProgress =course?.CourseProgress??0;
+            x.CourseProgress = course?.CourseProgress ?? 0;
         }
 
         return classResponse;
