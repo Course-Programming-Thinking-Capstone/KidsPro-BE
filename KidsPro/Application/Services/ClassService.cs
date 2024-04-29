@@ -82,7 +82,7 @@ public class ClassService : IClassService
 
         var classEntity = new Class()
         {
-            Code = dto.ClassCode,
+            Code = dto.ClassCode.ToUpper().Trim(),
             OpenDate = dto.OpenDay,
             CloseDate = dto.CloseDay,
             Status = ClassStatus.Opening,

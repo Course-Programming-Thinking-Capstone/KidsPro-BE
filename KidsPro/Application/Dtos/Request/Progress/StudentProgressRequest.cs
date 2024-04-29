@@ -1,7 +1,9 @@
-﻿namespace Application.Dtos.Request.Progress;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Application.Dtos.Request.Progress;
 
 public class StudentProgressRequest
 {
-    public int SectionId { get; set; }
-    public int CourseId { get; set; }
+    [Required] public int SectionId { get; set; }
+    [Required] public int CourseId { get; set; }
 }

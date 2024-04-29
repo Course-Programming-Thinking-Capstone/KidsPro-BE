@@ -37,7 +37,7 @@ public class PaymentService : IPaymentService
         //var parentId = GetIdMomoResponse(dto.requestId);
 
         var order = await _unitOfWork.OrderRepository.GetOrderByStatusAsync(orderId, OrderStatus.Process)
-                    ?? throw new BadRequestException($"OrderId {orderId} not found, can't update to pending status");
+                    ?? throw new BadRequestException($"OrderId {orderId} not found, update to pending status failed");
 
         order.Status = OrderStatus.Pending;
         _unitOfWork.OrderRepository.Update(order);

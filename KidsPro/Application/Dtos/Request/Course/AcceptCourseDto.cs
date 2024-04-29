@@ -8,6 +8,6 @@ public record AcceptCourseDto
     
     public bool IsAdminSetup { get; set; } 
     
-    [Range(0, 100000000)]
+    [Range(10000, 100000000)]
     public decimal? Price { get; set; }
 }

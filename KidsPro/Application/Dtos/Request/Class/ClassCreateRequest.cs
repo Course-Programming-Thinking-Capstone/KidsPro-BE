@@ -3,7 +3,8 @@ namespace Application.Dtos.Request.Class;
 
 public class ClassCreateRequest
 {
-    public string ClassCode { get; set; } = string.Empty;
+    
+    [StringLength(10)] public string ClassCode { get; set; } = string.Empty;
     [DataType(DataType.Date)]
     public DateTime OpenDay { get; set; }
     [DataType(DataType.Date)]
