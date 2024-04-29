@@ -215,8 +215,8 @@ public class GameControllerTest
     public async Task GetLevelData_WithValidData_Returns_OkResult()
     {
         // Arrange
-        var id = 1; // Provide a valid game mode id
-        var index = 1; // Provide a valid level index
+        var id = 1; 
+        var index = 1;
         var expectedResult = new LevelInformationResponse(); // Define the expected result
 
         _mockGameService.Setup(service => service.GetLevelInformation(id, index))
@@ -236,7 +236,22 @@ public class GameControllerTest
     public async Task AddNewLevels_WithValidData_Returns_OkResult()
     {
         // Arrange
-        var modifiedLevelData = new ModifiedLevelDataRequest(); // Provide valid data for the request
+        var modifiedLevelData = new ModifiedLevelDataRequest
+        {
+            CoinReward = 100,
+            GemReward = 100,
+            LevelIndex = 99,
+            VStartPosition = 15,
+            GameLevelTypeId = 2,
+            LevelDetail = new List<LevelDetailRequest>()
+            {
+                new LevelDetailRequest
+                {
+                    VPosition = 16,
+                    TypeId = 2
+                }
+            }
+        }; // Provide valid data for the request
 
         // Act
         var result = await _controller.AddNewLevels(modifiedLevelData);
