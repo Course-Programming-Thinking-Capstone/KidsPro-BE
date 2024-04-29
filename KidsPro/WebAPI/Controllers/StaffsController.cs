@@ -29,7 +29,7 @@ public class StaffsController : ControllerBase
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
     [HttpPost("student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -49,7 +49,7 @@ public class StaffsController : ControllerBase
     /// <param name="parentId"></param>
     /// <param name="studentName"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
     [HttpPost("parent/request-email")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -71,7 +71,7 @@ public class StaffsController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
     [HttpPost("parent/send-email")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -91,7 +91,7 @@ public class StaffsController : ControllerBase
     /// </summary>
     /// <param name="orderId"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StaffRole}")]
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
     [HttpGet("order/view-reason/{orderId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetail))]
