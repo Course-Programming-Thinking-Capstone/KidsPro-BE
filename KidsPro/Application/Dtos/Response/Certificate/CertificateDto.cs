@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Response.Certificate
 {
-    public class CertificateResponseDto
+    public class CertificateDto
     {
         public string? CourseName {  get; set; } = null;
         public string? CertificateUrl { get; set; } = null;

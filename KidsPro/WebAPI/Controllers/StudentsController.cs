@@ -91,7 +91,8 @@ public class StudentsController : Controller
     public async Task<ActionResult<List<SectionProgressResponse>>> GetStudentCourseAsync()
     {
         var result = await _progress.GetStudentCoursesProgressAsync();
-        return Ok(result);
+
+        return result != null ? Ok(result) : NotFound("Students do not have courses");
     }
 
     /// <summary>
@@ -108,6 +109,6 @@ public class StudentsController : Controller
     public async Task<ActionResult<SectionProgressResponse>> GetSectionProgress(int studentId, int courseId)
     {
         var result = await _progress.GetCourseProgressAsync(studentId, courseId);
-        return Ok(result);
+        return result != null ? Ok(result) : NotFound("The student does not has course");
     }
 }

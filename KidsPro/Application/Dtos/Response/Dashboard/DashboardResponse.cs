@@ -7,5 +7,6 @@ public class DashboardResponse
     public List<StatisticDto> Account { get; set; } = new List<StatisticDto>();
     public List<StatisticDto> NewUserThisMonth { get; set; } = new List<StatisticDto>();
     public List<StatisticDto> MonthlyEarning { get; set; } = new List<StatisticDto>();
-    public IncomeByMonthDto? IncomeByMonth { get; set; }
+    public List<StatisticDto> IncomeByMonth { get; set; } = new List<StatisticDto>();
+  //  public IncomeByMonthDto? IncomeByMonth { get; set; }
 }

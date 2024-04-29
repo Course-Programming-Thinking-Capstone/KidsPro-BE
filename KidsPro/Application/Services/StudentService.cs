@@ -14,12 +14,15 @@ public class StudentService : IStudentService
     private IUnitOfWork _unitOfWork;
     private IAccountService _accountService;
     private IClassService _classService;
+    private IProgressService _progressService;
 
-    public StudentService(IUnitOfWork unitOfWork, IAccountService accountService, IClassService classService)
+    public StudentService(IUnitOfWork unitOfWork, IAccountService accountService, IClassService classService,
+        IProgressService progressService)
     {
         _unitOfWork = unitOfWork;
         _accountService = accountService;
         _classService = classService;
+        _progressService = progressService;
     }
 
     public async Task UpdateStudentAsync(StudentUpdateRequest dto)
@@ -43,8 +46,9 @@ public class StudentService : IStudentService
     public async Task<StudentDetailResponse> GetDetailStudentAsync(int studentId)
     {
         var student = await _unitOfWork.StudentRepository.GetStudentInformation(studentId);
+        var progress = await _progressService.GetStudentCoursesProgressAsync(studentId);
         if (student != null)
-            return StudentMapper.ShowStudentDetail(student);
+            return StudentMapper.ShowStudentDetail(student,progress);
         throw new NotFoundException("studentId doesn't exist");
     }
 
