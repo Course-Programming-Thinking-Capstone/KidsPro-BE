@@ -23,13 +23,12 @@ public class DashboardController : ControllerBase
     /// <summary>
     ///  Admin get dashboard
     /// </summary>
-    /// <param name="month">Select month to view earning dashboard</param>
     /// <returns></returns>
     [Authorize(Roles = $"{Constant.AdminRole}")]
     [HttpGet]
-    public async Task<ActionResult<DashboardResponse>> AdminGetDashboardAsync(MonthType month)
+    public async Task<ActionResult<DashboardResponse>> AdminGetDashboardAsync()
     {
-        var result = await _dashboard.GetDashboardAsync(month);
+        var result = await _dashboard.GetDashboardAsync();
         return result;
     }
 }

@@ -8,7 +8,7 @@ namespace Application.Mappers;
 public static class DashboardMapper
 {
     public static DashboardResponse ShowDashboardResponse(List<Course> courses, List<Order> orders,
-        List<Account> accounts, List<Transaction> transactions, MonthType month)
+        List<Account> accounts, List<Transaction> transactions)
     {
         return new DashboardResponse
         {
@@ -20,6 +20,11 @@ public static class DashboardMapper
                 CourseToStatistics(courses, CourseStatus.Active),
                 CourseToStatistics(courses, CourseStatus.Inactive),
                 CourseToStatistics(courses, CourseStatus.Waiting),
+                new StatisticDto
+                {
+                    Total = courses.Count,
+                    Status = "All Courses"
+                }
             },
             Orders = new List<StatisticDto>
             {
@@ -28,6 +33,11 @@ public static class DashboardMapper
                 OrderToStatistics(orders, OrderStatus.Success),
                 OrderToStatistics(orders, OrderStatus.RequestRefund),
                 OrderToStatistics(orders, OrderStatus.Refunded),
+                new StatisticDto
+                {
+                    Total = orders.Count,
+                    Status = "All Orders"
+                }
             },
             Account = new List<StatisticDto>
             {
@@ -38,7 +48,7 @@ public static class DashboardMapper
                 new StatisticDto
                 {
                     Total = accounts.Count,
-                    Status = "AllAccount"
+                    Status = "All Accounts"
                 }
             },
             NewUserThisMonth = new List<StatisticDto>
@@ -52,7 +62,22 @@ public static class DashboardMapper
                 MonthlyEarning(transactions, "LastMonth"),
                 EarningPercent(transactions, "")
             },
-            IncomeByMonth = IncomeByMonth(transactions, month)
+            IncomeByMonth = new List<StatisticDto>
+            {
+                MonthlyEarning(transactions, MonthType.January),
+                MonthlyEarning(transactions, MonthType.February),
+                MonthlyEarning(transactions, MonthType.March),
+                MonthlyEarning(transactions, MonthType.April),
+                MonthlyEarning(transactions, MonthType.May),
+                MonthlyEarning(transactions, MonthType.June),
+                MonthlyEarning(transactions, MonthType.July),
+                MonthlyEarning(transactions, MonthType.August),
+                MonthlyEarning(transactions, MonthType.September),
+                MonthlyEarning(transactions, MonthType.October),
+                MonthlyEarning(transactions, MonthType.November),
+                MonthlyEarning(transactions, MonthType.December),
+            },
+            //IncomeByMonth = IncomeByMonth(transactions, month)
         };
     }
 
@@ -102,6 +127,18 @@ public static class DashboardMapper
         }
 
         result.Status = month;
+        return result;
+    }
+
+    private static StatisticDto MonthlyEarning(List<Transaction> transactions, MonthType month)
+    {
+        var result = new StatisticDto();
+
+        result.Total = transactions
+            .Where(x => x.CreatedDate.Month == (int)month)
+            .Sum(x => x.Amount);
+
+        result.Status = month.ToString();
         return result;
     }
 

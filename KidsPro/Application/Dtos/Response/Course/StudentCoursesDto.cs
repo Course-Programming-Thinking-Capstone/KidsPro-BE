@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Response.Course
 {
-    public class TitleDto
+    public class StudentCoursesDto
     {
         public int CourseId { get; set; }
         public string? CourseName { get; set; }
+        public float? CourseProgress { get; set; }
     }
 }

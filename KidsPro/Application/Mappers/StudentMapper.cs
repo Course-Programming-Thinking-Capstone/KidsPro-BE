@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.Response.Account.Student;
 using Application.Dtos.Response.Certificate;
 using Application.Dtos.Response.Course;
+using Application.Dtos.Response.StudentProgress;
 using Application.Utils;
 using Domain.Entities;
 
@@ -27,7 +28,7 @@ public static class StudentMapper
         return list;
     }
 
-    public static StudentDetailResponse ShowStudentDetail(Student entity)
+    public static StudentDetailResponse ShowStudentDetail(Student entity, List<SectionProgressResponse>? progress)
     {
         var student = new StudentDetailResponse()
         {
@@ -44,18 +45,19 @@ public static class StudentMapper
             Age = Math.Max(0, DateTime.Now.Year - (entity.Account.DateOfBirth?.Year ?? 0)),
             ParentId = entity.ParentId,
             ParentName = entity.Parent.Account.FullName,
-            StudentsCertificate = entity.Certificates?.Select(x => new CertificateResponseDto
+            StudentsCertificate = entity.Certificates?.Select(x => new CertificateDto
             {
                 CourseName = x.Course.Name,
                 CertificateUrl = x.ResourceUrl
             }).ToList(),
-            CertificateTotal = entity.Certificates?.Count??0,
-            StudentsCourse = entity.Classes.Select(x=> new TitleDto
+            CertificateTotal = entity.Certificates?.Count ?? 0,
+            StudentsCourse = entity.Classes.Select(x => new StudentCoursesDto
             {
-                CourseId = x.CourseId, 
-                CourseName = x.Course.Name
+                CourseId = x.CourseId,
+                CourseName = x.Course.Name,
+                CourseProgress = progress?.FirstOrDefault(z => z.CourseId == x.CourseId)?.CourseProgress,
             }).ToList(),
-            CourseTotal = entity.Classes?.Count??0
+            CourseTotal = entity.Classes?.Count ?? 0,
         };
 
         return student;

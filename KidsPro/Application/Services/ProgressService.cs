@@ -30,14 +30,14 @@ public class ProgressService : IProgressService
 
         if (student.Count == 0) return null;
 
-        return ProgressMapper.StudentToProgressResponse(student,course!.Sections.Count);
+        return ProgressMapper.StudentToProgressResponse(student, course!.Sections.Count);
     }
 
-    public async Task<List<SectionProgressResponse>?> GetStudentCoursesProgressAsync()
+    public async Task<List<SectionProgressResponse>?> GetStudentCoursesProgressAsync(int studentId = 0)
     {
         var account = await _account.GetCurrentAccountInformationAsync();
 
-        var student = await GetProgressListAsync(account.IdSubRole);
+        var student = await GetProgressListAsync(studentId > 0 ? studentId : account.IdSubRole);
         if (student.Count == 0) return null;
 
         return ProgressMapper.StudentToProgressResponseList(student);
@@ -49,6 +49,6 @@ public class ProgressService : IProgressService
         var progresses = await _unit.StudentProgressRepository
             .CheckStudentProgressAsync(account.IdSubRole, sectionIds);
         var students = await _unit.StudentRepository.GetByIdAsync(account.IdSubRole);
-        return ProgressMapper.StudentProgressToCheckProgressResponse(progresses, sectionIds,students!);
+        return ProgressMapper.StudentProgressToCheckProgressResponse(progresses, sectionIds, students!);
     }
 }
