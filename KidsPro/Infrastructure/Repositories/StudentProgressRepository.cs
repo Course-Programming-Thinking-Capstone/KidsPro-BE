@@ -44,6 +44,8 @@ namespace Infrastructure.Repositories
         {
             return await _dbSet.Include(sp => sp.Section)
                 .Where(sp => sp.StudentId == studentId && sp.CourseId == courseId)
+                .Include(sp => sp.Section)
+                .OrderByDescending(sp => sp.Section.Order)
                 .FirstOrDefaultAsync();
         }
         public async Task<List<StudentProgress?>> CheckStudentProgressAsync(int studentId, List<int> sectionId)
