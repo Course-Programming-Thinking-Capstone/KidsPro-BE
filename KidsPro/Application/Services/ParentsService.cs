@@ -35,7 +35,7 @@ public class ParentsService : IParentsService
             FullName = StringUtils.FormatName(request.FullName),
             Role = studentRole,
             DateOfBirth = request.Birthday,
-            Gender = (Gender)request.Gender,
+            Gender = (Gender)(request.Gender > 0 ? request.Gender : 1),
             CreatedDate = DateTime.UtcNow,
             Status = UserStatus.Active
         };
@@ -68,5 +68,4 @@ public class ParentsService : IParentsService
         var vouchers = await _unitOfWork.VoucherRepository.GetListVoucher(account.IdSubRole, status);
         return vouchers;
     }
-    
 }

@@ -9,7 +9,7 @@ using Domain.Enums;
 
 namespace Application.Services;
 
-public class StudentService:IStudentService
+public class StudentService : IStudentService
 {
     private IUnitOfWork _unitOfWork;
     private IAccountService _accountService;
@@ -29,7 +29,7 @@ public class StudentService:IStudentService
         {
             student.Account.FullName = StringUtils.FormatName(dto.FullName);
             student.Account.DateOfBirth = dto.BirthDay;
-            student.Account.Gender = (Gender)dto.Gender;
+            student.Account.Gender = (Gender)(dto.Gender > 0 ? dto.Gender : 1);
             student.Account.Email = dto.Email;
             student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
 
@@ -39,7 +39,7 @@ public class StudentService:IStudentService
         else
             throw new NotFoundException($"Student Id {dto.Id} not found");
     }
-    
+
     public async Task<StudentDetailResponse> GetDetailStudentAsync(int studentId)
     {
         var student = await _unitOfWork.StudentRepository.GetStudentInformation(studentId);
@@ -47,15 +47,15 @@ public class StudentService:IStudentService
             return StudentMapper.ShowStudentDetail(student);
         throw new NotFoundException("studentId doesn't exist");
     }
-    
-    public async Task<List<StudentResponse>> GetStudentsAsync(int classId=0)
+
+    public async Task<List<StudentResponse>> GetStudentsAsync(int classId = 0)
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
-        var students = await _unitOfWork.StudentRepository.GetStudents(account.Role,account.IdSubRole);
+        var students = await _unitOfWork.StudentRepository.GetStudents(account.Role, account.IdSubRole);
 
-        if (classId==0)
+        if (classId == 0)
             return StudentMapper.ShowStudentList(students);
-        
+
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(classId)
                           ?? throw new NotFoundException($"ClassId: {classId} doesn't exist");
 
@@ -66,7 +66,7 @@ public class StudentService:IStudentService
         return StudentMapper.ShowStudentList(studentsCanAddToClass);
     }
 
-    private  List<Student> GetStudentWithoutCourse(List<Student> students,int courseId)
+    private List<Student> GetStudentWithoutCourse(List<Student> students, int courseId)
     {
         return students.Where(x => x.Classes
             .All(c => c.CourseId != courseId)).ToList();

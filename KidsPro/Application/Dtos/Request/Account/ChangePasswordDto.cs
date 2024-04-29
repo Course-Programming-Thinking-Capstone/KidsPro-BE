@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.Validations;
 
 namespace Application.Dtos.Request.Account;
 
 public record ChangePasswordDto
 {
-    [Required] public string OldPassword { get; set; } = null!;
-
-    [Required] public string NewPassword { get; set; } = null!;
+    [PasswordValidation] [Required] public string OldPassword { get; set; } = null!;
+    [PasswordValidation] [Required] public string NewPassword { get; set; } = null!;
 }

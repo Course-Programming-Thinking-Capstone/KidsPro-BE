@@ -17,7 +17,8 @@ public class StudentsController : Controller
     private IAuthenticationService _authentication;
     private IProgressService _progress;
 
-    public StudentsController(IStudentService studentService, IAuthenticationService authentication, IProgressService progress)
+    public StudentsController(IStudentService studentService, IAuthenticationService authentication,
+        IProgressService progress)
     {
         _studentService = studentService;
         _authentication = authentication;
@@ -33,12 +34,12 @@ public class StudentsController : Controller
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<StudentResponse>> GetStudents([FromQuery]int? classId)
+    public async Task<ActionResult<StudentResponse>> GetStudents([FromQuery] int? classId)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
         if (classId > 0)
-            return Ok(await _studentService.GetStudentsAsync(classId??0));
+            return Ok(await _studentService.GetStudentsAsync(classId ?? 0));
         return Ok(await _studentService.GetStudentsAsync());
     }
 
@@ -55,7 +56,7 @@ public class StudentsController : Controller
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-        
+
         var result = await _studentService.GetDetailStudentAsync(id);
         return Ok(result);
     }
@@ -65,7 +66,7 @@ public class StudentsController : Controller
     /// </summary>
     /// <param name="dto">Gender is enum: "Male: 1, Female: 2".</param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.ParentRole}")]
+    [Authorize(Roles = $"{Constant.ParentRole},{Constant.StudentRole}")]
     [HttpPut()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetail))]
@@ -73,11 +74,11 @@ public class StudentsController : Controller
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();
-        
+
         await _studentService.UpdateStudentAsync(dto);
         return Ok("Update Student Information Success!");
     }
-    
+
     /// <summary>
     /// Get student's course, include course ratio
     /// </summary>
@@ -92,7 +93,7 @@ public class StudentsController : Controller
         var result = await _progress.GetStudentCoursesProgressAsync();
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Get student's section progress 
     /// </summary>

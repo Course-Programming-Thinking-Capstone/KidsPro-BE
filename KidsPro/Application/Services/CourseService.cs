@@ -1171,21 +1171,26 @@ public class CourseService : ICourseService
         var student = await _unitOfWork.StudentRepository.StudentGetStudentLessonAsync(account.IdSubRole)
                       ?? throw new BadRequestException($"StudentId {account.IdSubRole} not found");
 
-        var lesson = new StudentLesson()
-        {
-            LessonId = lessonId,
-            StudentId = account.IdSubRole,
-            IsCompleted = true
-        };
 
         if (student.StudentLessons.Count == 0)
             student.StudentLessons = new List<StudentLesson>();
-        if (student.StudentLessons.Any(x =>
-                x.StudentId == lesson.StudentId && x.LessonId == lesson.LessonId))
+
+        var existingLesson = student.StudentLessons.FirstOrDefault(x =>
+            x.StudentId == account.IdSubRole && x.LessonId == lessonId);
+
+        if (existingLesson != null)
+            existingLesson.IsCompleted = true;
+        else
         {
-            return;
+            var lesson = new StudentLesson()
+            {
+                LessonId = lessonId,
+                StudentId = account.IdSubRole,
+                IsCompleted = true
+            };
+            student.StudentLessons.Add(lesson);
         }
-        student.StudentLessons.Add(lesson);
+
         _unitOfWork.StudentRepository.Update(student);
         await _unitOfWork.SaveChangeAsync();
     }

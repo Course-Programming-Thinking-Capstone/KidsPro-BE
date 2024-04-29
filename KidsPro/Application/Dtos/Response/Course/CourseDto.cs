@@ -22,6 +22,5 @@ public class CourseDto
     public bool IsFree { get; set; }
     public ICollection<ClassesResponse> Classes { get; set; } = new List<ClassesResponse>();
 
-
     public ICollection<SectionDto>? Sections { get; set; }
 }
