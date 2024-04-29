@@ -8,8 +8,9 @@ namespace Application.Dtos.Response.Account.Student
         public string? UserName { get; set; }
       //  public string? Password { get; set; }
         public int CourseTotal { get; set; }
-        public List<TitleDto>? StudentsCourse { get; set; } = new List<TitleDto>();
+        public List<StudentCoursesDto>? StudentsCourse { get; set; } = new List<StudentCoursesDto>();
         public int CertificateTotal { get; set; }
-        public List<CertificateResponseDto>? StudentsCertificate { get; set; } = new List<CertificateResponseDto>();
+        public List<CertificateDto>? StudentsCertificate { get; set; } = new List<CertificateDto>();
+
     }
 }
