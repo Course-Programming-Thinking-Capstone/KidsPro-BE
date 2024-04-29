@@ -19,7 +19,7 @@ public class DashboardService:IDashboardService
         _accountService = accountService;
     }
 
-    public async Task<DashboardResponse> GetDashboardAsync(MonthType month)
+    public async Task<DashboardResponse> GetDashboardAsync()
     {
         var account = await _accountService.GetCurrentAccountInformationAsync();
         if (account.Role != Constant.AdminRole)
@@ -29,6 +29,6 @@ public class DashboardService:IDashboardService
         var courses = await _unitOfWork.CourseRepository.GetAllAsync();
         var accounts = await _unitOfWork.AccountRepository.GetAllAsync();
         var transactions= await _unitOfWork.TransactionRepository.GetAllAsync();
-        return DashboardMapper.ShowDashboardResponse(courses, orders, accounts,transactions,month);
+        return DashboardMapper.ShowDashboardResponse(courses, orders, accounts,transactions);
     }
 }
