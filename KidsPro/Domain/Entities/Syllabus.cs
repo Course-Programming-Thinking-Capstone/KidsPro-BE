@@ -12,6 +12,7 @@ namespace Domain.Entities
         [MaxLength(250)] public string Name { get; set; } = null!;
         public int TotalSlot { get; set; }
         public int SlotTime { get; set; }
+        public int SlotPerWeek { get; set; }
         [MaxLength(1000)] public string? Target { get; set; }
         [Column(TypeName = "tinyint")] public SyllabusStatus Status { get; set; } = SyllabusStatus.Draft;
         public virtual PassCondition? PassCondition { get; set; }

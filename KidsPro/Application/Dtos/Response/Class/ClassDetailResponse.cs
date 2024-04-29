@@ -13,14 +13,16 @@ public class ClassDetailResponse
     public int TotalStudent { get; set; }
     public int? TeacherId { get; set; }
     public string? TeacherName { get; set; }
-    public string? TeachPhoneNumber { get; set; }
-    public string? TeachEmail { get; set; }
+    public string? TeacherPhoneNumber { get; set; }
+    public string? TeacherEmail { get; set; }
     public string? OpenClass { get; set; }
     public string? DayOfWeekStart { get; set; }
     public string? CloseClass { get; set; }
     public string? DayOfWeekEnd { get; set; }
     public int Duration { get; set; }
     public int SlotDuration { get; set; }
+    
+    public int SlotPerWeek { get; set; }
     public IEnumerable<DayStatus>? StudyDay { get; set; } = new List<DayStatus>();
     public int? SlotNumber { get; set; }
     public TimeSpan? StartSlot { get; set; }

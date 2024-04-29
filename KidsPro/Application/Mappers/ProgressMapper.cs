@@ -30,7 +30,7 @@ public static class ProgressMapper
         if (courses.Any(x => x?.Sections.FirstOrDefault()?.Id == sectionId))
             return false;
         var quiz = studentQuizzes?.Where(x => x.Quiz.SectionId == (sectionId - 1));
-        if (quiz!.Any(z=>z.IsPass))
+        if (quiz!.Any(z => z.IsPass))
             return false;
         return true;
     }
@@ -78,7 +78,8 @@ public static class ProgressMapper
                     .Count(l => l.StudentLessons != null && l.StudentLessons
                         .Any(s => s.IsCompleted && s.StudentId == x.StudentId && s.LessonId == l.Id));
 
-                quizRatio = x.Section.Quizzes.FirstOrDefault()?.StudentQuizzes.FirstOrDefault()?.IsPass == true
+                quizRatio = x.Section.Quizzes.Any(m =>
+                    m.StudentQuizzes.Any(z => z.StudentId == x.StudentId && z.QuizId == m.Id && z.IsPass))
                     ? 20
                     : 0;
 
