@@ -103,7 +103,7 @@ public class ParentsController : ControllerBase
     [HttpGet("teacher/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
-    public async Task<ActionResult<List<TeacherResponse>>> GetTeachersDetailAsync(int id)
+    public async Task<ActionResult<AccountDto>> GetTeachersDetailAsync(int id)
     {
         //Check if the account is activated or not or inactive
         _authentication.CheckAccountStatus();

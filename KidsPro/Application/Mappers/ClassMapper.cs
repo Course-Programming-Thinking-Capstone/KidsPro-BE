@@ -115,6 +115,7 @@ public static class ClassMapper
         => new ScheduleResponse()
         {
             ClassId = dto.FirstOrDefault()?.ClassId,
+            SlotPerWeek = dto.FirstOrDefault()?.Class.Course.Syllabus?.SlotPerWeek,
             SlotTime = dto.FirstOrDefault()?.Class.Course.Syllabus?.SlotTime,
             StartSlot = dto.FirstOrDefault()?.StartTime,
             EndSlot = dto.FirstOrDefault()?.EndTime,

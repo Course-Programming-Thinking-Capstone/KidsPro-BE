@@ -53,7 +53,8 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
 
     public async Task<Course?> CheckCourseExist(int id)
     {
-        return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+        return await _dbSet.Include(x => x.Syllabus)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<List<Course>> GetCoursesByStatusAsync(CourseStatus status)
@@ -198,5 +199,4 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             })
             .FirstOrDefaultAsync();
     }
-
 }

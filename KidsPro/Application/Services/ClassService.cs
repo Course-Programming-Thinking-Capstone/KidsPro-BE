@@ -169,6 +169,12 @@ public class ClassService : IClassService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
                           ?? throw new BadRequestException($"ClassID {dto.ClassId} not found");
 
+        var slotPerWeek = entityClass.Course.Syllabus?.SlotPerWeek;
+
+        if (dto.Days.Count != slotPerWeek)
+            throw new BadRequestException("Total slot selected is " + dto.Days.Count +
+                                          ", BUT total slot per week in the syllabus is " + slotPerWeek);
+
         string? discordLink = null;
         if (dto.RoomUrl == string.Empty)
             discordLink = await _discord.CreateVoiceChannelAsync("Class: " + entityClass.Code);
@@ -205,6 +211,19 @@ public class ClassService : IClassService
     public async Task UpdateScheduleAsync(ScheduleUpdateRequest dto)
     {
         await CheckPermission();
+
+        var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId) ??
+                          throw new NotFoundException("ClassId " + dto.ClassId + " not found");
+
+        if (entityClass.TeacherId != null)
+        {
+            var entityTeacher = await _unitOfWork.TeacherRepository.GetByIdAsync((int)entityClass.TeacherId) ??
+                                throw new NotFoundException("TeacherId " + entityClass.TeacherId + " not found");
+            CheckTeacherOverlap(entityClass, entityTeacher);
+        }
+
+        if (entityClass.Students.Count > 0)
+            CheckStudentOverlap(entityClass.Students.ToList(), entityClass);
 
         var schedules =
             await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(dto.ClassId, ScheduleStatus.AllStatus);
@@ -272,12 +291,7 @@ public class ClassService : IClassService
         var teacher = await _unitOfWork.TeacherRepository.GetTeacherSchedulesById(teacherId)
                       ?? throw new NotFoundException($"TeacherId: {teacherId} doesn't exist");
 
-        bool hasOverlap = entityClass.Schedules!
-            .Any(c => teacher.Classes!
-                .Any(t => t.Schedules!
-                    .Any(s => s.Slot == c.Slot && s.StudyDay == c.StudyDay)));
-
-        if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
+        CheckTeacherOverlap(entityClass, teacher);
 
         entityClass.TeacherId = teacherId;
         _unitOfWork.ClassRepository.Update(entityClass);
@@ -289,6 +303,16 @@ public class ClassService : IClassService
         await _notify.SendNotifyToAccountAsync(teacherId, title, content);
 
         return teacher.Account.FullName;
+    }
+
+    private void CheckTeacherOverlap(Class entityClass, Teacher teacher)
+    {
+        bool hasOverlap = entityClass.Schedules!
+            .Any(c => teacher.Classes!
+                .Any(t => t.Schedules!
+                    .Any(s => s.Slot == c.Slot && s.StudyDay == c.StudyDay)));
+
+        if (hasOverlap) throw new BadRequestException("Teachers have conflicting teaching schedules");
     }
 
     public async Task<List<TeacherScheduleResponse>> GetTeacherToClassAsync()
@@ -321,6 +345,14 @@ public class ClassService : IClassService
         return students.Where(c => !c.Classes.Any() || c.Classes
             .All(s => s.Schedules!.All(x => entityClass.Schedules!
                 .All(e => e.StudyDay != x.StudyDay && e.Slot != x.Slot)))).ToList();
+    }
+
+    private void CheckStudentOverlap(List<Student> students, Class entityClass)
+    {
+        var hasOverlap = students.Any(c => c.Classes
+            .Any(s => s.Schedules!.Any(x => entityClass.Schedules!
+                .Any(e => e.StudyDay == x.StudyDay && e.Slot == x.Slot))));
+        if (hasOverlap) throw new BadRequestException("Student have conflicting study schedules");
     }
 
     public async Task<List<StudentClassResponse>> UpdateStudentsToClassAsync(StudentsAddRequest dto)
