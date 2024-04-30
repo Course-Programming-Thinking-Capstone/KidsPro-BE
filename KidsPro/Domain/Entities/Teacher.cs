@@ -8,7 +8,7 @@ namespace Domain.Entities;
 [Index(nameof(AccountId), IsUnique = true)]
 public class Teacher : BaseEntity
 {
-    [MaxLength(150)] public string? Field { get; set; }
+    [MaxLength(150)] public string? Facebook { get; set; }
 
     [MaxLength(500)] public string? PersonalInformation { get; set; }
 

@@ -2,7 +2,7 @@
 
 public class TeacherDto : AccountDto
 {
-    public string? Field { get; set; }
+    public string? Facebook { get; set; }
 
     public string? PersonalInformation { get; set; }
 

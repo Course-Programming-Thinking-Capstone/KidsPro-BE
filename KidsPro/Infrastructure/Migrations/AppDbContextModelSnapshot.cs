@@ -92,55 +92,55 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 4, 29, 17, 1, 50, 970, DateTimeKind.Utc).AddTicks(5438),
+                            CreatedDate = new DateTime(2024, 4, 30, 3, 35, 49, 276, DateTimeKind.Utc).AddTicks(3190),
                             Email = "admin@gmail.com",
                             FullName = "Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$R/31MFj1jDj/6WWZm/6GSuwV1wwXrobiSMvvYwFUzEWb7s/Ptgn56",
+                            PasswordHash = "$2a$11$SpvU2JLJC.wHZ01QTB3xbuclvGp3EiHFvZGnav1gnOM/NUeotQaJ2",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 4, 29, 17, 1, 51, 266, DateTimeKind.Utc).AddTicks(7700),
+                            CreatedDate = new DateTime(2024, 4, 30, 3, 35, 49, 507, DateTimeKind.Utc).AddTicks(6981),
                             Email = "subadmin@gmail.com",
                             FullName = "Sub Admin",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$EyKuzj9CKx4y3jbW9x3TJ.TSrPj0py3o2tedD19SCB/Vz2dx9VBIC",
+                            PasswordHash = "$2a$11$5RIxaJ6T.eFtwJByOCni6OhrXnjDH3DyYQvgTgNbP.sNSD2zMB7JK",
                             RoleId = 1,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 4, 29, 17, 1, 51, 475, DateTimeKind.Utc).AddTicks(2247),
+                            CreatedDate = new DateTime(2024, 4, 30, 3, 35, 49, 744, DateTimeKind.Utc).AddTicks(9216),
                             Email = "teacher@gmail.com",
                             FullName = "Teacher",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$n2ne5IkrF2jmjQTPJDCrEuTQWnTTew5HNQt7O2Lx71czF/ZTsMABm",
+                            PasswordHash = "$2a$11$F5E82iGB4odkaykxr/0aIuM1nhSe4buny0mcdUF4BjCfFHdwXjuze",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 4, 29, 17, 1, 51, 829, DateTimeKind.Utc).AddTicks(2743),
+                            CreatedDate = new DateTime(2024, 4, 30, 3, 35, 49, 969, DateTimeKind.Utc).AddTicks(5223),
                             Email = "teacher2@gmail.com",
                             FullName = "Teacher 2",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$z4ZU9SFb5x1KVGxXYRnYoug8FiBXNo70aVWqo9O2jXc/E5j7/mtt.",
+                            PasswordHash = "$2a$11$h5QucuArXdKVPFaVQAbpvua8dEF5TKCiCEZ3lRDo1K9zwhaRFyZvm",
                             RoleId = 3,
                             Status = (byte)1
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 4, 29, 17, 1, 52, 150, DateTimeKind.Utc).AddTicks(5873),
+                            CreatedDate = new DateTime(2024, 4, 30, 3, 35, 50, 186, DateTimeKind.Utc).AddTicks(3703),
                             Email = "staff@gmail.com",
                             FullName = "Staff",
                             IsDelete = false,
-                            PasswordHash = "$2a$11$qRFkeqRgQevNNz.r1LrsEemi5Xps/5ke7gW5fGvlLhMMHp1LYeV2e",
+                            PasswordHash = "$2a$11$XPhzEnDt5WTZ7LWm61Ch1uhDD4XyFNnqMGt6x4n6MjFIEb5qP/zVK",
                             RoleId = 2,
                             Status = (byte)1
                         });
@@ -1900,7 +1900,7 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
-                    b.Property<string>("Field")
+                    b.Property<string>("Facebook")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 

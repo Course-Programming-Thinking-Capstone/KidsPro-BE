@@ -87,7 +87,7 @@ public static class AccountMapper
         Status = entity.Status.ToString(),
         CreatedDate = DateUtils.FormatDateTimeToDatetimeV3(entity.CreatedDate),
         Role = entity.Role.Name,
-        Field = entity.Teacher?.Field,
+        Facebook = entity.Teacher?.Facebook,
         Biography = entity.Teacher?.Biography,
         PhoneNumber = entity.Teacher?.PhoneNumber,
         ProfilePicture = entity.Teacher?.ProfilePicture,
