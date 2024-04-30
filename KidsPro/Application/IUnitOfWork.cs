@@ -51,4 +51,5 @@ public interface IUnitOfWork : IDisposable
     
     public IQuizRepository QuizRepository { get; }
     public ICourseGameRepository CourseGameRepository { get; }
+    public ITeacherProfileRepository TeacherProfileRepository { get; }
 }

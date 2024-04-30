@@ -36,7 +36,7 @@ public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
 
     public override Task<Teacher?> GetByIdAsync(int id, bool disableTracking = false)
     {
-        return _dbSet.Include(x => x.Account)
+        return _dbSet.Include(x => x.Account).Include(x=> x.TeacherProfiles)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 }

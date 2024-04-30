@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Response.Account;
+﻿using Application.Dtos.Request.Teacher;
+using Application.Dtos.Response.Account;
 using Application.Dtos.Response.Account.Parent;
 using Application.Dtos.Response.Account.Student;
 using Application.Dtos.Response.Certificate;
@@ -92,7 +93,12 @@ public static class AccountMapper
         PhoneNumber = entity.Teacher?.PhoneNumber,
         ProfilePicture = entity.Teacher?.ProfilePicture,
         PersonalInformation = entity.Teacher?.PersonalInformation,
-        IdSubRole = entity.Teacher!.Id
+        IdSubRole = entity.Teacher!.Id,
+        Certificates = entity.Teacher?.TeacherProfiles?.Select(x=> new CertificateRequest
+        {
+            CertificateName = x.CertificatePicture,
+            CertificateUrl = x.Description
+        }).ToList()
     };
 
     public static ParentResponse AccountToParentDto(Account entity) => new ParentResponse()

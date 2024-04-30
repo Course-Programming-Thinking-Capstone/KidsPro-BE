@@ -49,7 +49,7 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
     public async Task<Account?> GetTeacherAccountById(int accountId)
     {
         return await _dbSet.Include(a => a.Role)
-            .Include(a => a.Teacher)
+            .Include(a => a.Teacher).ThenInclude(x=>x.TeacherProfiles)
             .FirstOrDefaultAsync(a => a.Id == accountId && !a.IsDelete && a.Status == UserStatus.Active);
     }
 

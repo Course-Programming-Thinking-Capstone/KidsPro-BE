@@ -1,4 +1,6 @@
-﻿namespace Application.Dtos.Response.Account;
+﻿using Application.Dtos.Request.Teacher;
+
+namespace Application.Dtos.Response.Account;
 
 public class TeacherDto : AccountDto
 {
@@ -11,4 +13,5 @@ public class TeacherDto : AccountDto
     public string? ProfilePicture { get; set; }
 
     public string? PhoneNumber { get; set; }
+    public List<CertificateRequest>? Certificates{ get; set; } = new List<CertificateRequest>();
 }

@@ -9,7 +9,7 @@ public class PhoneValidationAttribute: ValidationAttribute
     {
         var name = (string)value!;
 
-        var isValidPhoneNumber = new Regex(@"^\\+?\d{10,15}$");
+        var isValidPhoneNumber = new Regex(@"^\+?\d{10,15}$");
 
         return isValidPhoneNumber.IsMatch(name)
             ? ValidationResult.Success
