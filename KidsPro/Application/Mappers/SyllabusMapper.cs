@@ -16,6 +16,7 @@ public static class SyllabusMapper
             Target = entity.Target,
             TotalSlot = entity.TotalSlot,
             SlotTime = entity.SlotTime,
+            SlotPerWeek = entity.SlotPerWeek,
             TeacherId = entity.Course.ModifiedById,
             MinQuizScoreRatio = entity.PassCondition?.PassRatio,
             Sections = entity.Course.Sections.Select(SectionToSectionDto).ToList(),

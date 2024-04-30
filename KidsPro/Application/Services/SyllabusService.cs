@@ -53,6 +53,7 @@ public class SyllabusService : ISyllabusService
         entity.Target = dto.Target;
         entity.TotalSlot = dto.TotalSlot;
         entity.SlotTime = dto.SlotTime;
+        entity.SlotPerWeek = dto.SlotPerWeek;
 
         //update syllabus status
         entity.Status = SyllabusStatus.Open;

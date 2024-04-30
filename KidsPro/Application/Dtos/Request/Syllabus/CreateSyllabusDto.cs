@@ -17,6 +17,8 @@ public class CreateSyllabusDto
 
     [Required(ErrorMessage = "Slot time is required.")]
     public int SlotTime { get; init; }
+    [Required(ErrorMessage = "Slot Per Week is required.")]
+    public int SlotPerWeek { get; init; }
 
     [Range(0, 100, ErrorMessage = "Out of range 0 to 100")]
     public int? MinQuizScoreRatio { get; init; }

@@ -10,6 +10,7 @@ public class SyllabusDetailDto
 
     public int TotalSlot { get; set; }
 
+    public int SlotPerWeek { get; set; }
     public int SlotTime { get; set; }
 
     public int? MinQuizScoreRatio { get; set; }
