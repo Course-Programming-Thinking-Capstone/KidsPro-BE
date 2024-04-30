@@ -23,7 +23,7 @@ public static class DashboardMapper
                 new StatisticDto
                 {
                     Total = courses.Count,
-                    Status = "All Courses"
+                    Status = ""
                 }
             },
             Orders = new List<StatisticDto>
@@ -36,7 +36,7 @@ public static class DashboardMapper
                 new StatisticDto
                 {
                     Total = orders.Count,
-                    Status = "All Orders"
+                    Status = ""
                 }
             },
             Account = new List<StatisticDto>
