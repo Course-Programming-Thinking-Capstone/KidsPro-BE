@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.IRepositories;
+﻿using Application.Configurations;
+using Application.Interfaces.IRepositories;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -49,8 +50,10 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
     public async Task<Account?> GetTeacherAccountById(int accountId)
     {
         return await _dbSet.Include(a => a.Role)
-            .Include(a => a.Teacher).ThenInclude(x=>x.TeacherProfiles)
-            .FirstOrDefaultAsync(a => a.Id == accountId && !a.IsDelete && a.Status == UserStatus.Active);
+            .Include(a => a.Teacher).ThenInclude(x => x.TeacherProfiles)
+            .FirstOrDefaultAsync(a =>
+                a.Id == accountId && !a.IsDelete && a.Status == UserStatus.Active &&
+                a.Role.Name == Constant.TeacherRole);
     }
 
     public async Task<Account?> GetStaffAccountById(int accountId)
@@ -72,8 +75,8 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
         return await query.Include(a => a.Role)
             .FirstOrDefaultAsync(a => a.Id == id && !a.IsDelete && a.Status != UserStatus.Inactive);
     }
-    
-    public  async Task<Account?> AdminGetAccountById(int id)
+
+    public async Task<Account?> AdminGetAccountById(int id)
     {
         IQueryable<Account> query = _dbSet;
 
@@ -81,7 +84,7 @@ public class AccountRepository : BaseRepository<Account>, IAccountRepository
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public override Task<List<Account>> GetAllAsync()
+    public override Task<List<Account>> GetAllFieldAsync()
     {
         IQueryable<Account> query = _dbSet;
 

@@ -25,10 +25,10 @@ public class DashboardService:IDashboardService
         if (account.Role != Constant.AdminRole)
             throw new UnauthorizedException("Please login by account admin");
 
-        var orders = await _unitOfWork.OrderRepository.GetAllAsync();
-        var courses = await _unitOfWork.CourseRepository.GetAllAsync();
-        var accounts = await _unitOfWork.AccountRepository.GetAllAsync();
-        var transactions= await _unitOfWork.TransactionRepository.GetAllAsync();
+        var orders = await _unitOfWork.OrderRepository.GetAllFieldAsync();
+        var courses = await _unitOfWork.CourseRepository.GetAllFieldAsync();
+        var accounts = await _unitOfWork.AccountRepository.GetAllFieldAsync();
+        var transactions= await _unitOfWork.TransactionRepository.GetAllFieldAsync();
         return DashboardMapper.ShowDashboardResponse(courses, orders, accounts,transactions);
     }
 }

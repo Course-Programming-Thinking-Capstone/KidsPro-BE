@@ -180,7 +180,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
             .ContinueWith(t => t.Result != null);
     }
 
-    public virtual async Task<List<T>> GetAllAsync()
+    public virtual async Task<List<T>> GetAllFieldAsync()
     {
         return await _dbSet.ToListAsync();
     }

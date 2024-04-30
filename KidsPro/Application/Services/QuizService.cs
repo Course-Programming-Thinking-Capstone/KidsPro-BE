@@ -99,7 +99,7 @@ public class QuizService : IQuizService
 
     public async Task RefeshNumberAttempt()
     {
-        var studentQuizes = await _unit.StudentQuizRepository.GetAllAsync();
+        var studentQuizes = await _unit.StudentQuizRepository.GetAllFieldAsync();
 
         foreach (var x in studentQuizes)
         {

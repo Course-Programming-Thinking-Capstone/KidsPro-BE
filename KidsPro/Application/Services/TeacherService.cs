@@ -1,6 +1,9 @@
 ﻿using Application.Dtos.Request.Teacher;
+using Application.Dtos.Response.Account;
+using Application.Dtos.Response.Teacher;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
+using Application.Mappers;
 using Application.Utils;
 using Domain.Entities;
 using Domain.Enums;
@@ -52,23 +55,23 @@ public class TeacherService : ITeacherService
                     teacherProfiles = new List<TeacherProfile>();
 
                 //Update Certifies
-                foreach (var (teacherProfile, certify) in teacherProfiles.Zip(certificates!))
+                foreach (var (teacherProfile, certify) in teacherProfiles!.Zip(certificates!))
                 {
                     teacherProfile.CertificatePicture = certify.CertificateName;
                     teacherProfile.Description = certify.CertificateUrl;
                 }
 
-                _unitOfWork.TeacherProfileRepository.UpdateRange(teacherProfiles);
+                _unitOfWork.TeacherProfileRepository.UpdateRange(teacherProfiles!);
 
                 //Nếu bỏ bớt certificate
-                if (teacherProfiles.Count > certificates!.Count)
+                if (teacherProfiles!.Count > certificates!.Count)
                 {
                     var remainingTeacherCertifies
                         = teacherProfiles.Skip(certificates!.Count).ToList();
                     _unitOfWork.TeacherProfileRepository.DeleteRange(remainingTeacherCertifies);
                 }
 
-                if (teacherProfiles.Count < certificates!.Count)
+                if (teacherProfiles!.Count < certificates!.Count)
                 {
                     //Add thêm teacher profile nếu ở UI add them certificate
                     var remainingCertifies
@@ -93,5 +96,18 @@ public class TeacherService : ITeacherService
         }
 
         await _unitOfWork.SaveChangeAsync();
+    }
+
+    public async Task<List<TeacherResponse>> GetTeachers()
+    {
+        var teachers = await _unitOfWork.TeacherRepository.GetAllFieldAsync();
+        return TeacherMapper.TeacherToTeacherResponse(teachers);
+    }
+
+    public async Task<AccountDto> GetTeacherDetail(int teacherId)
+    {
+        var teacher = await _unitOfWork.AccountRepository.GetTeacherAccountById(teacherId)
+            .ContinueWith(t => t.Result ?? throw new NotFoundException("Can not find teacher information."));
+       return  AccountMapper.AccountToTeacherDto(teacher);
     }
 }
