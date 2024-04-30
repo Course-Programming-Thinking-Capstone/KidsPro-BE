@@ -12,7 +12,8 @@ public class ClassCreateResponse
     public string? DayOfWeekStart { get; set; }
     public string? CloseDay { get; set; }
     public string? DayOfWeekEnd { get; set; }
-    public int Duration { get; set; }
-    public int SlotDuration { get; set; }
+    public int ClassDuration { get; set; }
+    public int? SlotDuration { get; set; }
+    public int? SlotPerWeek { get; set; }
     public int? TotalSlot { get; set; }
 }

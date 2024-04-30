@@ -96,7 +96,7 @@ public class ClassService : IClassService
         await _unitOfWork.ClassRepository.AddAsync(classEntity);
         await _unitOfWork.SaveChangeAsync();
 
-        return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name, course.Syllabus?.SlotTime ?? 0);
+        return ClassMapper.ClassToClassCreateResponse(classEntity, course.Name, course.Syllabus);
     }
 
     private void CheckTotalSlotInPeriod(Course course, DateTime closeDate, DateTime openDate)

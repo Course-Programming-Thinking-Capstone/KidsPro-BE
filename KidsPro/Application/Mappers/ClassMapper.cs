@@ -11,7 +11,7 @@ namespace Application.Mappers;
 
 public static class ClassMapper
 {
-    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, int slotDuration) =>
+    public static ClassCreateResponse ClassToClassCreateResponse(Class dto, string courseName, Syllabus? syllabus) =>
         new ClassCreateResponse()
         {
             ClassId = dto.Id,
@@ -22,8 +22,9 @@ public static class ClassMapper
             CloseDay = DateUtils.FormatDateTimeToDateV3(dto.CloseDate),
             DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(dto.OpenDate),
             DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(dto.CloseDate),
-            Duration = dto.Duration,
-            SlotDuration = slotDuration,
+            ClassDuration = dto.Duration,
+            SlotDuration = syllabus?.SlotTime,
+            SlotPerWeek = syllabus?.SlotPerWeek,
             TotalSlot = dto.TotalSlot
         };
 
