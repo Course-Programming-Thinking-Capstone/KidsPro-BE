@@ -21,5 +21,5 @@ public class ClassesResponse
     public string? RoomUrl { get; set; }
     public int Duration { get; set; }
     public int SlotDuration { get; set; }
-    public float CourseProgress { get; set; }
+    public double CourseProgress { get; set; }
 }

@@ -37,7 +37,7 @@ public class ClassService : IClassService
     {
         var account = await _account.GetCurrentAccountInformationAsync();
 
-        if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole )
+        if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole)
             throw new ForbiddenException("Not the staff or admin role, please login by manager account");
         return account;
     }
@@ -152,7 +152,7 @@ public class ClassService : IClassService
         foreach (var x in classResponse)
         {
             var course = await _progress.GetCourseProgressAsync(account.IdSubRole, x.CourseId);
-            x.CourseProgress = course?.CourseProgress ?? 0;
+            x.CourseProgress = Math.Round(course?.CourseProgress ?? 0, 0);
         }
 
         return classResponse;
