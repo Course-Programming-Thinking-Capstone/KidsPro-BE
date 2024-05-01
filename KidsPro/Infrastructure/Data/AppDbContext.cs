@@ -162,18 +162,18 @@ public class AppDbContext : DbContext
             },
             new Account()
             {
-                Id = 3, Email = "teacher@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
-                FullName = "Teacher", CreatedDate = DateTime.UtcNow, RoleId = 3
+                Id = 3, Email = "long88ka@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("longka123"),
+                FullName = "Huỳnh Ngọc Long", CreatedDate = DateTime.UtcNow, RoleId = 3
             },
             new Account()
             {
-                Id = 4, Email = "teacher2@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
-                FullName = "Teacher 2", CreatedDate = DateTime.UtcNow, RoleId = 3
+                Id = 4, Email = "nguyentuanvu@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("tuanvu123"),
+                FullName = "Nguyễn Ngọc Vũ", CreatedDate = DateTime.UtcNow, RoleId = 3
             },
             new Account()
             {
-                Id = 5, Email = "staff@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("0000"),
-                FullName = "Staff", CreatedDate = DateTime.UtcNow, RoleId = 2
+                Id = 5, Email = "staff@gmail.com", PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("staf0000"),
+                FullName = "Lý Ngọc Linh", CreatedDate = DateTime.UtcNow, RoleId = 2
             }
         );
 

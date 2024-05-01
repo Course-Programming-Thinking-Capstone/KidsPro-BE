@@ -28,7 +28,8 @@ public class ProgressService : IProgressService
         var student = await GetProgressListAsync(studentId, courseId);
         var course = await _unit.CourseRepository.GetByIdAsync(courseId);
 
-        if (student.Count == 0) return null;
+        if (student == null || course == null)
+            throw new BadRequestException("StudentProgress or course is empty");
 
         return ProgressMapper.StudentToProgressResponse(student, course!.Sections.Count);
     }
