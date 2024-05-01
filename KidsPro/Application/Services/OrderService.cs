@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Order;
+using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Order;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -15,14 +16,16 @@ namespace Application.Services
         private IAccountService _account;
         private INotificationService _notify;
         private IPaymentService _payment;
+        private ICourseService courseService;
 
         public OrderService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
-            IPaymentService payment)
+            IPaymentService payment, ICourseService courseService)
         {
             _unitOfWork = unitOfWork;
             _account = account;
             _notify = notify;
             _payment = payment;
+            this.courseService = courseService;
         }
 
 
@@ -122,7 +125,7 @@ namespace Application.Services
                                             $"to {currentStatus} status from {toStatus} status failed");
         }
 
-        public async Task<PagingOrderResponse> GetListOrderAsync(OrderStatus status,int? pageSize,int? pageNumber)
+        public async Task<PagingOrderResponse> GetListOrderAsync(OrderStatus status, int? pageSize, int? pageNumber)
         {
             //set default page size
             if (!pageSize.HasValue || !pageNumber.HasValue)
@@ -130,16 +133,19 @@ namespace Application.Services
                 pageSize = 10;
                 pageNumber = 1;
             }
+
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,pageSize.Value,pageNumber.Value);
-           
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,
+                pageSize.Value, pageNumber.Value);
+
             return OrderMapper.OrdersToPagingOrderResponse(orders);
         }
-       
+
         public async Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.MobileGetListOrderAsync(status, account.IdSubRole, account.Role);
+            var orders =
+                await _unitOfWork.OrderRepository.MobileGetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.MobileShowOrder(orders!);
         }
 
@@ -199,8 +205,23 @@ namespace Application.Services
         public async Task<OrderResponse?> SearchOrderByCodeAsync(string code)
         {
             var order = await _unitOfWork.OrderRepository.SearchByOrderCode(code)
-                ??throw new NotFoundException("OrderCode "+code+" not found");
+                        ?? throw new NotFoundException("OrderCode " + code + " not found");
             return OrderMapper.OrderToOrderResponse(order);
+        }
+
+        public async Task ConfirmOrderAsync(int orderId)
+        {
+            var order = await _unitOfWork.OrderRepository.GetByIdAsync(orderId)
+                        ?? throw new BadRequestException("OrderId" + orderId + " not found");
+            var progress = new StudentProgressRequest()
+            {
+                CourseId = order.OrderDetails!.FirstOrDefault().CourseId,
+                SectionId = order.OrderDetails!.FirstOrDefault().Course.Sections.FirstOrDefault().Id
+            };
+
+            await courseService.StartStudyCourseAsync(progress);
+
+            await UpdateOrderStatusAsync(orderId, OrderStatus.Pending, OrderStatus.Success);
         }
     }
 }
