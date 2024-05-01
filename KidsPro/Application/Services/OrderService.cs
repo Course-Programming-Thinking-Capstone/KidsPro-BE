@@ -28,7 +28,7 @@ namespace Application.Services
 
         public async Task<int> CreateOrderAsync(OrderRequest dto)
         {
-            var voucher = await _unitOfWork.VoucherRepository.GetVoucher(dto.VoucherId);
+            var voucher = await _unitOfWork.VoucherRepository.GetVoucherPaymentAsync(dto.VoucherId);
             //Check lấy order code, nếu đã tồn tại phải tạo ordercode mới
             string? getOrderCode;
             Course? course;
@@ -75,7 +75,7 @@ namespace Application.Services
                 if (student != null)
                 {
                     // Kiểm tra xem danh sách OrderDetails đã tồn tại hay chưa
-                    if (student.OrderDetails == null)
+                    if (student.OrderDetails.Count==0)
                         student.OrderDetails = new List<OrderDetail>();
 
                     // Thêm _orderDetail vào danh sách hiện có
@@ -85,8 +85,14 @@ namespace Application.Services
 
             //Add data to database
             await _unitOfWork.OrderDetailRepository.AddAsync(orderDetail);
+            //update lai status voucher
+            if (voucher != null)
+            {
+                voucher.Status = VoucherStatus.Used;
+                _unitOfWork.VoucherRepository.Update(voucher);
+            }
             var result = await _unitOfWork.SaveChangeAsync();
-            if (result < 0)
+            if (result <= 0)
                 throw new NotImplementException("Create Order Failed");
             //Mapper
             return order.Id;
@@ -122,7 +128,7 @@ namespace Application.Services
                                             $"to {currentStatus} status from {toStatus} status failed");
         }
 
-        public async Task<PagingOrderResponse> GetListOrderAsync(OrderStatus status,int? pageSize,int? pageNumber)
+        public async Task<PagingOrderResponse> GetListOrderAsync(OrderStatus status, int? pageSize, int? pageNumber)
         {
             //set default page size
             if (!pageSize.HasValue || !pageNumber.HasValue)
@@ -130,16 +136,19 @@ namespace Application.Services
                 pageSize = 10;
                 pageNumber = 1;
             }
+
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,pageSize.Value,pageNumber.Value);
-           
+            var orders = await _unitOfWork.OrderRepository.GetListOrderAsync(status, account.IdSubRole, account.Role,
+                pageSize.Value, pageNumber.Value);
+
             return OrderMapper.OrdersToPagingOrderResponse(orders);
         }
-       
+
         public async Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status)
         {
             var account = await _account.GetCurrentAccountInformationAsync();
-            var orders = await _unitOfWork.OrderRepository.MobileGetListOrderAsync(status, account.IdSubRole, account.Role);
+            var orders =
+                await _unitOfWork.OrderRepository.MobileGetListOrderAsync(status, account.IdSubRole, account.Role);
             return OrderMapper.MobileShowOrder(orders!);
         }
 
@@ -199,7 +208,7 @@ namespace Application.Services
         public async Task<OrderResponse?> SearchOrderByCodeAsync(string code)
         {
             var order = await _unitOfWork.OrderRepository.SearchByOrderCode(code)
-                ??throw new NotFoundException("OrderCode "+code+" not found");
+                        ?? throw new NotFoundException("OrderCode " + code + " not found");
             return OrderMapper.OrderToOrderResponse(order);
         }
     }
