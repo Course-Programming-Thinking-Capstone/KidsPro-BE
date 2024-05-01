@@ -82,7 +82,6 @@ public class ParentsController : ControllerBase
     /// Parent get all teachers list
     /// </summary>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.ParentRole}")]
     [HttpGet("teachers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
@@ -99,7 +98,6 @@ public class ParentsController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.ParentRole}")]
     [HttpGet("teacher/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
