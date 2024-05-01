@@ -78,7 +78,7 @@ namespace Application.Services
                 if (student != null)
                 {
                     // Kiểm tra xem danh sách OrderDetails đã tồn tại hay chưa
-                    if (student.OrderDetails.Count==0)
+                    if (student.OrderDetails.Count == 0)
                         student.OrderDetails = new List<OrderDetail>();
 
                     // Thêm _orderDetail vào danh sách hiện có
@@ -94,6 +94,7 @@ namespace Application.Services
                 voucher.Status = VoucherStatus.Used;
                 _unitOfWork.VoucherRepository.Update(voucher);
             }
+
             var result = await _unitOfWork.SaveChangeAsync();
             if (result <= 0)
                 throw new NotImplementException("Create Order Failed");
@@ -225,7 +226,8 @@ namespace Application.Services
                 SectionId = order.OrderDetails!.FirstOrDefault().Course.Sections.FirstOrDefault().Id
             };
 
-            await courseService.StartStudyCourseAsync(progress);
+            await courseService.StartStudyCourseAsync(progress,
+                order.OrderDetails!.FirstOrDefault().Students.Select(x => x.Id).ToList());
 
             await UpdateOrderStatusAsync(orderId, OrderStatus.Pending, OrderStatus.Success);
         }

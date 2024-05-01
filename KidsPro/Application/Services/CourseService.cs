@@ -1141,27 +1141,46 @@ public class CourseService : ICourseService
         throw new Exception($"Section component type {type.ToString()} can not found.");
     }
 
-    public async Task StartStudyCourseAsync(StudentProgressRequest dto)
+    public async Task StartStudyCourseAsync(StudentProgressRequest dto, List<int>? studentIds = null)
     {
-        var account = await _accountService.GetCurrentAccountInformationAsync();
-
-        if (await _unitOfWork.StudentProgressRepository
-                .CheckStudentSectionExistAsync(account.IdSubRole, dto.SectionId))
+        if (studentIds != null && studentIds.Count > 0)
         {
-            var progress = new StudentProgress()
+            foreach (var x in studentIds)
             {
-                SectionId = dto.SectionId,
-                StudentId = account.IdSubRole,
-                CourseId = dto.CourseId,
-                Status = StudentProgressStatus.OnGoing,
-                EnrolledDate = DateTime.UtcNow,
-            };
-            await _unitOfWork.StudentProgressRepository.AddAsync(progress);
-            await _unitOfWork.SaveChangeAsync();
-            return;
+                if (await _unitOfWork.StudentProgressRepository
+                        .CheckStudentSectionExistAsync(x, dto.SectionId))
+                {
+                    var progress = new StudentProgress()
+                    {
+                        SectionId = dto.SectionId,
+                        StudentId = x,
+                        CourseId = dto.CourseId,
+                        Status = StudentProgressStatus.OnGoing,
+                        EnrolledDate = DateTime.UtcNow,
+                    };
+                    await _unitOfWork.StudentProgressRepository.AddAsync(progress);
+                }
+            }
         }
-
-        throw new BaseException($"StudentId {account.IdSubRole} && SectionId {dto.SectionId} are exist");
+        else
+        {
+            var account = await _accountService.GetCurrentAccountInformationAsync();
+            if (await _unitOfWork.StudentProgressRepository
+                    .CheckStudentSectionExistAsync(account.IdSubRole, dto.SectionId))
+            {
+                var progress = new StudentProgress()
+                {
+                    SectionId = dto.SectionId,
+                    StudentId = account.IdSubRole,
+                    CourseId = dto.CourseId,
+                    Status = StudentProgressStatus.OnGoing,
+                    EnrolledDate = DateTime.UtcNow,
+                };
+                await _unitOfWork.StudentProgressRepository.AddAsync(progress);
+            }
+        }
+        await _unitOfWork.SaveChangeAsync();
+      //  throw new BaseException($"StudentId {account.IdSubRole} && SectionId {dto.SectionId} are exist");
     }
 
     public async Task MarkLessonCompletedAsync(int lessonId)

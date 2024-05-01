@@ -103,6 +103,7 @@ namespace Infrastructure.Repositories
         {
             return _dbSet.Include(x => x.Parent).ThenInclude(x => x!.Account)
                 .Include(x=>x.OrderDetails).ThenInclude(x=>x.Course).ThenInclude(x=>x.Sections)
+                .Include(x=>x.OrderDetails).ThenInclude(x=>x.Students)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
