@@ -155,26 +155,36 @@ public static class ClassMapper
 
     public static List<ClassesResponse> ClassToClassesResponse(List<Class> dto)
     {
-        return dto.Select(x => new ClassesResponse()
+        var result = new List<ClassesResponse>();
+        foreach (var x in dto)
         {
-            ClassId = x.Id,
-            ClassCode = x.Code,
-            StartSlot = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
-            EndSlot = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
-            OpenClass = DateUtils.FormatDateTimeToDateV3(x.OpenDate),
-            CloseClass = DateUtils.FormatDateTimeToDateV3(x.CloseDate),
-            DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(x.OpenDate),
-            DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(x.CloseDate),
-            Days = x.Schedules?.Select(s => s.StudyDay).ToList(),
-            TeacherName = x.Teacher?.Account.FullName,
-            CourseName = x.Course.Name,
-            CourseId = x.CourseId,
-            CourseImage = x.Course.PictureUrl,
-            ClassStatus = x.Status,
-            RoomUrl = x.Schedules?.FirstOrDefault()?.RoomUrl,
-            Duration = x.Duration,
-            SlotDuration = x.Course.Syllabus?.SlotTime ?? 0,
-        }).ToList();
+            if (x.Status == ClassStatus.OnGoing)
+            {
+                var entityClass = new ClassesResponse
+                {
+                    ClassId = x.Id,
+                    ClassCode = x.Code,
+                    StartSlot = x.Schedules?.FirstOrDefault()?.StartTime.ToString(),
+                    EndSlot = x.Schedules?.FirstOrDefault()?.EndTime.ToString(),
+                    OpenClass = DateUtils.FormatDateTimeToDateV3(x.OpenDate),
+                    CloseClass = DateUtils.FormatDateTimeToDateV3(x.CloseDate),
+                    DayOfWeekStart = DateUtils.FormatDateTimeToDayOfWeek(x.OpenDate),
+                    DayOfWeekEnd = DateUtils.FormatDateTimeToDayOfWeek(x.CloseDate),
+                    Days = x.Schedules?.Select(s => s.StudyDay).ToList(),
+                    TeacherName = x.Teacher?.Account.FullName,
+                    CourseName = x.Course.Name,
+                    CourseId = x.CourseId,
+                    CourseImage = x.Course.PictureUrl,
+                    ClassStatus = x.Status,
+                    RoomUrl = x.Schedules?.FirstOrDefault()?.RoomUrl,
+                    Duration = x.Duration,
+                    SlotDuration = x.Course.Syllabus?.SlotTime ?? 0,
+                };
+                result.Add(entityClass);
+            }
+        }
+
+        return result;
     }
 
     public static TeacherClassStudentDto StudentToTeacherClassStudentDto(Student entity)
