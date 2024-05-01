@@ -914,7 +914,7 @@ public class CourseService : ICourseService
 
             if (isFree.HasValue)
             {
-                Expression.AndAlso(filter,
+                filter = Expression.AndAlso(filter,
                     Expression.Equal(Expression.Property(parameter, nameof(Course.IsFree)),
                         Expression.Constant(isFree)));
             }
