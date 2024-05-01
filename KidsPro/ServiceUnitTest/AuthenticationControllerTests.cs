@@ -8,7 +8,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebAPI.Controllers;
-
+namespace UnitTest;
 [TestFixture]
 public class AuthenticationControllerTests
 {
@@ -27,46 +27,133 @@ public class AuthenticationControllerTests
     }
 
     [Test]
-    public async Task LoginByEmailAsync_ReturnsOkResult_WhenCredentialsAreValid()
+    public void LoginByEmailAsync_ThrowsUnauthorizedException_WhenCredentialsAreInvalid()
     {
         // Arrange
-        var input = new EmailCredential
+        var request = new EmailCredential
         {
-            Email = "long88ka@gmail.com",
-            Password = "0000"
+            Email = "test@example.com",
+            Password = "invalidpassword"
         };
-        var expectedResponse = new LoginAccountDto();
 
-        _mockRepo.Setup(r => r.LoginByEmailAsync(input.Email)).ReturnsAsync(new Account());
-        _mockUnitOfWork.Setup(u => u.AccountRepository).Returns(_mockRepo.Object);
-        _mockService.Setup(s => s.LoginByEmailAsync(input)).ReturnsAsync(expectedResponse);
+        _mockService.Setup(s => s.LoginByEmailAsync(request))
+            .ThrowsAsync(new UnauthorizedException("Invalid credentials"));
+
+        // Act & Assert
+        Assert.ThrowsAsync<UnauthorizedException>(
+            async () => await _controller.LoginByEmailAsync(request)
+        );
+    }
+    [Test]
+    public async Task CheckConfirmation_ReturnsOkResult()
+    {
+        // Arrange
+        var code = "confirmationCode";
 
         // Act
-        var result = await _controller.LoginByEmailAsync(input);
+        var result = await _controller.CheckConfirmation(code);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOf<OkObjectResult>(result);
+    }
+    [Test]
+    public async Task SendConfirmation_ReturnsOkResult()
+    {
+        // Act
+        var result = await _controller.SendConfirmation();
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOf<OkObjectResult>(result);
+    }
+   
+    [Test]
+    public async Task StudentLoginToWebAsync_ReturnsOkResult_WhenCredentialsAreValid()
+    {
+        // Arrange
+        var request = new StudentLoginRequest
+        {
+            Account = "username",
+            Password = "password"
+        };
+        var expectedResult = new LoginAccountDto();
+
+        _mockService.Setup(s => s.StudentLoginToWeb(request)).ReturnsAsync(expectedResult);
+
+        // Act
+        var result = await _controller.StudentLoginToWebAsync(request);
 
         // Assert
         Assert.IsNotNull(result);
         Assert.IsInstanceOf<OkObjectResult>(result.Result);
-        Assert.That(((OkObjectResult)result.Result).Value, Is.EqualTo(expectedResponse));
+        Assert.AreEqual(expectedResult, (result.Result as OkObjectResult).Value);
     }
-
     [Test]
-    public void LoginByEmailAsync_ThrowsUnauthorizedException_WhenCredentialsAreInvalid()
+    public async Task RegisterByEmailAsync_ReturnsCreatedResult_WhenRegistrationIsSuccessful()
     {
         // Arrange
-        var input = new EmailCredential
+        var request = new EmailRegisterDto
         {
-            Email = "long88ka@gmail.com",
-            Password = "0000"
+            Email = "test@example.com",
+            Password = "password"
+        };
+        var expectedResult = new LoginAccountDto();
+
+        _mockService.Setup(s => s.RegisterByEmailAsync(request)).ReturnsAsync(expectedResult);
+
+        // Act
+        var result = await _controller.RegisterByEmailAsync(request);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOf<CreatedAtActionResult>(result.Result);
+        Assert.AreEqual(expectedResult, (result.Result as CreatedAtActionResult).Value);
+    }
+    [Test]
+    public void RegisterByEmailAsync_ThrowsConflictException_WhenEmailIsAlreadyRegistered()
+    {
+        // Arrange
+        var request = new EmailRegisterDto
+        {
+            Email = "existing@example.com",
+            Password = "password"
         };
 
-        _mockService.Setup(s => s.LoginByEmailAsync(input))
-            .ThrowsAsync(new UnauthorizedException("Invalid credentials"));
+        _mockService.Setup(s => s.RegisterByEmailAsync(request))
+            .ThrowsAsync(new ConflictException("Email is already registered"));
 
         // Act & Assert
-          Assert.ThrowsAsync<UnauthorizedException>(
-            async () => await _controller.LoginByEmailAsync(input)
+        Assert.ThrowsAsync<ConflictException>(
+            async () => await _controller.RegisterByEmailAsync(request)
         );
+    }
+    [Test]
+    public void CheckConfirmation_ThrowsException_WhenConfirmationCodeIsInvalid()
+    {
+        // Arrange
+        var code = "invalidCode";
+
+        _mockService.Setup(s => s.CheckConfirmation(code))
+            .ThrowsAsync(new Exception("Invalid confirmation code"));
+
+        // Act & Assert
+        Assert.ThrowsAsync<Exception>(
+            async () => await _controller.CheckConfirmation(code)
+        );
+    }
+    [Test]
+    public async Task UpdateToNotActivatedStatusAsync_ReturnsOkResult()
+    {
+        // Arrange
+        var email = "test@example.com";
+
+        // Act
+        var result = await _controller.UpdateToNotActivatedStatusAsync(email);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOf<OkObjectResult>(result.Result);
     }
 
 }
