@@ -6,7 +6,7 @@ namespace Application.Interfaces.IRepositories
 {
     public interface IVoucherRepository:IBaseRepository<GameVoucher>
     {
-        Task<GameVoucher?> GetVoucher(int id);
+        Task<GameVoucher?> GetVoucherPaymentAsync(int id);
         Task<List<GameVoucher>?> GetListVoucher(int parentId, VoucherStatus status);
     }
 }

@@ -42,6 +42,7 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .Include(x => x.Account).ThenInclude(x => x.Role)
             .Include(x => x.Parent).ThenInclude(x => x.Account)
             .Include(x=>x.StudentQuizzes).ThenInclude(x=>x.Quiz).ThenInclude(x=>x.Section)
+            .Include(x=>x.OrderDetails)
             .FirstOrDefaultAsync();
     }
     public async Task<Student?> StudentGetStudentLessonAsync(int id)

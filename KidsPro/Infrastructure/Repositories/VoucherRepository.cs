@@ -17,7 +17,7 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public async Task<GameVoucher?> GetVoucher(int id)
+        public async Task<GameVoucher?> GetVoucherPaymentAsync(int id)
         {
             return await _dbSet.FirstOrDefaultAsync(x => x.Id == id &&
                                                          x.Status == Valid && (x.ExpiredDate >= DateTime.UtcNow));
