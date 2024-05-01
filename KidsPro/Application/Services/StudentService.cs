@@ -34,13 +34,12 @@ public class StudentService : IStudentService
             student.Account.DateOfBirth = dto.BirthDay;
             student.Account.Gender = (Gender)(dto.Gender > 0 ? dto.Gender : 1);
             student.Account.Email = dto.Email;
-            student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
 
             _unitOfWork.StudentRepository.Update(student);
             await _unitOfWork.SaveChangeAsync();
         }
         else
-            throw new NotFoundException($"Student Id {dto.Id} not found");
+            throw new NotFoundException($"StudentId {dto.Id} not found");
     }
 
     public async Task<StudentDetailResponse> GetDetailStudentAsync(int studentId)

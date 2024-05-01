@@ -17,10 +17,7 @@ namespace Application.Dtos.Request.Account.Student
         [DataType(DataType.Date)]
         public DateTime BirthDay { get; set; }
 
-
         [DataType(DataType.EmailAddress)] public string Email { get; set; } = string.Empty;
-
-        [PasswordValidation] public string Password { get; set; } = string.Empty;
 
         public int Gender { get; set; }
     }
