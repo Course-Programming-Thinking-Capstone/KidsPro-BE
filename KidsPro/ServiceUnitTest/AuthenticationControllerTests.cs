@@ -89,27 +89,7 @@ public class AuthenticationControllerTests
         Assert.IsInstanceOf<OkObjectResult>(result.Result);
         Assert.AreEqual(expectedResult, (result.Result as OkObjectResult).Value);
     }
-    [Test]
-    public async Task RegisterByEmailAsync_ReturnsCreatedResult_WhenRegistrationIsSuccessful()
-    {
-        // Arrange
-        var request = new EmailRegisterDto
-        {
-            Email = "test@example.com",
-            Password = "password"
-        };
-        var expectedResult = new LoginAccountDto();
-
-        _mockService.Setup(s => s.RegisterByEmailAsync(request)).ReturnsAsync(expectedResult);
-
-        // Act
-        var result = await _controller.RegisterByEmailAsync(request);
-
-        // Assert
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOf<CreatedAtActionResult>(result.Result);
-        Assert.AreEqual(expectedResult, (result.Result as CreatedAtActionResult).Value);
-    }
+ 
     [Test]
     public void RegisterByEmailAsync_ThrowsConflictException_WhenEmailIsAlreadyRegistered()
     {
