@@ -20,5 +20,6 @@ namespace Application.Interfaces.IServices
         Task<Order?> GetOrderByStatusAsync(int orderId, OrderStatus status);
         Task<List<OrderResponse>> MobileGetListOrderAsync(OrderStatus status);
         Task<OrderResponse?> SearchOrderByCodeAsync(string code);
+        Task ConfirmOrderAsync(int orderId);
     }
 }

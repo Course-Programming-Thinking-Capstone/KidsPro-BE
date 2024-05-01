@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Request.Order;
+using Application.Dtos.Request.Progress;
 using Application.Dtos.Response.Order;
 using Application.ErrorHandlers;
 using Application.Interfaces.IServices;
@@ -15,14 +16,16 @@ namespace Application.Services
         private IAccountService _account;
         private INotificationService _notify;
         private IPaymentService _payment;
+        private ICourseService courseService;
 
         public OrderService(IUnitOfWork unitOfWork, IAccountService account, INotificationService notify,
-            IPaymentService payment)
+            IPaymentService payment, ICourseService courseService)
         {
             _unitOfWork = unitOfWork;
             _account = account;
             _notify = notify;
             _payment = payment;
+            this.courseService = courseService;
         }
 
 
@@ -210,6 +213,21 @@ namespace Application.Services
             var order = await _unitOfWork.OrderRepository.SearchByOrderCode(code)
                         ?? throw new NotFoundException("OrderCode " + code + " not found");
             return OrderMapper.OrderToOrderResponse(order);
+        }
+
+        public async Task ConfirmOrderAsync(int orderId)
+        {
+            var order = await _unitOfWork.OrderRepository.GetByIdAsync(orderId)
+                        ?? throw new BadRequestException("OrderId" + orderId + " not found");
+            var progress = new StudentProgressRequest()
+            {
+                CourseId = order.OrderDetails!.FirstOrDefault().CourseId,
+                SectionId = order.OrderDetails!.FirstOrDefault().Course.Sections.FirstOrDefault().Id
+            };
+
+            await courseService.StartStudyCourseAsync(progress);
+
+            await UpdateOrderStatusAsync(orderId, OrderStatus.Pending, OrderStatus.Success);
         }
     }
 }

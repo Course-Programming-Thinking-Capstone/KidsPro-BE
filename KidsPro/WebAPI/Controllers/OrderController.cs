@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
     {
         IOrderService _order;
         private IAuthenticationService _authentication;
-
+        
         public OrderController(IOrderService order, IAuthenticationService authentication)
         {
             _order = order;
@@ -150,7 +150,8 @@ namespace WebAPI.Controllers
             //Check if the account is activated or not or inactive
             _authentication.CheckAccountStatus();
 
-            await _order.UpdateOrderStatusAsync(orderId: id, OrderStatus.Pending, OrderStatus.Success);
+            await _order.ConfirmOrderAsync(id);
+            
             return Ok("Successfully update to success status");
         }
 
