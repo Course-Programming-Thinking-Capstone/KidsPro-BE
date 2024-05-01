@@ -42,6 +42,9 @@ public class StaffService : IStaffService
         var entityClass = await _unitOfWork.ClassRepository.GetByIdAsync(dto.ClassId)
                           ?? throw new BadRequestException($"ClassId:{dto.ClassId} not found");
 
+        var checkNameOverlap = await _unitOfWork.StudentRepository.CheckNameOverlapAsync(dto.UserName);
+        if (checkNameOverlap!=null) throw new ConflictException("Username already exists");
+        
         //Create student account
         student!.UserName = dto.UserName;
         student.Account.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);

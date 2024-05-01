@@ -28,7 +28,7 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
         var query = _dbSet.AsNoTracking();
         if (role == Constant.ParentRole)
         {
-            query = query.Include(x=> x.Classes).ThenInclude(x=> x.Schedules)
+            query = query.Include(x => x.Classes).ThenInclude(x => x.Schedules)
                 .Where(x => x.ParentId == parentId);
         }
 
@@ -41,15 +41,16 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
         return await _dbSet.Where(x => x.Id == id)
             .Include(x => x.Account).ThenInclude(x => x.Role)
             .Include(x => x.Parent).ThenInclude(x => x.Account)
-            .Include(x=>x.StudentQuizzes).ThenInclude(x=>x.Quiz).ThenInclude(x=>x.Section)
-            .Include(x=>x.OrderDetails)
+            .Include(x => x.StudentQuizzes).ThenInclude(x => x.Quiz).ThenInclude(x => x.Section)
+            .Include(x => x.OrderDetails)
             .FirstOrDefaultAsync();
     }
+
     public async Task<Student?> StudentGetStudentLessonAsync(int id)
     {
         return await _dbSet.Where(x => x.Id == id)
             .Include(x => x.Account).ThenInclude(x => x.Role)
-            .Include(x=> x.StudentLessons)
+            .Include(x => x.StudentLessons)
             .FirstOrDefaultAsync();
     }
 
@@ -60,7 +61,7 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .Include(x => x.Certificates)
             .Include(x => x.StudentProgresses)!.ThenInclude(x => x.Course)
             .Include(x => x.Parent).ThenInclude(x => x.Account)
-            .Include(x=>x.Classes).ThenInclude(x=>x.Course)
+            .Include(x => x.Classes).ThenInclude(x => x.Course)
             .FirstOrDefaultAsync();
     }
 
@@ -104,5 +105,10 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .ThenInclude(x => x.Quizzes).ThenInclude(x => x.StudentQuizzes)
             .Include(x => x.Account)
             .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<Student?> CheckNameOverlapAsync(string? name)
+    {
+        return await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == name);
     }
 }

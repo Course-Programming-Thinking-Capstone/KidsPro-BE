@@ -14,4 +14,5 @@ public interface IStudentRepository:IBaseRepository<Student>
     Task<List<Student>> GetStudentsByIds(List<int> ids);
     Task<Student?> GetStudentProgress(int id);
     Task<Student?> StudentGetStudentLessonAsync(int id);
+    Task<Student?> CheckNameOverlapAsync(string? name);
 }
