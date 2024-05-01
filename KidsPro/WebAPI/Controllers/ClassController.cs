@@ -170,7 +170,7 @@ public class ClassController : ControllerBase
     /// </summary>
     /// <param name="classId"></param>
     /// <returns></returns>
-    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole}")]
+    [Authorize(Roles = $"{Constant.StaffRole},{Constant.AdminRole},{Constant.TeacherRole}")]
     [HttpGet("schedules/{classId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDetail))]
