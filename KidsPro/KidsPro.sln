@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{352E4CEE-592
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{132F1F92-B269-4ED1-B098-AF30A1F091C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParentTesting", "ParentTesting\ParentTesting.csproj", "{0F871911-FFE5-4A3C-AA49-CAD3E24C22BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceUnitTest", "ServiceUnitTest\ServiceUnitTest.csproj", "{0F871911-FFE5-4A3C-AA49-CAD3E24C22BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

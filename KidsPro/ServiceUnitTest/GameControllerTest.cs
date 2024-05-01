@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebAPI.Controllers;
 
-namespace ParentTesting;
+namespace UnitTest;
 
 [TestFixture]
 public class GameControllerTest
