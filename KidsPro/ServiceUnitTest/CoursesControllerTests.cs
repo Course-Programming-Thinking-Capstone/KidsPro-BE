@@ -58,11 +58,11 @@ namespace UnitTest
             // Arrange
             var expectedCourses = new PagingResponse<FilterCourseDto>();
 
-            _mockCourseService.Setup(s => s.FilterCourseAsync(null, null, null, null, null, null, null, null))
+            _mockCourseService.Setup(s => s.FilterCourseAsync(null, null, null, null, null, null, null,   null, null))
                 .ReturnsAsync(expectedCourses);
 
             // Act
-            var result = await _controller.FilterCourseAsync(null, null, null, null, null, null, null, null);
+            var result = await _controller.FilterCourseAsync(null, null, null, null, null, null, null, null, null);
 
             // Assert
             Assert.IsNotNull(result);
