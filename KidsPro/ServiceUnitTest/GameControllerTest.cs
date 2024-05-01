@@ -1,8 +1,10 @@
 ﻿using Application;
 using Application.Dtos.Request.Game;
 using Application.Dtos.Response.Game;
+using Application.Dtos.Response.Paging;
 using Application.Interfaces.IRepositories;
 using Application.Interfaces.IServices;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebAPI.Controllers;
@@ -215,7 +217,7 @@ public class GameControllerTest
     public async Task GetLevelData_WithValidData_Returns_OkResult()
     {
         // Arrange
-        var id = 1; 
+        var id = 1;
         var index = 1;
         var expectedResult = new LevelInformationResponse(); // Define the expected result
 
@@ -271,5 +273,84 @@ public class GameControllerTest
 
         // Assert
         Assert.IsInstanceOf<OkResult>(result);
+    }
+
+    [Test]
+    public async Task GetUserShopItem_WithValidUserId_Returns_OkResult()
+    {
+        // Arrange
+        var userId = 1; // Provide a valid user ID
+        var expectedResult = new List<int>(); // Define the expected result
+
+        _mockGameService.Setup(service => service.GetUserShopItem(userId))
+            .ReturnsAsync(expectedResult);
+
+        // Act
+        var result = await _controller.GetUserItem(userId);
+
+        // Assert
+        Assert.IsInstanceOf<OkObjectResult>(result.Result);
+        var okResult = result.Result as OkObjectResult;
+        Assert.IsNotNull(okResult);
+    }
+
+    [Test]
+    public async Task GetShopItemPagination_WithValidParameters_Returns_OkResult()
+    {
+        // Arrange
+        var page = 1; // Provide a valid page number
+        var size = 10; // Provide a valid page size
+        var expectedResult = new PagingResponse<GameItemResponse>(); // Define the expected result
+
+        _mockGameService.Setup(service => service.GetAllShopItem(page, size))
+            .ReturnsAsync(expectedResult);
+
+        // Act
+        var result = await _controller.GetShopItemPagination(page, size);
+
+        // Assert
+        Assert.IsInstanceOf<OkObjectResult>(result.Result);
+        var okResult = result.Result as OkObjectResult;
+        Assert.IsNotNull(okResult);
+        Assert.AreEqual(expectedResult, okResult.Value);
+    }
+
+    [Test]
+    public async Task DeleteGameItem_WithValidId_Returns_OkResult()
+    {
+        // Arrange
+        var deleteId = 1; // Provide a valid item ID
+
+        // Act
+        var result = await _controller.DeleteGameItem(deleteId);
+
+        // Assert
+        Assert.IsInstanceOf<ActionResult<PagingResponse<GameItemResponse>>>(result);
+    }
+
+    [Test]
+    public async Task UpdateNewGameItem_WithValidData_Returns_OkResult()
+    {
+        // Arrange
+        var newItemRequest = new NewItemRequest(); // Provide valid data for the request
+
+        // Act
+        var result = await _controller.UpdateNewGameItem(newItemRequest);
+
+        // Assert
+        Assert.IsInstanceOf<ActionResult<PagingResponse<GameItemResponse>>>(result);
+    }
+
+    [Test]
+    public async Task AddNewGameItem_WithValidData_Returns_OkResult()
+    {
+        // Arrange
+        var newItemRequest = new NewItemRequest(); // Provide valid data for the request
+
+        // Act
+        var result = await _controller.AddNewGameItem(newItemRequest);
+
+        // Assert
+        Assert.IsInstanceOf<ActionResult<PagingResponse<GameItemResponse>>>(result);
     }
 }
