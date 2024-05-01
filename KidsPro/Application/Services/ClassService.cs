@@ -37,8 +37,8 @@ public class ClassService : IClassService
     {
         var account = await _account.GetCurrentAccountInformationAsync();
 
-        if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole)
-            throw new UnauthorizedException("Not the staff or admin role, please login by manager account");
+        if (account.Role != Constant.StaffRole && account.Role != Constant.AdminRole )
+            throw new ForbiddenException("Not the staff or admin role, please login by manager account");
         return account;
     }
 
@@ -199,8 +199,6 @@ public class ClassService : IClassService
 
     public async Task<ScheduleResponse> GetScheduleByClassIdAsync(int classId)
     {
-        await CheckPermission();
-
         var schedule = await _unitOfWork.ScheduleReposisoty.GetScheduleByClassIdAsync(classId, ScheduleStatus.Active);
 
         return schedule.Any()
