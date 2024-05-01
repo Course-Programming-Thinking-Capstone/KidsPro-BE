@@ -816,15 +816,15 @@ public class CourseService : ICourseService
 
     public async Task<IPagingResponse<FilterCourseDto>> FilterCourseAsync(string? name, CourseStatus? status,
         string? sortName, string? sortCreatedDate,
-        string? sortModifiedDate, string? action, int? page, int? size)
+        string? sortModifiedDate, string? action, bool? isFree, int? page, int? size)
     {
         if (action == "manage")
         {
-            return await FilterManageCourseAsync(name, status, sortName, sortCreatedDate, sortModifiedDate, page, size);
+            return await FilterManageCourseAsync(name, status, sortName, sortCreatedDate, sortModifiedDate,isFree, page, size);
         }
         else
         {
-            return await FilterCommonCourseAsync(name, sortName, page, size);
+            return await FilterCommonCourseAsync(name, sortName, isFree, page, size);
         }
     }
 
@@ -893,7 +893,7 @@ public class CourseService : ICourseService
 
     private async Task<PagingResponse<CommonFilterCourseDto>> FilterCommonCourseAsync(
         string? name,
-        string? sortName, int? page, int? size)
+        string? sortName, bool? isFree, int? page, int? size)
     {
         //need to check role
         var parameter = Expression.Parameter(typeof(Course));
@@ -911,6 +911,13 @@ public class CourseService : ICourseService
             filter = Expression.AndAlso(filter,
                 Expression.Equal(Expression.Property(parameter, nameof(Course.IsDelete)),
                     Expression.Constant(false)));
+
+            if (isFree.HasValue)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.IsFree)),
+                        Expression.Constant(isFree)));
+            }
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -959,7 +966,7 @@ public class CourseService : ICourseService
     private async Task<PagingResponse<ManageFilterCourseDto>> FilterManageCourseAsync(
         string? name, CourseStatus? status,
         string? sortName, string? sortCreatedDate,
-        string? sortModifiedDate, int? page, int? size)
+        string? sortModifiedDate, bool? isFree, int? page, int? size)
     {
         var accountId = 0;
         string role;
@@ -1005,6 +1012,13 @@ public class CourseService : ICourseService
                         ?? throw new NotImplementException(
                             $"{nameof(string.Contains)} method is deprecated or not supported."),
                         Expression.Constant(name)));
+            }
+
+            if (isFree.HasValue)
+            {
+                filter = Expression.AndAlso(filter,
+                    Expression.Equal(Expression.Property(parameter, nameof(Course.IsFree)),
+                        Expression.Constant(isFree.Value)));
             }
 
             if (status.HasValue)

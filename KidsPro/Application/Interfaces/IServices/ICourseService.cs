@@ -52,6 +52,7 @@ public interface ICourseService
         string? sortCreatedDate,
         string? sortModifiedDate,
         string? action,
+        bool? isFree,
         int? page,
         int? size
     );

@@ -59,6 +59,7 @@ public class CoursesController : ControllerBase
     /// <param name="status"></param>
     /// <param name="sortName"></param>
     /// <param name="action"></param>
+    /// <param name="isFree"></param>
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <param name="sortCreatedDate"></param>
@@ -73,6 +74,7 @@ public class CoursesController : ControllerBase
         [FromQuery] string? sortCreatedDate,
         [FromQuery] string? sortModifiedDate,
         [FromQuery] string? action,
+        [FromQuery] bool? isFree,
         [FromQuery] int? page,
         [FromQuery] int? size)
     {
@@ -83,6 +85,7 @@ public class CoursesController : ControllerBase
             sortCreatedDate,
             sortModifiedDate,
             action,
+            isFree,
             page,
             size);
         return Ok(result);
