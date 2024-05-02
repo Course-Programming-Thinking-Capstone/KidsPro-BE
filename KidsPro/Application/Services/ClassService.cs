@@ -149,10 +149,13 @@ public class ClassService : IClassService
 
         var classResponse = ClassMapper.ClassToClassesResponse(classes);
 
-        foreach (var x in classResponse)
+        if (account.Role == Constant.StudentRole)
         {
-            var course = await _progress.GetCourseProgressAsync(account.IdSubRole, x.CourseId);
-            x.CourseProgress = Math.Round(course?.CourseProgress ?? 0, 0);
+            foreach (var x in classResponse)
+            {
+                var course = await _progress.GetCourseProgressAsync(account.IdSubRole, x.CourseId);
+                x.CourseProgress = Math.Round(course?.CourseProgress ?? 0, 0);
+            }
         }
 
         return classResponse;
