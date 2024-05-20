@@ -8,11 +8,11 @@ public static class EmailUtils
 {
     public static void SendEmail(string toEmail, string toSubject, string toContent)
     {
-        // set up send meail
+        // set up send email
         string sendto = toEmail;
         string subject = toSubject;
         string content = toContent;
-        //update password
+        // this is sender email
         string fromEmail = "nguyentuanvu020901@gmail.com";
         string fromPasswordEmail = "fhnwtwqisekdqzcr";
         try
